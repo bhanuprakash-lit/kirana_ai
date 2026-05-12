@@ -1,0 +1,246 @@
+import 'dart:convert';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../core/config/app_config.dart';
+import '../models/app_user.dart';
+
+class ApiException implements Exception {
+  final int statusCode;
+  final String message;
+  const ApiException(this.statusCode, this.message);
+
+  @override
+  String toString() => message;
+}
+
+class AuthRepository {
+  static const _storage = FlutterSecureStorage();
+  static const _tokenKey = 'auth_token';
+  static const _posTokenKey = 'pos_token';
+  static const _sessionExpiryKey = 'session_expiry';
+  static const _sessionDays = 30;
+
+  // ── Token helpers ──────────────────────────────────────────────────────────
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final expiryStr = prefs.getString(_sessionExpiryKey);
+    if (expiryStr != null) {
+      final expiry = DateTime.tryParse(expiryStr);
+      if (expiry != null && DateTime.now().isAfter(expiry)) {
+        await _clearTokensOnly(prefs);
+        return null;
+      }
+    }
+    return _storage.read(key: _tokenKey);
+  }
+
+  Future<void> _saveSession(
+      AuthResult result, {String? username, String? password}) async {
+    await _storage.write(key: _tokenKey, value: result.accessToken);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('user_id', result.user.userId);
+    await prefs.setInt('store_id', result.user.storeId);
+    await prefs.setString('username', result.user.username);
+    await prefs.setString('full_name', result.user.fullName);
+    await prefs.setString('role', result.user.role);
+    await prefs.setBool('onboarding_completed', true);
+    final expiry = DateTime.now().add(const Duration(days: _sessionDays));
+    await prefs.setString(_sessionExpiryKey, expiry.toIso8601String());
+
+    if (username != null && password != null && password.isNotEmpty) {
+      await _obtainPosToken(username, password);
+    } else {
+      // Phone-auth users have no password — exchange Kirana token for POS JWT
+      await _obtainPosTokenFromKirana(result.accessToken);
+    }
+  }
+
+  Future<void> _obtainPosToken(String username, String password) async {
+    try {
+      final res = await http.post(
+        Uri.parse('${AppConfig.apiBaseUrl}/pos/token'),
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body:
+            'username=${Uri.encodeComponent(username)}&password=${Uri.encodeComponent(password)}',
+      );
+      if (res.statusCode == 200) {
+        final json = jsonDecode(res.body) as Map<String, dynamic>;
+        await _storage.write(
+            key: _posTokenKey, value: json['access_token'] as String);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _obtainPosTokenFromKirana(String kiranaToken) async {
+    try {
+      final res = await http.post(
+        Uri.parse('${AppConfig.apiBaseUrl}/pos/token-from-kirana'),
+        headers: {'Authorization': 'Bearer $kiranaToken'},
+      );
+      if (res.statusCode == 200) {
+        final json = jsonDecode(res.body) as Map<String, dynamic>;
+        await _storage.write(
+            key: _posTokenKey, value: json['access_token'] as String);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> clearSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await _clearTokensOnly(prefs);
+  }
+
+  Future<void> _clearTokensOnly(SharedPreferences prefs) async {
+    await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _posTokenKey);
+    await prefs.remove('user_id');
+    await prefs.remove('store_id');
+    await prefs.remove('username');
+    await prefs.remove('full_name');
+    await prefs.remove('role');
+    await prefs.remove(_sessionExpiryKey);
+  }
+
+  // ── Auth calls ─────────────────────────────────────────────────────────────
+
+  Future<AppUser> getCurrentUser() async {
+    final token = await getToken();
+    if (token == null) throw const ApiException(401, 'Not authenticated');
+
+    final res = await http.get(
+      Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/me'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (res.statusCode == 200) {
+      return AppUser.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+    }
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
+  /// Email + password login (legacy / admin path).
+  Future<AuthResult> login({
+    required String username,
+    required String password,
+  }) async {
+    final res = await http.post(
+      Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': username, 'password': password}),
+    );
+    if (res.statusCode == 200) {
+      final result =
+          AuthResult.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+      await _saveSession(result, username: username, password: password);
+      return result;
+    }
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
+  /// Phone OTP login — Firebase has already verified the OTP on the client.
+  /// Returns null if no account exists for this number (caller shows registration).
+  Future<AuthResult?> phoneLogin({
+    required String phoneNumber,
+    required String firebaseUid,
+  }) async {
+    final res = await http.post(
+      Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/phone-login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'phone_number': phoneNumber,
+        'firebase_uid': firebaseUid,
+      }),
+    );
+    if (res.statusCode == 200) {
+      final result =
+          AuthResult.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+      // No password for phone users — POS features gracefully unavailable
+      await _saveSession(result);
+      return result;
+    }
+    if (res.statusCode == 404) {
+      return null; // No account → caller redirects to registration
+    }
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
+  /// Check whether a username is available (before registration).
+  Future<bool> checkUsernameAvailable(String username) async {
+    final res = await http.get(
+      Uri.parse(
+          '${AppConfig.apiBaseUrl}/kirana/auth/check-username/${Uri.encodeComponent(username)}'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if (res.statusCode == 200) {
+      final json = jsonDecode(res.body) as Map<String, dynamic>;
+      return json['available'] as bool? ?? false;
+    }
+    return false;
+  }
+
+  Future<AuthResult> register({
+    required String username,
+    String password = '',
+    required String fullName,
+    required String storeName,
+    required String storeType,
+    int footfall = 40,
+    String? location,
+    String? region,
+    String? email,
+    String? phoneNumber,
+    String? firebaseUid,
+  }) async {
+    final res = await http.post(
+      Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': username,
+        'password': password,
+        'full_name': fullName,
+        'store_name': storeName,
+        'store_type': storeType,
+        'footfall': footfall,
+        if (location != null && location.isNotEmpty) 'location': location,
+        if (region != null && region.isNotEmpty) 'region': region,
+        if (email != null && email.isNotEmpty) 'email': email,
+        if (phoneNumber != null && phoneNumber.isNotEmpty)
+          'phone_number': phoneNumber,
+        if (firebaseUid != null && firebaseUid.isNotEmpty)
+          'firebase_uid': firebaseUid,
+      }),
+    );
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      final result =
+          AuthResult.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+      // Only exchange POS token when a real password was set
+      await _saveSession(
+        result,
+        username: password.isNotEmpty ? username : null,
+        password: password.isNotEmpty ? password : null,
+      );
+      return result;
+    }
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  String _extractError(String body) {
+    try {
+      final json = jsonDecode(body) as Map<String, dynamic>;
+      return json['error'] as String? ??
+          json['detail']?.toString() ??
+          'Unknown error';
+    } catch (_) {
+      return body;
+    }
+  }
+}
