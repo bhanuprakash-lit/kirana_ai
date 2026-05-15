@@ -278,9 +278,42 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                         onSelected: (v) =>
                             _update(d.copyWith(alertDeadStockDays: v)),
                       ),
+                      const _Divider(),
+                      _SettingLabel(
+                        label: 'Expiry Alert Days',
+                        hint: 'Alert this many days before a batch/item expires',
+                        value: '${d.alertExpiryDays} days before',
+                      ),
+                      const SizedBox(height: 6),
+                      _ChipSelector<int>(
+                        options: const [1, 3, 5, 7, 14, 30],
+                        labels: const ['1d', '3d', '5d', '7d', '14d', '30d'],
+                        selected: d.alertExpiryDays,
+                        onSelected: (v) =>
+                            _update(d.copyWith(alertExpiryDays: v)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
+
+                  // ── Marketing ─────────────────────────────────────────────
+                  _SectionHeader(
+                    icon: Icons.share_rounded,
+                    title: 'Marketing',
+                    color: BrandColors.accent,
+                  ),
+                  _Card(
+                    children: [
+                      _ToggleRow(
+                        icon: Icons.storefront_rounded,
+                        label: 'Allow LohiyaAI to Market My Store',
+                        hint: 'We promote your store on Facebook, Instagram & WhatsApp on your behalf',
+                        value: d.allowSocialMarketing,
+                        onChanged: (v) => _update(d.copyWith(allowSocialMarketing: v)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
 
                   // ── Notifications ──────────────────────────────────────────
                   _SectionHeader(

@@ -191,7 +191,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                         controller: scrollController,
                         padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
                         itemCount: _orders!.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
                         itemBuilder: (_, i) {
                           final o = _orders![i];
                           final amount =

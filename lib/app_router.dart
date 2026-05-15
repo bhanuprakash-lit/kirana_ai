@@ -6,13 +6,18 @@ import 'features/dashboard/views/dashboard_screen.dart';
 import 'features/dashboard/views/intelligence_details/intelligence_detail_screen.dart';
 import 'features/onboarding/views/onboarding_screen.dart';
 import 'features/pos_inventory/views/transaction_history_screen.dart';
+import 'features/pos_inventory/views/order_details_screen.dart';
 import 'features/profile/views/history_screen.dart';
 import 'features/profile/views/kpi_subscription_screen.dart';
 import 'features/profile/views/profile_screen.dart';
 import 'features/profile/views/store_settings_screen.dart';
 import 'features/profile/views/customer_management_screen.dart';
 import 'features/profile/views/config_screen.dart';
+import 'features/profile/views/cashflow_screen.dart';
 import 'features/profile/views/customer_detail_screen.dart';
+import 'features/referral/models/referral_models.dart';
+import 'features/referral/views/referral_screen.dart';
+import 'features/referral/views/referral_qr_screen.dart';
 import 'features/support/views/support_screen.dart';
 import 'features/support/views/faq_screen.dart';
 import 'features/support/views/report_issue_screen.dart';
@@ -24,6 +29,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     // Strip /kiranaai prefix from deep links (lohiyaai.com/kiranaai/home → /home)
     redirect: (context, state) {
       final path = state.uri.path;
+      if (path == '/') return '/home';
       if (path.startsWith('/kiranaai')) {
         final stripped = path.replaceFirst('/kiranaai', '');
         return stripped.isEmpty ? '/home' : stripped;
@@ -58,6 +64,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const TransactionHistoryScreen(),
       ),
       GoRoute(
+        path: '/pos-order-details',
+        builder: (context, state) {
+          final order = state.extra as Map<String, dynamic>;
+          return OrderDetailsScreen(order: order);
+        },
+      ),
+      GoRoute(
         path: '/intelligence-detail/:type',
         builder: (context, state) {
           final type = state.pathParameters['type'] ?? 'fast_moving';
@@ -68,6 +81,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
         routes: [
+          GoRoute(
+            path: 'cashflow',
+            builder: (context, state) => const CashflowScreen(),
+          ),
+          GoRoute(
+            path: 'referral',
+            builder: (context, state) => const ReferralScreen(),
+            routes: [
+              GoRoute(
+                path: 'qr',
+                builder: (context, state) {
+                  final campaign = state.extra as ReferralCampaign;
+                  return ReferralQrScreen(campaign: campaign);
+                },
+              ),
+            ],
+          ),
           GoRoute(
             path: 'kpis',
             builder: (context, state) => const KpiSubscriptionScreen(),

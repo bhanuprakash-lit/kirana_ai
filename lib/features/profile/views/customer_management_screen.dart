@@ -16,6 +16,21 @@ class CustomerManagementScreen extends ConsumerStatefulWidget {
 
 class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScreen> {
   bool _isSyncing = false;
+  final _searchCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(customerProvider.notifier).setSearchQuery('');
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +73,7 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
             color: Colors.white,
             child: TextField(
+              controller: _searchCtrl,
               onChanged: (v) => ref.read(customerProvider.notifier).setSearchQuery(v),
               decoration: InputDecoration(
                 hintText: 'Search by name or phone...',
@@ -99,7 +115,7 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                 itemCount: customers.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_,_) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final customer = customers[index];
                   return _CustomerCard(customer: customer);

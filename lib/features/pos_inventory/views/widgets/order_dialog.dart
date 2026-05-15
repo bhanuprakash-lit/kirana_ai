@@ -100,7 +100,6 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   }
 
   Future<void> _confirm() async {
-    final subtotal = ref.read(posProvider).subtotal;
     setState(() {
       _placing = true;
       _success = false;
@@ -114,12 +113,8 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         _placing = false;
         _success = true;
       });
-      final Map<String, dynamic> mutableResult = Map.from(result);
-      if ((mutableResult['total_amount'] as num? ?? 0) == 0) {
-        mutableResult['total_amount'] = subtotal;
-      }
       await Future.delayed(const Duration(milliseconds: 600));
-      if (mounted) Navigator.pop(context, mutableResult);
+      if (mounted) Navigator.pop(context, result);
     } else {
       setState(() => _placing = false);
     }
@@ -175,7 +170,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             child: ListView.separated(
               shrinkWrap: true,
               itemCount: cart.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final item = cart[index];
                 return Row(
@@ -202,6 +197,46 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             padding: EdgeInsets.symmetric(vertical: 20),
             child: Divider(height: 1),
           ),
+          if (state.referralDiscountPct != null) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Subtotal',
+                    style: TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w600, color: BrandColors.muted)),
+                Text(_fmt(state.subtotal),
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w600, color: BrandColors.muted)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.card_giftcard_rounded,
+                        size: 14, color: BrandColors.accent),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Referral Discount (${state.referralDiscountPct!.toStringAsFixed(0)}%)'
+                      '${state.referralReferrerName != null ? " · ${state.referralReferrerName}" : ""}',
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: BrandColors.accent),
+                    ),
+                  ],
+                ),
+                Text('-${_fmt(state.discountAmount)}',
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: BrandColors.accent)),
+              ],
+            ),
+            const SizedBox(height: 10),
+          ],
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -209,7 +244,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                   style: TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w700, color: BrandColors.muted)),
               Text(
-                _fmt(state.subtotal),
+                _fmt(state.discountedSubtotal),
                 style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
@@ -250,7 +285,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             width: double.infinity,
             height: 56,
             child: LoadingButton(
-              label: 'Place Order · ${_fmt(state.subtotal)}',
+              label: 'Place Order · ${_fmt(state.discountedSubtotal)}',
               isLoading: _placing,
               onPressed: _success ? null : _confirm,
             ),

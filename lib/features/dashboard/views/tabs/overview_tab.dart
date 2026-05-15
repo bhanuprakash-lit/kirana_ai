@@ -274,40 +274,29 @@ class _GreetingHeader extends ConsumerWidget {
                       ).animate(delay: 60.ms).fadeIn(duration: 400.ms),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
+
+                  // 1️⃣ Notifications first
+                  const NotificationBell(color: Colors.white),
+                  const SizedBox(width: 8),
+
+                  // 2️⃣ Profile circular button
                   GestureDetector(
                     onTap: () => context.push('/profile'),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(20),
+                        shape: BoxShape.circle,
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.person_rounded,
-                            size: 14,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Profile',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      child: const Icon(
+                        Icons.person_rounded,
+                        size: 18,
+                        color: Colors.white,
                       ),
                     ),
                   ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
-                  const SizedBox(width: 8),
-                  const NotificationBell(color: Colors.white),
                 ],
               ),
             ],

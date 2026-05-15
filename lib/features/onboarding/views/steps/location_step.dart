@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/brand_text_field.dart';
@@ -17,6 +20,7 @@ class LocationStep extends ConsumerStatefulWidget {
 class _LocationStepState extends ConsumerState<LocationStep> {
   final _addressCtrl = TextEditingController();
   final _cityCtrl = TextEditingController();
+  bool _geocoding = false;
 
   @override
   void dispose() {
@@ -25,7 +29,7 @@ class _LocationStepState extends ConsumerState<LocationStep> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final address = _addressCtrl.text.trim();
     final city = _cityCtrl.text.trim();
 
@@ -45,19 +49,53 @@ class _LocationStepState extends ConsumerState<LocationStep> {
 
     final notifier = ref.read(onboardingProvider.notifier);
     final current = ref.read(onboardingProvider).data;
+    final location = current.location.isNotEmpty ? current.location : address;
 
-    // When user edits manually: address becomes location too (short form)
-    final location =
-        current.location.isNotEmpty ? current.location : address;
+    double? lat = current.latitude;
+    double? lng = current.longitude;
+
+    // Manual entry — forward geocode to get coordinates
+    if (lat == null) {
+      setState(() => _geocoding = true);
+      final coords = await _forwardGeocode('$address, $city, India');
+      if (mounted) setState(() => _geocoding = false);
+      lat = coords?['lat'];
+      lng = coords?['lng'];
+    }
 
     notifier.updateData(
       current.copyWith(
         address: address,
         location: location,
         region: city,
+        latitude: lat,
+        longitude: lng,
       ),
     );
     notifier.goToStep(4);
+  }
+
+  Future<Map<String, double>?> _forwardGeocode(String query) async {
+    try {
+      final uri = Uri.parse(
+        'https://nominatim.openstreetmap.org/search'
+        '?format=json&q=${Uri.encodeComponent(query)}&limit=1',
+      );
+      final res = await http.get(
+        uri,
+        headers: {'User-Agent': 'KiranaAI/1.0 (contact@lohiyaai.com)'},
+      );
+      if (res.statusCode == 200) {
+        final list = jsonDecode(res.body) as List;
+        if (list.isNotEmpty) {
+          final item = list.first as Map<String, dynamic>;
+          final lat = double.tryParse(item['lat'] as String? ?? '');
+          final lng = double.tryParse(item['lon'] as String? ?? '');
+          if (lat != null && lng != null) return {'lat': lat, 'lng': lng};
+        }
+      }
+    } catch (_) {}
+    return null;
   }
 
   @override
@@ -163,8 +201,9 @@ class _LocationStepState extends ConsumerState<LocationStep> {
           ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 36),
           PrimaryButton(
-            label: 'Continue',
-            onPressed: _submit,
+            label: _geocoding ? 'Getting coordinates…' : 'Continue',
+            isLoading: _geocoding,
+            onPressed: _geocoding ? null : _submit,
           ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
         ],
       ),

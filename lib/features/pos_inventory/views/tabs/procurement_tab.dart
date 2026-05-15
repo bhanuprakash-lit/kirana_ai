@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
@@ -543,19 +544,36 @@ class ProcurementTab extends ConsumerWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: qtyCtrl, decoration: const InputDecoration(labelText: 'Quantity'), keyboardType: TextInputType.number),
-            TextField(controller: costCtrl, decoration: const InputDecoration(labelText: 'Cost Price per unit'), keyboardType: TextInputType.number),
+            TextField(
+              controller: qtyCtrl,
+              decoration: const InputDecoration(labelText: 'Quantity'),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+            ),
+            TextField(
+              controller: costCtrl,
+              decoration: const InputDecoration(labelText: 'Cost Price per unit'),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+              ],
+            ),
           ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           TextButton(
             onPressed: () {
+              final qty = int.tryParse(qtyCtrl.text) ?? 0;
+              final cost = double.tryParse(costCtrl.text) ?? 0.0;
+              if (qty <= 0 || cost <= 0) return;
               onAdd({
                 'product_id': product.productId,
                 'name': product.name,
-                'quantity': int.tryParse(qtyCtrl.text) ?? 0,
-                'cost_price': double.tryParse(costCtrl.text) ?? 0.0,
+                'quantity': qty,
+                'cost_price': cost,
               });
               Navigator.pop(ctx);
             },

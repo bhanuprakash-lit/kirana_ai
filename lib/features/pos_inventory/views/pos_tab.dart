@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kirana_ai/features/pos_inventory/views/widgets/add_product_sheet.dart';
+import 'package:kirana_ai/features/referral/views/referral_scan_sheet.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/theme/brand_theme.dart';
 import '../models/pos_product.dart';
@@ -35,10 +37,12 @@ class _PosTabState extends ConsumerState<PosTab> {
     if (_query.isEmpty) return products;
     final q = _query.toLowerCase();
     return products
-        .where((p) =>
-            p.name.toLowerCase().contains(q) ||
-            (p.brand?.toLowerCase().contains(q) ?? false) ||
-            (p.barcode?.contains(q) ?? false))
+        .where(
+          (p) =>
+              p.name.toLowerCase().contains(q) ||
+              (p.brand?.toLowerCase().contains(q) ?? false) ||
+              (p.barcode?.contains(q) ?? false),
+        )
         .toList();
   }
 
@@ -53,7 +57,10 @@ class _PosTabState extends ConsumerState<PosTab> {
     }
   }
 
-  Future<double?> _showWeightDialog(PosProduct p, {double? initialValue}) async {
+  Future<double?> _showWeightDialog(
+    PosProduct p, {
+    double? initialValue,
+  }) async {
     final ctrl = TextEditingController(text: initialValue?.toString() ?? '');
     return showDialog<double>(
       context: context,
@@ -65,23 +72,35 @@ class _PosTabState extends ConsumerState<PosTab> {
           children: [
             Text(p.name, style: const TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            Text('Price: ${p.priceLabel}', style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+            Text(
+              'Price: ${p.priceLabel}',
+              style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: ctrl,
               autofocus: true,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}'))],
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}')),
+              ],
               decoration: InputDecoration(
                 labelText: 'Weight / Measurement',
                 suffixText: p.unit ?? '',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, double.tryParse(ctrl.text)),
             child: const Text('Add to Cart'),
@@ -96,7 +115,9 @@ class _PosTabState extends ConsumerState<PosTab> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Unknown Barcode'),
-        content: Text('Barcode "$barcode" is not in your inventory. What would you like to do?'),
+        content: Text(
+          'Barcode "$barcode" is not in your inventory. What would you like to do?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'new'),
@@ -124,7 +145,9 @@ class _PosTabState extends ConsumerState<PosTab> {
       context: context,
       isScrollControlled: true,
       useRootNavigator: true, // Use root to ensure it pops correctly
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (ctx) => DraggableScrollableSheet(
         initialChildSize: 0.7,
         maxChildSize: 0.9,
@@ -138,41 +161,81 @@ class _PosTabState extends ConsumerState<PosTab> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text('Link Barcode "$barcode"', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  child: Text(
+                    'Link Barcode "$barcode"',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
                 const Divider(height: 1),
                 Expanded(
                   child: inventoryAsync.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (err, _) => Center(child: Text('Error loading inventory: $err')),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (err, _) =>
+                        Center(child: Text('Error loading inventory: $err')),
                     data: (data) {
-                      final unbarcoded = data.items.where((i) => i.barcode == null || i.barcode!.isEmpty).toList();
-                      
+                      final unbarcoded = data.items
+                          .where((i) => i.barcode == null || i.barcode!.isEmpty)
+                          .toList();
+
                       if (unbarcoded.isEmpty) {
-                        return const Center(child: Text('No items found without barcodes.'));
+                        return const Center(
+                          child: Text('No items found without barcodes.'),
+                        );
                       }
 
                       return ListView.separated(
                         controller: scrollCtrl,
                         itemCount: unbarcoded.length,
-                        separatorBuilder: (_, index) => const Divider(height: 1),
+                        separatorBuilder: (_, index) =>
+                            const Divider(height: 1),
                         itemBuilder: (context, i) {
                           final item = unbarcoded[i];
                           return ListTile(
-                            title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                            subtitle: Text('Category: ${item.categoryName ?? "General"}'),
-                            trailing: const Icon(Icons.link_rounded, color: BrandColors.primary),
+                            title: Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Category: ${item.categoryName ?? "General"}',
+                            ),
+                            trailing: const Icon(
+                              Icons.link_rounded,
+                              color: BrandColors.primary,
+                            ),
                             onTap: () async {
-                              final messenger = ScaffoldMessenger.of(this.context);
-                              final success = await ref.read(inventoryProvider.notifier).linkBarcode(item.productId, barcode);
+                              final messenger = ScaffoldMessenger.of(
+                                this.context,
+                              );
+                              final success = await ref
+                                  .read(inventoryProvider.notifier)
+                                  .linkBarcode(item.productId, barcode);
                               if (context.mounted) {
-                                 Navigator.of(ctx).pop(); // Use the bottom sheet's context explicitly
-                                 if (success) {
-                                   messenger.showSnackBar(SnackBar(content: Text('Linked $barcode to ${item.name}')));
-                                   // Automatically add the linked item to cart
-                                   final updatedProduct = ref.read(posProvider).products.firstWhere((p) => p.productId == item.productId);
-                                   _handleProductAdd(updatedProduct);
-                                 }
+                                Navigator.of(
+                                  ctx,
+                                ).pop(); // Use the bottom sheet's context explicitly
+                                if (success) {
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Linked $barcode to ${item.name}',
+                                      ),
+                                    ),
+                                  );
+                                  // Automatically add the linked item to cart
+                                  final updatedProduct = ref
+                                      .read(posProvider)
+                                      .products
+                                      .firstWhere(
+                                        (p) => p.productId == item.productId,
+                                      );
+                                  _handleProductAdd(updatedProduct);
+                                }
                               }
                             },
                           );
@@ -189,6 +252,43 @@ class _PosTabState extends ConsumerState<PosTab> {
     );
   }
 
+  Future<void> _openReferralScanner() async {
+    const prefix = 'KIRANA_REF:';
+    String? scannedToken;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Scan Referral QR',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
+            backgroundColor: BrandColors.accent,
+            foregroundColor: Colors.white,
+          ),
+          body: MobileScanner(
+            onDetect: (capture) {
+              final code = capture.barcodes.first.rawValue ?? '';
+              if (code.startsWith(prefix) && scannedToken == null) {
+                scannedToken = code.substring(prefix.length);
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted || scannedToken == null) return;
+
+    final pending = await showReferralScanSheet(context, ref, scannedToken!);
+    if (!mounted || pending == null) return;
+
+    ref.read(posProvider.notifier).setPendingReferral(pending);
+  }
+
   void _openScanner() async {
     await Navigator.push(
       context,
@@ -201,14 +301,32 @@ class _PosTabState extends ConsumerState<PosTab> {
                 color: Colors.black45,
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                         const SizedBox(width: 16),
-                        Text('Looking for $barcode...', style: const TextStyle(fontWeight: FontWeight.w600, color: BrandColors.ink, decoration: TextDecoration.none, fontSize: 14)),
+                        Text(
+                          'Looking for $barcode...',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: BrandColors.ink,
+                            decoration: TextDecoration.none,
+                            fontSize: 14,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -219,7 +337,9 @@ class _PosTabState extends ConsumerState<PosTab> {
             Overlay.of(context).insert(overlay);
 
             try {
-              final product = await ref.read(posProvider.notifier).lookupBarcode(barcode);
+              final product = await ref
+                  .read(posProvider.notifier)
+                  .lookupBarcode(barcode);
               overlay.remove();
 
               if (product != null) {
@@ -227,8 +347,9 @@ class _PosTabState extends ConsumerState<PosTab> {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                        content: Text('${product.name} added to cart'),
-                        duration: const Duration(milliseconds: 600)),
+                      content: Text('${product.name} added to cart'),
+                      duration: const Duration(milliseconds: 600),
+                    ),
                   );
                 }
               } else {
@@ -247,11 +368,13 @@ class _PosTabState extends ConsumerState<PosTab> {
 
   void _showCustomerSearchSheet() {
     final searchCtrl = TextEditingController();
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => Container(
           height: MediaQuery.of(ctx).size.height * 0.7,
@@ -261,7 +384,10 @@ class _PosTabState extends ConsumerState<PosTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Select Customer', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Select Customer',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   TextButton.icon(
                     onPressed: () {
                       Navigator.pop(ctx);
@@ -279,14 +405,18 @@ class _PosTabState extends ConsumerState<PosTab> {
                 decoration: InputDecoration(
                   hintText: 'Search by name or phone...',
                   prefixIcon: const Icon(Icons.search_rounded),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 onChanged: (v) => setState(() {}),
               ),
               const SizedBox(height: 16),
               Expanded(
                 child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: ref.read(posProvider.notifier).searchCustomers(searchCtrl.text),
+                  future: ref
+                      .read(posProvider.notifier)
+                      .searchCustomers(searchCtrl.text),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -301,13 +431,23 @@ class _PosTabState extends ConsumerState<PosTab> {
                         final c = customers[index];
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
-                            child: const Icon(Icons.person_rounded, color: BrandColors.primary),
+                            backgroundColor: BrandColors.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            child: const Icon(
+                              Icons.person_rounded,
+                              color: BrandColors.primary,
+                            ),
                           ),
                           title: Text(c['name'] as String),
                           subtitle: Text(c['phone'] as String),
                           onTap: () {
-                            ref.read(posProvider.notifier).setCustomer(c['customer_id'] as int, c['name'] as String);
+                            ref
+                                .read(posProvider.notifier)
+                                .setCustomer(
+                                  c['customer_id'] as int,
+                                  c['name'] as String,
+                                );
                             Navigator.pop(ctx);
                           },
                         );
@@ -321,10 +461,9 @@ class _PosTabState extends ConsumerState<PosTab> {
         ),
       ),
     );
-    }
+  }
 
-    void _showAddCustomerDialog() {
-
+  void _showAddCustomerDialog() {
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
 
@@ -343,12 +482,17 @@ class _PosTabState extends ConsumerState<PosTab> {
                     setModalState(() {
                       nameCtrl.text = contact.name!.first.toString();
                       if (contact.phones.isNotEmpty) {
-                        phoneCtrl.text = ContactService.formatPhone(contact.phones.first.number);
+                        phoneCtrl.text = ContactService.formatPhone(
+                          contact.phones.first.number,
+                        );
                       }
                     });
                   }
                 },
-                icon: const Icon(Icons.contacts_rounded, color: BrandColors.primary),
+                icon: const Icon(
+                  Icons.contacts_rounded,
+                  color: BrandColors.primary,
+                ),
                 tooltip: 'Select from Contacts',
               ),
             ],
@@ -356,16 +500,28 @@ class _PosTabState extends ConsumerState<PosTab> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Customer Name')),
-              TextField(controller: phoneCtrl, decoration: const InputDecoration(labelText: 'Phone Number'), keyboardType: TextInputType.phone),
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Customer Name'),
+              ),
+              TextField(
+                controller: phoneCtrl,
+                decoration: const InputDecoration(labelText: 'Phone Number'),
+                keyboardType: TextInputType.phone,
+              ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
               onPressed: () async {
                 if (nameCtrl.text.isEmpty || phoneCtrl.text.isEmpty) return;
-                await ref.read(posProvider.notifier).createCustomer(nameCtrl.text, phoneCtrl.text);
+                await ref
+                    .read(posProvider.notifier)
+                    .createCustomer(nameCtrl.text, phoneCtrl.text);
                 if (ctx.mounted) Navigator.pop(ctx);
               },
               child: const Text('Save & Select'),
@@ -395,20 +551,21 @@ class _PosTabState extends ConsumerState<PosTab> {
                   onChanged: (v) => setState(() => _query = v),
                   decoration: InputDecoration(
                     hintText: 'Search products…',
-                    prefixIcon: const Icon(Icons.search_rounded,
-                        size: 20, color: BrandColors.muted),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      size: 20,
+                      color: BrandColors.muted,
+                    ),
                     suffixIcon: _query.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded,
-                                size: 18),
+                            icon: const Icon(Icons.clear_rounded, size: 18),
                             onPressed: () {
                               _searchCtrl.clear();
                               setState(() => _query = '');
                             },
                           )
                         : null,
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     filled: true,
                     fillColor: BrandColors.surfaceTint,
                     border: OutlineInputBorder(
@@ -422,12 +579,36 @@ class _PosTabState extends ConsumerState<PosTab> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: const BorderSide(
-                          color: BrandColors.primary, width: 1.5),
+                        color: BrandColors.primary,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
+              // Referral QR scan
+              Tooltip(
+                message: 'Scan Referral QR',
+                child: GestureDetector(
+                  onTap: _openReferralScanner,
+                  child: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: BrandColors.accent,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.card_giftcard_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Product barcode scan
               GestureDetector(
                 onTap: _openScanner,
                 child: Container(
@@ -437,8 +618,11 @@ class _PosTabState extends ConsumerState<PosTab> {
                     color: BrandColors.primary,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.qr_code_scanner_rounded,
-                      color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -452,8 +636,11 @@ class _PosTabState extends ConsumerState<PosTab> {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: BrandColors.border),
                   ),
-                  child: const Icon(Icons.receipt_long_rounded,
-                      size: 20, color: BrandColors.ink),
+                  child: const Icon(
+                    Icons.receipt_long_rounded,
+                    size: 20,
+                    color: BrandColors.ink,
+                  ),
                 ),
               ),
             ],
@@ -475,26 +662,29 @@ class _PosTabState extends ConsumerState<PosTab> {
           child: state.isLoadingProducts && state.products.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : cart.isEmpty
-                  ? _EmptyCart(
-                      hasPosError: state.error != null,
-                      errorMsg: state.error,
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: cart.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(height: 8),
-                      itemBuilder: (_, i) =>
-                          _CartTile(
-                            item: cart[i],
-                            onEditLoose: (item) async {
-                              final qty = await _showWeightDialog(item.product, initialValue: item.quantity);
-                              if (qty != null && qty > 0) {
-                                ref.read(posProvider.notifier).updateQty(item.product.productId, qty);
-                              }
-                            },
-                          ),
-                    ),
+              ? _EmptyCart(
+                  hasPosError: state.error != null,
+                  errorMsg: state.error,
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: cart.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemBuilder: (_, i) => _CartTile(
+                    item: cart[i],
+                    onEditLoose: (item) async {
+                      final qty = await _showWeightDialog(
+                        item.product,
+                        initialValue: item.quantity,
+                      );
+                      if (qty != null && qty > 0) {
+                        ref
+                            .read(posProvider.notifier)
+                            .updateQty(item.product.productId, qty);
+                      }
+                    },
+                  ),
+                ),
         ),
 
         const _SmartAssortmentHints(),
@@ -506,7 +696,8 @@ class _PosTabState extends ConsumerState<PosTab> {
             isPlacing: state.isPlacingOrder,
             selectedCustomer: state.selectedCustomerName,
             onSelectCustomer: _showCustomerSearchSheet,
-            onClearCustomer: () => ref.read(posProvider.notifier).clearCustomer(),
+            onClearCustomer: () =>
+                ref.read(posProvider.notifier).clearCustomer(),
             onOrder: () => showOrderDialog(context, ref),
           ),
       ],
@@ -524,7 +715,10 @@ class _SmartAssortmentHints extends ConsumerWidget {
     if (cart.isEmpty || state.products.isEmpty) return const SizedBox.shrink();
 
     final cartIds = cart.map((e) => e.product.productId).toSet();
-    final suggestions = state.products.where((p) => !cartIds.contains(p.productId)).take(5).toList();
+    final suggestions = state.products
+        .where((p) => !cartIds.contains(p.productId))
+        .take(5)
+        .toList();
     if (suggestions.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -535,11 +729,20 @@ class _SmartAssortmentHints extends ConsumerWidget {
           padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: Row(
             children: [
-              Icon(Icons.auto_awesome_rounded, size: 14, color: BrandColors.primary),
+              Icon(
+                Icons.auto_awesome_rounded,
+                size: 14,
+                color: BrandColors.primary,
+              ),
               SizedBox(width: 6),
               Text(
                 'FREQUENTLY BOUGHT TOGETHER',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: BrandColors.primary, letterSpacing: 0.5),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: BrandColors.primary,
+                  letterSpacing: 0.5,
+                ),
               ),
             ],
           ),
@@ -554,38 +757,72 @@ class _SmartAssortmentHints extends ConsumerWidget {
             itemBuilder: (context, i) {
               final p = suggestions[i];
               return InkWell(
-                onTap: () {
-                   ref.read(posProvider.notifier).addToCart(p);
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                    onTap: () {
+                      ref.read(posProvider.notifier).addToCart(p);
+                    },
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: BrandColors.border),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4, offset: const Offset(0, 2))],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(color: BrandColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                        child: const Icon(Icons.add_rounded, size: 16, color: BrandColors.primary),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
                       ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(p.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: BrandColors.ink), maxLines: 1),
-                          Text('₹${p.price.toStringAsFixed(1)}', style: const TextStyle(fontSize: 11, color: BrandColors.muted, fontWeight: FontWeight.w600)),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: BrandColors.border),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.02),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ).animate().fadeIn(delay: Duration(milliseconds: 100 * i)).slideX(begin: 0.2, end: 0);
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: BrandColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.add_rounded,
+                              size: 16,
+                              color: BrandColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                p.name,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: BrandColors.ink,
+                                ),
+                                maxLines: 1,
+                              ),
+                              Text(
+                                '₹${p.price.toStringAsFixed(1)}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: BrandColors.muted,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(delay: Duration(milliseconds: 100 * i))
+                  .slideX(begin: 0.2, end: 0);
             },
           ),
         ),
@@ -612,9 +849,7 @@ class _SearchResults extends StatelessWidget {
       constraints: const BoxConstraints(maxHeight: 280),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: BrandColors.border),
-        ),
+        border: Border(bottom: BorderSide(color: BrandColors.border)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -631,56 +866,70 @@ class _SearchResults extends StatelessWidget {
               ),
             )
           : products.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text('No products found',
-                      style: TextStyle(color: BrandColors.muted)),
-                )
-              : ListView.separated(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  itemCount: products.length,
-                  separatorBuilder: (_, _) =>
-                      const Divider(height: 1, indent: 16),
-                  itemBuilder: (_, i) {
-                    final p = products[i];
-                    return ListTile(
-                      dense: true,
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: BrandColors.primary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.inventory_2_rounded,
-                            size: 16, color: BrandColors.primary),
+          ? const Padding(
+              padding: EdgeInsets.all(20),
+              child: Text(
+                'No products found',
+                style: TextStyle(color: BrandColors.muted),
+              ),
+            )
+          : ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              itemCount: products.length,
+              separatorBuilder: (_, _) => const Divider(height: 1, indent: 16),
+              itemBuilder: (_, i) {
+                final p = products[i];
+                return ListTile(
+                  dense: true,
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: BrandColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.inventory_2_rounded,
+                      size: 16,
+                      color: BrandColors.primary,
+                    ),
+                  ),
+                  title: Text(
+                    p.displayName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    '${p.priceLabel} · Stock: ${p.stockLabel}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: BrandColors.muted,
+                    ),
+                  ),
+                  trailing: GestureDetector(
+                    onTap: () => onAdd(p),
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: BrandColors.primary,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      title: Text(p.displayName,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 13),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
-                      subtitle: Text(
-                          '${p.priceLabel} · Stock: ${p.stockLabel}',
-                          style: const TextStyle(
-                              fontSize: 11, color: BrandColors.muted)),
-                      trailing: GestureDetector(
-                        onTap: () => onAdd(p),
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: BrandColors.primary,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.add_rounded,
-                              color: Colors.white, size: 18),
-                        ),
+                      child: const Icon(
+                        Icons.add_rounded,
+                        color: Colors.white,
+                        size: 18,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
@@ -710,8 +959,11 @@ class _CartTile extends ConsumerWidget {
               color: BrandColors.surfaceTint,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.inventory_2_rounded,
-                size: 18, color: BrandColors.muted),
+            child: const Icon(
+              Icons.inventory_2_rounded,
+              size: 18,
+              color: BrandColors.muted,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -721,33 +973,46 @@ class _CartTile extends ConsumerWidget {
                 Text(
                   p.displayName,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 13),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   p.priceLabel,
                   style: const TextStyle(
-                      fontSize: 11, color: BrandColors.muted),
+                    fontSize: 11,
+                    color: BrandColors.muted,
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          
+
           if (p.isLoose)
             GestureDetector(
               onTap: () => onEditLoose(item),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: BrandColors.primary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: BrandColors.primary.withValues(alpha: 0.1)),
+                  border: Border.all(
+                    color: BrandColors.primary.withValues(alpha: 0.1),
+                  ),
                 ),
                 child: Text(
                   '${item.quantity} ${p.unit ?? ""}',
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: BrandColors.primary),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                    color: BrandColors.primary,
+                  ),
                 ),
               ),
             )
@@ -766,9 +1031,10 @@ class _CartTile extends ConsumerWidget {
           Text(
             '₹${item.lineTotal.toStringAsFixed(1)}',
             style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-                color: BrandColors.primary),
+              fontWeight: FontWeight.w800,
+              fontSize: 14,
+              color: BrandColors.primary,
+            ),
           ),
         ],
       ),
@@ -860,10 +1126,9 @@ class _EmptyCart extends StatelessWidget {
                   ? (errorMsg ?? 'Could not connect to POS.')
                   : 'Search for a product or scan a barcode to start a sale.',
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontSize: 13),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 13),
             ),
           ],
         ),
@@ -918,25 +1183,42 @@ class _OrderFooter extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: BrandColors.primary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: BrandColors.primary.withValues(alpha: 0.1)),
+                  border: Border.all(
+                    color: BrandColors.primary.withValues(alpha: 0.1),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.person_outline_rounded, size: 16, color: BrandColors.primary),
+                    const Icon(
+                      Icons.person_outline_rounded,
+                      size: 16,
+                      color: BrandColors.primary,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Customer: $selectedCustomer',
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: BrandColors.primary),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: BrandColors.primary,
+                        ),
                       ),
                     ),
                     GestureDetector(
                       onTap: onClearCustomer,
-                      child: const Icon(Icons.close_rounded, size: 16, color: BrandColors.primary),
+                      child: const Icon(
+                        Icons.close_rounded,
+                        size: 16,
+                        color: BrandColors.primary,
+                      ),
                     ),
                   ],
                 ),
@@ -949,7 +1231,10 @@ class _OrderFooter extends StatelessWidget {
                 onTap: onSelectCustomer,
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: BrandColors.surfaceTint,
                     borderRadius: BorderRadius.circular(12),
@@ -958,11 +1243,19 @@ class _OrderFooter extends StatelessWidget {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.person_add_alt_1_rounded, size: 16, color: BrandColors.muted),
-                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.person_add_alt_1_rounded,
+                        size: 16,
+                        color: BrandColors.muted,
+                      ),
+                      SizedBox(width: 8),
                       Text(
                         'Add/Select Customer',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: BrandColors.muted),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: BrandColors.muted,
+                        ),
                       ),
                     ],
                   ),
@@ -974,13 +1267,14 @@ class _OrderFooter extends StatelessWidget {
             children: [
               Text(
                 '${itemCount % 1 == 0 ? itemCount.toInt() : itemCount.toStringAsFixed(2)} item${itemCount == 1 ? '' : 's'}',
-                style: const TextStyle(
-                    color: BrandColors.muted, fontSize: 13),
+                style: const TextStyle(color: BrandColors.muted, fontSize: 13),
               ),
               Text(
                 'Subtotal: ${_fmt(subtotal)}',
                 style: const TextStyle(
-                    fontWeight: FontWeight.w800, fontSize: 16),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -998,7 +1292,9 @@ class _OrderFooter extends StatelessWidget {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2.5, color: Colors.white),
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
                         )
                       : Text('Place Order · ${_fmt(subtotal)}'),
                 ),

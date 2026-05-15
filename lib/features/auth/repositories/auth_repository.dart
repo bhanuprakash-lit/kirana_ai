@@ -39,7 +39,10 @@ class AuthRepository {
   }
 
   Future<void> _saveSession(
-      AuthResult result, {String? username, String? password}) async {
+    AuthResult result, {
+    String? username,
+    String? password,
+  }) async {
     await _storage.write(key: _tokenKey, value: result.accessToken);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('user_id', result.user.userId);
@@ -70,7 +73,9 @@ class AuthRepository {
       if (res.statusCode == 200) {
         final json = jsonDecode(res.body) as Map<String, dynamic>;
         await _storage.write(
-            key: _posTokenKey, value: json['access_token'] as String);
+          key: _posTokenKey,
+          value: json['access_token'] as String,
+        );
       }
     } catch (_) {}
   }
@@ -84,7 +89,9 @@ class AuthRepository {
       if (res.statusCode == 200) {
         final json = jsonDecode(res.body) as Map<String, dynamic>;
         await _storage.write(
-            key: _posTokenKey, value: json['access_token'] as String);
+          key: _posTokenKey,
+          value: json['access_token'] as String,
+        );
       }
     } catch (_) {}
   }
@@ -136,8 +143,9 @@ class AuthRepository {
       body: jsonEncode({'username': username, 'password': password}),
     );
     if (res.statusCode == 200) {
-      final result =
-          AuthResult.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+      final result = AuthResult.fromJson(
+        jsonDecode(res.body) as Map<String, dynamic>,
+      );
       await _saveSession(result, username: username, password: password);
       return result;
     }
@@ -159,8 +167,9 @@ class AuthRepository {
       }),
     );
     if (res.statusCode == 200) {
-      final result =
-          AuthResult.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+      final result = AuthResult.fromJson(
+        jsonDecode(res.body) as Map<String, dynamic>,
+      );
       // No password for phone users — POS features gracefully unavailable
       await _saveSession(result);
       return result;
@@ -175,7 +184,8 @@ class AuthRepository {
   Future<bool> checkUsernameAvailable(String username) async {
     final res = await http.get(
       Uri.parse(
-          '${AppConfig.apiBaseUrl}/kirana/auth/check-username/${Uri.encodeComponent(username)}'),
+        '${AppConfig.apiBaseUrl}/kirana/auth/check-username/${Uri.encodeComponent(username)}',
+      ),
       headers: {'Content-Type': 'application/json'},
     );
     if (res.statusCode == 200) {
@@ -197,6 +207,8 @@ class AuthRepository {
     String? email,
     String? phoneNumber,
     String? firebaseUid,
+    double? latitude,
+    double? longitude,
   }) async {
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/register'),
@@ -215,11 +227,14 @@ class AuthRepository {
           'phone_number': phoneNumber,
         if (firebaseUid != null && firebaseUid.isNotEmpty)
           'firebase_uid': firebaseUid,
+        'latitude': ?latitude,
+        'longitude': ?longitude,
       }),
     );
     if (res.statusCode == 200 || res.statusCode == 201) {
-      final result =
-          AuthResult.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+      final result = AuthResult.fromJson(
+        jsonDecode(res.body) as Map<String, dynamic>,
+      );
       // Only exchange POS token when a real password was set
       await _saveSession(
         result,

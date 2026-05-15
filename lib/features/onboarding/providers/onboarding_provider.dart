@@ -165,6 +165,8 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             firebaseUid: state.data.firebaseUid.isNotEmpty
                 ? state.data.firebaseUid
                 : null,
+            latitude: state.data.latitude,
+            longitude: state.data.longitude,
           );
 
       // Persist extra fields not stored by the backend register endpoint

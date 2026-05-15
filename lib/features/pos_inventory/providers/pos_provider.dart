@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
 import '../../dashboard/providers/overview_provider.dart';
 import '../../profile/providers/customer_provider.dart';
+import '../../referral/models/referral_models.dart';
+import '../../referral/providers/referral_provider.dart';
 import '../models/cart_item.dart';
 import '../models/pos_product.dart';
 
@@ -16,6 +18,9 @@ class PosState {
   final String? error;
   final int? selectedCustomerId;
   final String? selectedCustomerName;
+  final double? referralDiscountPct;
+  final String? referralReferrerName;
+  final PendingReferralScan? pendingReferral;
 
   const PosState({
     this.products = const [],
@@ -25,6 +30,9 @@ class PosState {
     this.error,
     this.selectedCustomerId,
     this.selectedCustomerName,
+    this.referralDiscountPct,
+    this.referralReferrerName,
+    this.pendingReferral,
   });
 
   PosState copyWith({
@@ -37,6 +45,10 @@ class PosState {
     int? selectedCustomerId,
     String? selectedCustomerName,
     bool clearCustomer = false,
+    double? referralDiscountPct,
+    String? referralReferrerName,
+    PendingReferralScan? pendingReferral,
+    bool clearReferral = false,
   }) =>
       PosState(
         products: products ?? this.products,
@@ -46,10 +58,20 @@ class PosState {
         error: clearError ? null : (error ?? this.error),
         selectedCustomerId: clearCustomer ? null : (selectedCustomerId ?? this.selectedCustomerId),
         selectedCustomerName: clearCustomer ? null : (selectedCustomerName ?? this.selectedCustomerName),
+        referralDiscountPct: clearReferral ? null : (referralDiscountPct ?? this.referralDiscountPct),
+        referralReferrerName: clearReferral ? null : (referralReferrerName ?? this.referralReferrerName),
+        pendingReferral: clearReferral ? null : (pendingReferral ?? this.pendingReferral),
       );
 
   double get subtotal =>
       cart.fold(0, (sum, item) => sum + item.lineTotal);
+
+  double get discountedSubtotal {
+    if (referralDiscountPct == null || referralDiscountPct! <= 0) return subtotal;
+    return subtotal * (1 - referralDiscountPct! / 100);
+  }
+
+  double get discountAmount => subtotal - discountedSubtotal;
 
   double get cartItemCount =>
       cart.fold(0, (sum, item) => sum + item.quantity);
@@ -191,7 +213,7 @@ class PosNotifier extends Notifier<PosState> {
     state = state.copyWith(cart: updated);
   }
 
-  void clearCart() => state = state.copyWith(cart: const [], clearCustomer: true);
+  void clearCart() => state = state.copyWith(cart: const [], clearCustomer: true, clearReferral: true);
 
   void setCustomer(int id, String name) {
     state = state.copyWith(selectedCustomerId: id, selectedCustomerName: name);
@@ -234,6 +256,25 @@ class PosNotifier extends Notifier<PosState> {
     }
   }
 
+  void setPendingReferral(PendingReferralScan scan) {
+    state = state.copyWith(
+      pendingReferral: scan,
+      referralDiscountPct: scan.discountPct,
+      referralReferrerName: scan.referrerName,
+    );
+  }
+
+  void setReferralDiscount(double pct, String referrerName) {
+    state = state.copyWith(
+      referralDiscountPct: pct,
+      referralReferrerName: referrerName,
+    );
+  }
+
+  void clearReferralDiscount() {
+    state = state.copyWith(clearReferral: true);
+  }
+
   Future<Map<String, dynamic>?> placeOrder({
     String paymentMethod = 'cash',
   }) async {
@@ -241,13 +282,24 @@ class PosNotifier extends Notifier<PosState> {
     state = state.copyWith(isPlacingOrder: true, clearError: true);
 
     final client = ref.read(apiClientProvider);
-    final totalAmount = state.subtotal;
+    final pending = state.pendingReferral;
+
+    // Resolve customer ID and discount from pending referral (if any)
+    int? customerId = state.selectedCustomerId;
+    final discountPct = state.referralDiscountPct ?? 0;
+
+    // If a referral QR was scanned, we may already have the new customer's ID
+    // (pre-set from the scan sheet). Use it if not already overridden by a manual selection.
+    final subtotal = state.subtotal;
+    final totalAmount = discountPct > 0
+        ? subtotal * (1 - discountPct / 100)
+        : subtotal;
 
     try {
       final body = <String, dynamic>{
         'total_amount': totalAmount,
         'payment_method': paymentMethod,
-        'customer_id': state.selectedCustomerId,
+        'customer_id': customerId,
         'items': state.cart
             .map((i) => {
                   'product_id': i.product.productId,
@@ -259,10 +311,31 @@ class PosNotifier extends Notifier<PosState> {
       };
       final order = await client.posPost('/pos/orders', body);
       if (order != null) {
+        final orderId = order['order_id'] as int?;
+
+        // Now process the referral with the real order_id (creates customer + referral record)
+        if (pending != null) {
+          try {
+            final scanResult = await processReferralScan(
+              tokenHash: pending.tokenHash,
+              newCustomerPhone: pending.newCustomerPhone,
+              newCustomerName: pending.newCustomerName,
+              orderId: orderId,
+            );
+            if (scanResult.isNewCustomer) {
+              ref.invalidate(customerProvider);
+            }
+          } catch (_) {
+            // referral processing failed — order is already placed, so ignore
+          }
+        }
+
         clearCart();
         state = state.copyWith(isPlacingOrder: false);
         ref.read(overviewProvider.notifier).refresh();
-        return order;
+        final mutable = Map<String, dynamic>.from(order);
+        mutable['total_amount'] ??= totalAmount;
+        return mutable;
       }
       state = state.copyWith(
           isPlacingOrder: false, error: 'Failed to place order.');

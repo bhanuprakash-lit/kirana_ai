@@ -17,6 +17,24 @@ class BarcodeScannerOverlay extends StatefulWidget {
 class _BarcodeScannerOverlayState extends State<BarcodeScannerOverlay> {
   bool _detected = false;
 
+  /// Returns true only for linear product barcodes (EAN, UPC, Code 128, etc.).
+  /// QR codes are rejected entirely — they're used for referrals, not products.
+  static bool _isProductBarcode(String value, BarcodeFormat? format) {
+    if (value.isEmpty) return false;
+    // QR codes are not product barcodes — handled separately as referral codes
+    if (format == BarcodeFormat.qrCode) return false;
+    // Aztec, DataMatrix, PDF417 — also 2D codes, not product barcodes
+    if (format == BarcodeFormat.aztec ||
+        format == BarcodeFormat.dataMatrix ||
+        format == BarcodeFormat.pdf417) {
+      return false;
+    }
+    // Fallback string checks for unknown format
+    if (value.contains('://')) return false;
+    if (value.startsWith('KIRANA_REF:')) return false;
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,8 +50,9 @@ class _BarcodeScannerOverlayState extends State<BarcodeScannerOverlay> {
           MobileScanner(
             onDetect: (capture) {
               if (_detected) return;
-              final raw = capture.barcodes.firstOrNull?.rawValue;
-              if (raw != null) {
+              final barcode = capture.barcodes.firstOrNull;
+              final raw = barcode?.rawValue;
+              if (raw != null && _isProductBarcode(raw, barcode?.format)) {
                 _detected = true;
                 Navigator.pop(context, raw); // returns value to awaiting push
                 widget.onDetected?.call(raw); // callback for POS tab

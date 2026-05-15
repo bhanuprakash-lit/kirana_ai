@@ -13,6 +13,8 @@ class UserPrefs {
   final bool notifyInApp;
   final int quietHoursStart;
   final int quietHoursEnd;
+  final bool allowSocialMarketing;
+  final int alertExpiryDays;
 
   const UserPrefs({
     this.forecastHorizonDays = 7,
@@ -24,6 +26,8 @@ class UserPrefs {
     this.notifyInApp = true,
     this.quietHoursStart = 22,
     this.quietHoursEnd = 7,
+    this.allowSocialMarketing = false,
+    this.alertExpiryDays = 7,
   });
 
   factory UserPrefs.fromJson(Map<String, dynamic> j) => UserPrefs(
@@ -40,6 +44,8 @@ class UserPrefs {
         notifyInApp: j['notify_in_app'] as bool? ?? true,
         quietHoursStart: (j['quiet_hours_start'] as num?)?.toInt() ?? 22,
         quietHoursEnd: (j['quiet_hours_end'] as num?)?.toInt() ?? 7,
+        allowSocialMarketing: j['allow_social_marketing'] as bool? ?? false,
+        alertExpiryDays: (j['alert_expiry_days'] as num?)?.toInt() ?? 7,
       );
 
   Map<String, dynamic> toJson() => {
@@ -52,6 +58,8 @@ class UserPrefs {
         'notify_in_app': notifyInApp,
         'quiet_hours_start': quietHoursStart,
         'quiet_hours_end': quietHoursEnd,
+        'allow_social_marketing': allowSocialMarketing,
+        'alert_expiry_days': alertExpiryDays,
       };
 
   UserPrefs copyWith({
@@ -64,6 +72,8 @@ class UserPrefs {
     bool? notifyInApp,
     int? quietHoursStart,
     int? quietHoursEnd,
+    bool? allowSocialMarketing,
+    int? alertExpiryDays,
   }) =>
       UserPrefs(
         forecastHorizonDays: forecastHorizonDays ?? this.forecastHorizonDays,
@@ -76,6 +86,8 @@ class UserPrefs {
         notifyInApp: notifyInApp ?? this.notifyInApp,
         quietHoursStart: quietHoursStart ?? this.quietHoursStart,
         quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+        allowSocialMarketing: allowSocialMarketing ?? this.allowSocialMarketing,
+        alertExpiryDays: alertExpiryDays ?? this.alertExpiryDays,
       );
 }
 

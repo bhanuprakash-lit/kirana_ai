@@ -95,7 +95,7 @@ class CustomerDetailScreen extends ConsumerWidget {
                       value: khataAsync.when(
                         data: (khata) => '₹${(khata?['amount'] as num? ?? 0) - (khata?['amount_paid'] as num? ?? 0)}',
                         loading: () => '...',
-                        error: (_, __) => 'N/A',
+                        error: (_, _) => 'N/A',
                       ),
                       icon: Icons.account_balance_wallet_outlined,
                       color: Colors.orange,
@@ -111,7 +111,7 @@ class CustomerDetailScreen extends ConsumerWidget {
                           return '₹${NumberFormat('#,##,###').format(total)}';
                         },
                         loading: () => '...',
-                        error: (_, __) => 'N/A',
+                        error: (_, _) => 'N/A',
                       ),
                       icon: Icons.shopping_bag_outlined,
                       color: BrandColors.success,
@@ -124,7 +124,7 @@ class CustomerDetailScreen extends ConsumerWidget {
                       value: ordersAsync.when(
                         data: (orders) => orders.length.toString(),
                         loading: () => '...',
-                        error: (_, __) => 'N/A',
+                        error: (_, _) => 'N/A',
                       ),
                       icon: Icons.receipt_long_outlined,
                       color: BrandColors.primary,
@@ -175,7 +175,7 @@ class CustomerDetailScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   itemCount: orders.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_,_) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final order = orders[index];
                     return _OrderListItem(order: order);

@@ -66,7 +66,7 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) => _RecommendationTile(item: filtered[index]),
                   ),
                 );

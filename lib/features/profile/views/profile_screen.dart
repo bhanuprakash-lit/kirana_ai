@@ -121,6 +121,13 @@ class ProfileScreen extends ConsumerWidget {
               ),
               // const SizedBox(height: 32),
               // Settings Options
+              _CashflowBanner(onTap: () => context.push('/profile/cashflow')),
+              _ProfileOption(
+                icon: Icons.share_rounded,
+                label: 'Referral Marketing',
+                subtitle: 'Let customers refer friends and earn rewards',
+                onTap: () => context.push('/profile/referral'),
+              ),
               _ProfileOption(
                 icon: Icons.people_outline_rounded,
                 label: 'Customer Management',
@@ -189,6 +196,64 @@ class ProfileScreen extends ConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _CashflowBanner extends StatelessWidget {
+  final VoidCallback onTap;
+  const _CashflowBanner({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1A3A5C), Color(0xFF243B6B)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.account_balance_wallet_rounded,
+                  color: Colors.white, size: 22),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Cashflow Support',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15)),
+                  SizedBox(height: 2),
+                  Text('Apply for ₹50K – ₹10L business finance',
+                      style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500)),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded,
+                color: Colors.white54, size: 16),
+          ],
+        ),
       ),
     );
   }

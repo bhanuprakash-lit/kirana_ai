@@ -49,8 +49,8 @@ class UdhaarTab extends ConsumerWidget {
                 Text(
                   'Customer Dues',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 TextButton.icon(
                   onPressed: () => _showAddUdhaarSheet(context, ref),
@@ -151,7 +151,11 @@ class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
             children: [
               const Text(
                 'Add New Udhaar',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: BrandColors.ink),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: BrandColors.ink,
+                ),
               ),
               if (!_saving && !_success)
                 TextButton.icon(
@@ -159,9 +163,12 @@ class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
                     final contact = await ContactService.pickContact();
                     if (contact != null) {
                       setState(() {
-                        widget.nameController.text = contact.name!.first.toString();
+                        widget.nameController.text = contact.name!.first
+                            .toString();
                         if (contact.phones.isNotEmpty) {
-                          final p = ContactService.formatPhone(contact.phones.first.number);
+                          final p = ContactService.formatPhone(
+                            contact.phones.first.number,
+                          );
                           widget.phoneController.text = p;
                           widget.onContactPick(widget.nameController.text, p);
                         }
@@ -169,12 +176,15 @@ class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
                     }
                   },
                   icon: const Icon(Icons.contacts_rounded, size: 18),
-                  label: const Text('Contacts', style: TextStyle(fontWeight: FontWeight.w700)),
+                  label: const Text(
+                    'Contacts',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 16),
-          
+
           ActionStatusOverlay(
             isSaving: _saving,
             error: _error,
@@ -219,40 +229,52 @@ class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
             child: LoadingButton(
               label: 'Save Udhaar',
               isLoading: _saving,
-              onPressed: _success ? null : () async {
-                final amount = double.tryParse(widget.amountController.text) ?? 0;
-                if (widget.nameController.text.isEmpty || widget.phoneController.text.isEmpty || amount <= 0) {
-                  setState(() => _error = 'Enter valid name, phone and amount');
-                  return;
-                }
-                
-                setState(() {
-                  _saving = true;
-                  _error = null;
-                });
-                try {
-                  await widget.ref.read(financeProvider.notifier).addUdhaar(
-                    name: widget.nameController.text,
-                    phone: widget.phoneController.text,
-                    amount: amount,
-                  );
-                  if (mounted) {
-                    setState(() {
-                      _saving = false;
-                      _success = true;
-                    });
-                    await Future.delayed(const Duration(milliseconds: 600));
-                    if (mounted) Navigator.pop(context);
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    setState(() {
-                      _saving = false;
-                      _error = e.toString();
-                    });
-                  }
-                }
-              },
+              onPressed: _success
+                  ? null
+                  : () async {
+                      final amount =
+                          double.tryParse(widget.amountController.text) ?? 0;
+                      if (widget.nameController.text.isEmpty ||
+                          widget.phoneController.text.isEmpty ||
+                          amount <= 0) {
+                        setState(
+                          () => _error = 'Enter valid name, phone and amount',
+                        );
+                        return;
+                      }
+
+                      setState(() {
+                        _saving = true;
+                        _error = null;
+                      });
+                      try {
+                        await widget.ref
+                            .read(financeProvider.notifier)
+                            .addUdhaar(
+                              name: widget.nameController.text,
+                              phone: widget.phoneController.text,
+                              amount: amount,
+                            );
+                        if (mounted) {
+                          setState(() {
+                            _saving = false;
+                            _success = true;
+                          });
+                          await Future.delayed(
+                            const Duration(milliseconds: 600),
+                          );
+                          // ignore: use_build_context_synchronously
+                          if (mounted) Navigator.pop(context);
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          setState(() {
+                            _saving = false;
+                            _error = e.toString();
+                          });
+                        }
+                      }
+                    },
             ),
           ),
         ],
@@ -433,7 +455,9 @@ class _UdhaarTile extends ConsumerWidget {
                       IconButton(
                         onPressed: () async {
                           try {
-                            await ref.read(financeProvider.notifier).sendReminder(item.khataId);
+                            await ref
+                                .read(financeProvider.notifier)
+                                .sendReminder(item.khataId);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -445,12 +469,18 @@ class _UdhaarTile extends ConsumerWidget {
                           } catch (e) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Failed to send reminder: $e')),
+                                SnackBar(
+                                  content: Text('Failed to send reminder: $e'),
+                                ),
                               );
                             }
                           }
                         },
-                        icon: const Icon(Icons.message_outlined, size: 20, color: BrandColors.success),
+                        icon: const Icon(
+                          Icons.message_outlined,
+                          size: 20,
+                          color: BrandColors.success,
+                        ),
                         tooltip: 'Send WhatsApp Reminder',
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -543,10 +573,14 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
           const SizedBox(height: 24),
           Text(
             'Recover Udhaar from ${widget.item.customerName}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink),
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.ink,
+            ),
           ),
           const SizedBox(height: 16),
-          
+
           ActionStatusOverlay(
             isSaving: _saving,
             error: _error,
@@ -572,36 +606,43 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
             child: LoadingButton(
               label: 'Confirm Recovery',
               isLoading: _saving,
-              onPressed: _success ? null : () async {
-                final amount = double.tryParse(_controller.text) ?? 0;
-                if (amount <= 0) {
-                  setState(() => _error = 'Please enter a valid amount');
-                  return;
-                }
-                
-                setState(() {
-                  _saving = true;
-                  _error = null;
-                });
-                try {
-                  await widget.ref.read(financeProvider.notifier).recordRecovery(widget.item.khataId, amount);
-                  if (mounted) {
-                    setState(() {
-                      _saving = false;
-                      _success = true;
-                    });
-                    await Future.delayed(const Duration(milliseconds: 600));
-                    if (mounted) Navigator.pop(context);
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    setState(() {
-                      _saving = false;
-                      _error = e.toString();
-                    });
-                  }
-                }
-              },
+              onPressed: _success
+                  ? null
+                  : () async {
+                      final amount = double.tryParse(_controller.text) ?? 0;
+                      if (amount <= 0) {
+                        setState(() => _error = 'Please enter a valid amount');
+                        return;
+                      }
+
+                      setState(() {
+                        _saving = true;
+                        _error = null;
+                      });
+                      try {
+                        await widget.ref
+                            .read(financeProvider.notifier)
+                            .recordRecovery(widget.item.khataId, amount);
+                        if (mounted) {
+                          setState(() {
+                            _saving = false;
+                            _success = true;
+                          });
+                          await Future.delayed(
+                            const Duration(milliseconds: 600),
+                          );
+                          // ignore: use_build_context_synchronously
+                          if (mounted) Navigator.pop(context);
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          setState(() {
+                            _saving = false;
+                            _error = e.toString();
+                          });
+                        }
+                      }
+                    },
             ),
           ),
         ],
