@@ -11,6 +11,7 @@ import '../providers/auth_provider.dart';
 import '../repositories/auth_repository.dart';
 import '../../../shared/widgets/brand_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../subscription/providers/subscription_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -299,6 +300,7 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
       }
 
       ref.read(notificationServiceProvider).uploadToken();
+      ref.invalidate(subscriptionProvider);
       context.go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -477,6 +479,7 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
             password: _passwordCtrl.text,
           );
       ref.read(notificationServiceProvider).uploadToken();
+      ref.invalidate(subscriptionProvider);
       if (mounted) context.go('/home');
     } on ApiException catch (e) {
       setState(() {

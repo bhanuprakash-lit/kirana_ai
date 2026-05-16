@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 enum AlertPriority { high, medium, low }
-enum AlertType { lowStock, expiry, udhaar, performance }
+enum AlertType { lowStock, expiry, udhaar, performance, subscription }
 
 class BusinessAlert {
   final String id;
@@ -28,6 +28,7 @@ class BusinessAlert {
       case AlertType.expiry: return Icons.event_busy_rounded;
       case AlertType.udhaar: return Icons.account_balance_wallet_rounded;
       case AlertType.performance: return Icons.trending_down_rounded;
+      case AlertType.subscription: return Icons.workspace_premium_rounded;
     }
   }
 

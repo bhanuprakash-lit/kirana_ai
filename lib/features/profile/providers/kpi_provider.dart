@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
+import '../../subscription/models/subscription_model.dart';
+import '../../subscription/providers/subscription_provider.dart';
 
 @immutable
 class KpiRegistryItem {
@@ -86,28 +88,47 @@ class KpiState {
   final List<KpiRegistryItem> registry;
   final List<KpiData> subscribedData;
   final Set<String> subscribedIds;
+  // kpi_id → 'basic'|'pro' as fetched from backend
+  final Map<String, String> tierConfig;
 
   const KpiState({
     required this.registry,
     required this.subscribedData,
     required this.subscribedIds,
+    this.tierConfig = const {},
   });
 
   Map<String, List<KpiRegistryItem>> get groupedRegistry {
     final map = <String, List<KpiRegistryItem>>{};
     for (final item in registry) {
-      // Use 'Core Insights' for 'Common' business category
       final cat = item.category.toLowerCase() == 'common' ? 'Core Insights' : item.category;
       map.putIfAbsent(cat, () => []).add(item);
     }
     return map;
   }
 
+  /// Returns true if the given KPI is accessible for the provided subscription tier.
+  /// Uses server-side tier config when available; falls back to positional defaults.
+  bool isKpiAccessible(String kpiId, SubTier tier) {
+    if (tier == SubTier.pro) return true;
+    final required = tierConfig[kpiId];
+    if (required != null) return required == 'basic';
+    // Fallback: Core Insight category → pro only; first 3 per category → basic
+    final grouped = groupedRegistry;
+    for (final entry in grouped.entries) {
+      final items = entry.value;
+      final idx = items.indexWhere((k) => k.kpiId == kpiId);
+      if (idx == -1) continue;
+      if (entry.key == 'Core Insights') return false;
+      return idx < 3;
+    }
+    return false;
+  }
+
   Map<String, List<KpiData>> get groupedSubscribedData {
     final map = <String, List<KpiData>>{};
-    // Map kpiId to theme for lookup
     final idToTheme = {
-      for (final item in registry) 
+      for (final item in registry)
         item.kpiId: item.category.toLowerCase() == 'common' ? 'Core Insights' : item.category,
     };
 
@@ -122,18 +143,18 @@ class KpiState {
     List<KpiRegistryItem>? registry,
     List<KpiData>? subscribedData,
     Set<String>? subscribedIds,
+    Map<String, String>? tierConfig,
   }) {
     return KpiState(
       registry: registry ?? this.registry,
       subscribedData: subscribedData ?? this.subscribedData,
       subscribedIds: subscribedIds ?? this.subscribedIds,
+      tierConfig: tierConfig ?? this.tierConfig,
     );
   }
 }
 
 class KpiNotifier extends AsyncNotifier<KpiState> {
-  static const _prefKey = 'subscribed_kpis';
-
   @override
   Future<KpiState> build() => _fetch();
 
@@ -146,28 +167,52 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
     final client = ref.read(apiClientProvider);
     final prefs = await SharedPreferences.getInstance();
     final storeId = prefs.getInt('store_id') ?? 1;
-    final subscribedIds = prefs.getStringList(_prefKey)?.toSet() ?? {};
 
-    // Fetch registry and summary in parallel
+    // Fetch registry, summary, server prefs, and tier config in parallel
     final registryFuture = client.get('/kirana/kpis/registry');
-    final summaryFuture = client.get('/kirana/kpis/summary?store_id=$storeId');
+    final summaryFuture  = client.get('/kirana/kpis/summary?store_id=$storeId');
+    final prefsFuture    = client.get('/kirana/preferences');
+    final tiersFuture    = client.get('/kirana/kpis/tiers');
 
     final registryRes = await registryFuture;
-    final summaryRes = await summaryFuture;
+    final summaryRes  = await summaryFuture;
+    final prefsRes    = await prefsFuture;
+    final tiersRes    = await tiersFuture.catchError((_) => <String, dynamic>{});
 
     final registry = (registryRes['kpis'] as List)
-        .map((e) => KpiRegistryItem.fromJson(e))
+        .map((e) => KpiRegistryItem.fromJson(e as Map<String, dynamic>))
         .toList();
 
+    // Load subscribed IDs from server; default to Finance KPIs on first use
+    final subscribedKpisStr = prefsRes['subscribed_kpis'] as String?;
+    final Set<String> subscribedIds;
+
+    if (subscribedKpisStr == null || subscribedKpisStr.isEmpty) {
+      // First-time: default to all Finance category KPIs
+      subscribedIds = registry
+          .where((k) => k.category.toLowerCase().contains('finance'))
+          .map((k) => k.kpiId)
+          .toSet();
+    } else {
+      subscribedIds = subscribedKpisStr
+          .split(',')
+          .where((s) => s.isNotEmpty)
+          .toSet();
+    }
+
     final subscribedData = (summaryRes['kpis'] as List)
-        .map((e) => KpiData.fromJson(e))
+        .map((e) => KpiData.fromJson(e as Map<String, dynamic>))
         .where((k) => subscribedIds.contains(k.kpiId))
         .toList();
+
+    final rawTiers = (tiersRes as Map<String, dynamic>?)?['tiers'] as Map<String, dynamic>? ?? {};
+    final tierConfig = rawTiers.map((k, v) => MapEntry(k, v as String));
 
     return KpiState(
       registry: registry,
       subscribedData: subscribedData,
       subscribedIds: subscribedIds,
+      tierConfig: tierConfig,
     );
   }
 
@@ -175,9 +220,8 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
     final client = ref.read(apiClientProvider);
     final prefs = await SharedPreferences.getInstance();
     final storeId = prefs.getInt('store_id') ?? 1;
-    
+
     try {
-      // Append store_id if not present
       final connector = endpoint.contains('?') ? '&' : '?';
       return await client.get('$endpoint${connector}store_id=$storeId');
     } catch (e) {
@@ -189,11 +233,29 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
     final currentState = state.value;
     if (currentState == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_prefKey, currentState.subscribedIds.toList());
-    
-    // Refresh to update subscribedData based on new selection
-    await refresh();
+    final client = ref.read(apiClientProvider);
+    final tier = ref.read(subTierProvider);
+
+    // Strip KPIs the user's tier can't access before saving
+    final accessibleIds = currentState.subscribedIds
+        .where((id) => currentState.isKpiAccessible(id, tier))
+        .toSet();
+
+    await client.patch('/kirana/preferences', {
+      'subscribed_kpis': accessibleIds.join(','),
+    });
+
+    // Silent refresh: fetch fresh data without showing loading indicator
+    try {
+      final newState = await _fetch();
+      state = AsyncData(newState);
+    } catch (_) {
+      // If refresh fails, keep current state with updated selection
+      final newSubscribedData = currentState.subscribedData
+          .where((k) => currentState.subscribedIds.contains(k.kpiId))
+          .toList();
+      state = AsyncData(currentState.copyWith(subscribedData: newSubscribedData));
+    }
   }
 
   void toggleKpi(String id) {
@@ -215,7 +277,7 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
 
     final newIds = Set<String>.from(currentState.subscribedIds);
     final group = currentState.groupedRegistry[categoryName] ?? [];
-    
+
     for (final item in group) {
       if (subscribe) {
         newIds.add(item.kpiId);

@@ -103,9 +103,10 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) => _buildContent(storeName, location, footfall),
         data: (status) {
-          if (status.hasRequest && !_submitted)
+          if (status.hasRequest && !_submitted) {
             return _buildExistingRequest(status);
-          if (_submitted) return _buildSuccess();
+          }
+          if (_submitted) { return _buildSuccess(); }
           return _buildContent(storeName, location, footfall);
         },
       ),
@@ -522,8 +523,9 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
   }
 
   String _fmt(double v) {
-    if (v >= 100000)
+    if (v >= 100000) {
       return '₹${(v / 100000).toStringAsFixed(v % 100000 == 0 ? 0 : 1)}L';
+    }
     return '₹${(v / 1000).toStringAsFixed(0)}K';
   }
 }

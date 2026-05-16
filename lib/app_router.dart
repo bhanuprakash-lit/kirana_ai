@@ -12,12 +12,14 @@ import 'features/profile/views/kpi_subscription_screen.dart';
 import 'features/profile/views/profile_screen.dart';
 import 'features/profile/views/store_settings_screen.dart';
 import 'features/profile/views/customer_management_screen.dart';
+import 'features/associations/views/association_screen.dart';
 import 'features/profile/views/config_screen.dart';
 import 'features/profile/views/cashflow_screen.dart';
 import 'features/profile/views/customer_detail_screen.dart';
 import 'features/referral/models/referral_models.dart';
 import 'features/referral/views/referral_screen.dart';
 import 'features/referral/views/referral_qr_screen.dart';
+import 'features/subscription/views/subscription_screen.dart';
 import 'features/support/views/support_screen.dart';
 import 'features/support/views/faq_screen.dart';
 import 'features/support/views/report_issue_screen.dart';
@@ -86,6 +88,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CashflowScreen(),
           ),
           GoRoute(
+            path: 'subscription',
+            builder: (context, state) => const SubscriptionScreen(),
+          ),
+          GoRoute(
             path: 'referral',
             builder: (context, state) => const ReferralScreen(),
             routes: [
@@ -126,6 +132,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 },
               ),
             ],
+          ),
+          GoRoute(
+            path: 'associations',
+            builder: (context, state) => const AssociationScreen(),
           ),
           GoRoute(
             path: 'support',

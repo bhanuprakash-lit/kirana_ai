@@ -62,6 +62,22 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
+  Future<dynamic> delete(String path) async {
+    final token = await _storage.read(key: 'auth_token');
+    final res = await http.delete(
+      Uri.parse('${AppConfig.apiBaseUrl}$path'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (res.statusCode == 200 || res.statusCode == 204) {
+      if (res.body.isEmpty) return {};
+      return jsonDecode(res.body);
+    }
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
   // ── POS endpoints (Bearer pos token) ──────────────────────────────────────
 
   Future<Map<String, dynamic>?> posGet(String path) async {

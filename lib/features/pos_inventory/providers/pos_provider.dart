@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kirana_ai/features/auth/repositories/auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -80,6 +82,9 @@ class PosState {
 }
 
 class PosNotifier extends Notifier<PosState> {
+  int? _storeId;
+  Timer? _cartPingTimer;
+
   @override
   PosState build() {
     Future.microtask(_loadProducts);
@@ -90,7 +95,8 @@ class PosNotifier extends Notifier<PosState> {
     state = state.copyWith(isLoadingProducts: true, clearError: true);
     final client = ref.read(apiClientProvider);
     final prefs = await SharedPreferences.getInstance();
-    final storeId = prefs.getInt('store_id') ?? 1;
+    _storeId = prefs.getInt('store_id') ?? 1;
+    final storeId = _storeId!;
 
     final productsFuture = client.posGetList(
         '/pos/products?store_id=$storeId&limit=1000');
@@ -139,45 +145,54 @@ class PosNotifier extends Notifier<PosState> {
 
   Future<void> reloadProducts() => _loadProducts();
 
-  Future<PosProduct?> lookupBarcode(String barcode) async {
-    final client = ref.read(apiClientProvider);
-    final prefs = await SharedPreferences.getInstance();
-    final storeId = prefs.getInt('store_id') ?? 1;
+  // Sync local-cache lookup — no network, no async overhead.
+  PosProduct? lookupBarcodeLocal(String barcode) {
+    for (final p in state.products) {
+      if (p.barcode == barcode) return p;
+    }
+    return null;
+  }
 
+  Future<PosProduct?> lookupBarcode(String barcode) async {
+    final storeId = _storeId ?? 1;
+    final client = ref.read(apiClientProvider);
     try {
       final res = await client.posGet(
           '/pos/products/barcode/$barcode?store_id=$storeId');
       if (res == null) return null;
-
-      var p = PosProduct.fromJson(res);
-
-      try {
-        final pricingRes = await client.getOltp('pricing',
-            filters: {'store_id': '$storeId', 'product_id': '${p.productId}'});
-        final rows = (pricingRes['rows'] as List<dynamic>?) ?? [];
-        if (rows.isNotEmpty) {
-          final pricing = rows.first as Map<String, dynamic>;
-          final sp = (pricing['selling_price'] ??
-                  pricing['price'] ??
-                  pricing['unit_price'] ??
-                  0.0) as num;
-          final mrp = (pricing['mrp'] ?? p.mrp ?? 0.0) as num;
-
-          p = p.copyWith(
-            price: sp > 0 ? sp.toDouble() : p.price,
-            mrp: mrp > 0 ? mrp.toDouble() : p.mrp,
-          );
-        }
-      } catch (_) {}
-
-      return p;
+      return PosProduct.fromJson(res);
     } on ApiException catch (e) {
       if (e.statusCode == 404) return null;
       rethrow;
-    } catch (e) {
-      rethrow;
     }
   }
+
+  // ── Cart ping (abandoned cart intelligence) ────────────────────────────────
+
+  void _schedulePing() {
+    _cartPingTimer?.cancel();
+    _cartPingTimer = Timer(const Duration(seconds: 3), _doPing);
+  }
+
+  Future<void> _doPing({bool converted = false}) async {
+    try {
+      final client = ref.read(apiClientProvider);
+      final items = state.cart.map((i) => {
+        'product_id': i.product.productId,
+        'name': i.product.name,
+        'qty': i.quantity,
+      }).toList();
+      await client.post('/kirana/intelligence/cart-ping', {
+        'item_count': converted ? 0 : state.cart.length,
+        'items': converted ? [] : items,
+        'converted': converted,
+      });
+    } catch (_) {
+      // Non-critical — silently ignore
+    }
+  }
+
+  // ── Cart mutations ─────────────────────────────────────────────────────────
 
   void addToCart(PosProduct product, {double qty = 1.0}) {
     final existing = state.cart.indexWhere(
@@ -191,6 +206,7 @@ class PosNotifier extends Notifier<PosState> {
       state = state.copyWith(
           cart: [...state.cart, CartItem(product: product, quantity: qty)]);
     }
+    _schedulePing();
   }
 
   void removeFromCart(int productId) {
@@ -198,6 +214,7 @@ class PosNotifier extends Notifier<PosState> {
         cart: state.cart
             .where((i) => i.product.productId != productId)
             .toList());
+    _schedulePing();
   }
 
   void updateQty(int productId, double qty) {
@@ -211,9 +228,14 @@ class PosNotifier extends Notifier<PosState> {
             : i)
         .toList();
     state = state.copyWith(cart: updated);
+    _schedulePing();
   }
 
-  void clearCart() => state = state.copyWith(cart: const [], clearCustomer: true, clearReferral: true);
+  void clearCart() {
+    state = state.copyWith(cart: const [], clearCustomer: true, clearReferral: true);
+    _cartPingTimer?.cancel();
+    _doPing(converted: false);
+  }
 
   void setCustomer(int id, String name) {
     state = state.copyWith(selectedCustomerId: id, selectedCustomerName: name);
@@ -244,23 +266,29 @@ class PosNotifier extends Notifier<PosState> {
   Future<List<Map<String, dynamic>>> searchCustomers(String query) async {
     final client = ref.read(apiClientProvider);
     try {
-      final res = await client.getOltp('customer', filters: {'limit': '100'});
+      final res = await client.getOltp('customer', filters: {'limit': '500'});
       final rows = (res['rows'] as List).cast<Map<String, dynamic>>();
       if (query.isEmpty) return rows;
-      return rows.where((r) => 
-        (r['name'] as String).toLowerCase().contains(query.toLowerCase()) ||
-        (r['phone'] as String).contains(query)
-      ).toList();
+      final q = query.toLowerCase();
+      return rows.where((r) {
+        final name = (r['name'] as String? ?? '').toLowerCase();
+        final phone = (r['phone'] as String? ?? '');
+        return name.contains(q) || phone.contains(q);
+      }).toList();
     } catch (_) {
       return [];
     }
   }
 
   void setPendingReferral(PendingReferralScan scan) {
+    final customerDisplayName = scan.newCustomerName.isNotEmpty
+        ? scan.newCustomerName
+        : scan.newCustomerPhone;
     state = state.copyWith(
       pendingReferral: scan,
       referralDiscountPct: scan.discountPct,
       referralReferrerName: scan.referrerName,
+      selectedCustomerName: customerDisplayName,
     );
   }
 
@@ -322,15 +350,24 @@ class PosNotifier extends Notifier<PosState> {
               newCustomerName: pending.newCustomerName,
               orderId: orderId,
             );
-            if (scanResult.isNewCustomer) {
-              ref.invalidate(customerProvider);
+            // Back-fill customer_id on the order (order was placed before customer existed)
+            if (orderId != null) {
+              try {
+                await client.patchOltp(
+                  'orders',
+                  {'customer_id': scanResult.newCustomerId},
+                  filters: {'order_id': '$orderId'},
+                );
+              } catch (_) {}
             }
+            ref.invalidate(customerProvider);
           } catch (_) {
             // referral processing failed — order is already placed, so ignore
           }
         }
 
         clearCart();
+        _doPing(converted: true);
         state = state.copyWith(isPlacingOrder: false);
         ref.read(overviewProvider.notifier).refresh();
         final mutable = Map<String, dynamic>.from(order);

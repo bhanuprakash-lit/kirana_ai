@@ -31,6 +31,15 @@ class AppConfig {
     _urlChanges.add(++_revision);
   }
 
+  // ── Trial days (from Remote Config) ───────────────────────────────────────
+
+  static int _trialDays = 14;
+  static int get trialDays => _trialDays;
+
+  static void updateTrialDays(int days) {
+    if (days > 0) _trialDays = days;
+  }
+
   // ── Block state ────────────────────────────────────────────────────────────
 
   static final _blockChanges = StreamController<void>.broadcast();

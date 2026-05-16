@@ -17,11 +17,11 @@ class FaqScreen extends StatelessWidget {
       ),
       _Faq(
         question: 'How do I manage customer credit (Khata)?',
-        answer: 'When placing an order, select a customer and choose "Credit" as the payment method. You can view all pending dues in the Finance -> Udhaar tab or Customer Management section.',
+        answer: 'When placing an order, select a customer and choose "Credit" as the payment method. You can view all pending dues in the Finance -> Udhaar tab or Customer Relations section.',
       ),
       _Faq(
         question: 'Can I sync my phone contacts?',
-        answer: 'Yes! Go to Profile -> Customer Management and click the Sync icon. This will import your regular shoppers into the app for easy credit tracking.',
+        answer: 'Yes! Go to Profile -> Customer Relations and click the Sync icon. This will import your regular shoppers into the app for easy credit tracking.',
       ),
       _Faq(
         question: 'What are KPI Subscriptions?',

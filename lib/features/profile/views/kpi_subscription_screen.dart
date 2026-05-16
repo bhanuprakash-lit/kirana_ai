@@ -6,6 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../providers/kpi_provider.dart';
 import '../../dashboard/views/dashboard_screen.dart';
+import '../../subscription/providers/subscription_provider.dart';
+import '../../subscription/views/paywall_sheet.dart';
 
 class KpiSubscriptionScreen extends ConsumerStatefulWidget {
   const KpiSubscriptionScreen({super.key});
@@ -37,6 +39,13 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
         ),
       ),
       data: (state) {
+        // When no subscriptions exist, auto-enter edit mode so that tapping
+        // a KPI doesn't immediately flip back to the empty dashboard view.
+        if (!_isEditing && state.subscribedIds.isEmpty) {
+          Future.microtask(() {
+            if (mounted) setState(() => _isEditing = true);
+          });
+        }
         final showEditMode = _isEditing || state.subscribedIds.isEmpty;
 
         return Scaffold(
@@ -85,7 +94,7 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
   }
 }
 
-class _KpiSelectionView extends StatelessWidget {
+class _KpiSelectionView extends ConsumerWidget {
   final KpiState state;
   final KpiNotifier notifier;
   final VoidCallback onSave;
@@ -93,8 +102,9 @@ class _KpiSelectionView extends StatelessWidget {
   const _KpiSelectionView({required this.state, required this.notifier, required this.onSave});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final grouped = state.groupedRegistry;
+    final tier = ref.watch(subTierProvider);
 
     return Column(
       children: [
@@ -162,25 +172,68 @@ class _KpiSelectionView extends StatelessWidget {
                     style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                     child: Text(allSelected ? 'Unselect' : 'Select All'),
                   ),
-                  children: items.map((kpi) {
+                  children: items.asMap().entries.map((entry) {
+                    final kpi = entry.value;
                     final isSelected = state.subscribedIds.contains(kpi.kpiId);
+                    final accessible = state.isKpiAccessible(kpi.kpiId, tier);
+
                     return ListTile(
-                      onTap: () => notifier.toggleKpi(kpi.kpiId),
+                      onTap: () {
+                        if (!accessible) {
+                          showPaywallSheet(
+                            context,
+                            featureName: 'Pro KPI: ${kpi.name}',
+                            featureDescription: kpi.why,
+                            featureIcon: Icons.analytics_rounded,
+                          );
+                          return;
+                        }
+                        notifier.toggleKpi(kpi.kpiId);
+                      },
                       contentPadding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                      leading: Checkbox(
-                        value: isSelected,
-                        onChanged: (_) => notifier.toggleKpi(kpi.kpiId),
-                        activeColor: BrandColors.primary,
-                      ),
-                      title: Text(
-                        kpi.name,
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                      leading: accessible
+                          ? Checkbox(
+                              value: isSelected,
+                              onChanged: (_) => notifier.toggleKpi(kpi.kpiId),
+                              activeColor: BrandColors.primary,
+                            )
+                          : Container(
+                              width: 24, height: 24,
+                              margin: const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Icon(Icons.lock_outline_rounded, size: 14, color: Color(0xFF7C3AED)),
+                            ),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              kpi.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: accessible ? BrandColors.ink : BrandColors.muted,
+                              ),
+                            ),
+                          ),
+                          if (!accessible)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF7C3AED),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: const Text('PRO', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800)),
+                            ),
+                        ],
                       ),
                       subtitle: Text(
                         kpi.why,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12),
+                        style: TextStyle(fontSize: 12, color: accessible ? null : BrandColors.muted),
                       ),
                     );
                   }).toList(),

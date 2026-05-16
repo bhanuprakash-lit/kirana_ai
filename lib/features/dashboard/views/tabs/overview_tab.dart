@@ -5,7 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/models/alert_model.dart';
+import '../../../../shared/providers/alert_provider.dart';
+import '../../../../shared/views/notifications_screen.dart';
 import '../../../../shared/widgets/notification_bell.dart';
+import '../../../subscription/models/subscription_model.dart';
+import '../../../subscription/providers/subscription_provider.dart';
+import '../../../subscription/widgets/trial_countdown_widget.dart';
 import '../../models/overview_models.dart';
 import '../../providers/overview_provider.dart';
 import '../dashboard_screen.dart';
@@ -108,6 +114,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
               data: (data) => SliverList(
                 delegate: SliverChildListDelegate([
                   _MorningBriefingRibbon(reco: data.recommendations),
+                  const _ProAlertsStrip(),
                   _IntelligenceStrip(reco: data.recommendations),
                   const SizedBox(height: 24),
                   _TodaySalesCard(sales: data.dailySales),
@@ -275,6 +282,10 @@ class _GreetingHeader extends ConsumerWidget {
                     ],
                   ),
                   const Spacer(),
+
+                  // Trial countdown (shown only during trial)
+                  const TrialCountdownWidget(),
+                  const SizedBox(width: 8),
 
                   // 1️⃣ Notifications first
                   const NotificationBell(color: Colors.white),
@@ -901,6 +912,105 @@ class _ErrorView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Pro alerts strip (home screen) ───────────────────────────────────────────
+
+class _ProAlertsStrip extends ConsumerWidget {
+  const _ProAlertsStrip();
+
+  static const _typeColor = {
+    AlertType.lowStock:     Color(0xFFEF4444),
+    AlertType.expiry:       Color(0xFFF97316),
+    AlertType.udhaar:       Color(0xFF8B5CF6),
+    AlertType.performance:  Color(0xFF3B82F6),
+    AlertType.subscription: Color(0xFF10B981),
+  };
+
+  void _navigate(BuildContext context, WidgetRef ref, BusinessAlert alert) {
+    switch (alert.type) {
+      case AlertType.udhaar:
+        ref.read(dashboardTabProvider.notifier).switchTab(1);       // Finance
+        ref.read(financeSubTabProvider.notifier).setSubTab(0);      // Udhaar tab
+      case AlertType.performance:
+        ref.read(dashboardTabProvider.notifier).switchTab(1);       // Finance
+        ref.read(financeSubTabProvider.notifier).setSubTab(1);      // Distributor tab
+      case AlertType.lowStock:
+      case AlertType.expiry:
+        ref.read(dashboardTabProvider.notifier).switchTab(2);       // POS/Inventory
+        ref.read(dashboardSubTabProvider.notifier).setSubTab(1);    // Inventory sub-tab
+      case AlertType.subscription:
+        context.push('/profile/subscription');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tier = ref.watch(subTierProvider);
+    if (tier != SubTier.pro) return const SizedBox.shrink();
+
+    final alerts = ref.watch(alertProvider);
+    final visible = alerts
+        .where((a) => a.priority == AlertPriority.high || a.priority == AlertPriority.medium)
+        .take(8)
+        .toList();
+    if (visible.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 0, 16, 8),
+            child: Row(
+              children: [
+                const Text('ALERTS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: BrandColors.muted)),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+                  child: const Text('See all', style: TextStyle(fontSize: 12, color: BrandColors.primary, fontWeight: FontWeight.w600)),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 36,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              itemCount: visible.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 8),
+              itemBuilder: (_, i) {
+                final alert = visible[i];
+                final color = _typeColor[alert.type] ?? BrandColors.primary;
+                final isHigh = alert.priority == AlertPriority.high;
+                return GestureDetector(
+                  onTap: () => _navigate(context, ref, alert),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: isHigh ? 0.12 : 0.07),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: color.withValues(alpha: isHigh ? 0.4 : 0.2)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(alert.icon, size: 13, color: color),
+                        const SizedBox(width: 5),
+                        Text(alert.title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

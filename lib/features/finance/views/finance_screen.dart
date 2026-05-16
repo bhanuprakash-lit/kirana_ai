@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../features/dashboard/views/dashboard_screen.dart' show financeSubTabProvider;
 import '../models/finance_models.dart';
 import '../providers/finance_provider.dart';
 import 'tabs/udhaar_tab.dart';
@@ -20,7 +21,13 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    final initialTab = ref.read(financeSubTabProvider).clamp(0, 1);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: initialTab);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        ref.read(financeSubTabProvider.notifier).setSubTab(_tabController.index);
+      }
+    });
   }
 
   @override
@@ -32,6 +39,12 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final asyncData = ref.watch(financeProvider);
+
+    ref.listen(financeSubTabProvider, (prev, next) {
+      if (next != _tabController.index) {
+        _tabController.animateTo(next.clamp(0, 1));
+      }
+    });
 
     return Scaffold(
       backgroundColor: BrandColors.background,

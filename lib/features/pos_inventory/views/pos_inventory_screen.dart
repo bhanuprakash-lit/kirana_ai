@@ -4,6 +4,8 @@ import 'package:kirana_ai/shared/widgets/notification_bell.dart';
 
 import '../../../core/theme/brand_theme.dart';
 import '../providers/pos_provider.dart';
+import '../../subscription/providers/subscription_provider.dart';
+import '../../subscription/views/paywall_sheet.dart';
 import 'inventory_tab.dart';
 import 'pos_tab.dart';
 import 'tabs/procurement_tab.dart';
@@ -117,11 +119,105 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
       body: TabBarView(
         controller: _tabController,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          PosTab(),
-          InventoryTab(),
-          ProcurementTab(),
+        children: [
+          const PosTab(),
+          const InventoryTab(),
+          // Gate: only Pro users see Procurement
+          Consumer(
+            builder: (ctx, ref, _) {
+              final sub = ref.watch(subInfoProvider);
+              if (sub.canAccessVendorManagement) return const ProcurementTab();
+              return _ProGateTab(
+                title: 'Vendor & Procurement',
+                description: 'Manage purchase orders, supplier relationships, and distributor payments to keep your shelves stocked efficiently.',
+                icon: Icons.local_shipping_rounded,
+                onUpgrade: () => showPaywallSheet(
+                  ctx,
+                  featureName: 'Vendor & Procurement',
+                  featureDescription: 'Manage purchase orders, suppliers, and track distributor payments. Available exclusively on the Pro plan.',
+                  featureIcon: Icons.local_shipping_rounded,
+                ),
+              );
+            },
+          ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Pro gate placeholder tab ───────────────────────────────────────────────────
+
+class _ProGateTab extends StatelessWidget {
+  final String title;
+  final String description;
+  final IconData icon;
+  final VoidCallback onUpgrade;
+
+  const _ProGateTab({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.onUpgrade,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF7C3AED).withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 48, color: const Color(0xFF7C3AED)),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF7C3AED),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'PRO ONLY',
+                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: BrandColors.ink),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              description,
+              style: const TextStyle(fontSize: 14, color: BrandColors.muted, height: 1.5),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: onUpgrade,
+                icon: const Icon(Icons.workspace_premium_rounded, size: 18),
+                label: const Text('Upgrade to Pro  ₹500/mo · just ₹17/day'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
+                  backgroundColor: const Color(0xFF7C3AED),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

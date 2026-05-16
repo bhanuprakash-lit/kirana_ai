@@ -171,6 +171,7 @@ class _AddSupplierSheetState extends State<_AddSupplierSheet> {
                   _saving = true;
                   _error = null;
                 });
+                final nav = Navigator.of(context);
                 try {
                   await widget.ref.read(procurementProvider.notifier).createSupplier(
                     name: _nameCtrl.text,
@@ -182,7 +183,7 @@ class _AddSupplierSheetState extends State<_AddSupplierSheet> {
                       _success = true;
                     });
                     await Future.delayed(const Duration(milliseconds: 600));
-                    if (mounted) Navigator.pop(context);
+                    if (mounted) { nav.pop(); }
                   }
                 } catch (e) {
                   if (mounted) {

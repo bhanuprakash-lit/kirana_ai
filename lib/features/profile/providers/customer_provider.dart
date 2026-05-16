@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
 import '../models/customer_model.dart';
 
@@ -7,12 +8,14 @@ class CustomerState {
   final bool isLoading;
   final String? error;
   final String searchQuery;
+  final String? selectedSegment;
 
   CustomerState({
     this.customers = const [],
     this.isLoading = false,
     this.error,
     this.searchQuery = '',
+    this.selectedSegment,
   });
 
   CustomerState copyWith({
@@ -20,12 +23,15 @@ class CustomerState {
     bool? isLoading,
     String? error,
     String? searchQuery,
+    String? selectedSegment,
+    bool clearSegment = false,
   }) {
     return CustomerState(
       customers: customers ?? this.customers,
       isLoading: isLoading ?? this.isLoading,
       error: error,
       searchQuery: searchQuery ?? this.searchQuery,
+      selectedSegment: clearSegment ? null : (selectedSegment ?? this.selectedSegment),
     );
   }
 }
@@ -33,7 +39,6 @@ class CustomerState {
 class CustomerNotifier extends Notifier<CustomerState> {
   @override
   CustomerState build() {
-    // Initial fetch
     Future.microtask(() => fetchCustomers());
     return CustomerState();
   }
@@ -43,22 +48,16 @@ class CustomerNotifier extends Notifier<CustomerState> {
     final client = ref.read(apiClientProvider);
 
     try {
-      // 1. Fetch customers from OLTP
-      final res = await client.getOltp('customer', filters: {'limit': '500'});
-      final rows = (res['rows'] as List).cast<Map<String, dynamic>>();
-      
-      // 2. Map to model
+      final prefs = await SharedPreferences.getInstance();
+      final storeId = prefs.getInt('store_id') ?? 1;
+
+      final res = await client.get('/kirana/customers?store_id=$storeId');
+      final rows = (res['customers'] as List).cast<Map<String, dynamic>>();
       final customers = rows.map((json) => Customer.fromJson(json)).toList();
 
-      state = state.copyWith(
-        customers: customers,
-        isLoading: false,
-      );
+      state = state.copyWith(customers: customers, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to fetch customers: $e',
-      );
+      state = state.copyWith(isLoading: false, error: 'Failed to fetch customers: $e');
     }
   }
 
@@ -66,12 +65,28 @@ class CustomerNotifier extends Notifier<CustomerState> {
     state = state.copyWith(searchQuery: query);
   }
 
+  void setSegment(String? segment) {
+    state = state.copyWith(
+      selectedSegment: segment,
+      clearSegment: segment == null,
+    );
+  }
+
   List<Customer> get filteredCustomers {
-    if (state.searchQuery.isEmpty) return state.customers;
-    final q = state.searchQuery.toLowerCase();
-    return state.customers.where((c) {
-      return c.name.toLowerCase().contains(q) || c.phone.contains(q);
-    }).toList();
+    var list = state.customers;
+
+    if (state.selectedSegment != null) {
+      list = list.where((c) => c.segments.contains(state.selectedSegment)).toList();
+    }
+
+    if (state.searchQuery.isNotEmpty) {
+      final q = state.searchQuery.toLowerCase();
+      list = list.where((c) {
+        return c.name.toLowerCase().contains(q) || c.phone.contains(q);
+      }).toList();
+    }
+
+    return list;
   }
 
   Future<bool> createCustomer(Map<String, dynamic> data) async {
@@ -111,7 +126,6 @@ class CustomerNotifier extends Notifier<CustomerState> {
 
 final customerProvider = NotifierProvider<CustomerNotifier, CustomerState>(CustomerNotifier.new);
 
-// Detail provider for a single customer
 final customerOrdersProvider = FutureProvider.autoDispose.family<List<Map<String, dynamic>>, int>((ref, customerId) async {
   final client = ref.read(apiClientProvider);
   final res = await client.posGetList('/pos/orders?customer_id=$customerId&limit=50');

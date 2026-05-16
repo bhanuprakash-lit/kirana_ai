@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app_router.dart';
 import 'core/config/firebase_backend_config.dart';
 import 'core/theme/brand_theme.dart';
+import 'features/subscription/providers/iap_provider.dart';
+import 'features/support/providers/notification_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,9 @@ Future<void> main() async {
   // Enable Firebase Performance monitoring
   await FirebasePerformance.instance.setPerformanceCollectionEnabled(true);
 
+  // Register FCM background handler before runApp (Flutter requirement)
+  await initLocalNotifications();
+
   runApp(const ProviderScope(child: KiranaApp()));
 }
 
@@ -35,6 +40,9 @@ class KiranaApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(iapProvider); // Initialize IAP stream at app startup
+    // Initialize FCM listeners once; safe to call multiple times (idempotent via Provider)
+    ref.watch(notificationServiceProvider).init();
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       title: 'Kirana AI',

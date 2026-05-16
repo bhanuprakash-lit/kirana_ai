@@ -19,7 +19,7 @@ class ReferralScreen extends ConsumerWidget {
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         title: const Text(
-          'Referral Marketing',
+          'Customer Growth',
           style: TextStyle(fontWeight: FontWeight.w800),
         ),
       ),

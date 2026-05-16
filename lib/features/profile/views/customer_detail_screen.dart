@@ -6,21 +6,30 @@ import '../../../../core/theme/brand_theme.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
 import 'customer_management_screen.dart';
+import '../../associations/providers/association_provider.dart';
+import '../../associations/models/association_model.dart';
 
-class CustomerDetailScreen extends ConsumerWidget {
+class CustomerDetailScreen extends ConsumerStatefulWidget {
   final int customerId;
   const CustomerDetailScreen({super.key, required this.customerId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CustomerDetailScreen> createState() => _CustomerDetailScreenState();
+}
+
+class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
+  bool _savingAssociation = false;
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(customerProvider);
     final customer = state.customers.firstWhere(
-      (c) => c.customerId == customerId,
-      orElse: () => Customer(customerId: customerId, name: 'Loading...', phone: ''),
+      (c) => c.customerId == widget.customerId,
+      orElse: () => Customer(customerId: widget.customerId, name: 'Loading...', phone: ''),
     );
 
-    final ordersAsync = ref.watch(customerOrdersProvider(customerId));
-    final khataAsync = ref.watch(customerKhataProvider(customerId));
+    final ordersAsync = ref.watch(customerOrdersProvider(widget.customerId));
+    final khataAsync = ref.watch(customerKhataProvider(widget.customerId));
 
     return Scaffold(
       backgroundColor: BrandColors.background,
@@ -29,11 +38,11 @@ class CustomerDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () => _showEditCustomerSheet(context, ref, customer),
+            onPressed: () => _showEditCustomerSheet(context, customer),
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline_rounded, color: BrandColors.error),
-            onPressed: () => _confirmDelete(context, ref, customer),
+            onPressed: () => _confirmDelete(context, customer),
           ),
         ],
       ),
@@ -150,9 +159,15 @@ class CustomerDetailScreen extends ConsumerWidget {
                   _InfoRow(label: 'Household Size', value: '${customer.householdSize} members', icon: Icons.group_outlined),
                   const Divider(height: 32),
                   _InfoRow(
-                    label: 'Joined On', 
-                    value: customer.createdAt != null ? DateFormat('MMM dd, yyyy').format(customer.createdAt!) : 'Unknown', 
+                    label: 'Joined On',
+                    value: customer.createdAt != null ? DateFormat('MMM dd, yyyy').format(customer.createdAt!) : 'Unknown',
                     icon: Icons.calendar_today_outlined
+                  ),
+                  const Divider(height: 32),
+                  _AssociationRow(
+                    customer: customer,
+                    saving: _savingAssociation,
+                    onChanged: (newId) => _saveAssociation(customer, newId),
                   ),
                 ],
               ),
@@ -197,7 +212,7 @@ class CustomerDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditCustomerSheet(BuildContext context, WidgetRef ref, Customer customer) {
+  void _showEditCustomerSheet(BuildContext context, Customer customer) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -206,7 +221,7 @@ class CustomerDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, WidgetRef ref, Customer customer) {
+  void _confirmDelete(BuildContext context, Customer customer) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -218,14 +233,108 @@ class CustomerDetailScreen extends ConsumerWidget {
             onPressed: () async {
               await ref.read(customerProvider.notifier).deleteCustomer(customer.customerId);
               if (context.mounted) {
-                Navigator.pop(context); // pop dialog
-                context.pop(); // pop detail screen
+                Navigator.pop(context);
+                context.pop();
               }
             },
             child: const Text('Delete', style: TextStyle(color: BrandColors.error)),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _saveAssociation(Customer customer, int? newId) async {
+    setState(() => _savingAssociation = true);
+    try {
+      await ref.read(customerProvider.notifier).updateCustomer(
+        customer.customerId,
+        {'association_id': newId},
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update area: $e'), backgroundColor: BrandColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _savingAssociation = false);
+    }
+  }
+}
+
+// ── Association row with inline dropdown ──────────────────────────────────────
+
+class _AssociationRow extends ConsumerWidget {
+  final Customer customer;
+  final bool saving;
+  final ValueChanged<int?> onChanged;
+
+  const _AssociationRow({required this.customer, required this.saving, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final assocAsync = ref.watch(associationProvider);
+
+    return Row(
+      children: [
+        const Icon(Icons.location_city_rounded, size: 20, color: BrandColors.muted),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Area / Association',
+                  style: TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w500)),
+              const SizedBox(height: 4),
+              assocAsync.when(
+                loading: () => const SizedBox(height: 20, width: 80, child: LinearProgressIndicator()),
+                error: (_, _) => const Text('Unable to load areas', style: TextStyle(fontSize: 13, color: BrandColors.muted)),
+                data: (list) {
+                  if (list.isEmpty) {
+                    return GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/profile/associations'),
+                      child: const Text('No areas — tap to add one',
+                          style: TextStyle(fontSize: 13, color: BrandColors.primary, fontWeight: FontWeight.w600)),
+                    );
+                  }
+
+                  final items = <DropdownMenuItem<int?>>[
+                    const DropdownMenuItem(value: null, child: Text('None', style: TextStyle(color: BrandColors.muted))),
+                    ...list.map((a) => DropdownMenuItem(
+                          value: a.associationId,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(a.areaType.emoji),
+                              const SizedBox(width: 6),
+                              Text(a.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                        )),
+                  ];
+
+                  return saving
+                      ? const SizedBox(height: 20, width: 80, child: LinearProgressIndicator())
+                      : DropdownButtonHideUnderline(
+                          child: DropdownButton<int?>(
+                            value: customer.associationId,
+                            isDense: true,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: BrandColors.ink,
+                            ),
+                            onChanged: onChanged,
+                            items: items,
+                          ),
+                        );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

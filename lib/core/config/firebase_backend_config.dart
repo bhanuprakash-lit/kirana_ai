@@ -53,6 +53,8 @@ class FirebaseBackendConfig {
         'blocked_reason': '',
         // JSON array of store IDs to block, e.g. "[12, 34]"
         'blocked_store_ids': '[]',
+        // Trial period duration in days (configurable per market/campaign)
+        'trial_days': 14,
       });
 
       await remoteConfig.fetchAndActivate();
@@ -91,5 +93,9 @@ class FirebaseBackendConfig {
       blockedReason: reason,
       blockedStoreIds: blockedStoreIds,
     );
+
+    // ── Trial days ─────────────────────────────────────────────────────────────
+    final trialDays = rc.getInt('trial_days');
+    AppConfig.updateTrialDays(trialDays);
   }
 }

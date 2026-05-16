@@ -11,9 +11,12 @@ import '../models/pos_product.dart';
 import '../providers/pos_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../../../../core/services/contact_service.dart';
-import 'widgets/barcode_scanner_overlay.dart';
+import 'widgets/continuous_scanner_sheet.dart';
 import 'widgets/order_dialog.dart';
 import 'widgets/today_orders_sheet.dart';
+import '../../campaigns/models/campaign_model.dart' as campaign_card_lib;
+import '../../campaigns/providers/campaign_provider.dart';
+import '../../campaigns/views/widgets/campaign_card.dart';
 
 class PosTab extends ConsumerStatefulWidget {
   const PosTab({super.key});
@@ -289,81 +292,46 @@ class _PosTabState extends ConsumerState<PosTab> {
     ref.read(posProvider.notifier).setPendingReferral(pending);
   }
 
+  // Adds all in-stock campaign items to cart.
+  void _addCampaignToCart(campaign_card_lib.Campaign campaign) {
+    final notifier = ref.read(posProvider.notifier);
+    for (final item in campaign.stockedItems) {
+      final p = item.product;
+      if (p == null) continue;
+      notifier.addToCart(p.toPosProduct(), qty: item.quantity);
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('${campaign.availableCount} items from "${campaign.name}" added to cart'),
+      duration: const Duration(milliseconds: 1500),
+    ));
+  }
+
   void _openScanner() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BarcodeScannerOverlay(
-          onDetected: (barcode) async {
-            // Show feedback overlay immediately on the POS screen
-            final overlay = OverlayEntry(
-              builder: (context) => Container(
-                color: Colors.black45,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          'Looking for $barcode...',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: BrandColors.ink,
-                            decoration: TextDecoration.none,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-
-            Overlay.of(context).insert(overlay);
-
-            try {
-              final product = await ref
-                  .read(posProvider.notifier)
-                  .lookupBarcode(barcode);
-              overlay.remove();
-
-              if (product != null) {
-                _handleProductAdd(product);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${product.name} added to cart'),
-                      duration: const Duration(milliseconds: 600),
-                    ),
-                  );
-                }
-              } else {
-                if (mounted) {
-                  _handleUnknownBarcode(barcode);
-                }
-              }
-            } catch (_) {
-              overlay.remove();
-            }
-          },
-        ),
-      ),
+    final items = await showContinuousScannerSheet(
+      context, ref,
+      onUnknownBarcode: (barcode) => _handleUnknownBarcode(barcode),
     );
+    if (items == null || items.isEmpty || !mounted) return;
+
+    // For loose items we need a weight dialog; all others are added directly.
+    for (final ScanSessionItem item in items) {
+      if (item.product.isLoose) {
+        final qty = await _showWeightDialog(item.product, initialValue: item.qty.toDouble());
+        if (qty != null && qty > 0) {
+          ref.read(posProvider.notifier).addToCart(item.product, qty: qty);
+        }
+      } else {
+        ref.read(posProvider.notifier).addToCart(item.product, qty: item.qty.toDouble());
+      }
+    }
+
+    if (mounted) {
+      final count = items.fold<int>(0, (s, i) => s + i.qty);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('$count item${count > 1 ? 's' : ''} added to cart'),
+        duration: const Duration(milliseconds: 800),
+      ));
+    }
   }
 
   void _showCustomerSearchSheet() {
@@ -439,14 +407,14 @@ class _PosTabState extends ConsumerState<PosTab> {
                               color: BrandColors.primary,
                             ),
                           ),
-                          title: Text(c['name'] as String),
-                          subtitle: Text(c['phone'] as String),
+                          title: Text(c['name'] as String? ?? ''),
+                          subtitle: Text(c['phone'] as String? ?? ''),
                           onTap: () {
                             ref
                                 .read(posProvider.notifier)
                                 .setCustomer(
                                   c['customer_id'] as int,
-                                  c['name'] as String,
+                                  c['name'] as String? ?? '',
                                 );
                             Navigator.pop(ctx);
                           },
@@ -662,28 +630,84 @@ class _PosTabState extends ConsumerState<PosTab> {
           child: state.isLoadingProducts && state.products.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : cart.isEmpty
-              ? _EmptyCart(
+              ? _EmptyCartWithCampaigns(
                   hasPosError: state.error != null,
                   errorMsg: state.error,
+                  onAddCampaign: _addCampaignToCart,
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: cart.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (_, i) => _CartTile(
-                    item: cart[i],
-                    onEditLoose: (item) async {
-                      final qty = await _showWeightDialog(
-                        item.product,
-                        initialValue: item.quantity,
-                      );
-                      if (qty != null && qty > 0) {
-                        ref
-                            .read(posProvider.notifier)
-                            .updateQty(item.product.productId, qty);
-                      }
-                    },
-                  ),
+              : Column(
+                  children: [
+                    // Cart header with clear button
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 12, 2),
+                      child: Row(
+                        children: [
+                          Text(
+                            '${cart.length} item${cart.length > 1 ? 's' : ''} in cart',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: BrandColors.muted),
+                          ),
+                          const Spacer(),
+                          TextButton.icon(
+                            onPressed: () async {
+                              final ok = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Clear Cart?'),
+                                  content: const Text('All items will be removed from the cart.'),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      style: TextButton.styleFrom(foregroundColor: BrandColors.error),
+                                      child: const Text('Clear'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (ok == true) ref.read(posProvider.notifier).clearCart();
+                            },
+                            icon: const Icon(Icons.delete_sweep_rounded, size: 16),
+                            label: const Text('Clear'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: BrandColors.error,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                        itemCount: cart.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 8),
+                        itemBuilder: (_, i) => Dismissible(
+                          key: ValueKey(cart[i].product.productId),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            decoration: BoxDecoration(
+                              color: BrandColors.error,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.delete_rounded, color: Colors.white),
+                          ),
+                          onDismissed: (_) => ref.read(posProvider.notifier).removeFromCart(cart[i].product.productId),
+                          child: _CartTile(
+                            item: cart[i],
+                            onEditLoose: (item) async {
+                              final qty = await _showWeightDialog(item.product, initialValue: item.quantity);
+                              if (qty != null && qty > 0) {
+                                ref.read(posProvider.notifier).updateQty(item.product.productId, qty);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
         ),
 
@@ -1095,10 +1119,90 @@ class _QtyBtn extends StatelessWidget {
   }
 }
 
-class _EmptyCart extends StatelessWidget {
+class _EmptyCartWithCampaigns extends ConsumerWidget {
   final bool hasPosError;
   final String? errorMsg;
-  const _EmptyCart({required this.hasPosError, this.errorMsg});
+  final void Function(campaign_card_lib.Campaign) onAddCampaign;
+
+  const _EmptyCartWithCampaigns({
+    required this.hasPosError,
+    required this.onAddCampaign,
+    this.errorMsg,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (hasPosError) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.cloud_off_rounded, size: 56, color: BrandColors.muted.withValues(alpha: 0.4)),
+              const SizedBox(height: 16),
+              Text('POS Offline', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Text(errorMsg ?? 'Could not connect to POS.', textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 13)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final campaignsAsync = ref.watch(campaignProvider);
+
+    return campaignsAsync.when(
+      loading: () => const _EmptyCartHint(),
+      error: (err, st) => const _EmptyCartHint(),
+      data: (campaigns) {
+        if (campaigns.isEmpty) return const _EmptyCartHint();
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('🤖', style: TextStyle(fontSize: 18)),
+                      SizedBox(width: 8),
+                      Text(
+                        'Suggested for right now',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,
+                            color: BrandColors.muted, letterSpacing: 0.3),
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () => ref.read(campaignProvider.notifier).refresh(),
+                    child: const Text('Refresh', style: TextStyle(fontSize: 12, color: BrandColors.primary, fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+            ),
+            for (int i = 0; i < campaigns.length; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: CampaignCard(
+                  campaign: campaigns[i],
+                  index: i,
+                  onAddAll: () => onAddCampaign(campaigns[i]),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _EmptyCartHint extends StatelessWidget {
+  const _EmptyCartHint();
 
   @override
   Widget build(BuildContext context) {
@@ -1108,28 +1212,13 @@ class _EmptyCart extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              hasPosError
-                  ? Icons.cloud_off_rounded
-                  : Icons.shopping_cart_outlined,
-              size: 56,
-              color: BrandColors.muted.withValues(alpha: 0.4),
-            ),
+            Icon(Icons.shopping_cart_outlined, size: 56, color: BrandColors.muted.withValues(alpha: 0.4)),
             const SizedBox(height: 16),
-            Text(
-              hasPosError ? 'POS Offline' : 'Cart is empty',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Cart is empty', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            Text(
-              hasPosError
-                  ? (errorMsg ?? 'Could not connect to POS.')
-                  : 'Search for a product or scan a barcode to start a sale.',
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontSize: 13),
-            ),
+            Text('Search for a product or scan a barcode to start a sale.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 13)),
           ],
         ),
       ),
