@@ -47,3 +47,6 @@ app.*.map.json
 
 API_REFERENCE.md
 database_schemas_token_efficient.xlsx
+
+# Local secrets — never commit the real key file
+lib/core/config/secrets.dart

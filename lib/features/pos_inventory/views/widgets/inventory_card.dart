@@ -61,6 +61,16 @@ class InventoryCard extends StatelessWidget {
     return BrandColors.primary;
   }
 
+  Widget _iconBox(Color catColor) => Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: catColor.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(_categoryIcon(item.categoryName), size: 18, color: catColor),
+      );
+
   @override
   Widget build(BuildContext context) {
     final catColor = _categoryColor(item.categoryName);
@@ -91,21 +101,21 @@ class InventoryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Icon row + badge
+                    // Image / icon row + badge
                     Row(
                       children: [
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: catColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            _categoryIcon(item.categoryName),
-                            size: 16,
-                            color: catColor,
-                          ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: item.imageUrl != null
+                              ? Image.network(
+                                  item.imageUrl!,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) =>
+                                      _iconBox(catColor),
+                                )
+                              : _iconBox(catColor),
                         ),
                         const Spacer(),
                         if (item.isFastMoving)

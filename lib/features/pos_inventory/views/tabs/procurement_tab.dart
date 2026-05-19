@@ -104,6 +104,7 @@ class ProcurementTab extends ConsumerWidget {
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
     final categoryCtrl = TextEditingController();
+    bool saving = false;
 
     showModalBottomSheet(
       context: context,
@@ -124,7 +125,7 @@ class ProcurementTab extends ConsumerWidget {
                   children: [
                     const Text('Add New Supplier', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     TextButton.icon(
-                      onPressed: () async {
+                      onPressed: saving ? null : () async {
                         final contact = await ContactService.pickContact();
                         if (contact != null) {
                           setModalState(() {
@@ -133,7 +134,6 @@ class ProcurementTab extends ConsumerWidget {
                               phoneCtrl.text = ContactService.formatPhone(contact.phones.first.number);
                             }
                           });
-
                         }
                       },
                       icon: const Icon(Icons.contacts_rounded, size: 18),
@@ -142,25 +142,33 @@ class ProcurementTab extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Supplier Name')),
+                TextField(controller: nameCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Supplier Name')),
                 const SizedBox(height: 16),
-                TextField(controller: phoneCtrl, decoration: const InputDecoration(labelText: 'Phone Number'), keyboardType: TextInputType.phone),
+                TextField(controller: phoneCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Phone Number'), keyboardType: TextInputType.phone),
                 const SizedBox(height: 16),
-                TextField(controller: categoryCtrl, decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG, Beverages)')),
+                TextField(controller: categoryCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG, Beverages)')),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () async {
+                    onPressed: saving ? null : () async {
                       if (nameCtrl.text.isEmpty) return;
-                      await ref.read(procurementProvider.notifier).createSupplier(
-                        name: nameCtrl.text,
-                        phone: phoneCtrl.text,
-                        category: categoryCtrl.text,
-                      );
+                      setModalState(() => saving = true);
+                      try {
+                        await ref.read(procurementProvider.notifier).createSupplier(
+                          name: nameCtrl.text,
+                          phone: phoneCtrl.text,
+                          category: categoryCtrl.text,
+                        );
+                      } catch (_) {
+                        setModalState(() => saving = false);
+                        return;
+                      }
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
-                    child: const Text('Save Supplier'),
+                    child: saving
+                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Text('Save Supplier'),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -176,6 +184,7 @@ class ProcurementTab extends ConsumerWidget {
     final nameCtrl = TextEditingController(text: supplier.name);
     final phoneCtrl = TextEditingController(text: supplier.phone ?? '');
     final categoryCtrl = TextEditingController(text: supplier.category ?? '');
+    bool saving = false;
 
     showModalBottomSheet(
       context: context,
@@ -196,7 +205,7 @@ class ProcurementTab extends ConsumerWidget {
                   children: [
                     const Text('Edit Supplier', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     TextButton.icon(
-                      onPressed: () async {
+                      onPressed: saving ? null : () async {
                         final contact = await ContactService.pickContact();
                         if (contact != null) {
                           setModalState(() {
@@ -213,26 +222,34 @@ class ProcurementTab extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Supplier Name')),
+                TextField(controller: nameCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Supplier Name')),
                 const SizedBox(height: 16),
-                TextField(controller: phoneCtrl, decoration: const InputDecoration(labelText: 'Phone Number'), keyboardType: TextInputType.phone),
+                TextField(controller: phoneCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Phone Number'), keyboardType: TextInputType.phone),
                 const SizedBox(height: 16),
-                TextField(controller: categoryCtrl, decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG, Beverages)')),
+                TextField(controller: categoryCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG, Beverages)')),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () async {
+                    onPressed: saving ? null : () async {
                       if (nameCtrl.text.isEmpty) return;
-                      await ref.read(procurementProvider.notifier).updateSupplier(
-                        supplierId: supplier.supplierId,
-                        name: nameCtrl.text,
-                        phone: phoneCtrl.text,
-                        category: categoryCtrl.text,
-                      );
+                      setModalState(() => saving = true);
+                      try {
+                        await ref.read(procurementProvider.notifier).updateSupplier(
+                          supplierId: supplier.supplierId,
+                          name: nameCtrl.text,
+                          phone: phoneCtrl.text,
+                          category: categoryCtrl.text,
+                        );
+                      } catch (_) {
+                        setModalState(() => saving = false);
+                        return;
+                      }
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
-                    child: const Text('Save Changes'),
+                    child: saving
+                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Text('Save Changes'),
                   ),
                 ),
                 const SizedBox(height: 24),

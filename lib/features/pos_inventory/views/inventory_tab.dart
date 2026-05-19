@@ -1,14 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
 import '../models/inventory_item.dart';
+import '../models/pending_inventory_item.dart';
 import '../providers/inventory_provider.dart';
 import 'widgets/add_product_sheet.dart';
 import 'widgets/barcode_scanner_overlay.dart';
+import 'widgets/edit_product_sheet.dart';
 
 class InventoryTab extends ConsumerStatefulWidget {
   const InventoryTab({super.key});
@@ -42,220 +43,224 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
     final item = data.items.where((i) => i.barcode == barcode).firstOrNull;
 
     if (item != null) {
-      _showUpdateStockDialog(item);
+      _showEditProduct(item);
     } else {
       if (mounted) showAddProductSheet(context, ref, initialBarcode: barcode);
     }
   }
 
-  void _showUpdateStockDialog(InventoryItem item) {
-    if (item.isPerishable) {
-      _showPerishableOptions(item);
-    } else {
-      _showSimpleUpdateStock(item);
-    }
+  void _showEditProduct(InventoryItem item) {
+    showEditProductSheet(context, ref, item);
   }
 
-  void _showPerishableOptions(InventoryItem item) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(item.name,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-            Text('Current stock: ${item.stockLabel}',
-                style: const TextStyle(color: BrandColors.muted, fontSize: 13)),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  _showReceiveBatchDialog(item);
-                },
-                icon: const Icon(Icons.add_box_outlined),
-                label: const Text('Receive New Batch'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: BrandColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  _showSimpleUpdateStock(item);
-                },
-                icon: const Icon(Icons.edit_outlined),
-                label: const Text('Correct Stock Count'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // void _showUpdateStockDialog(InventoryItem item) {
+  //   if (item.isPerishable) {
+  //     _showPerishableOptions(item);
+  //   } else {
+  //     _showSimpleUpdateStock(item);
+  //   }
+  // }
 
-  void _showReceiveBatchDialog(InventoryItem item) {
-    final qtyCtrl = TextEditingController();
-    DateTime? selectedExpiry;
+  // void _showPerishableOptions(InventoryItem item) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  //     ),
+  //     builder: (ctx) => Padding(
+  //       padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(item.name,
+  //               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+  //           Text('Current stock: ${item.stockLabel}',
+  //               style: const TextStyle(color: BrandColors.muted, fontSize: 13)),
+  //           const SizedBox(height: 20),
+  //           SizedBox(
+  //             width: double.infinity,
+  //             child: ElevatedButton.icon(
+  //               onPressed: () {
+  //                 Navigator.pop(ctx);
+  //                 _showReceiveBatchDialog(item);
+  //               },
+  //               icon: const Icon(Icons.add_box_outlined),
+  //               label: const Text('Receive New Batch'),
+  //               style: ElevatedButton.styleFrom(
+  //                 backgroundColor: BrandColors.primary,
+  //                 foregroundColor: Colors.white,
+  //                 padding: const EdgeInsets.symmetric(vertical: 14),
+  //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+  //               ),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 10),
+  //           SizedBox(
+  //             width: double.infinity,
+  //             child: OutlinedButton.icon(
+  //               onPressed: () {
+  //                 Navigator.pop(ctx);
+  //                 _showSimpleUpdateStock(item);
+  //               },
+  //               icon: const Icon(Icons.edit_outlined),
+  //               label: const Text('Correct Stock Count'),
+  //               style: OutlinedButton.styleFrom(
+  //                 padding: const EdgeInsets.symmetric(vertical: 14),
+  //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialog) => AlertDialog(
-          title: Text('Receive Batch: ${item.name}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Current stock: ${item.stockLabel}',
-                  style: const TextStyle(color: BrandColors.muted, fontSize: 12)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: qtyCtrl,
-                autofocus: true,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}'))],
-                decoration: InputDecoration(
-                  labelText: 'Quantity Received',
-                  suffixText: item.isLoose ? (item.unit ?? 'units') : 'units',
-                ),
-              ),
-              const SizedBox(height: 16),
-              InkWell(
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: ctx,
-                    initialDate: DateTime.now().add(const Duration(days: 3)),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 730)),
-                  );
-                  if (date != null) setDialog(() => selectedExpiry = date);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: BrandColors.border),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calendar_today_rounded, size: 18, color: BrandColors.primary),
-                      const SizedBox(width: 8),
-                      Text(
-                        selectedExpiry == null
-                            ? 'Select Expiry Date *'
-                            : '${selectedExpiry!.day}/${selectedExpiry!.month}/${selectedExpiry!.year}',
-                        style: TextStyle(
-                          color: selectedExpiry == null ? BrandColors.muted : BrandColors.ink,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: selectedExpiry == null ? null : () async {
-                final qty = double.tryParse(qtyCtrl.text);
-                if (qty == null || qty <= 0) return;
-                final expiryStr =
-                    '${selectedExpiry!.year}-${selectedExpiry!.month.toString().padLeft(2,'0')}-${selectedExpiry!.day.toString().padLeft(2,'0')}';
-                final success = await ref
-                    .read(inventoryProvider.notifier)
-                    .receiveBatch(
-                      productId: item.productId,
-                      quantity: qty,
-                      expiryDate: expiryStr,
-                      currentStock: item.stockQuantity,
-                    );
-                if (success && ctx.mounted) {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Batch received for ${item.name}')),
-                  );
-                }
-              },
-              child: const Text('Receive'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // void _showReceiveBatchDialog(InventoryItem item) {
+  //   final qtyCtrl = TextEditingController();
+  //   DateTime? selectedExpiry;
 
-  void _showSimpleUpdateStock(InventoryItem item) {
-    final ctrl = TextEditingController(text: item.stockQuantity.toStringAsFixed(0));
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Correct Stock: ${item.name}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Current: ${item.stockLabel}',
-                style: const TextStyle(color: BrandColors.muted)),
-            const SizedBox(height: 16),
-            TextField(
-              controller: ctrl,
-              autofocus: true,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}'))],
-              decoration: InputDecoration(
-                labelText: 'Correct Stock Quantity',
-                suffixText: item.isLoose ? (item.unit ?? 'units') : 'units',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final newQty = double.tryParse(ctrl.text);
-              if (newQty != null) {
-                final success = await ref
-                    .read(inventoryProvider.notifier)
-                    .updateStock(item.productId, newQty);
-                if (success && ctx.mounted) {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Stock corrected for ${item.name}')),
-                  );
-                }
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
+  //   showDialog(
+  //     context: context,
+  //     builder: (ctx) => StatefulBuilder(
+  //       builder: (ctx, setDialog) => AlertDialog(
+  //         title: Text('Receive Batch: ${item.name}'),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text('Current stock: ${item.stockLabel}',
+  //                 style: const TextStyle(color: BrandColors.muted, fontSize: 12)),
+  //             const SizedBox(height: 16),
+  //             TextField(
+  //               controller: qtyCtrl,
+  //               autofocus: true,
+  //               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+  //               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}'))],
+  //               decoration: InputDecoration(
+  //                 labelText: 'Quantity Received',
+  //                 suffixText: item.isLoose ? (item.unit ?? 'units') : 'units',
+  //               ),
+  //             ),
+  //             const SizedBox(height: 16),
+  //             InkWell(
+  //               onTap: () async {
+  //                 final date = await showDatePicker(
+  //                   context: ctx,
+  //                   initialDate: DateTime.now().add(const Duration(days: 3)),
+  //                   firstDate: DateTime.now(),
+  //                   lastDate: DateTime.now().add(const Duration(days: 730)),
+  //                 );
+  //                 if (date != null) setDialog(() => selectedExpiry = date);
+  //               },
+  //               child: Container(
+  //                 padding: const EdgeInsets.all(12),
+  //                 decoration: BoxDecoration(
+  //                   border: Border.all(color: BrandColors.border),
+  //                   borderRadius: BorderRadius.circular(8),
+  //                 ),
+  //                 child: Row(
+  //                   children: [
+  //                     const Icon(Icons.calendar_today_rounded, size: 18, color: BrandColors.primary),
+  //                     const SizedBox(width: 8),
+  //                     Text(
+  //                       selectedExpiry == null
+  //                           ? 'Select Expiry Date *'
+  //                           : '${selectedExpiry!.day}/${selectedExpiry!.month}/${selectedExpiry!.year}',
+  //                       style: TextStyle(
+  //                         color: selectedExpiry == null ? BrandColors.muted : BrandColors.ink,
+  //                         fontWeight: FontWeight.w500,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+  //           ElevatedButton(
+  //             onPressed: selectedExpiry == null ? null : () async {
+  //               final qty = double.tryParse(qtyCtrl.text);
+  //               if (qty == null || qty <= 0) return;
+  //               final expiryStr =
+  //                   '${selectedExpiry!.year}-${selectedExpiry!.month.toString().padLeft(2,'0')}-${selectedExpiry!.day.toString().padLeft(2,'0')}';
+  //               final success = await ref
+  //                   .read(inventoryProvider.notifier)
+  //                   .receiveBatch(
+  //                     productId: item.productId,
+  //                     quantity: qty,
+  //                     expiryDate: expiryStr,
+  //                     currentStock: item.stockQuantity,
+  //                   );
+  //               if (success && ctx.mounted) {
+  //                 Navigator.pop(ctx);
+  //                 ScaffoldMessenger.of(context).showSnackBar(
+  //                   SnackBar(content: Text('Batch received for ${item.name}')),
+  //                 );
+  //               }
+  //             },
+  //             child: const Text('Receive'),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // void _showSimpleUpdateStock(InventoryItem item) {
+  //   final ctrl = TextEditingController(text: item.stockQuantity.toStringAsFixed(0));
+  //   showDialog(
+  //     context: context,
+  //     builder: (ctx) => AlertDialog(
+  //       title: Text('Correct Stock: ${item.name}'),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text('Current: ${item.stockLabel}',
+  //               style: const TextStyle(color: BrandColors.muted)),
+  //           const SizedBox(height: 16),
+  //           TextField(
+  //             controller: ctrl,
+  //             autofocus: true,
+  //             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+  //             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}'))],
+  //             decoration: InputDecoration(
+  //               labelText: 'Correct Stock Quantity',
+  //               suffixText: item.isLoose ? (item.unit ?? 'units') : 'units',
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(ctx),
+  //           child: const Text('Cancel'),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () async {
+  //             final newQty = double.tryParse(ctrl.text);
+  //             if (newQty != null) {
+  //               final success = await ref
+  //                   .read(inventoryProvider.notifier)
+  //                   .updateStock(item.productId, newQty);
+  //               if (success && ctx.mounted) {
+  //                 Navigator.pop(ctx);
+  //                 ScaffoldMessenger.of(context).showSnackBar(
+  //                   SnackBar(content: Text('Stock corrected for ${item.name}')),
+  //                 );
+  //               }
+  //             }
+  //           },
+  //           child: const Text('Save'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -282,8 +287,11 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
             );
           }
 
-          final categories = data.categories
-              .map((c) => c['name'] as String)
+          // Only show categories that actually have items in this store's inventory
+          final categories = data.items
+              .map((i) => i.categoryName)
+              .whereType<String>()
+              .toSet()
               .toList()
             ..sort();
           
@@ -423,6 +431,26 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                   ),
                 ),
 
+                // ── Pending (optimistic) items ───────────────────────────
+                if (data.pendingItems.isNotEmpty)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (_, i) => _PendingTile(
+                          pending: data.pendingItems[i],
+                          onRetry: data.pendingItems[i].status ==
+                                  PendingStatus.failed
+                              ? () => ref
+                                  .read(inventoryProvider.notifier)
+                                  .retryPending(data.pendingItems[i].tempId)
+                              : null,
+                        ),
+                        childCount: data.pendingItems.length,
+                      ),
+                    ),
+                  ),
+
                 if (filteredItems.isEmpty)
                   const SliverFillRemaining(
                     hasScrollBody: false,
@@ -446,7 +474,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                         delegate: SliverChildBuilderDelegate(
                           (_, i) => _InventoryTile(
                             item: entry.value[i],
-                            onTap: () => _showUpdateStockDialog(entry.value[i]),
+                            onTap: () => _showEditProduct(entry.value[i]),
                           ),
                           childCount: entry.value.length,
                         ),
@@ -614,10 +642,17 @@ class _InventoryTile extends StatelessWidget {
     return Icons.inventory_2_rounded;
   }
 
+  Widget _iconBox(Color catColor) => Container(
+        width: 40,
+        height: 40,
+        color: catColor.withValues(alpha: 0.1),
+        child: Icon(_categoryIcon(item.categoryName), color: catColor, size: 20),
+      );
+
   @override
   Widget build(BuildContext context) {
     final catColor = _categoryColor(item.categoryName);
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -630,18 +665,17 @@ class _InventoryTile extends StatelessWidget {
         dense: true,
         visualDensity: VisualDensity.compact,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: catColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            _categoryIcon(item.categoryName),
-            color: catColor,
-            size: 20,
-          ),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: item.imageUrl != null
+              ? Image.network(
+                  item.imageUrl!,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => _iconBox(catColor),
+                )
+              : _iconBox(catColor),
         ),
         title: Text(
           item.displayName,
@@ -689,6 +723,77 @@ class _InventoryTile extends StatelessWidget {
     );
   }
 }
+
+// ── Pending tile ──────────────────────────────────────────────────────────────
+
+class _PendingTile extends StatelessWidget {
+  final PendingInventoryItem pending;
+  final VoidCallback? onRetry;
+  const _PendingTile({required this.pending, this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final failed = pending.status == PendingStatus.failed;
+    final accent = failed ? BrandColors.error : BrandColors.primary;
+
+    return GestureDetector(
+      onTap: onRetry,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: failed
+              ? BrandColors.error.withValues(alpha: 0.05)
+              : BrandColors.primary.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: accent.withValues(alpha: failed ? 0.35 : 0.2),
+          ),
+        ),
+        child: ListTile(
+          dense: true,
+          visualDensity: VisualDensity.compact,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          leading: SizedBox(
+            width: 40,
+            height: 40,
+            child: failed
+                ? Icon(Icons.cloud_off_rounded, color: accent, size: 22)
+                : Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: BrandColors.primary,
+                    ),
+                  ),
+          ),
+          title: Text(
+            pending.name,
+            style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+                color: BrandColors.ink),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            failed ? 'Sync failed — tap to retry' : 'Syncing to server...',
+            style: TextStyle(
+              fontSize: 12,
+              color: accent,
+              fontWeight: failed ? FontWeight.w700 : FontWeight.normal,
+            ),
+          ),
+          trailing: failed
+              ? Icon(Icons.refresh_rounded, color: accent, size: 20)
+              : null,
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _EmptyInventory extends StatelessWidget {
   final VoidCallback onAdd;

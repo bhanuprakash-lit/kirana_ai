@@ -46,7 +46,7 @@ class AuthRepository {
     await _storage.write(key: _tokenKey, value: result.accessToken);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('user_id', result.user.userId);
-    await prefs.setInt('store_id', result.user.storeId);
+    if (result.user.storeId != null) await prefs.setInt('store_id', result.user.storeId!);
     await prefs.setString('username', result.user.username);
     await prefs.setString('full_name', result.user.fullName);
     await prefs.setString('role', result.user.role);
@@ -118,18 +118,54 @@ class AuthRepository {
     final token = await getToken();
     if (token == null) throw const ApiException(401, 'Not authenticated');
 
-    final res = await http.get(
-      Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/me'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+    try {
+      final res = await http.get(
+        Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 8));
 
-    if (res.statusCode == 200) {
-      return AppUser.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+      if (res.statusCode == 200) {
+        final user = AppUser.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+        // Refresh local cache on successful fetch
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('user_id', user.userId);
+        if (user.storeId != null) await prefs.setInt('store_id', user.storeId!);
+        await prefs.setString('username', user.username);
+        await prefs.setString('full_name', user.fullName);
+        await prefs.setString('role', user.role);
+        return user;
+      }
+      // 401 → truly not authenticated, don't fall back
+      if (res.statusCode == 401) {
+        throw ApiException(res.statusCode, _extractError(res.body));
+      }
+    } on ApiException {
+      rethrow;
+    } catch (_) {
+      // Network error / timeout → fall through to cache
     }
-    throw ApiException(res.statusCode, _extractError(res.body));
+
+    // Fallback: read from SharedPreferences (saved during login/register)
+    return _userFromPrefs();
+  }
+
+  Future<AppUser> _userFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
+    final username = prefs.getString('username');
+    final fullName = prefs.getString('full_name');
+    final role = prefs.getString('role');
+    final storeId = prefs.getInt('store_id');
+    if (userId == null || username == null) {
+      throw const ApiException(401, 'Not authenticated');
+    }
+    return AppUser(
+      userId: userId,
+      username: username,
+      fullName: fullName ?? username,
+      role: role ?? 'store_owner',
+      storeId: storeId,
+    );
   }
 
   /// Email + password login (legacy / admin path).

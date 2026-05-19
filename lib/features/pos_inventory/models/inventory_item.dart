@@ -3,24 +3,25 @@ class InventoryItem {
   final String name;
   final String? brand;
   final String? unit;
-  final double? weight;    // e.g. 250 for "250g"
+  final double? weight; // e.g. 250 for "250g"
   final String? barcode;
   final int categoryId;
   final String? categoryName;
   final double price;
   final double? mrp;
-  final double stockQuantity; 
+  final double stockQuantity;
   final bool isPerishable;
   final bool isLoose;
   // From recommendations
-  final double? reorderQty; 
+  final double? reorderQty;
   final double? daysToStockout;
   final double? prob7Day;
   final String? recommendationType;
   // From snapshot (units sold today)
-  final double soldToday; 
+  final double soldToday;
   // From inventory_batch
   final String? expiryDate;
+  final String? imageUrl;
 
   const InventoryItem({
     required this.productId,
@@ -42,6 +43,7 @@ class InventoryItem {
     this.recommendationType,
     this.soldToday = 0,
     this.expiryDate,
+    this.imageUrl,
   });
 
   bool get isFastMoving =>
@@ -67,14 +69,16 @@ class InventoryItem {
     if (weight == null && unit == null) return null;
     final w = weight != null
         ? (weight! % 1 == 0
-            ? weight!.toInt().toString()
-            : weight!.toStringAsFixed(1))
+              ? weight!.toInt().toString()
+              : weight!.toStringAsFixed(1))
         : null;
     return [w, unit].whereType<String>().join(' ');
   }
 
   String get stockLabel {
-    final qty = stockQuantity % 1 == 0 ? stockQuantity.toInt().toString() : stockQuantity.toStringAsFixed(2);
+    final qty = stockQuantity % 1 == 0
+        ? stockQuantity.toInt().toString()
+        : stockQuantity.toStringAsFixed(2);
     if (isLoose) {
       return '$qty ${unit ?? "units"}';
     }
@@ -91,7 +95,8 @@ class InventoryItem {
   }) {
     double? extractPrice(Map<String, dynamic>? map) {
       if (map == null) return null;
-      final v = (map['selling_price'] ?? map['price'] ?? map['unit_price']) as num?;
+      final v =
+          (map['selling_price'] ?? map['price'] ?? map['unit_price']) as num?;
       final val = v?.toDouble();
       return (val != null && val > 0) ? val : null;
     }
@@ -102,11 +107,11 @@ class InventoryItem {
       return double.tryParse(v.toString()) ?? 0.0;
     }
 
-    final price = extractPrice(pricing) ??
+    final price =
+        extractPrice(pricing) ??
         extractPrice(product) ??
         (product['price'] as num?)?.toDouble() ??
         0.0;
-
     return InventoryItem(
       productId: product['product_id'] as int,
       name: product['name'] as String,
@@ -117,19 +122,19 @@ class InventoryItem {
       categoryId: (product['category_id'] as num?)?.toInt() ?? 0,
       categoryName: categoryName,
       price: price,
-      mrp: (pricing?['mrp'] as num?)?.toDouble() ??
+      mrp:
+          (pricing?['mrp'] as num?)?.toDouble() ??
           (product['mrp'] as num?)?.toDouble(),
       stockQuantity: extractNum(product['stock_quantity']),
       isPerishable: product['is_perishable'] as bool? ?? false,
       isLoose: product['is_loose'] as bool? ?? false,
       reorderQty: (recommendation?['reorder_qty'] as num?)?.toDouble(),
-      daysToStockout:
-          (recommendation?['days_to_stockout'] as num?)?.toDouble(),
+      daysToStockout: (recommendation?['days_to_stockout'] as num?)?.toDouble(),
       prob7Day: (recommendation?['prob_stockout_7d'] as num?)?.toDouble(),
-      recommendationType:
-          recommendation?['recommendation_type'] as String?,
+      recommendationType: recommendation?['recommendation_type'] as String?,
       soldToday: soldToday,
       expiryDate: expiryDate,
+      imageUrl: product['image_url'] as String?,
     );
   }
 }

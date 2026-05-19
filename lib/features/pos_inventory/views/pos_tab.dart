@@ -14,6 +14,10 @@ import '../../../../core/services/contact_service.dart';
 import 'widgets/continuous_scanner_sheet.dart';
 import 'widgets/order_dialog.dart';
 import 'widgets/today_orders_sheet.dart';
+import '../../baskets/models/basket_model.dart';
+import '../../baskets/providers/basket_provider.dart';
+import 'widgets/voice_order_sheet.dart';
+import 'widgets/handwriting_order_sheet.dart';
 import '../../campaigns/models/campaign_model.dart' as campaign_card_lib;
 import '../../campaigns/providers/campaign_provider.dart';
 import '../../campaigns/views/widgets/campaign_card.dart';
@@ -302,6 +306,36 @@ class _PosTabState extends ConsumerState<PosTab> {
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('${campaign.availableCount} items from "${campaign.name}" added to cart'),
+      duration: const Duration(milliseconds: 1500),
+    ));
+  }
+
+  Future<void> _showVoiceOrderSheet() =>
+      showVoiceOrderSheet(context, ref);
+
+  Future<void> _showHandwritingSheet() =>
+      showHandwritingOrderSheet(context, ref);
+
+  // Adds all basket products (matched by productId) to cart.
+  void _addBasketToCart(Basket basket) {
+    final notifier = ref.read(posProvider.notifier);
+    final products = ref.read(posProvider).products;
+    int added = 0;
+    for (final item in basket.items) {
+      final product = products.where((p) => p.productId == item.productId).firstOrNull;
+      if (product == null) continue;
+      notifier.addToCart(product, qty: item.qty);
+      added++;
+    }
+    if (!mounted) return;
+    if (added == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('No matching products found in inventory for this basket'),
+      ));
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('$added item${added != 1 ? 's' : ''} from "${basket.name}" added to cart'),
       duration: const Duration(milliseconds: 1500),
     ));
   }
@@ -615,6 +649,13 @@ class _PosTabState extends ConsumerState<PosTab> {
           ),
         ),
 
+        // AI entry strip — always visible below search bar
+        if (!isSearching)
+          _AiEntryStrip(
+            onVoice: _showVoiceOrderSheet,
+            onHandwrite: _showHandwritingSheet,
+          ),
+
         if (isSearching)
           _SearchResults(
             products: _filtered,
@@ -634,6 +675,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                   hasPosError: state.error != null,
                   errorMsg: state.error,
                   onAddCampaign: _addCampaignToCart,
+                  onAddBasket: _addBasketToCart,
                 )
               : Column(
                   children: [
@@ -856,6 +898,14 @@ class _SmartAssortmentHints extends ConsumerWidget {
   }
 }
 
+Widget _posIconBox(double size) => Container(
+      width: size,
+      height: size,
+      color: BrandColors.surfaceTint,
+      child: Icon(Icons.inventory_2_rounded,
+          size: size * 0.45, color: BrandColors.muted),
+    );
+
 class _SearchResults extends StatelessWidget {
   final List<PosProduct> products;
   final bool isLoading;
@@ -906,18 +956,17 @@ class _SearchResults extends StatelessWidget {
                 final p = products[i];
                 return ListTile(
                   dense: true,
-                  leading: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: BrandColors.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.inventory_2_rounded,
-                      size: 16,
-                      color: BrandColors.primary,
-                    ),
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: p.imageUrl != null
+                        ? Image.network(
+                            p.imageUrl!,
+                            width: 36,
+                            height: 36,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => _posIconBox(36),
+                          )
+                        : _posIconBox(36),
                   ),
                   title: Text(
                     p.displayName,
@@ -976,18 +1025,17 @@ class _CartTile extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: BrandColors.surfaceTint,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.inventory_2_rounded,
-              size: 18,
-              color: BrandColors.muted,
-            ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: p.imageUrl != null
+                ? Image.network(
+                    p.imageUrl!,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => _posIconBox(40),
+                  )
+                : _posIconBox(40),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1123,10 +1171,12 @@ class _EmptyCartWithCampaigns extends ConsumerWidget {
   final bool hasPosError;
   final String? errorMsg;
   final void Function(campaign_card_lib.Campaign) onAddCampaign;
+  final void Function(Basket) onAddBasket;
 
   const _EmptyCartWithCampaigns({
     required this.hasPosError,
     required this.onAddCampaign,
+    required this.onAddBasket,
     this.errorMsg,
   });
 
@@ -1152,39 +1202,52 @@ class _EmptyCartWithCampaigns extends ConsumerWidget {
     }
 
     final campaignsAsync = ref.watch(campaignProvider);
+    final basketsAsync   = ref.watch(basketProvider);
+    final posProducts    = ref.watch(posProvider).products;
 
     return campaignsAsync.when(
       loading: () => const _EmptyCartHint(),
-      error: (err, st) => const _EmptyCartHint(),
+      error: (_, __) => const _EmptyCartHint(),
       data: (campaigns) {
-        if (campaigns.isEmpty) return const _EmptyCartHint();
+        final activeBaskets = basketsAsync.value
+            ?.where((b) => b.isActive2 && b.items.isNotEmpty)
+            .toList() ?? [];
+
+        if (campaigns.isEmpty && activeBaskets.isEmpty) return const _EmptyCartHint();
+
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
           children: [
+            // ── Single unified header ──────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('🤖', style: TextStyle(fontSize: 18)),
-                      SizedBox(width: 8),
-                      Text(
-                        'Suggested for right now',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800,
-                            color: BrandColors.muted, letterSpacing: 0.3),
-                      ),
-                    ],
+                  const Text(
+                    'Bundles & Deals',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: BrandColors.muted, letterSpacing: 0.3),
                   ),
                   GestureDetector(
                     onTap: () => ref.read(campaignProvider.notifier).refresh(),
-                    child: const Text('Refresh', style: TextStyle(fontSize: 12, color: BrandColors.primary, fontWeight: FontWeight.w600)),
+                    child: const Text('Refresh AI', style: TextStyle(fontSize: 12, color: BrandColors.primary, fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
             ),
+
+            // ── User baskets first ─────────────────────────────────────────
+            for (final basket in activeBaskets)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _PosBasketCard(
+                  basket: basket,
+                  posProducts: posProducts,
+                  onAddToCart: () => onAddBasket(basket),
+                ),
+              ),
+
+            // ── AI campaigns after ─────────────────────────────────────────
             for (int i = 0; i < campaigns.length; i++)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -1200,6 +1263,423 @@ class _EmptyCartWithCampaigns extends ConsumerWidget {
     );
   }
 }
+
+// ── Basket card — same visual structure as CampaignCard ──────────────────────
+
+class _PosBasketCard extends StatelessWidget {
+  static const _color = Color(0xFF0EA5E9); // sky-blue distinguishes user baskets from AI
+
+  final Basket basket;
+  final List<PosProduct> posProducts;
+  final VoidCallback onAddToCart;
+
+  const _PosBasketCard({
+    required this.basket,
+    required this.posProducts,
+    required this.onAddToCart,
+  });
+
+  int get _inStockCount => basket.items
+      .where((i) => posProducts.any((p) => p.productId == i.productId && p.stockQuantity > 0))
+      .length;
+
+  @override
+  Widget build(BuildContext context) {
+    final inStock  = _inStockCount;
+    final total    = basket.items.length;
+    final allReady = inStock == total;
+
+    return GestureDetector(
+      onTap: () => showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => _BasketDetailSheet(
+          basket: basket,
+          posProducts: posProducts,
+          onAddToCart: onAddToCart,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: _color.withValues(alpha: 0.25)),
+          boxShadow: [
+            BoxShadow(color: _color.withValues(alpha: 0.08), blurRadius: 12, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+              decoration: BoxDecoration(
+                color: _color.withValues(alpha: 0.06),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              ),
+              child: Row(
+                children: [
+                  const Text('🛒', style: TextStyle(fontSize: 26)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(basket.name,
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: _color)),
+                        if (basket.description != null)
+                          Text(basket.description!,
+                              style: const TextStyle(fontSize: 11, color: BrandColors.muted),
+                              maxLines: 1, overflow: TextOverflow.ellipsis)
+                        else
+                          Text('${basket.items.length} items in bundle',
+                              style: const TextStyle(fontSize: 11, color: BrandColors.muted)),
+                      ],
+                    ),
+                  ),
+                  // In-stock pill
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: allReady
+                          ? Colors.green.withValues(alpha: 0.12)
+                          : Colors.orange.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '$inStock/$total',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: allReady ? Colors.green.shade700 : Colors.orange.shade700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Item chips
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: basket.items.take(5).map((item) {
+                  final matched = posProducts.where((p) => p.productId == item.productId).firstOrNull;
+                  final inStockItem = matched != null && matched.stockQuantity > 0;
+                  return ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 160),
+                    child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: inStockItem
+                          ? _color.withValues(alpha: 0.08)
+                          : Colors.grey.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: inStockItem
+                            ? _color.withValues(alpha: 0.2)
+                            : Colors.grey.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          inStockItem ? Icons.check_circle_rounded : Icons.remove_circle_outline_rounded,
+                          size: 10,
+                          color: inStockItem ? _color : BrandColors.muted,
+                        ),
+                        const SizedBox(width: 3),
+                        Flexible(
+                          child: Text(
+                          '${item.productName ?? 'Item'} × ${item.qty.toStringAsFixed(item.qty == item.qty.roundToDouble() ? 0 : 1)}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: inStockItem ? _color : BrandColors.muted,
+                          ),
+                        ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  );
+                }).toList(),
+              ),
+            ),
+
+            // Footer
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (basket.price != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('₹${basket.price!.toStringAsFixed(0)}',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: _color)),
+                        const Text('bundle price', style: TextStyle(fontSize: 11, color: BrandColors.muted)),
+                      ],
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 160),
+                    child: ElevatedButton.icon(
+                      onPressed: inStock == 0 ? null : onAddToCart,
+                      icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
+                      label: const Text('Add to Cart'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _color,
+                        foregroundColor: Colors.white,
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Basket detail sheet (mirrors CampaignDetailSheet) ────────────────────────
+
+class _BasketDetailSheet extends StatelessWidget {
+  static const _color = Color(0xFF0EA5E9);
+
+  final Basket basket;
+  final List<PosProduct> posProducts;
+  final VoidCallback onAddToCart;
+
+  const _BasketDetailSheet({
+    required this.basket,
+    required this.posProducts,
+    required this.onAddToCart,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.65,
+      maxChildSize: 0.92,
+      minChildSize: 0.4,
+      expand: false,
+      builder: (_, ctrl) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40, height: 4,
+                decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+              child: Row(
+                children: [
+                  const Text('🛒', style: TextStyle(fontSize: 32)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(basket.name,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: _color)),
+                        if (basket.description != null)
+                          Text(basket.description!,
+                              style: const TextStyle(fontSize: 13, color: BrandColors.muted)),
+                        if (basket.validTo != null)
+                          Text('Valid until ${basket.validTo}',
+                              style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView.builder(
+                controller: ctrl,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: basket.items.length,
+                itemBuilder: (_, i) {
+                  final item    = basket.items[i];
+                  final matched = posProducts.where((p) => p.productId == item.productId).firstOrNull;
+                  final inStk   = matched != null && matched.stockQuantity > 0;
+                  return ListTile(
+                    leading: Container(
+                      width: 40, height: 40,
+                      decoration: BoxDecoration(
+                        color: inStk ? _color.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        inStk ? Icons.check_rounded : Icons.close_rounded,
+                        color: inStk ? _color : BrandColors.muted,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      item.productName ?? 'Item',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 14,
+                        color: inStk ? BrandColors.ink : BrandColors.muted,
+                      ),
+                    ),
+                    subtitle: inStk && matched != null
+                        ? Text('Stock: ${matched.stockQuantity.toStringAsFixed(0)} ${matched.unit ?? 'pcs'}  ·  ₹${matched.price.toStringAsFixed(0)}',
+                            style: const TextStyle(fontSize: 12))
+                        : const Text('Not in stock', style: TextStyle(fontSize: 12, color: Colors.red)),
+                    trailing: Text(
+                      '× ${item.qty.toStringAsFixed(item.qty == item.qty.roundToDouble() ? 0 : 1)}',
+                      style: const TextStyle(fontWeight: FontWeight.w700, color: _color),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 8, 20, MediaQuery.of(context).padding.bottom + 16),
+              child: Column(
+                children: [
+                  if (basket.price != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Bundle Price', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                        Text('₹${basket.price!.toStringAsFixed(0)}',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: _color)),
+                      ],
+                    ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: basket.items.every((i) =>
+                          !posProducts.any((p) => p.productId == i.productId && p.stockQuantity > 0))
+                          ? null
+                          : () { Navigator.pop(context); onAddToCart(); },
+                      icon: const Icon(Icons.add_shopping_cart_rounded),
+                      label: const Text('Add Available Items to Cart'),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        backgroundColor: _color,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── AI Entry Strip ────────────────────────────────────────────────────────────
+
+class _AiEntryStrip extends StatelessWidget {
+  final VoidCallback onVoice;
+  final VoidCallback onHandwrite;
+
+  const _AiEntryStrip({required this.onVoice, required this.onHandwrite});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+      child: Row(
+        children: [
+          _AiPill(
+            icon: Icons.mic_rounded,
+            label: 'Voice Order',
+            color: BrandColors.primary,
+            onTap: onVoice,
+          ),
+          const SizedBox(width: 8),
+          _AiPill(
+            icon: Icons.draw_rounded,
+            label: 'Handwrite',
+            color: const Color(0xFF7C3AED),
+            onTap: onHandwrite,
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              Icon(Icons.auto_awesome_rounded, size: 10, color: BrandColors.muted.withValues(alpha: 0.5)),
+              const SizedBox(width: 3),
+              Text(
+                'Kirana AI',
+                style: TextStyle(fontSize: 10, color: BrandColors.muted.withValues(alpha: 0.5), fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AiPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _AiPill({required this.icon, required this.label, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.22)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: color),
+            const SizedBox(width: 5),
+            Text(label, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w700)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _EmptyCartHint extends StatelessWidget {
   const _EmptyCartHint();

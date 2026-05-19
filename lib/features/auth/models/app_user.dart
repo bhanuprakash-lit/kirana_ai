@@ -3,22 +3,22 @@ class AppUser {
   final String username;
   final String fullName;
   final String role;
-  final int storeId;
+  final int? storeId;
 
   const AppUser({
     required this.userId,
     required this.username,
     required this.fullName,
     required this.role,
-    required this.storeId,
+    this.storeId,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) => AppUser(
         userId: json['user_id'] as int,
         username: json['username'] as String,
-        fullName: json['full_name'] as String,
-        role: json['role'] as String,
-        storeId: json['store_id'] as int,
+        fullName: (json['full_name'] as String?) ?? (json['username'] as String),
+        role: (json['role'] as String?) ?? 'store_owner',
+        storeId: json['store_id'] as int?,
       );
 
   Map<String, dynamic> toPrefs() => {

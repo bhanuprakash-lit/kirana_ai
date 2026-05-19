@@ -14,6 +14,7 @@ class BrandTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final FocusNode? focusNode;
   final List<String>? autofillHints;
+  final bool autofocus;
 
   const BrandTextField({
     super.key,
@@ -29,6 +30,7 @@ class BrandTextField extends StatelessWidget {
     this.inputFormatters,
     this.focusNode,
     this.autofillHints,
+    this.autofocus = false,
   });
 
   @override
@@ -41,6 +43,7 @@ class BrandTextField extends StatelessWidget {
       inputFormatters: inputFormatters,
       focusNode: focusNode,
       autofillHints: autofillHints,
+      autofocus: autofocus,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,

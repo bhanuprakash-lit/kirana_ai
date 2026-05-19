@@ -95,8 +95,15 @@ class OrderDetailsScreen extends ConsumerWidget {
                   children: [
                     _InfoTile(
                       label: 'Payment',
-                      value: paymentMethod.toUpperCase(),
-                      icon: Icons.payments_outlined,
+                      value: paymentMethod.toLowerCase() == 'udhaar'
+                          ? 'Udhaar'
+                          : paymentMethod.toUpperCase(),
+                      icon: paymentMethod.toLowerCase() == 'udhaar'
+                          ? Icons.account_balance_wallet_outlined
+                          : Icons.payments_outlined,
+                      valueColor: paymentMethod.toLowerCase() == 'udhaar'
+                          ? const Color(0xFFD97706)
+                          : null,
                     ),
                     _InfoTile(
                       label: 'Total Amount',
@@ -241,19 +248,36 @@ class OrderDetailsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: BrandColors.primary,
+              color: paymentMethod.toLowerCase() == 'udhaar'
+                  ? const Color(0xFFD97706)   // amber — neutral, doesn't imply unpaid
+                  : BrandColors.primary,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Total Paid',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      paymentMethod.toLowerCase() == 'udhaar'
+                          ? 'Udhaar Sale'
+                          : 'Total Paid',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (paymentMethod.toLowerCase() == 'udhaar')
+                      const Text(
+                        'Recorded as credit — check Udhaar tab for balance',
+                        style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500),
+                      ),
+                  ],
                 ),
                 Text(
                   _fmt(total),

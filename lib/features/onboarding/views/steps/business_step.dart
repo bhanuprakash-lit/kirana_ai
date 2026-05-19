@@ -79,6 +79,7 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
               controller: _ownerCtrl,
               label: "Owner's full name",
               hint: 'e.g. Ramesh Kumar',
+              autofocus: true,
               validator: (v) =>
                   (v == null || v.trim().isEmpty) ? 'Name is required' : null,
             ).animate(delay: 100.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
@@ -107,11 +108,10 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
             ).animate(delay: 200.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              initialValue: _selectedType,
+              value: _selectedType,
               decoration: const InputDecoration(labelText: 'Business type'),
               hint: const Text('Select your store type'),
               isExpanded: true,
-              borderRadius: BorderRadius.circular(18),
               items: _businessTypes
                   .map((t) => DropdownMenuItem(value: t, child: Text(t)))
                   .toList(),

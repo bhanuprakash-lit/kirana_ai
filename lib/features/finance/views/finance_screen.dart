@@ -70,7 +70,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
                 unselectedLabelColor: BrandColors.muted,
                 tabs: const [
                   Tab(text: 'Udhaar'),
-                  Tab(text: 'Distributor'),
+                  Tab(text: 'Suppliers'),
                 ],
               ),
             ],

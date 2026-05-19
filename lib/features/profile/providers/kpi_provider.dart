@@ -234,7 +234,7 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
     if (currentState == null) return;
 
     final client = ref.read(apiClientProvider);
-    final tier = ref.read(subTierProvider);
+    final tier = ref.read(subInfoProvider).effectiveTier;
 
     // Strip KPIs the user's tier can't access before saving
     final accessibleIds = currentState.subscribedIds

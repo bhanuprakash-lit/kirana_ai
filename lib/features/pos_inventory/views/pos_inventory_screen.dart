@@ -110,9 +110,9 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
           labelStyle: const TextStyle(
               fontWeight: FontWeight.w700, fontSize: 13),
           tabs: const [
-            Tab(icon: Icon(Icons.point_of_sale_rounded), text: 'Sales'),
-            Tab(icon: Icon(Icons.inventory_2_rounded), text: 'Inventory'),
-            Tab(icon: Icon(Icons.local_shipping_rounded), text: 'Procure'),
+            Tab(icon: Icon(Icons.point_of_sale_rounded), text: 'Billing'),
+            Tab(icon: Icon(Icons.inventory_2_rounded), text: 'Stock'),
+            Tab(icon: Icon(Icons.local_shipping_rounded), text: 'Purchase'),
           ],
         ),
       ),
@@ -128,13 +128,13 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
               final sub = ref.watch(subInfoProvider);
               if (sub.canAccessVendorManagement) return const ProcurementTab();
               return _ProGateTab(
-                title: 'Vendor & Procurement',
-                description: 'Manage purchase orders, supplier relationships, and distributor payments to keep your shelves stocked efficiently.',
+                title: 'Purchase & Suppliers',
+                description: 'Create purchase orders, manage your suppliers, and track what you owe them — all in one place.',
                 icon: Icons.local_shipping_rounded,
                 onUpgrade: () => showPaywallSheet(
                   ctx,
-                  featureName: 'Vendor & Procurement',
-                  featureDescription: 'Manage purchase orders, suppliers, and track distributor payments. Available exclusively on the Pro plan.',
+                  featureName: 'Purchase & Suppliers',
+                  featureDescription: 'Manage purchase orders and suppliers. Track payments to distributors. Available on the Pro plan.',
                   featureIcon: Icons.local_shipping_rounded,
                 ),
               );

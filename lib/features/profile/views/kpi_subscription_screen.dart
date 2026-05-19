@@ -104,7 +104,7 @@ class _KpiSelectionView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final grouped = state.groupedRegistry;
-    final tier = ref.watch(subTierProvider);
+    final tier = ref.watch(subInfoProvider).effectiveTier;
 
     return Column(
       children: [

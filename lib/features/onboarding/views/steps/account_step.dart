@@ -56,10 +56,20 @@ class _AccountStepState extends ConsumerState<AccountStep> {
       _step = _AccountStep.chooseUsername;
     }
     _usernameCtrl.addListener(_onUsernameChanged);
+    _otpCtrl.addListener(_onOtpChanged);
+  }
+
+  void _onOtpChanged() {
+    if (_otpCtrl.text.trim().length == 6 &&
+        !_loading &&
+        _step == _AccountStep.enterOtp) {
+      _verifyOtp();
+    }
   }
 
   @override
   void dispose() {
+    _otpCtrl.removeListener(_onOtpChanged);
     _phoneCtrl.dispose();
     _otpCtrl.dispose();
     _usernameCtrl.dispose();
@@ -196,6 +206,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   }
 
   void _submitUsername() {
+    FocusScope.of(context).unfocus();
     final uname = _usernameCtrl.text.trim();
     if (uname.isEmpty) {
       setState(() => _error = 'Choose a unique username for your store');

@@ -27,12 +27,14 @@ class FirebaseBackendConfig {
     }
 
     // Crashlytics — disable in debug so logs stay clean locally
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
+    );
 
     // Performance
-    await FirebasePerformance.instance
-        .setPerformanceCollectionEnabled(!kDebugMode);
+    await FirebasePerformance.instance.setPerformanceCollectionEnabled(
+      !kDebugMode,
+    );
 
     final remoteConfig = FirebaseRemoteConfig.instance;
     try {
@@ -83,8 +85,9 @@ class FirebaseBackendConfig {
     try {
       final raw = rc.getString('blocked_store_ids').trim();
       if (raw.isNotEmpty) {
-        blockedStoreIds =
-            (jsonDecode(raw) as List<dynamic>).map((e) => e as int).toList();
+        blockedStoreIds = (jsonDecode(raw) as List<dynamic>)
+            .map((e) => e as int)
+            .toList();
       }
     } catch (_) {}
 

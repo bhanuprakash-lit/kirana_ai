@@ -4,7 +4,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
-import '../../auth/providers/user_provider.dart';
 import '../../subscription/providers/subscription_provider.dart';
 
 // ── Background handler — must be top-level (no class, no context) ─────────────
@@ -180,8 +179,10 @@ class NotificationService {
   // ── Act on the data payload ───────────────────────────────────────────────
 
   void _handleAction(String? action, {String? route}) {
-    // Legacy subscription action
     if (action == 'open_subscription' || route == '/profile/subscription') {
+      _ref.read(subscriptionProvider.notifier).refresh();
+    } else if (action == 'subscription_cancelled') {
+      // Refresh subscription — tier drops to 'none', dashboard will gate automatically
       _ref.read(subscriptionProvider.notifier).refresh();
     }
   }
@@ -199,11 +200,11 @@ class NotificationService {
 
   Future<void> _uploadTokenToServer(String token) async {
     try {
-      final user = await _ref.read(userProvider.future);
-      if (user == null) return;
+      // ApiClient reads auth_token from secure storage directly — no need to
+      // wait for userProvider, which lags behind on first registration.
       final client = _ref.read(apiClientProvider);
       await client.post('/kirana/auth/fcm-token', {'fcm_token': token});
-      debugPrint('FCM token uploaded for ${user.username}');
+      debugPrint('FCM token uploaded');
     } catch (e) {
       debugPrint('FCM token server upload failed: $e');
     }

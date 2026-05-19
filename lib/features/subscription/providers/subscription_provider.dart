@@ -29,13 +29,14 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
     state = await AsyncValue.guard(_fetch);
   }
 
-  /// Requests a trial (creates pending_trial on backend awaiting admin approval).
-  Future<SubscriptionInfo> requestTrial() async {
+  /// Requests a trial for the chosen tier ('basic' or 'pro').
+  Future<SubscriptionInfo> requestTrial({String tier = 'basic'}) async {
     final client = ref.read(apiClientProvider);
     try {
-      final res =
-          await client.post('/kirana/subscription/request-trial', {})
-              as Map<String, dynamic>;
+      final res = await client.post(
+        '/kirana/subscription/request-trial',
+        {'tier': tier},
+      ) as Map<String, dynamic>;
       final info = SubscriptionInfo.fromJson(res);
       state = AsyncData(info);
       return info;

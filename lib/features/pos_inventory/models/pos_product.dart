@@ -12,6 +12,7 @@ class PosProduct {
   final double price;
   final double? mrp;
   final double stockQuantity;
+  final String? imageUrl;
 
   const PosProduct({
     required this.productId,
@@ -27,6 +28,7 @@ class PosProduct {
     required this.price,
     this.mrp,
     required this.stockQuantity,
+    this.imageUrl,
   });
 
   factory PosProduct.fromJson(Map<String, dynamic> j) {
@@ -53,6 +55,7 @@ class PosProduct {
       price: price,
       mrp: mrp > 0 ? mrp : null,
       stockQuantity: extract(j['stock_quantity']),
+      imageUrl: j['image_url'] as String?,
     );
   }
 
@@ -71,6 +74,7 @@ class PosProduct {
         price: price ?? this.price,
         mrp: mrp ?? this.mrp,
         stockQuantity: stockQuantity ?? this.stockQuantity,
+        imageUrl: imageUrl,
       );
 
   String get displayName {

@@ -14,6 +14,7 @@ import 'features/profile/views/store_settings_screen.dart';
 import 'features/profile/views/customer_management_screen.dart';
 import 'features/associations/views/association_screen.dart';
 import 'features/profile/views/config_screen.dart';
+import 'features/profile/views/password_screen.dart';
 import 'features/profile/views/cashflow_screen.dart';
 import 'features/profile/views/customer_detail_screen.dart';
 import 'features/referral/models/referral_models.dart';
@@ -24,6 +25,8 @@ import 'features/support/views/support_screen.dart';
 import 'features/support/views/faq_screen.dart';
 import 'features/support/views/report_issue_screen.dart';
 import 'features/splash/views/splash_screen.dart';
+import 'features/profile/views/admin_activity_screen.dart';
+import 'features/baskets/views/baskets_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -121,6 +124,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ConfigScreen(),
           ),
           GoRoute(
+            path: 'password',
+            builder: (context, state) => const PasswordScreen(),
+          ),
+          GoRoute(
             path: 'customers',
             builder: (context, state) => const CustomerManagementScreen(),
             routes: [
@@ -136,6 +143,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'associations',
             builder: (context, state) => const AssociationScreen(),
+          ),
+          GoRoute(
+            path: 'admin-activity',
+            builder: (context, state) => const AdminActivityScreen(),
+          ),
+          GoRoute(
+            path: 'baskets',
+            builder: (context, state) => const BasketsScreen(),
           ),
           GoRoute(
             path: 'support',

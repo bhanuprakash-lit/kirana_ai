@@ -108,8 +108,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       text: 'Phone OTP',
                     ),
                     Tab(
-                      icon: Icon(Icons.email_outlined, size: 18),
-                      text: 'Email',
+                      icon: Icon(Icons.lock_outline_rounded, size: 18),
+                      text: 'Username',
                     ),
                   ],
                 ),
@@ -505,9 +505,9 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
         children: [
           BrandTextField(
             controller: _emailCtrl,
-            label: 'Username / Email',
-            hint: 'mystore or you@example.com',
-            keyboardType: TextInputType.emailAddress,
+            label: 'Username',
+            hint: 'e.g. mykiranastore',
+            keyboardType: TextInputType.text,
             validator: (v) =>
                 (v == null || v.trim().isEmpty) ? 'Username is required' : null,
           ),

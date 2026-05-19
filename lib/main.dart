@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_router.dart';
 import 'core/config/firebase_backend_config.dart';
+import 'core/services/api_client.dart';
 import 'core/theme/brand_theme.dart';
 import 'features/subscription/providers/iap_provider.dart';
 import 'features/support/providers/notification_provider.dart';
@@ -35,11 +36,57 @@ Future<void> main() async {
   runApp(const ProviderScope(child: KiranaApp()));
 }
 
-class KiranaApp extends ConsumerWidget {
+class KiranaApp extends ConsumerStatefulWidget {
   const KiranaApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<KiranaApp> createState() => _KiranaAppState();
+}
+
+class _KiranaAppState extends ConsumerState<KiranaApp> with WidgetsBindingObserver {
+  DateTime? _foregroundStart;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // App launched = first foreground event
+    _foregroundStart = DateTime.now();
+    _trackEvent('foreground');
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _foregroundStart = DateTime.now();
+      _trackEvent('foreground');
+    } else if (state == AppLifecycleState.paused) {
+      final durationSec = _foregroundStart != null
+          ? DateTime.now().difference(_foregroundStart!).inSeconds
+          : null;
+      _foregroundStart = null;
+      _trackEvent('background', durationSec: durationSec);
+    }
+  }
+
+  Future<void> _trackEvent(String event, {int? durationSec}) async {
+    try {
+      final body = <String, dynamic>{'event': event};
+      if (durationSec != null) body['duration_sec'] = durationSec;
+      await ref.read(apiClientProvider).post('/kirana/tracking/app-event', body);
+    } catch (_) {
+      // Silently ignore — user may not be logged in yet
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ref.watch(iapProvider); // Initialize IAP stream at app startup
     // Initialize FCM listeners once; safe to call multiple times (idempotent via Provider)
     ref.watch(notificationServiceProvider).init();

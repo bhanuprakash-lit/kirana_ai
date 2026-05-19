@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../core/services/api_client.dart';
 import '../../../../core/services/contact_service.dart';
 import '../../../../shared/widgets/action_widgets.dart';
+import '../../../profile/models/customer_model.dart';
+import '../../../profile/providers/customer_provider.dart';
 import '../../models/finance_models.dart';
 import '../../providers/finance_provider.dart';
 
@@ -94,7 +97,7 @@ class UdhaarTab extends ConsumerWidget {
   }
 }
 
-class _AddUdhaarSheet extends StatefulWidget {
+class _AddUdhaarSheet extends ConsumerStatefulWidget {
   final WidgetRef ref;
   final TextEditingController nameController;
   final TextEditingController amountController;
@@ -110,16 +113,53 @@ class _AddUdhaarSheet extends StatefulWidget {
   });
 
   @override
-  State<_AddUdhaarSheet> createState() => _AddUdhaarSheetState();
+  ConsumerState<_AddUdhaarSheet> createState() => _AddUdhaarSheetState();
 }
 
-class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
+class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
   bool _saving = false;
   bool _success = false;
   String? _error;
+  Customer? _selectedCustomer;
+
+  void _fillFromCustomer(Customer c) {
+    setState(() {
+      _selectedCustomer = c;
+      widget.nameController.text = c.name;
+      widget.phoneController.text = c.phone;
+    });
+  }
+
+  void _clearCustomer() {
+    setState(() {
+      _selectedCustomer = null;
+      widget.nameController.clear();
+      widget.phoneController.clear();
+    });
+  }
+
+  Future<void> _showCustomerPicker() async {
+    final customers = ref.read(customerProvider).customers;
+    if (customers.isEmpty) return;
+
+    await showModalBottomSheet<Customer>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _CustomerPickerSheet(
+        customers: customers,
+        onSelected: (c) {
+          Navigator.pop(context);
+          _fillFromCustomer(c);
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final customers = ref.watch(customerProvider).customers;
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -163,8 +203,8 @@ class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
                     final contact = await ContactService.pickContact();
                     if (contact != null) {
                       setState(() {
-                        widget.nameController.text = contact.name!.first
-                            .toString();
+                        _selectedCustomer = null;
+                        widget.nameController.text = contact.name!.first.toString();
                         if (contact.phones.isNotEmpty) {
                           final p = ContactService.formatPhone(
                             contact.phones.first.number,
@@ -184,6 +224,92 @@ class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
             ],
           ),
           const SizedBox(height: 16),
+
+          // Existing customer picker
+          if (customers.isNotEmpty && !_saving && !_success) ...[
+            GestureDetector(
+              onTap: _selectedCustomer != null ? _clearCustomer : _showCustomerPicker,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: _selectedCustomer != null
+                      ? BrandColors.primary.withValues(alpha: 0.06)
+                      : BrandColors.surfaceTint,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _selectedCustomer != null
+                        ? BrandColors.primary.withValues(alpha: 0.4)
+                        : BrandColors.border,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _selectedCustomer != null
+                          ? Icons.check_circle_rounded
+                          : Icons.person_search_rounded,
+                      color: _selectedCustomer != null
+                          ? BrandColors.primary
+                          : BrandColors.muted,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _selectedCustomer != null
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _selectedCustomer!.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: BrandColors.ink,
+                                  ),
+                                ),
+                                if (_selectedCustomer!.phone.isNotEmpty)
+                                  Text(
+                                    _selectedCustomer!.phone,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: BrandColors.muted,
+                                    ),
+                                  ),
+                              ],
+                            )
+                          : const Text(
+                              'Select existing customer',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: BrandColors.muted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                    ),
+                    Icon(
+                      _selectedCustomer != null
+                          ? Icons.close_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      color: BrandColors.muted,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Row(
+              children: [
+                Expanded(child: Divider()),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: Text('or enter manually', style: TextStyle(fontSize: 11, color: BrandColors.muted)),
+                ),
+                Expanded(child: Divider()),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
 
           ActionStatusOverlay(
             isSaving: _saving,
@@ -278,6 +404,137 @@ class _AddUdhaarSheetState extends State<_AddUdhaarSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Customer picker sheet ─────────────────────────────────────────────────────
+
+class _CustomerPickerSheet extends StatefulWidget {
+  final List<Customer> customers;
+  final ValueChanged<Customer> onSelected;
+
+  const _CustomerPickerSheet({required this.customers, required this.onSelected});
+
+  @override
+  State<_CustomerPickerSheet> createState() => _CustomerPickerSheetState();
+}
+
+class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
+  final _searchCtrl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = widget.customers
+        .where((c) {
+          if (_query.isEmpty) return true;
+          final q = _query.toLowerCase();
+          return c.name.toLowerCase().contains(q) || c.phone.contains(q);
+        })
+        .toList();
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.65,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, scrollCtrl) => Container(
+        decoration: const BoxDecoration(
+          color: BrandColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40, height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Select Customer',
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _searchCtrl,
+                    autofocus: true,
+                    onChanged: (v) => setState(() => _query = v),
+                    decoration: InputDecoration(
+                      hintText: 'Search by name or phone...',
+                      prefixIcon: const Icon(Icons.search_rounded, size: 20, color: BrandColors.muted),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      suffixIcon: _query.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              onPressed: () { _searchCtrl.clear(); setState(() => _query = ''); },
+                            )
+                          : null,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: filtered.isEmpty
+                  ? const Center(
+                      child: Text('No customers found',
+                          style: TextStyle(color: BrandColors.muted)),
+                    )
+                  : ListView.builder(
+                      controller: scrollCtrl,
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                      itemCount: filtered.length,
+                      itemBuilder: (_, i) {
+                        final c = filtered[i];
+                        return ListTile(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          leading: CircleAvatar(
+                            backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
+                            child: Text(
+                              c.name.isNotEmpty ? c.name[0].toUpperCase() : '?',
+                              style: const TextStyle(
+                                  color: BrandColors.primary,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          title: Text(c.name,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 14)),
+                          subtitle: c.phone.isNotEmpty
+                              ? Text(c.phone,
+                                  style: const TextStyle(
+                                      fontSize: 12, color: BrandColors.muted))
+                              : null,
+                          onTap: () => widget.onSelected(c),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -493,6 +750,15 @@ class _UdhaarTile extends ConsumerWidget {
                         ),
                         child: const Text('Recover'),
                       ),
+                      const SizedBox(width: 4),
+                      TextButton(
+                        onPressed: () => _showHistorySheet(context, ref),
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          foregroundColor: BrandColors.muted,
+                        ),
+                        child: const Text('History'),
+                      ),
                     ],
                   ),
 
@@ -523,6 +789,15 @@ class _UdhaarTile extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _RecoverUdhaarSheet(ref: ref, item: item),
+    );
+  }
+
+  void _showHistorySheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _UdhaarHistorySheet(ref: ref, item: item),
     );
   }
 }
@@ -593,10 +868,11 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
             controller: _controller,
             enabled: !_saving && !_success,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Amount',
               prefixText: '₹ ',
-              prefixIcon: Icon(Icons.currency_rupee_rounded),
+              prefixIcon: const Icon(Icons.currency_rupee_rounded),
+              helperText: 'Balance: ₹${widget.item.balance.toStringAsFixed(0)}',
             ),
           ),
           const SizedBox(height: 28),
@@ -612,6 +888,10 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
                       final amount = double.tryParse(_controller.text) ?? 0;
                       if (amount <= 0) {
                         setState(() => _error = 'Please enter a valid amount');
+                        return;
+                      }
+                      if (amount > widget.item.balance) {
+                        setState(() => _error = 'Amount cannot exceed balance ₹${widget.item.balance.toStringAsFixed(0)}');
                         return;
                       }
 
@@ -675,6 +955,147 @@ class _EmptyUdhaar extends StatelessWidget {
                 color: BrandColors.muted,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UdhaarHistorySheet extends StatefulWidget {
+  final WidgetRef ref;
+  final UdhaarItem item;
+  const _UdhaarHistorySheet({required this.ref, required this.item});
+
+  @override
+  State<_UdhaarHistorySheet> createState() => _UdhaarHistorySheetState();
+}
+
+class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
+  List<Map<String, dynamic>> _payments = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final client = widget.ref.read(apiClientProvider);
+      final res = await client.get('/kirana/finance/udhaar/${widget.item.khataId}/history') as Map<String, dynamic>;
+      if (mounted) {
+        setState(() {
+          _payments = (res['payments'] as List).cast<Map<String, dynamic>>();
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() { _loading = false; _error = e.toString(); });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.3,
+      maxChildSize: 0.85,
+      expand: false,
+      builder: (_, scrollCtrl) => Container(
+        decoration: const BoxDecoration(
+          color: BrandColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Recovery History', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+                        Text(widget.item.customerName, style: const TextStyle(fontSize: 13, color: BrandColors.muted)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: BrandColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'Balance: ₹${widget.item.balance.toStringAsFixed(0)}',
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: BrandColors.error),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _error != null
+                      ? Center(child: Text(_error!, style: const TextStyle(color: BrandColors.error)))
+                      : _payments.isEmpty
+                          ? const Center(child: Text('No recoveries recorded yet.', style: TextStyle(color: BrandColors.muted)))
+                          : ListView.separated(
+                              controller: scrollCtrl,
+                              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                              itemCount: _payments.length,
+                              separatorBuilder: (context2, index2) => const Divider(height: 1),
+                              itemBuilder: (_, i) {
+                                final p = _payments[i];
+                                final amount = (p['amount'] as num?)?.toDouble() ?? 0.0;
+                                final paidAt = p['paid_at'] as String?;
+                                final dt = paidAt != null ? DateTime.tryParse(paidAt)?.toLocal() : null;
+                                final dateLabel = dt != null
+                                    ? '${dt.day}/${dt.month}/${dt.year}  ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}'
+                                    : '—';
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: BrandColors.success.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(Icons.arrow_downward_rounded, color: BrandColors.success, size: 18),
+                                      ),
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Recovery #${_payments.length - i}',
+                                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                                            Text(dateLabel, style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                                          ],
+                                        ),
+                                      ),
+                                      Text('+ ₹${amount.toStringAsFixed(0)}',
+                                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: BrandColors.success)),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
             ),
           ],
         ),

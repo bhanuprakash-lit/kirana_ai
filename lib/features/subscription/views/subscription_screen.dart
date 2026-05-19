@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../models/subscription_model.dart';
 import '../providers/iap_provider.dart';
 import '../providers/subscription_provider.dart';
-import '../services/iap_service.dart';
 import '../widgets/trial_countdown_widget.dart';
 
 class SubscriptionScreen extends ConsumerWidget {
@@ -60,83 +58,7 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
   }
 
   Future<void> _startPayment(String tier) async {
-    final testMode = await IapService.isTestMode();
-
-    if (testMode) {
-      await _startTestPayment(tier);
-    } else {
-      // Google Play Billing — purchase stream result is handled by IapNotifier
-      await ref.read(iapProvider.notifier).purchase(tier);
-    }
-  }
-
-  Future<void> _startTestPayment(String tier) async {
-    final confirmed = await _showTestPaymentDialog(context, tier);
-    if (confirmed != true || !mounted) return;
-
-    setState(() => _isProcessing = true);
-    try {
-      final client = ref.read(apiClientProvider);
-      await client.post('/kirana/payment/mock-confirm', {'tier': tier});
-      await ref.read(subscriptionProvider.notifier).refresh();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Test mode: ${tier == 'pro' ? 'Pro' : 'Basic'} plan activated!'),
-          backgroundColor: BrandColors.success,
-        ));
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: BrandColors.error,
-        ));
-      }
-    } finally {
-      if (mounted) setState(() => _isProcessing = false);
-    }
-  }
-
-  Future<bool?> _showTestPaymentDialog(BuildContext context, String tier) {
-    final price = tier == 'pro' ? '₹500' : '₹200';
-    return showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.science_rounded, color: Color(0xFFFF8C00)),
-            SizedBox(width: 8),
-            Text('Test Mode Payment'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF8C00).withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFFF8C00).withValues(alpha: 0.3)),
-              ),
-              child: const Text(
-                'Test mode is ON.\nThis simulates a real payment — no money is charged.',
-                style: TextStyle(fontSize: 13, color: BrandColors.ink, height: 1.4),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text('Plan: ${tier == 'pro' ? 'Pro' : 'Basic'}  ·  $price/month', style: const TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            const Text('Disable test mode in Profile → Developer Options to go live.', style: TextStyle(fontSize: 11, color: BrandColors.muted)),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Simulate Payment ✓')),
-        ],
-      ),
-    );
+    await ref.read(iapProvider.notifier).purchase(tier);
   }
 
   Future<void> _cancelSubscription() async {
@@ -192,7 +114,7 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
               color: BrandColors.primary,
               icon: Icons.star_rounded,
               isCurrentPlan: info.tier == SubTier.basic,
-              isTrialPlan: info.tier == SubTier.trial,
+              isTrialPlan: info.tier == SubTier.trial && info.trialTier == 'basic',
               features: _basicFeatures,
               lockedFeatures: _proOnlyFeatures,
               onUpgrade: _isProcessing ? null : () => _startPayment('basic'),
@@ -206,6 +128,7 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
               color: const Color(0xFF7C3AED),
               icon: Icons.workspace_premium_rounded,
               isCurrentPlan: info.tier == SubTier.pro,
+              isTrialPlan: info.tier == SubTier.trial && info.trialTier == 'pro',
               isBestValue: true,
               features: [..._basicFeatures, ..._proOnlyFeatures],
               onUpgrade: _isProcessing ? null : () => _startPayment('pro'),
@@ -317,7 +240,7 @@ class _CurrentPlanCard extends StatelessWidget {
           Row(children: [
             Icon(_icon(info.tier), color: Colors.white, size: 20),
             const SizedBox(width: 10),
-            Text('Current: ${info.tier.displayName}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15)),
+            Text('Current: ${info.tier.displayName(trialTier: info.trialTier)}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15)),
           ]),
           if (info.isTrial && info.isActive) ...[
             const SizedBox(height: 10),
@@ -340,7 +263,7 @@ class _CurrentPlanCard extends StatelessWidget {
     switch (t) {
       case SubTier.none: return BrandColors.muted;
       case SubTier.pending: return const Color(0xFFFF8C00);
-      case SubTier.trial: return BrandColors.primary;
+      case SubTier.trial: return info.trialTier == 'pro' ? const Color(0xFF7C3AED) : BrandColors.primary;
       case SubTier.basic: return BrandColors.primary;
       case SubTier.pro: return const Color(0xFF7C3AED);
     }
@@ -350,7 +273,7 @@ class _CurrentPlanCard extends StatelessWidget {
     switch (t) {
       case SubTier.none: return Icons.block_rounded;
       case SubTier.pending: return Icons.hourglass_top_rounded;
-      case SubTier.trial: return Icons.timer_outlined;
+      case SubTier.trial: return info.trialTier == 'pro' ? Icons.workspace_premium_rounded : Icons.timer_outlined;
       case SubTier.basic: return Icons.star_rounded;
       case SubTier.pro: return Icons.workspace_premium_rounded;
     }

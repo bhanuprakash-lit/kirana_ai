@@ -8,7 +8,6 @@ import '../../auth/providers/user_provider.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
 import '../../subscription/models/subscription_model.dart';
 import '../../subscription/providers/subscription_provider.dart';
-import '../../subscription/services/iap_service.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../providers/store_settings_provider.dart';
 
@@ -116,74 +115,100 @@ class ProfileScreen extends ConsumerWidget {
                   context.push('/profile/cashflow');
                 },
               ),
-              _ProfileOption(
-                icon: Icons.share_rounded,
-                label: 'Customer Growth',
-                subtitle: 'Let customers refer friends and earn rewards',
-                badge: ref.watch(subInfoProvider).canAccessReferral ? null : 'PRO',
-                onTap: () {
-                  final sub = ref.read(subInfoProvider);
-                  if (!sub.canAccessReferral) {
-                    showPaywallSheet(
-                      context,
-                      featureName: 'Customer Growth',
-                      featureDescription: 'Build a referral engine — let your happy customers bring in new ones automatically.',
-                      featureIcon: Icons.share_rounded,
-                    );
-                    return;
-                  }
-                  context.push('/profile/referral');
-                },
-              ),
-              _ProfileOption(
-                icon: Icons.people_outline_rounded,
-                label: 'Customer Relations',
-                subtitle: 'Manage your regular shoppers and khata',
-                onTap: () => context.push('/profile/customers'),
-              ),
-              _ProfileOption(
-                icon: Icons.location_city_rounded,
-                label: 'Area Associations',
-                subtitle: 'Nearby apartments, hostels, schools & offices',
-                onTap: () => context.push('/profile/associations'),
-              ),
-              _ProfileOption(
-                icon: Icons.analytics_outlined,
-                label: 'KPI Subscriptions',
-                subtitle: 'Choose and monitor your key metrics',
-                onTap: () => context.push('/profile/kpis'),
-              ),
-              _ProfileOption(
-                icon: Icons.history_rounded,
-                label: 'Transaction History',
-                subtitle: 'View past purchases and POS orders',
-                onTap: () => context.push('/profile/history'),
-              ),
-              _ProfileOption(
-                icon: Icons.storefront_rounded,
-                label: 'Store Settings',
-                subtitle: 'Manage your store details and layout',
-                onTap: () => context.push('/profile/store'),
-              ),
-              _ProfileOption(
-                icon: Icons.tune_rounded,
-                label: 'Configuration',
-                subtitle: 'POS preferences, AI settings, notifications',
-                onTap: () => context.push('/profile/config'),
-              ),
-              _ProfileOption(
-                icon: Icons.workspace_premium_rounded,
-                label: 'Subscription & Plans',
-                subtitle: 'Manage your plan — Basic ₹7/day · Pro ₹17/day',
-                onTap: () => context.push('/profile/subscription'),
-              ),
-              _ProfileOption(
-                icon: Icons.help_outline_rounded,
-                label: 'Help & Support',
-                subtitle: 'Contact us for any assistance',
-                onTap: () => context.push('/profile/support'),
-              ),
-              const _DeveloperOptions(),
+
+              const _SectionLabel('Customers'),
+              _GroupCard(rows: [
+                _CompactRow(
+                  icon: Icons.share_rounded,
+                  label: 'Customer Growth',
+                  badge: ref.watch(subInfoProvider).canAccessReferral ? null : 'PRO',
+                  onTap: () {
+                    final sub = ref.read(subInfoProvider);
+                    if (!sub.canAccessReferral) {
+                      showPaywallSheet(context,
+                          featureName: 'Customer Growth',
+                          featureDescription: 'Build a referral engine — let your happy customers bring in new ones automatically.',
+                          featureIcon: Icons.share_rounded);
+                      return;
+                    }
+                    context.push('/profile/referral');
+                  },
+                ),
+                _CompactRow(
+                  icon: Icons.people_outline_rounded,
+                  label: 'Customer Relations',
+                  onTap: () => context.push('/profile/customers'),
+                ),
+                _CompactRow(
+                  icon: Icons.location_city_rounded,
+                  label: 'Area Associations',
+                  onTap: () => context.push('/profile/associations'),
+                ),
+              ]),
+
+              const _SectionLabel('Analytics'),
+              _GroupCard(rows: [
+                _CompactRow(
+                  icon: Icons.analytics_outlined,
+                  label: 'KPI Subscriptions',
+                  onTap: () => context.push('/profile/kpis'),
+                ),
+                _CompactRow(
+                  icon: Icons.history_rounded,
+                  label: 'Transaction History',
+                  onTap: () => context.push('/profile/history'),
+                ),
+                _CompactRow(
+                  icon: Icons.shopping_basket_rounded,
+                  label: 'My Baskets',
+                  onTap: () => context.push('/profile/baskets'),
+                ),
+              ]),
+
+              const _SectionLabel('Store & Account'),
+              _GroupCard(rows: [
+                _CompactRow(
+                  icon: Icons.storefront_rounded,
+                  label: 'Store Settings',
+                  onTap: () => context.push('/profile/store'),
+                ),
+                _CompactRow(
+                  icon: Icons.tune_rounded,
+                  label: 'Configuration',
+                  onTap: () => context.push('/profile/config'),
+                ),
+                _CompactRow(
+                  icon: Icons.lock_outline_rounded,
+                  label: 'Password & Security',
+                  onTap: () => context.push('/profile/password'),
+                ),
+              ]),
+
+              const _SectionLabel('Plan & Support'),
+              _GroupCard(rows: [
+                _CompactRow(
+                  icon: Icons.workspace_premium_rounded,
+                  label: 'Subscription & Plans',
+                  onTap: () => context.push('/profile/subscription'),
+                ),
+                _CompactRow(
+                  icon: Icons.help_outline_rounded,
+                  label: 'Help & Support',
+                  onTap: () => context.push('/profile/support'),
+                ),
+              ]),
+
+              if (user.role == 'admin') ...[
+                const _SectionLabel('Admin'),
+                _GroupCard(rows: [
+                  _CompactRow(
+                    icon: Icons.people_alt_rounded,
+                    label: 'User Activity',
+                    onTap: () => context.push('/profile/admin-activity'),
+                  ),
+                ]),
+              ],
+
               const _ProfileFooter(),
               // Logout Button
               Padding(
@@ -321,58 +346,118 @@ class _ProfileFooter extends StatelessWidget {
   }
 }
 
-class _ProfileOption extends StatelessWidget {
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  const _SectionLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 18, 24, 6),
+        child: Text(
+          text.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            color: BrandColors.muted,
+            letterSpacing: 1.1,
+          ),
+        ),
+      );
+}
+
+class _GroupCard extends StatelessWidget {
+  final List<_CompactRow> rows;
+  const _GroupCard({required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        children: [
+          for (int i = 0; i < rows.length; i++) ...[
+            rows[i],
+            if (i < rows.length - 1)
+              const Divider(height: 1, indent: 52, endIndent: 16),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CompactRow extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String subtitle;
   final VoidCallback onTap;
   final String? badge;
 
-  const _ProfileOption({
+  const _CompactRow({
     required this.icon,
     required this.label,
-    required this.subtitle,
     required this.onTap,
     this.badge,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return InkWell(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-      leading: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: BrandColors.surfaceTint,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Icon(icon, color: BrandColors.primary, size: 24),
-      ),
-      title: Row(
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-          if (badge != null) ...[
-            const SizedBox(width: 8),
+      borderRadius: BorderRadius.circular(18),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        child: Row(
+          children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              width: 34,
+              height: 34,
               decoration: BoxDecoration(
-                color: const Color(0xFF7C3AED),
-                borderRadius: BorderRadius.circular(6),
+                color: BrandColors.surfaceTint,
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Text(
-                badge!,
-                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+              child: Icon(icon, color: BrandColors.primary, size: 18),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  if (badge != null) ...[
+                    const SizedBox(width: 7),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7C3AED),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        badge!,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
+            const Icon(Icons.chevron_right_rounded,
+                color: BrandColors.muted, size: 18),
           ],
-        ],
+        ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: const TextStyle(fontSize: 13, color: BrandColors.muted, fontWeight: FontWeight.w500),
-      ),
-      trailing: const Icon(Icons.chevron_right_rounded, color: BrandColors.muted, size: 20),
     );
   }
 }
@@ -401,9 +486,11 @@ class _SubscriptionBadge extends ConsumerWidget {
         icon = Icons.hourglass_top_rounded;
         label = 'Awaiting Activation';
       case SubTier.trial:
-        color = const Color(0xFFFF8C00);
-        icon = Icons.timer_outlined;
-        label = sub.daysRemaining > 0 ? 'Trial · ${sub.daysRemaining}d left' : 'Trial Active';
+        final isProTrial = sub.trialTier == 'pro';
+        color = isProTrial ? const Color(0xFF7C3AED) : const Color(0xFFFF8C00);
+        icon = isProTrial ? Icons.workspace_premium_rounded : Icons.timer_outlined;
+        final tierLabel = isProTrial ? 'Pro Trial' : 'Basic Trial';
+        label = sub.daysRemaining > 0 ? '$tierLabel · ${sub.daysRemaining}d left' : '$tierLabel Active';
       case SubTier.basic:
         color = BrandColors.primary;
         icon = Icons.star_rounded;
@@ -436,68 +523,3 @@ class _SubscriptionBadge extends ConsumerWidget {
   }
 }
 
-// ── Developer Options (test mode toggle) ──────────────────────────────────────
-
-class _DeveloperOptions extends StatefulWidget {
-  const _DeveloperOptions();
-
-  @override
-  State<_DeveloperOptions> createState() => _DeveloperOptionsState();
-}
-
-class _DeveloperOptionsState extends State<_DeveloperOptions> {
-  bool _testMode = true;
-  bool _loaded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    IapService.isTestMode().then((v) {
-      if (mounted) setState(() { _testMode = v; _loaded = true; });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_loaded) return const SizedBox.shrink();
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFEF3C7)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-            child: Row(children: [
-              const Icon(Icons.developer_mode_rounded, size: 16, color: Color(0xFFF59E0B)),
-              const SizedBox(width: 6),
-              const Text('Developer Options', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFFB45309))),
-            ]),
-          ),
-          SwitchListTile(
-            dense: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            title: const Text('Test Payment Mode', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-            subtitle: Text(
-              _testMode
-                  ? 'Mock dialog — no real payment. Disable before going live.'
-                  : 'Google Play Billing is active.',
-              style: const TextStyle(fontSize: 12),
-            ),
-            value: _testMode,
-            activeThumbColor: const Color(0xFFF59E0B),
-            activeTrackColor: const Color(0xFFFEF3C7),
-            onChanged: (v) async {
-              await IapService.setTestMode(v);
-              if (mounted) setState(() => _testMode = v);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}

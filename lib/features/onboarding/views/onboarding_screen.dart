@@ -5,6 +5,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../core/theme/brand_theme.dart';
 import '../providers/onboarding_provider.dart';
+import '../../support/providers/notification_provider.dart';
 import 'steps/account_step.dart';
 import 'steps/business_step.dart';
 import 'steps/consent_step.dart';
@@ -58,6 +59,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         );
       }
       if (next.status == OnboardingStatus.success) {
+        ref.read(notificationServiceProvider).uploadToken();
         context.go('/home');
       }
     });
