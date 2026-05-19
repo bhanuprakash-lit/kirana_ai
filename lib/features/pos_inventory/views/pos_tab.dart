@@ -1548,7 +1548,7 @@ class _BasketDetailSheet extends StatelessWidget {
                         color: inStk ? BrandColors.ink : BrandColors.muted,
                       ),
                     ),
-                    subtitle: inStk && matched != null
+                    subtitle: inStk
                         ? Text('Stock: ${matched.stockQuantity.toStringAsFixed(0)} ${matched.unit ?? 'pcs'}  ·  ₹${matched.price.toStringAsFixed(0)}',
                             style: const TextStyle(fontSize: 12))
                         : const Text('Not in stock', style: TextStyle(fontSize: 12, color: Colors.red)),

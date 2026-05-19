@@ -39,7 +39,26 @@
       "Bash(C:\\\\Users\\\\Bhanuprakash\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\python.exe *)",
       "Bash(conda run *)",
       "Bash(git -C \"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\FlutterProjects\\\\kirana_ai\" diff --stat HEAD)",
-      "Bash(git -C \"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\kirana-master-backend\" log --oneline -10)"
+      "Bash(git -C \"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\kirana-master-backend\" log --oneline -10)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(len\\(d\\), 'products'\\)\")",
+      "Bash(node *)",
+      "Bash(python db_generation/seed_blinkit_catalog.py)",
+      "Bash(python db_generation/db_cleanup_and_upgrade.py)",
+      "Bash(python -c \"from kirana.routes import router; from kirana.schemas import ChangePasswordRequest; print\\('OK'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('kirana/routes.py'\\).read\\(\\)\\); ast.parse\\(open\\('kirana/schemas.py'\\).read\\(\\)\\); ast.parse\\(open\\('kirana/repository.py'\\).read\\(\\)\\); print\\('All syntax OK'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('kirana/routes.py'\\).read\\(\\)\\); ast.parse\\(open\\('kirana/service.py'\\).read\\(\\)\\); ast.parse\\(open\\('kirana/repository.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('kirana/routes.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(python db_generation/dedup_categories.py)",
+      "PowerShell(Get-Process *)",
+      "Bash(grep -v \"//.*admin\")",
+      "Bash(python -c \"from kirana.repository import KiranaRepository; print\\('OK'\\)\")",
+      "Bash(python -m py_compile kirana/repository.py)",
+      "Bash(python -m py_compile kirana/repository.py kirana/service.py kirana/fcm_sender.py kirana/intelligence/engine.py kirana/intelligence/repository.py)",
+      "Bash(ls -la assets/)",
+      "Bash(dir assets *)",
+      "PowerShell(cd \"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\FlutterProjects\\\\kirana_stt\"; ls -Recurse -Directory -Exclude \".dart_tool\",\"build\",\".idea\",\"ios\",\"android\",\"linux\",\"macos\",\"windows\" | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\FlutterProjects\\\\kirana_stt\\\\\", \"\"\\) } | Sort-Object)",
+      "Bash(flutter build *)",
+      "Bash(git check-ignore *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Bhanuprakash\\.claude\\projects\\c--Users-Bhanuprakash-Documents-FlutterProjects-kirana-ai\\memory"
