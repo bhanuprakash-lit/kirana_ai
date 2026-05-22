@@ -133,11 +133,17 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: BrandColors.primary,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                       child: const Row(
                         children: [
-                          Text('View All', style: TextStyle(fontWeight: FontWeight.w700)),
+                          Text(
+                            'View All',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
                           Icon(Icons.chevron_right_rounded, size: 18),
                         ],
                       ),
@@ -199,7 +205,8 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                           final status =
                               o['order_status'] as String? ?? 'completed';
                           final date = o['order_date'] as String? ?? '';
-                          final payment = o['payment_method'] as String? ?? 'Cash';
+                          final payment =
+                              o['payment_method'] as String? ?? 'Cash';
 
                           return Material(
                             color: Colors.white,
@@ -208,7 +215,8 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) => OrderDetailsScreen(order: o),
+                                    builder: (_) =>
+                                        OrderDetailsScreen(order: o),
                                   ),
                                 );
                               },
@@ -216,7 +224,11 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: BrandColors.border.withValues(alpha: 0.8)),
+                                  border: Border.all(
+                                    color: BrandColors.border.withValues(
+                                      alpha: 0.8,
+                                    ),
+                                  ),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Row(
@@ -225,7 +237,9 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                       width: 48,
                                       height: 48,
                                       decoration: BoxDecoration(
-                                        color: BrandColors.success.withValues(alpha: 0.1),
+                                        color: BrandColors.success.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(14),
                                       ),
                                       child: const Icon(
@@ -237,7 +251,8 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Order #${o['order_id']}',

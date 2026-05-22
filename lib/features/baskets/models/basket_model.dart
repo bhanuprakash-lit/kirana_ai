@@ -12,17 +12,17 @@ class BasketItem {
   });
 
   factory BasketItem.fromJson(Map<String, dynamic> j) => BasketItem(
-        id: (j['id'] as num?)?.toInt(),
-        productId: (j['product_id'] as num).toInt(),
-        productName: j['product_name'] as String?,
-        qty: (j['qty'] as num?)?.toDouble() ?? 1,
-      );
+    id: (j['id'] as num?)?.toInt(),
+    productId: (j['product_id'] as num).toInt(),
+    productName: j['product_name'] as String?,
+    qty: (j['qty'] as num?)?.toDouble() ?? 1,
+  );
 
   Map<String, dynamic> toJson() => {
-        'product_id': productId,
-        'product_name': productName,
-        'qty': qty,
-      };
+    'product_id': productId,
+    'product_name': productName,
+    'qty': qty,
+  };
 }
 
 class Basket {
@@ -47,18 +47,18 @@ class Basket {
   });
 
   factory Basket.fromJson(Map<String, dynamic> j) => Basket(
-        basketId: (j['basket_id'] as num).toInt(),
-        name: j['name'] as String,
-        description: j['description'] as String?,
-        price: (j['price'] as num?)?.toDouble(),
-        validFrom: j['valid_from'] as String?,
-        validTo: j['valid_to'] as String?,
-        isActive: j['is_active'] as bool? ?? true,
-        items: (j['items'] as List? ?? [])
-            .cast<Map<String, dynamic>>()
-            .map(BasketItem.fromJson)
-            .toList(),
-      );
+    basketId: (j['basket_id'] as num).toInt(),
+    name: j['name'] as String,
+    description: j['description'] as String?,
+    price: (j['price'] as num?)?.toDouble(),
+    validFrom: j['valid_from'] as String?,
+    validTo: j['valid_to'] as String?,
+    isActive: j['is_active'] as bool? ?? true,
+    items: (j['items'] as List? ?? [])
+        .cast<Map<String, dynamic>>()
+        .map(BasketItem.fromJson)
+        .toList(),
+  );
 
   bool get isExpired {
     if (validTo == null) return false;

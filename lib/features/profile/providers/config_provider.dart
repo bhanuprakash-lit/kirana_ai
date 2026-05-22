@@ -31,36 +31,33 @@ class UserPrefs {
   });
 
   factory UserPrefs.fromJson(Map<String, dynamic> j) => UserPrefs(
-        forecastHorizonDays: (j['forecast_horizon_days'] as num?)?.toInt() ?? 7,
-        alertStockoutThreshold:
-            (j['alert_stockout_threshold'] as num?)?.toDouble() ?? 0.5,
-        alertMinVelocity:
-            (j['alert_min_velocity'] as num?)?.toDouble() ?? 0.3,
-        alertReorderDays:
-            (j['alert_reorder_days'] as num?)?.toInt() ?? 3,
-        alertDeadStockDays:
-            (j['alert_dead_stock_days'] as num?)?.toInt() ?? 21,
-        notifyWhatsapp: j['notify_whatsapp'] as bool? ?? false,
-        notifyInApp: j['notify_in_app'] as bool? ?? true,
-        quietHoursStart: (j['quiet_hours_start'] as num?)?.toInt() ?? 22,
-        quietHoursEnd: (j['quiet_hours_end'] as num?)?.toInt() ?? 7,
-        allowSocialMarketing: j['allow_social_marketing'] as bool? ?? false,
-        alertExpiryDays: (j['alert_expiry_days'] as num?)?.toInt() ?? 7,
-      );
+    forecastHorizonDays: (j['forecast_horizon_days'] as num?)?.toInt() ?? 7,
+    alertStockoutThreshold:
+        (j['alert_stockout_threshold'] as num?)?.toDouble() ?? 0.5,
+    alertMinVelocity: (j['alert_min_velocity'] as num?)?.toDouble() ?? 0.3,
+    alertReorderDays: (j['alert_reorder_days'] as num?)?.toInt() ?? 3,
+    alertDeadStockDays: (j['alert_dead_stock_days'] as num?)?.toInt() ?? 21,
+    notifyWhatsapp: j['notify_whatsapp'] as bool? ?? false,
+    notifyInApp: j['notify_in_app'] as bool? ?? true,
+    quietHoursStart: (j['quiet_hours_start'] as num?)?.toInt() ?? 22,
+    quietHoursEnd: (j['quiet_hours_end'] as num?)?.toInt() ?? 7,
+    allowSocialMarketing: j['allow_social_marketing'] as bool? ?? false,
+    alertExpiryDays: (j['alert_expiry_days'] as num?)?.toInt() ?? 7,
+  );
 
   Map<String, dynamic> toJson() => {
-        'forecast_horizon_days': forecastHorizonDays,
-        'alert_stockout_threshold': alertStockoutThreshold,
-        'alert_min_velocity': alertMinVelocity,
-        'alert_reorder_days': alertReorderDays,
-        'alert_dead_stock_days': alertDeadStockDays,
-        'notify_whatsapp': notifyWhatsapp,
-        'notify_in_app': notifyInApp,
-        'quiet_hours_start': quietHoursStart,
-        'quiet_hours_end': quietHoursEnd,
-        'allow_social_marketing': allowSocialMarketing,
-        'alert_expiry_days': alertExpiryDays,
-      };
+    'forecast_horizon_days': forecastHorizonDays,
+    'alert_stockout_threshold': alertStockoutThreshold,
+    'alert_min_velocity': alertMinVelocity,
+    'alert_reorder_days': alertReorderDays,
+    'alert_dead_stock_days': alertDeadStockDays,
+    'notify_whatsapp': notifyWhatsapp,
+    'notify_in_app': notifyInApp,
+    'quiet_hours_start': quietHoursStart,
+    'quiet_hours_end': quietHoursEnd,
+    'allow_social_marketing': allowSocialMarketing,
+    'alert_expiry_days': alertExpiryDays,
+  };
 
   UserPrefs copyWith({
     int? forecastHorizonDays,
@@ -74,21 +71,20 @@ class UserPrefs {
     int? quietHoursEnd,
     bool? allowSocialMarketing,
     int? alertExpiryDays,
-  }) =>
-      UserPrefs(
-        forecastHorizonDays: forecastHorizonDays ?? this.forecastHorizonDays,
-        alertStockoutThreshold:
-            alertStockoutThreshold ?? this.alertStockoutThreshold,
-        alertMinVelocity: alertMinVelocity ?? this.alertMinVelocity,
-        alertReorderDays: alertReorderDays ?? this.alertReorderDays,
-        alertDeadStockDays: alertDeadStockDays ?? this.alertDeadStockDays,
-        notifyWhatsapp: notifyWhatsapp ?? this.notifyWhatsapp,
-        notifyInApp: notifyInApp ?? this.notifyInApp,
-        quietHoursStart: quietHoursStart ?? this.quietHoursStart,
-        quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
-        allowSocialMarketing: allowSocialMarketing ?? this.allowSocialMarketing,
-        alertExpiryDays: alertExpiryDays ?? this.alertExpiryDays,
-      );
+  }) => UserPrefs(
+    forecastHorizonDays: forecastHorizonDays ?? this.forecastHorizonDays,
+    alertStockoutThreshold:
+        alertStockoutThreshold ?? this.alertStockoutThreshold,
+    alertMinVelocity: alertMinVelocity ?? this.alertMinVelocity,
+    alertReorderDays: alertReorderDays ?? this.alertReorderDays,
+    alertDeadStockDays: alertDeadStockDays ?? this.alertDeadStockDays,
+    notifyWhatsapp: notifyWhatsapp ?? this.notifyWhatsapp,
+    notifyInApp: notifyInApp ?? this.notifyInApp,
+    quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+    quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+    allowSocialMarketing: allowSocialMarketing ?? this.allowSocialMarketing,
+    alertExpiryDays: alertExpiryDays ?? this.alertExpiryDays,
+  );
 }
 
 class ConfigNotifier extends AsyncNotifier<UserPrefs> {
@@ -112,8 +108,9 @@ class ConfigNotifier extends AsyncNotifier<UserPrefs> {
   }
 }
 
-final configProvider =
-    AsyncNotifierProvider<ConfigNotifier, UserPrefs>(ConfigNotifier.new);
+final configProvider = AsyncNotifierProvider<ConfigNotifier, UserPrefs>(
+  ConfigNotifier.new,
+);
 
 // ── POS local preference (default payment method) ─────────────────────────────
 
@@ -133,5 +130,6 @@ class PosPrefsNotifier extends AsyncNotifier<String> {
   }
 }
 
-final posPrefsProvider =
-    AsyncNotifierProvider<PosPrefsNotifier, String>(PosPrefsNotifier.new);
+final posPrefsProvider = AsyncNotifierProvider<PosPrefsNotifier, String>(
+  PosPrefsNotifier.new,
+);

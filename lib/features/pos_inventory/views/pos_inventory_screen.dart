@@ -15,8 +15,7 @@ class PosInventoryScreen extends ConsumerStatefulWidget {
   const PosInventoryScreen({super.key});
 
   @override
-  ConsumerState<PosInventoryScreen> createState() =>
-      _PosInventoryScreenState();
+  ConsumerState<PosInventoryScreen> createState() => _PosInventoryScreenState();
 }
 
 class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
@@ -27,10 +26,16 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
   void initState() {
     super.initState();
     final initialTab = ref.read(dashboardSubTabProvider);
-    _tabController = TabController(length: 3, vsync: this, initialIndex: initialTab.clamp(0, 2));
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: initialTab.clamp(0, 2),
+    );
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        ref.read(dashboardSubTabProvider.notifier).setSubTab(_tabController.index);
+        ref
+            .read(dashboardSubTabProvider.notifier)
+            .setSubTab(_tabController.index);
       }
     });
   }
@@ -60,8 +65,7 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
             const Text('POS / Inventory'),
             const SizedBox(width: 10),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: posOnline
                     ? BrandColors.success.withValues(alpha: 0.12)
@@ -97,10 +101,7 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
             ),
           ],
         ),
-        actions: const [
-          NotificationBell(),
-          SizedBox(width: 8),
-        ],
+        actions: const [NotificationBell(), SizedBox(width: 8)],
         bottom: TabBar(
           controller: _tabController,
           labelColor: BrandColors.primary,
@@ -108,7 +109,9 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
           indicatorColor: BrandColors.primary,
           indicatorSize: TabBarIndicatorSize.tab,
           labelStyle: const TextStyle(
-              fontWeight: FontWeight.w700, fontSize: 13),
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+          ),
           tabs: const [
             Tab(icon: Icon(Icons.point_of_sale_rounded), text: 'Billing'),
             Tab(icon: Icon(Icons.inventory_2_rounded), text: 'Stock'),
@@ -129,12 +132,14 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
               if (sub.canAccessVendorManagement) return const ProcurementTab();
               return _ProGateTab(
                 title: 'Purchase & Suppliers',
-                description: 'Create purchase orders, manage your suppliers, and track what you owe them — all in one place.',
+                description:
+                    'Create purchase orders, manage your suppliers, and track what you owe them — all in one place.',
                 icon: Icons.local_shipping_rounded,
                 onUpgrade: () => showPaywallSheet(
                   ctx,
                   featureName: 'Purchase & Suppliers',
-                  featureDescription: 'Manage purchase orders and suppliers. Track payments to distributors. Available on the Pro plan.',
+                  featureDescription:
+                      'Manage purchase orders and suppliers. Track payments to distributors. Available on the Pro plan.',
                   featureIcon: Icons.local_shipping_rounded,
                 ),
               );
@@ -186,19 +191,32 @@ class _ProGateTab extends StatelessWidget {
               ),
               child: const Text(
                 'PRO ONLY',
-                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1,
+                ),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: BrandColors.ink),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: BrandColors.ink,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
             Text(
               description,
-              style: const TextStyle(fontSize: 14, color: BrandColors.muted, height: 1.5),
+              style: const TextStyle(
+                fontSize: 14,
+                color: BrandColors.muted,
+                height: 1.5,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 28),
@@ -212,7 +230,9 @@ class _ProGateTab extends StatelessWidget {
                   minimumSize: const Size.fromHeight(52),
                   backgroundColor: const Color(0xFF7C3AED),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ),

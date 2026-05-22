@@ -22,9 +22,9 @@ class UsageLimitsState {
 
   // ── Computed helpers ───────────────────────────────────────────────────────
 
-  int get voiceLimit     => kDailyLimits[kFeatureVoice]!;
+  int get voiceLimit => kDailyLimits[kFeatureVoice]!;
   int get handwriteLimit => kDailyLimits[kFeatureHandwrite]!;
-  int get invoiceLimit   => kDailyLimits[kFeatureInvoice]!;
+  int get invoiceLimit => kDailyLimits[kFeatureInvoice]!;
 
   int get voiceRemaining {
     final free = (voiceLimit - voiceUsed).clamp(0, voiceLimit);
@@ -41,16 +41,20 @@ class UsageLimitsState {
     return free > 0 ? free : invoiceCredits;
   }
 
-  bool get canUseVoice     => voiceRemaining > 0;
+  bool get canUseVoice => voiceRemaining > 0;
   bool get canUseHandwrite => handwriteRemaining > 0;
-  bool get canUseInvoice   => invoiceRemaining > 0;
+  bool get canUseInvoice => invoiceRemaining > 0;
 
   int remainingFor(String feature) {
     switch (feature) {
-      case kFeatureVoice:     return voiceRemaining;
-      case kFeatureHandwrite: return handwriteRemaining;
-      case kFeatureInvoice:   return invoiceRemaining;
-      default: return 0;
+      case kFeatureVoice:
+        return voiceRemaining;
+      case kFeatureHandwrite:
+        return handwriteRemaining;
+      case kFeatureInvoice:
+        return invoiceRemaining;
+      default:
+        return 0;
     }
   }
 
@@ -61,34 +65,39 @@ class UsageLimitsState {
     final h = feat(kFeatureHandwrite);
     final i = feat(kFeatureInvoice);
     return UsageLimitsState(
-      voiceUsed:        (v['used']    as num?)?.toInt() ?? 0,
-      voiceCredits:     (v['credits'] as num?)?.toInt() ?? 0,
-      handwriteUsed:    (h['used']    as num?)?.toInt() ?? 0,
+      voiceUsed: (v['used'] as num?)?.toInt() ?? 0,
+      voiceCredits: (v['credits'] as num?)?.toInt() ?? 0,
+      handwriteUsed: (h['used'] as num?)?.toInt() ?? 0,
       handwriteCredits: (h['credits'] as num?)?.toInt() ?? 0,
-      invoiceUsed:      (i['used']    as num?)?.toInt() ?? 0,
-      invoiceCredits:   (i['credits'] as num?)?.toInt() ?? 0,
+      invoiceUsed: (i['used'] as num?)?.toInt() ?? 0,
+      invoiceCredits: (i['credits'] as num?)?.toInt() ?? 0,
     );
   }
 
   /// Patch a single feature's counts using the inline `ai_status` the server
   /// returns alongside every AI response — avoids a second network call.
   UsageLimitsState withFeatureUpdate(String feature, Map<String, dynamic> s) {
-    final used    = (s['used']    as num?)?.toInt() ?? 0;
+    final used = (s['used'] as num?)?.toInt() ?? 0;
     final credits = (s['credits'] as num?)?.toInt() ?? 0;
     return UsageLimitsState(
-      voiceUsed:        feature == kFeatureVoice     ? used    : voiceUsed,
-      voiceCredits:     feature == kFeatureVoice     ? credits : voiceCredits,
-      handwriteUsed:    feature == kFeatureHandwrite ? used    : handwriteUsed,
-      handwriteCredits: feature == kFeatureHandwrite ? credits : handwriteCredits,
-      invoiceUsed:      feature == kFeatureInvoice   ? used    : invoiceUsed,
-      invoiceCredits:   feature == kFeatureInvoice   ? credits : invoiceCredits,
+      voiceUsed: feature == kFeatureVoice ? used : voiceUsed,
+      voiceCredits: feature == kFeatureVoice ? credits : voiceCredits,
+      handwriteUsed: feature == kFeatureHandwrite ? used : handwriteUsed,
+      handwriteCredits: feature == kFeatureHandwrite
+          ? credits
+          : handwriteCredits,
+      invoiceUsed: feature == kFeatureInvoice ? used : invoiceUsed,
+      invoiceCredits: feature == kFeatureInvoice ? credits : invoiceCredits,
     );
   }
 
   static const zero = UsageLimitsState(
-    voiceUsed: 0, voiceCredits: 0,
-    handwriteUsed: 0, handwriteCredits: 0,
-    invoiceUsed: 0, invoiceCredits: 0,
+    voiceUsed: 0,
+    voiceCredits: 0,
+    handwriteUsed: 0,
+    handwriteCredits: 0,
+    invoiceUsed: 0,
+    invoiceCredits: 0,
   );
 }
 
@@ -131,5 +140,5 @@ class UsageLimitsNotifier extends AsyncNotifier<UsageLimitsState> {
 
 final usageLimitsProvider =
     AsyncNotifierProvider<UsageLimitsNotifier, UsageLimitsState>(
-  UsageLimitsNotifier.new,
-);
+      UsageLimitsNotifier.new,
+    );

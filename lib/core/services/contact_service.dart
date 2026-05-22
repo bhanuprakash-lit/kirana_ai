@@ -33,10 +33,7 @@ class ContactService {
     if (status == PermissionStatus.granted) {
       // Use getAll with properties as shown in the example
       return await FlutterContacts.getAll(
-        properties: {
-          ContactProperty.name,
-          ContactProperty.phone,
-        },
+        properties: {ContactProperty.name, ContactProperty.phone},
       );
     }
     return [];
@@ -44,7 +41,11 @@ class ContactService {
 
   static String formatPhone(String phone) {
     // Basic cleanup: remove spaces, dashes, +91 etc.
-    var p = phone.replaceAll(RegExp(r'\s+'), '').replaceAll('-', '').replaceAll('(', '').replaceAll(')', '');
+    var p = phone
+        .replaceAll(RegExp(r'\s+'), '')
+        .replaceAll('-', '')
+        .replaceAll('(', '')
+        .replaceAll(')', '');
     if (p.startsWith('+91')) p = p.substring(3);
     if (p.length > 10) p = p.substring(p.length - 10);
     return p;

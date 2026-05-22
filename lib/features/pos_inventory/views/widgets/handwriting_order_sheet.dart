@@ -52,10 +52,12 @@ class _HandwritingOrderSheet extends ConsumerStatefulWidget {
   const _HandwritingOrderSheet();
 
   @override
-  ConsumerState<_HandwritingOrderSheet> createState() => _HandwritingOrderSheetState();
+  ConsumerState<_HandwritingOrderSheet> createState() =>
+      _HandwritingOrderSheetState();
 }
 
-class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> {
+class _HandwritingOrderSheetState
+    extends ConsumerState<_HandwritingOrderSheet> {
   late final GeminiVisionService _visionSvc;
   final _repaintKey = GlobalKey();
 
@@ -65,7 +67,7 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
   _DetectState _detectState = _DetectState.idle;
   String _transcript = '';
   List<_MatchedItem> _matches = [];
-  bool _autoDetectEnabled = true;  // toggle in sheet
+  bool _autoDetectEnabled = true; // toggle in sheet
   String _errorMsg = '';
   bool _hasDrawn = false;
 
@@ -150,7 +152,8 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
 
     try {
       final boundary =
-          _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+          _repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) throw Exception('Canvas not ready');
 
       final image = await boundary.toImage(pixelRatio: 2.0);
@@ -163,7 +166,9 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
 
       // Server already recorded the use; apply inline status update instantly
       if (result.aiStatus != null) {
-        ref.read(usageLimitsProvider.notifier).applyInlineUpdate(kFeatureHandwrite, result.aiStatus!);
+        ref
+            .read(usageLimitsProvider.notifier)
+            .applyInlineUpdate(kFeatureHandwrite, result.aiStatus!);
       }
 
       setState(() {
@@ -187,7 +192,10 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
 
   void _linkProduct(int index, PosProduct product) {
     setState(() {
-      _matches[index] = _MatchedItem(gemini: _matches[index].gemini, product: product);
+      _matches[index] = _MatchedItem(
+        gemini: _matches[index].gemini,
+        product: product,
+      );
     });
   }
 
@@ -198,7 +206,8 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _InlinePickerSheet(products: products, initialQuery: initial),
+      builder: (_) =>
+          _InlinePickerSheet(products: products, initialQuery: initial),
     );
     if (picked != null && mounted) _linkProduct(index, picked);
   }
@@ -214,11 +223,15 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
       added++;
     }
     if (mounted) Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('$added item${added != 1 ? 's' : ''} added to cart from handwriting'),
-      backgroundColor: BrandColors.success,
-      duration: const Duration(milliseconds: 1800),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '$added item${added != 1 ? 's' : ''} added to cart from handwriting',
+        ),
+        backgroundColor: BrandColors.success,
+        duration: const Duration(milliseconds: 1800),
+      ),
+    );
   }
 
   // ── UI ────────────────────────────────────────────────────────────────────
@@ -237,7 +250,9 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
     final subInfo = ref.watch(subInfoProvider);
     final isPro = subInfo.effectiveTier == SubTier.pro;
     final limitsAsync = ref.watch(usageLimitsProvider);
-    final remaining = limitsAsync.value?.handwriteRemaining ?? kDailyLimits[kFeatureHandwrite]!;
+    final remaining =
+        limitsAsync.value?.handwriteRemaining ??
+        kDailyLimits[kFeatureHandwrite]!;
     final canUse = isPro && remaining > 0;
 
     return SizedBox(
@@ -253,8 +268,12 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
             const SizedBox(height: 12),
             Center(
               child: Container(
-                width: 40, height: 4,
-                decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: BrandColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -270,20 +289,42 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                       color: BrandColors.purple.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.draw_rounded, color: BrandColors.purple, size: 20),
+                    child: const Icon(
+                      Icons.draw_rounded,
+                      color: BrandColors.purple,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Handwrite Order', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink)),
-                        Text('Write items in any script', style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+                        Text(
+                          'Handwrite Order',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: BrandColors.ink,
+                          ),
+                        ),
+                        Text(
+                          'Write items in any script',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: BrandColors.muted,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   // Usage badge
-                  if (isPro) AiUsageBadge(remaining: remaining, total: kDailyLimits[kFeatureHandwrite]!, label: 'draws'),
+                  if (isPro)
+                    AiUsageBadge(
+                      remaining: remaining,
+                      total: kDailyLimits[kFeatureHandwrite]!,
+                      label: 'draws',
+                    ),
                   if (_strokes.isNotEmpty) ...[
                     const SizedBox(width: 4),
                     IconButton(
@@ -331,7 +372,11 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                   color: BrandColors.error,
                   message: 'Daily limit reached. Top up credits to continue.',
                   actionLabel: 'Buy Credits',
-                  onAction: () => showCreditsPurchaseSheet(context, ref, highlightFeature: kFeatureHandwrite),
+                  onAction: () => showCreditsPurchaseSheet(
+                    context,
+                    ref,
+                    highlightFeature: kFeatureHandwrite,
+                  ),
                 ),
               ),
             if (!isPro || remaining == 0) const SizedBox(height: 8),
@@ -348,16 +393,25 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  const Icon(Icons.timer_rounded, size: 14, color: BrandColors.muted),
+                  const Icon(
+                    Icons.timer_rounded,
+                    size: 14,
+                    color: BrandColors.muted,
+                  ),
                   const SizedBox(width: 6),
                   const Expanded(
-                    child: Text('Auto-detect after 5s', style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+                    child: Text(
+                      'Auto-detect after 5s',
+                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                    ),
                   ),
                   Transform.scale(
                     scale: 0.8,
                     child: Switch(
                       value: _autoDetectEnabled,
-                      onChanged: canUse ? (v) => setState(() => _autoDetectEnabled = v) : null,
+                      onChanged: canUse
+                          ? (v) => setState(() => _autoDetectEnabled = v)
+                          : null,
                       activeTrackColor: BrandColors.purple,
                       activeThumbColor: Colors.white,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -377,7 +431,9 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _hasDrawn ? BrandColors.purple.withValues(alpha: 0.4) : BrandColors.border,
+                    color: _hasDrawn
+                        ? BrandColors.purple.withValues(alpha: 0.4)
+                        : BrandColors.border,
                     width: 1.5,
                   ),
                   boxShadow: [
@@ -399,7 +455,10 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                           onPanUpdate: canUse ? _onPanUpdate : null,
                           onPanEnd: canUse ? _onPanEnd : null,
                           child: CustomPaint(
-                            painter: _StrokePainter(strokes: _strokes, current: _current),
+                            painter: _StrokePainter(
+                              strokes: _strokes,
+                              current: _current,
+                            ),
                             size: const Size(double.infinity, 220),
                           ),
                         ),
@@ -409,14 +468,34 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.gesture_rounded, size: 32, color: canUse ? BrandColors.border : BrandColors.border.withValues(alpha: 0.4)),
+                              Icon(
+                                Icons.gesture_rounded,
+                                size: 32,
+                                color: canUse
+                                    ? BrandColors.border
+                                    : BrandColors.border.withValues(alpha: 0.4),
+                              ),
                               const SizedBox(height: 8),
                               Text(
-                                canUse ? 'Write items here' : 'Upgrade or top up to write',
-                                style: TextStyle(fontSize: 13, color: canUse ? BrandColors.muted : BrandColors.border, fontWeight: FontWeight.w500),
+                                canUse
+                                    ? 'Write items here'
+                                    : 'Upgrade or top up to write',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: canUse
+                                      ? BrandColors.muted
+                                      : BrandColors.border,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               if (canUse)
-                                const Text('e.g. Rice 5kg, Sugar 2kg', style: TextStyle(fontSize: 11, color: BrandColors.border)),
+                                const Text(
+                                  'e.g. Rice 5kg, Sugar 2kg',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: BrandColors.border,
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -434,18 +513,34 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                 width: double.infinity,
                 height: 44,
                 child: ElevatedButton.icon(
-                  onPressed: (!canUse || _detectState == _DetectState.processing || !_hasDrawn) ? null : _detect,
+                  onPressed:
+                      (!canUse ||
+                          _detectState == _DetectState.processing ||
+                          !_hasDrawn)
+                      ? null
+                      : _detect,
                   icon: _detectState == _DetectState.processing
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Icon(Icons.auto_awesome_rounded, size: 16),
                   label: Text(
-                    _detectState == _DetectState.processing ? 'Detecting…' : 'Detect Items',
+                    _detectState == _DetectState.processing
+                        ? 'Detecting…'
+                        : 'Detect Items',
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: BrandColors.purple,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
@@ -468,9 +563,21 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline_rounded, color: BrandColors.error, size: 16),
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: BrandColors.error,
+                              size: 16,
+                            ),
                             const SizedBox(width: 8),
-                            Expanded(child: Text(_errorMsg, style: const TextStyle(color: BrandColors.error, fontSize: 12))),
+                            Expanded(
+                              child: Text(
+                                _errorMsg,
+                                style: const TextStyle(
+                                  color: BrandColors.error,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -491,9 +598,24 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Read', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: BrandColors.muted, letterSpacing: 1)),
+                              const Text(
+                                'Read',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: BrandColors.muted,
+                                  letterSpacing: 1,
+                                ),
+                              ),
                               const SizedBox(height: 4),
-                              Text(_transcript, style: const TextStyle(fontSize: 12, color: BrandColors.ink, fontStyle: FontStyle.italic)),
+                              Text(
+                                _transcript,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: BrandColors.ink,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -502,14 +624,24 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
 
                       // Items
                       if (_matches.isEmpty)
-                        const Text('No items detected. Try writing more clearly.', style: TextStyle(color: BrandColors.muted, fontSize: 13))
+                        const Text(
+                          'No items detected. Try writing more clearly.',
+                          style: TextStyle(
+                            color: BrandColors.muted,
+                            fontSize: 13,
+                          ),
+                        )
                       else
                         Column(
                           children: [
                             for (final m in _matches) ...[
                               _MatchTile(
                                 match: m,
-                                onLink: m.found ? null : () => _showInventoryPicker(_matches.indexOf(m)),
+                                onLink: m.found
+                                    ? null
+                                    : () => _showInventoryPicker(
+                                        _matches.indexOf(m),
+                                      ),
                               ),
                               const Divider(height: 1),
                             ],
@@ -525,16 +657,27 @@ class _HandwritingOrderSheetState extends ConsumerState<_HandwritingOrderSheet> 
                               onPressed: _clear,
                               icon: const Icon(Icons.draw_rounded, size: 16),
                               label: const Text('Write Again'),
-                              style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: matched > 0 ? _addToCart : null,
-                              icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
+                              icon: const Icon(
+                                Icons.add_shopping_cart_rounded,
+                                size: 16,
+                              ),
                               label: Text('Add $matched to Cart'),
-                              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -608,7 +751,11 @@ class _ScriptBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.translate_rounded, size: 13, color: BrandColors.purple),
+          const Icon(
+            Icons.translate_rounded,
+            size: 13,
+            color: BrandColors.purple,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -638,16 +785,20 @@ class _MatchTile extends StatelessWidget {
     final color = match.inStock
         ? BrandColors.success
         : match.found
-            ? Colors.orange
-            : BrandColors.muted;
+        ? Colors.orange
+        : BrandColors.muted;
 
     final icon = match.inStock
         ? Icons.check_circle_rounded
         : match.found
-            ? Icons.warning_amber_rounded
-            : Icons.cancel_rounded;
+        ? Icons.warning_amber_rounded
+        : Icons.cancel_rounded;
 
-    final statusLabel = match.inStock ? 'In stock' : match.found ? 'Low stock' : 'Not found';
+    final statusLabel = match.inStock
+        ? 'In stock'
+        : match.found
+        ? 'Low stock'
+        : 'Not found';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
@@ -661,11 +812,22 @@ class _MatchTile extends StatelessWidget {
               children: [
                 Text(
                   match.product?.displayName ?? match.gemini.name,
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: match.found ? BrandColors.ink : BrandColors.muted),
-                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: match.found ? BrandColors.ink : BrandColors.muted,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (!match.found)
-                  Text('"${match.gemini.name}"', style: const TextStyle(fontSize: 11, color: BrandColors.muted)),
+                  Text(
+                    '"${match.gemini.name}"',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: BrandColors.muted,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -678,15 +840,35 @@ class _MatchTile extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
-              child: const Text('Pick', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              child: const Text(
+                'Pick',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              ),
             )
           else ...[
-            Text(match.gemini.quantity, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: BrandColors.ink)),
+            Text(
+              match.gemini.quantity,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-              child: Text(statusLabel, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w700)),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                statusLabel,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ],
         ],
@@ -700,7 +882,10 @@ class _MatchTile extends StatelessWidget {
 class _InlinePickerSheet extends StatefulWidget {
   final List<PosProduct> products;
   final String initialQuery;
-  const _InlinePickerSheet({required this.products, required this.initialQuery});
+  const _InlinePickerSheet({
+    required this.products,
+    required this.initialQuery,
+  });
 
   @override
   State<_InlinePickerSheet> createState() => _InlinePickerSheetState();
@@ -718,14 +903,18 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final filtered = widget.products.where((p) {
       if (_query.isEmpty) return true;
       final q = _query.toLowerCase();
-      return p.name.toLowerCase().contains(q) || (p.brand?.toLowerCase().contains(q) ?? false);
+      return p.name.toLowerCase().contains(q) ||
+          (p.brand?.toLowerCase().contains(q) ?? false);
     }).toList();
 
     return DraggableScrollableSheet(
@@ -740,14 +929,24 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 14),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Pick from Inventory', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                  const Text(
+                    'Pick from Inventory',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: _ctrl,
@@ -755,12 +954,29 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       hintText: 'Search products…',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 18, color: BrandColors.muted),
-                      filled: true, fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 18,
+                        color: BrandColors.muted,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       suffixIcon: _query.isNotEmpty
-                          ? IconButton(icon: const Icon(Icons.clear_rounded, size: 16), onPressed: () { _ctrl.clear(); setState(() => _query = ''); })
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 16),
+                              onPressed: () {
+                                _ctrl.clear();
+                                setState(() => _query = '');
+                              },
+                            )
                           : null,
                     ),
                   ),
@@ -770,7 +986,12 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(child: Text('No products found', style: TextStyle(color: BrandColors.muted)))
+                  ? const Center(
+                      child: Text(
+                        'No products found',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    )
                   : ListView.builder(
                       controller: ctrl,
                       padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -778,10 +999,27 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                       itemBuilder: (_, i) {
                         final p = filtered[i];
                         return ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          title: Text(p.displayName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                          subtitle: Text('${p.priceLabel} · Stock: ${p.stockLabel}', style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
-                          trailing: const Icon(Icons.add_circle_rounded, color: BrandColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          title: Text(
+                            p.displayName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${p.priceLabel} · Stock: ${p.stockLabel}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.add_circle_rounded,
+                            color: BrandColors.primary,
+                          ),
                           onTap: () => Navigator.pop(context, p),
                         );
                       },

@@ -20,7 +20,9 @@ final _passwordStatusProvider = FutureProvider<_PasswordStatus>((ref) async {
     headers: {'Authorization': 'Bearer $token'},
   );
   if (res.statusCode == 200) {
-    return _PasswordStatus.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+    return _PasswordStatus.fromJson(
+      jsonDecode(res.body) as Map<String, dynamic>,
+    );
   }
   throw Exception('Failed to load password status');
 });
@@ -38,7 +40,8 @@ class _PasswordStatus {
     required this.daysUntilChange,
   });
 
-  factory _PasswordStatus.fromJson(Map<String, dynamic> json) => _PasswordStatus(
+  factory _PasswordStatus.fromJson(Map<String, dynamic> json) =>
+      _PasswordStatus(
         hasPassword: json['has_password'] as bool? ?? false,
         lastChangedAt: json['last_changed_at'] != null
             ? DateTime.tryParse(json['last_changed_at'] as String)
@@ -68,8 +71,10 @@ class PasswordScreen extends ConsumerWidget {
       body: statusAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text('Could not load status: $e',
-              style: const TextStyle(color: BrandColors.muted)),
+          child: Text(
+            'Could not load status: $e',
+            style: const TextStyle(color: BrandColors.muted),
+          ),
         ),
         data: (status) => _PasswordForm(
           status: status,
@@ -164,9 +169,11 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
         _oldCtrl.clear();
         _newCtrl.clear();
         _confirmCtrl.clear();
-        setState(() => _success = widget.status.hasPassword
-            ? 'Password updated successfully.'
-            : 'Password created successfully.');
+        setState(
+          () => _success = widget.status.hasPassword
+              ? 'Password updated successfully.'
+              : 'Password created successfully.',
+        );
         widget.onSuccess();
       } else {
         final detail = _extractError(res.body);
@@ -214,15 +221,20 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: (status.hasPassword ? BrandColors.success : BrandColors.primary)
-                      .withValues(alpha: 0.1),
+                  color:
+                      (status.hasPassword
+                              ? BrandColors.success
+                              : BrandColors.primary)
+                          .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   status.hasPassword
                       ? Icons.lock_rounded
                       : Icons.lock_open_rounded,
-                  color: status.hasPassword ? BrandColors.success : BrandColors.primary,
+                  color: status.hasPassword
+                      ? BrandColors.success
+                      : BrandColors.primary,
                   size: 24,
                 ),
               ),
@@ -244,8 +256,8 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
                       status.hasPassword && status.lastChangedAt != null
                           ? 'Last changed ${_formatDate(status.lastChangedAt!)}'
                           : status.hasPassword
-                              ? 'Password is active'
-                              : 'Create a password to enable username login',
+                          ? 'Password is active'
+                          : 'Create a password to enable username login',
                       style: const TextStyle(
                         fontSize: 12,
                         color: BrandColors.muted,
@@ -271,7 +283,11 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.timer_outlined, color: Color(0xFFB45309), size: 18),
+                const Icon(
+                  Icons.timer_outlined,
+                  color: Color(0xFFB45309),
+                  size: 18,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -291,9 +307,9 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
         const SizedBox(height: 28),
         Text(
           status.hasPassword ? 'Change Password' : 'Create Password',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 4),
         Text(
@@ -339,19 +355,27 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
             decoration: BoxDecoration(
               color: BrandColors.error.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: BrandColors.error.withValues(alpha: 0.25)),
+              border: Border.all(
+                color: BrandColors.error.withValues(alpha: 0.25),
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline_rounded,
-                    color: BrandColors.error, size: 16),
+                const Icon(
+                  Icons.error_outline_rounded,
+                  color: BrandColors.error,
+                  size: 16,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(_error!,
-                      style: const TextStyle(
-                          fontSize: 13,
-                          color: BrandColors.error,
-                          fontWeight: FontWeight.w500)),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: BrandColors.error,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -365,19 +389,27 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
             decoration: BoxDecoration(
               color: BrandColors.success.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: BrandColors.success.withValues(alpha: 0.25)),
+              border: Border.all(
+                color: BrandColors.success.withValues(alpha: 0.25),
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle_rounded,
-                    color: BrandColors.success, size: 16),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: BrandColors.success,
+                  size: 16,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(_success!,
-                      style: const TextStyle(
-                          fontSize: 13,
-                          color: BrandColors.success,
-                          fontWeight: FontWeight.w600)),
+                  child: Text(
+                    _success!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: BrandColors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -406,8 +438,18 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
   String _formatDate(DateTime dt) {
     final d = dt.toLocal();
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }

@@ -7,10 +7,7 @@ class FinanceData {
   final FinanceStats stats;
   final List<UdhaarItem> udhaarList;
 
-  const FinanceData({
-    required this.stats,
-    required this.udhaarList,
-  });
+  const FinanceData({required this.stats, required this.udhaarList});
 }
 
 class FinanceNotifier extends AsyncNotifier<FinanceData> {
@@ -26,7 +23,9 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
     final client = ref.read(apiClientProvider);
 
     final statsJsonFuture = client.get('/kirana/finance/overview');
-    final udhaarJsonFuture = client.get('/kirana/finance/udhaar?include_recovered=true');
+    final udhaarJsonFuture = client.get(
+      '/kirana/finance/udhaar?include_recovered=true',
+    );
 
     final statsJson = await statsJsonFuture;
     final udhaarJson = await udhaarJsonFuture;
@@ -36,10 +35,7 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
         .map((item) => UdhaarItem.fromJson(item as Map<String, dynamic>))
         .toList();
 
-    return FinanceData(
-      stats: stats,
-      udhaarList: udhaarList,
-    );
+    return FinanceData(stats: stats, udhaarList: udhaarList);
   }
 
   Future<void> addUdhaar({
@@ -78,9 +74,7 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
   Future<void> sendReminder(int khataId) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.post('/kirana/finance/udhaar/remind', {
-        'khata_id': khataId,
-      });
+      await client.post('/kirana/finance/udhaar/remind', {'khata_id': khataId});
     } catch (e) {
       rethrow;
     }
@@ -99,4 +93,6 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
   }
 }
 
-final financeProvider = AsyncNotifierProvider<FinanceNotifier, FinanceData>(FinanceNotifier.new);
+final financeProvider = AsyncNotifierProvider<FinanceNotifier, FinanceData>(
+  FinanceNotifier.new,
+);

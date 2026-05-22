@@ -86,9 +86,26 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           storeAsync.when(
-                            loading: () => const SizedBox(height: 14, width: 100, child: LinearProgressIndicator()),
-                            error: (_, _) => const Text('Lohiya Store', style: TextStyle(color: BrandColors.muted, fontSize: 14)),
-                            data: (store) => Text(store.name, style: const TextStyle(color: BrandColors.muted, fontSize: 15, fontWeight: FontWeight.w500)),
+                            loading: () => const SizedBox(
+                              height: 14,
+                              width: 100,
+                              child: LinearProgressIndicator(),
+                            ),
+                            error: (_, _) => const Text(
+                              'Lohiya Store',
+                              style: TextStyle(
+                                color: BrandColors.muted,
+                                fontSize: 14,
+                              ),
+                            ),
+                            data: (store) => Text(
+                              store.name,
+                              style: const TextStyle(
+                                color: BrandColors.muted,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 6),
                           // Compact subscription badge
@@ -107,7 +124,8 @@ class ProfileScreen extends ConsumerWidget {
                     showPaywallSheet(
                       context,
                       featureName: 'Cashflow Support',
-                      featureDescription: 'Apply for ₹50K – ₹10L business finance with tailored repayment plans.',
+                      featureDescription:
+                          'Apply for ₹50K – ₹10L business finance with tailored repayment plans.',
                       featureIcon: Icons.account_balance_wallet_rounded,
                     );
                     return;
@@ -117,96 +135,111 @@ class ProfileScreen extends ConsumerWidget {
               ),
 
               const _SectionLabel('Customers'),
-              _GroupCard(rows: [
-                _CompactRow(
-                  icon: Icons.share_rounded,
-                  label: 'Customer Growth',
-                  badge: ref.watch(subInfoProvider).canAccessReferral ? null : 'PRO',
-                  onTap: () {
-                    final sub = ref.read(subInfoProvider);
-                    if (!sub.canAccessReferral) {
-                      showPaywallSheet(context,
+              _GroupCard(
+                rows: [
+                  _CompactRow(
+                    icon: Icons.share_rounded,
+                    label: 'Customer Growth',
+                    badge: ref.watch(subInfoProvider).canAccessReferral
+                        ? null
+                        : 'PRO',
+                    onTap: () {
+                      final sub = ref.read(subInfoProvider);
+                      if (!sub.canAccessReferral) {
+                        showPaywallSheet(
+                          context,
                           featureName: 'Customer Growth',
-                          featureDescription: 'Build a referral engine — let your happy customers bring in new ones automatically.',
-                          featureIcon: Icons.share_rounded);
-                      return;
-                    }
-                    context.push('/profile/referral');
-                  },
-                ),
-                _CompactRow(
-                  icon: Icons.people_outline_rounded,
-                  label: 'Customer Relations',
-                  onTap: () => context.push('/profile/customers'),
-                ),
-                _CompactRow(
-                  icon: Icons.location_city_rounded,
-                  label: 'Area Associations',
-                  onTap: () => context.push('/profile/associations'),
-                ),
-              ]),
+                          featureDescription:
+                              'Build a referral engine — let your happy customers bring in new ones automatically.',
+                          featureIcon: Icons.share_rounded,
+                        );
+                        return;
+                      }
+                      context.push('/profile/referral');
+                    },
+                  ),
+                  _CompactRow(
+                    icon: Icons.people_outline_rounded,
+                    label: 'Customer Relations',
+                    onTap: () => context.push('/profile/customers'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.location_city_rounded,
+                    label: 'Area Associations',
+                    onTap: () => context.push('/profile/associations'),
+                  ),
+                ],
+              ),
 
               const _SectionLabel('Analytics'),
-              _GroupCard(rows: [
-                _CompactRow(
-                  icon: Icons.analytics_outlined,
-                  label: 'KPI Subscriptions',
-                  onTap: () => context.push('/profile/kpis'),
-                ),
-                _CompactRow(
-                  icon: Icons.history_rounded,
-                  label: 'Transaction History',
-                  onTap: () => context.push('/profile/history'),
-                ),
-                _CompactRow(
-                  icon: Icons.shopping_basket_rounded,
-                  label: 'My Baskets',
-                  onTap: () => context.push('/profile/baskets'),
-                ),
-              ]),
+              _GroupCard(
+                rows: [
+                  _CompactRow(
+                    icon: Icons.analytics_outlined,
+                    label: 'KPI Subscriptions',
+                    onTap: () => context.push('/profile/kpis'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.history_rounded,
+                    label: 'Transaction History',
+                    onTap: () => context.push('/profile/history'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.shopping_basket_rounded,
+                    label: 'My Baskets',
+                    onTap: () => context.push('/profile/baskets'),
+                  ),
+                ],
+              ),
 
               const _SectionLabel('Store & Account'),
-              _GroupCard(rows: [
-                _CompactRow(
-                  icon: Icons.storefront_rounded,
-                  label: 'Store Settings',
-                  onTap: () => context.push('/profile/store'),
-                ),
-                _CompactRow(
-                  icon: Icons.tune_rounded,
-                  label: 'Configuration',
-                  onTap: () => context.push('/profile/config'),
-                ),
-                _CompactRow(
-                  icon: Icons.lock_outline_rounded,
-                  label: 'Password & Security',
-                  onTap: () => context.push('/profile/password'),
-                ),
-              ]),
+              _GroupCard(
+                rows: [
+                  _CompactRow(
+                    icon: Icons.storefront_rounded,
+                    label: 'Store Settings',
+                    onTap: () => context.push('/profile/store'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.tune_rounded,
+                    label: 'Configuration',
+                    onTap: () => context.push('/profile/config'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.lock_outline_rounded,
+                    label: 'Password & Security',
+                    onTap: () => context.push('/profile/password'),
+                  ),
+                ],
+              ),
 
               const _SectionLabel('Plan & Support'),
-              _GroupCard(rows: [
-                _CompactRow(
-                  icon: Icons.workspace_premium_rounded,
-                  label: 'Subscription & Plans',
-                  onTap: () => context.push('/profile/subscription'),
-                ),
-                _CompactRow(
-                  icon: Icons.help_outline_rounded,
-                  label: 'Help & Support',
-                  onTap: () => context.push('/profile/support'),
-                ),
-              ]),
+              _GroupCard(
+                rows: [
+                  _CompactRow(
+                    icon: Icons.workspace_premium_rounded,
+                    label: 'Subscription & Plans',
+                    onTap: () => context.push('/profile/subscription'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.help_outline_rounded,
+                    label: 'Help & Support',
+                    onTap: () => context.push('/profile/support'),
+                  ),
+                ],
+              ),
 
               if (user.role == 'admin') ...[
                 const _SectionLabel('Admin'),
-                _GroupCard(rows: [
-                  _CompactRow(
-                    icon: Icons.people_alt_rounded,
-                    label: 'User Activity',
-                    onTap: () => context.push('/profile/admin-activity'),
-                  ),
-                ]),
+                _GroupCard(
+                  rows: [
+                    _CompactRow(
+                      icon: Icons.people_alt_rounded,
+                      label: 'User Activity',
+                      onTap: () => context.push('/profile/admin-activity'),
+                    ),
+                  ],
+                ),
               ],
 
               const _ProfileFooter(),
@@ -273,30 +306,42 @@ class _CashflowBanner extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.account_balance_wallet_rounded,
-                  color: Colors.white, size: 22),
+              child: const Icon(
+                Icons.account_balance_wallet_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 14),
             const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Cashflow Support',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 15)),
+                  Text(
+                    'Cashflow Support',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                    ),
+                  ),
                   SizedBox(height: 2),
-                  Text('Apply for ₹50K – ₹10L business finance',
-                      style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500)),
+                  Text(
+                    'Apply for ₹50K – ₹10L business finance',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded,
-                color: Colors.white54, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white54,
+              size: 16,
+            ),
           ],
         ),
       ),
@@ -352,17 +397,17 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 18, 24, 6),
-        child: Text(
-          text.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            color: BrandColors.muted,
-            letterSpacing: 1.1,
-          ),
-        ),
-      );
+    padding: const EdgeInsets.fromLTRB(24, 18, 24, 6),
+    child: Text(
+      text.toUpperCase(),
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        color: BrandColors.muted,
+        letterSpacing: 1.1,
+      ),
+    ),
+  );
 }
 
 class _GroupCard extends StatelessWidget {
@@ -429,13 +474,17 @@ class _CompactRow extends StatelessWidget {
                   Text(
                     label,
                     style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 14),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                   if (badge != null) ...[
                     const SizedBox(width: 7),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 2),
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF7C3AED),
                         borderRadius: BorderRadius.circular(5),
@@ -443,18 +492,22 @@ class _CompactRow extends StatelessWidget {
                       child: Text(
                         badge!,
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5),
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ],
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded,
-                color: BrandColors.muted, size: 18),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: BrandColors.muted,
+              size: 18,
+            ),
           ],
         ),
       ),
@@ -488,9 +541,13 @@ class _SubscriptionBadge extends ConsumerWidget {
       case SubTier.trial:
         final isProTrial = sub.trialTier == 'pro';
         color = isProTrial ? const Color(0xFF7C3AED) : const Color(0xFFFF8C00);
-        icon = isProTrial ? Icons.workspace_premium_rounded : Icons.timer_outlined;
+        icon = isProTrial
+            ? Icons.workspace_premium_rounded
+            : Icons.timer_outlined;
         final tierLabel = isProTrial ? 'Pro Trial' : 'Basic Trial';
-        label = sub.daysRemaining > 0 ? '$tierLabel · ${sub.daysRemaining}d left' : '$tierLabel Active';
+        label = sub.daysRemaining > 0
+            ? '$tierLabel · ${sub.daysRemaining}d left'
+            : '$tierLabel Active';
       case SubTier.basic:
         color = BrandColors.primary;
         icon = Icons.star_rounded;
@@ -515,11 +572,17 @@ class _SubscriptionBadge extends ConsumerWidget {
           children: [
             Icon(icon, size: 12, color: color),
             const SizedBox(width: 5),
-            Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

@@ -54,23 +54,38 @@ class DistributorTab extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => Center(child: Text('Error: $err')),
       data: (data) {
-        final unpaid = data.purchases.where((p) => p.paymentStatus != 'paid').toList();
-        final paid   = data.purchases.where((p) => p.paymentStatus == 'paid').toList();
+        final unpaid = data.purchases
+            .where((p) => p.paymentStatus != 'paid')
+            .toList();
+        final paid = data.purchases
+            .where((p) => p.paymentStatus == 'paid')
+            .toList();
 
         // Buckets
-        final overdue   = unpaid.where((p) => p.dueDate != null && _isOverdue(p.dueDate!)).toList()
-          ..sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
-        final dueToday  = unpaid.where((p) => p.dueDate != null && _isToday(p.dueDate!)).toList();
-        final next7     = unpaid.where((p) => p.dueDate != null && _isWithinNextDays(p.dueDate!, 7)).toList()
-          ..sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
-        final paidLast7 = paid.where((p) => _withinLastDays(p.purchaseDate, 7)).toList()
-          ..sort((a, b) => b.purchaseDate.compareTo(a.purchaseDate));
+        final overdue =
+            unpaid
+                .where((p) => p.dueDate != null && _isOverdue(p.dueDate!))
+                .toList()
+              ..sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+        final dueToday = unpaid
+            .where((p) => p.dueDate != null && _isToday(p.dueDate!))
+            .toList();
+        final next7 =
+            unpaid
+                .where(
+                  (p) => p.dueDate != null && _isWithinNextDays(p.dueDate!, 7),
+                )
+                .toList()
+              ..sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+        final paidLast7 =
+            paid.where((p) => _withinLastDays(p.purchaseDate, 7)).toList()
+              ..sort((a, b) => b.purchaseDate.compareTo(a.purchaseDate));
 
         // Summary numbers
-        final totalDue      = unpaid.fold(0.0, (s, p) => s + p.totalAmount);
-        final todayDue      = dueToday.fold(0.0, (s, p) => s + p.totalAmount);
-        final next7Due      = next7.fold(0.0, (s, p) => s + p.totalAmount);
-        final paid7Total    = paidLast7.fold(0.0, (s, p) => s + p.totalAmount);
+        final totalDue = unpaid.fold(0.0, (s, p) => s + p.totalAmount);
+        final todayDue = dueToday.fold(0.0, (s, p) => s + p.totalAmount);
+        final next7Due = next7.fold(0.0, (s, p) => s + p.totalAmount);
+        final paid7Total = paidLast7.fold(0.0, (s, p) => s + p.totalAmount);
 
         return RefreshIndicator(
           onRefresh: () => ref.read(procurementProvider.notifier).refresh(),
@@ -163,7 +178,10 @@ class DistributorTab extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: BrandColors.surfaceTint,
                   borderRadius: BorderRadius.circular(10),
@@ -171,10 +189,16 @@ class DistributorTab extends ConsumerWidget {
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.info_outline_rounded, size: 14, color: BrandColors.muted),
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 14,
+                      color: BrandColors.muted,
+                    ),
                     SizedBox(width: 8),
-                    Text('Add or edit suppliers in the Purchase tab',
-                        style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+                    Text(
+                      'Add or edit suppliers in the Purchase tab',
+                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                    ),
                   ],
                 ),
               ),
@@ -182,7 +206,12 @@ class DistributorTab extends ConsumerWidget {
               if (data.suppliers.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Center(child: Text('No suppliers yet.', style: TextStyle(color: BrandColors.muted))),
+                  child: Center(
+                    child: Text(
+                      'No suppliers yet.',
+                      style: TextStyle(color: BrandColors.muted),
+                    ),
+                  ),
                 )
               else
                 ...data.suppliers.map((s) => _SupplierTile(supplier: s)),
@@ -221,25 +250,58 @@ class _SummaryCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 12, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
         children: [
-          const Text('Total Outstanding', style: TextStyle(color: Colors.white60, fontSize: 12, letterSpacing: 0.5)),
+          const Text(
+            'Total Outstanding',
+            style: TextStyle(
+              color: Colors.white60,
+              fontSize: 12,
+              letterSpacing: 0.5,
+            ),
+          ),
           const SizedBox(height: 6),
           Text(
             '₹${totalDue.toStringAsFixed(0)}',
-            style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 34,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 18),
           Row(
             children: [
-              Expanded(child: _MetricChip(label: 'Today', value: '₹${todayDue.toStringAsFixed(0)}', color: Colors.orange)),
+              Expanded(
+                child: _MetricChip(
+                  label: 'Today',
+                  value: '₹${todayDue.toStringAsFixed(0)}',
+                  color: Colors.orange,
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _MetricChip(label: 'Next 7 Days', value: '₹${next7Due.toStringAsFixed(0)}', color: const Color(0xFF60A5FA))),
+              Expanded(
+                child: _MetricChip(
+                  label: 'Next 7 Days',
+                  value: '₹${next7Due.toStringAsFixed(0)}',
+                  color: const Color(0xFF60A5FA),
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _MetricChip(label: 'Paid (7d)', value: '₹${paid7Total.toStringAsFixed(0)}', color: const Color(0xFF4ADE80))),
+              Expanded(
+                child: _MetricChip(
+                  label: 'Paid (7d)',
+                  value: '₹${paid7Total.toStringAsFixed(0)}',
+                  color: const Color(0xFF4ADE80),
+                ),
+              ),
             ],
           ),
         ],
@@ -252,7 +314,11 @@ class _MetricChip extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _MetricChip({required this.label, required this.value, required this.color});
+  const _MetricChip({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -265,9 +331,24 @@ class _MetricChip extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(value, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14)),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w900,
+              fontSize: 14,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(label, style: TextStyle(color: color.withValues(alpha: 0.8), fontSize: 10, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+          Text(
+            label,
+            style: TextStyle(
+              color: color.withValues(alpha: 0.8),
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -295,8 +376,14 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 6),
-        Text(label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: color)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: color,
+          ),
+        ),
         const SizedBox(width: 6),
         if (count > 0)
           Container(
@@ -305,7 +392,14 @@ class _SectionHeader extends StatelessWidget {
               color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text('$count', style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700)),
+            child: Text(
+              '$count',
+              style: TextStyle(
+                fontSize: 11,
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
       ],
     );
@@ -318,7 +412,11 @@ class _EmptyBanner extends StatelessWidget {
   final IconData icon;
   final Color color;
   final String message;
-  const _EmptyBanner({required this.icon, required this.color, required this.message});
+  const _EmptyBanner({
+    required this.icon,
+    required this.color,
+    required this.message,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -333,7 +431,16 @@ class _EmptyBanner extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: color),
           const SizedBox(width: 10),
-          Expanded(child: Text(message, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w500))),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: color,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -360,9 +467,17 @@ class _PaymentTile extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isOverdue ? BrandColors.error.withValues(alpha: 0.3) : BrandColors.border),
+        border: Border.all(
+          color: isOverdue
+              ? BrandColors.error.withValues(alpha: 0.3)
+              : BrandColors.border,
+        ),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
@@ -376,17 +491,32 @@ class _PaymentTile extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(order.supplierName,
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                      Text(
+                        order.supplierName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
                       const SizedBox(height: 3),
                       Row(
                         children: [
-                          Icon(Icons.notes_rounded, size: 12, color: BrandColors.muted),
+                          Icon(
+                            Icons.notes_rounded,
+                            size: 12,
+                            color: BrandColors.muted,
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
-                            child: Text(order.notes ?? 'Stock Purchase',
-                                style: const TextStyle(fontSize: 12, color: BrandColors.muted),
-                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              order.notes ?? 'Stock Purchase',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: BrandColors.muted,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
@@ -395,20 +525,26 @@ class _PaymentTile extends ConsumerWidget {
                         Row(
                           children: [
                             Icon(
-                              isOverdue ? Icons.error_outline_rounded : Icons.schedule_rounded,
+                              isOverdue
+                                  ? Icons.error_outline_rounded
+                                  : Icons.schedule_rounded,
                               size: 12,
-                              color: isOverdue ? BrandColors.error : Colors.orange,
+                              color: isOverdue
+                                  ? BrandColors.error
+                                  : Colors.orange,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               isOverdue
                                   ? 'Overdue since ${order.dueDate!.day}/${order.dueDate!.month}'
                                   : showDayLabel
-                                      ? 'Due ${_dayLabel(order.dueDate!)}'
-                                      : 'Due today',
+                                  ? 'Due ${_dayLabel(order.dueDate!)}'
+                                  : 'Due today',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isOverdue ? BrandColors.error : Colors.orange,
+                                color: isOverdue
+                                    ? BrandColors.error
+                                    : Colors.orange,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -430,7 +566,10 @@ class _PaymentTile extends ConsumerWidget {
                         color: isOverdue ? BrandColors.error : BrandColors.ink,
                       ),
                     ),
-                    Text('to pay', style: TextStyle(fontSize: 10, color: BrandColors.muted)),
+                    Text(
+                      'to pay',
+                      style: TextStyle(fontSize: 10, color: BrandColors.muted),
+                    ),
                   ],
                 ),
               ],
@@ -452,12 +591,17 @@ class _PaymentTile extends ConsumerWidget {
               Container(width: 1, height: 28, color: BrandColors.border),
               Expanded(
                 child: TextButton(
-                  onPressed: () => ref.read(procurementProvider.notifier).markAsPaid(order.purchaseId),
+                  onPressed: () => ref
+                      .read(procurementProvider.notifier)
+                      .markAsPaid(order.purchaseId),
                   style: TextButton.styleFrom(
                     foregroundColor: BrandColors.success,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
-                  child: const Text('Mark Paid ✓', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                  child: const Text(
+                    'Mark Paid ✓',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
             ],
@@ -469,13 +613,16 @@ class _PaymentTile extends ConsumerWidget {
 
   void _showDetails(BuildContext context, WidgetRef ref) {
     // Fetch once before showing — prevents future recreation on every builder rebuild
-    final itemsFuture =
-        ref.read(procurementProvider.notifier).fetchPurchaseItems(order.purchaseId);
+    final itemsFuture = ref
+        .read(procurementProvider.notifier)
+        .fetchPurchaseItems(order.purchaseId);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => DraggableScrollableSheet(
         initialChildSize: 0.55,
         minChildSize: 0.35,
@@ -485,7 +632,10 @@ class _PaymentTile extends ConsumerWidget {
           future: itemsFuture,
           builder: (ctx, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+              return const SizedBox(
+                height: 200,
+                child: Center(child: CircularProgressIndicator()),
+              );
             }
             final items = snapshot.data ?? [];
             return ListView(
@@ -493,49 +643,96 @@ class _PaymentTile extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               children: [
                 // Drag handle
-                Center(child: Container(width: 40, height: 4,
-                    decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)))),
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: BrandColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 16),
-                Text(order.supplierName,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                Text(
+                  order.supplierName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Purchase on ${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}',
-                    style: const TextStyle(color: BrandColors.muted, fontSize: 13)),
+                Text(
+                  'Purchase on ${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}',
+                  style: const TextStyle(
+                    color: BrandColors.muted,
+                    fontSize: 13,
+                  ),
+                ),
                 const Divider(height: 28),
                 if (items.isEmpty)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text('No items found.', style: TextStyle(color: BrandColors.muted)),
+                    child: Text(
+                      'No items found.',
+                      style: TextStyle(color: BrandColors.muted),
+                    ),
                   )
                 else
-                  ...items.map((item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.productName,
-                                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                                  Text('${item.quantity.toStringAsFixed(0)} × ₹${item.costPrice.toStringAsFixed(0)}',
-                                      style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
-                                ],
-                              ),
+                  ...items.map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.productName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  '${item.quantity.toStringAsFixed(0)} × ₹${item.costPrice.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: BrandColors.muted,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text('₹${(item.quantity * item.costPrice).toStringAsFixed(0)}',
-                                style: const TextStyle(fontWeight: FontWeight.w700)),
-                          ],
-                        ),
-                      )),
+                          ),
+                          Text(
+                            '₹${(item.quantity * item.costPrice).toStringAsFixed(0)}',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 const Divider(height: 28),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total Bill', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text('₹${order.totalAmount.toStringAsFixed(0)}',
-                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: BrandColors.error)),
+                    const Text(
+                      'Total Bill',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      '₹${order.totalAmount.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 20,
+                        color: BrandColors.error,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -571,19 +768,32 @@ class _PaidTile extends StatelessWidget {
               color: BrandColors.success.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check_rounded, color: BrandColors.success, size: 16),
+            child: const Icon(
+              Icons.check_rounded,
+              color: BrandColors.success,
+              size: 16,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(order.supplierName,
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                Text(
+                  order.supplierName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
                 Text(
                   '${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}  ·  ${order.notes ?? 'Stock Purchase'}',
-                  style: const TextStyle(fontSize: 11, color: BrandColors.muted),
-                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: BrandColors.muted,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -591,7 +801,11 @@ class _PaidTile extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             '₹${order.totalAmount.toStringAsFixed(0)}',
-            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: BrandColors.success),
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 15,
+              color: BrandColors.success,
+            ),
           ),
         ],
       ),
@@ -619,17 +833,32 @@ class _SupplierTile extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
-            child: const Icon(Icons.business_rounded, color: BrandColors.primary, size: 20),
+            child: const Icon(
+              Icons.business_rounded,
+              color: BrandColors.primary,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(supplier.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                Text(
+                  supplier.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
                 if (supplier.phone != null)
-                  Text(supplier.phone!,
-                      style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                  Text(
+                    supplier.phone!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -640,9 +869,14 @@ class _SupplierTile extends StatelessWidget {
                 color: BrandColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(supplier.category!,
-                  style: const TextStyle(
-                      fontSize: 10, color: BrandColors.primary, fontWeight: FontWeight.w700)),
+              child: Text(
+                supplier.category!,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: BrandColors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
         ],
       ),

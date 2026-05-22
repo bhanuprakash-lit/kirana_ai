@@ -5,8 +5,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/inventory_provider.dart';
 
-Future<bool> showAddCategorySheet(
-    BuildContext context, WidgetRef ref) async {
+Future<bool> showAddCategorySheet(BuildContext context, WidgetRef ref) async {
   final result = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -21,8 +20,7 @@ class _AddCategorySheet extends ConsumerStatefulWidget {
   const _AddCategorySheet({required this.ref});
 
   @override
-  ConsumerState<_AddCategorySheet> createState() =>
-      _AddCategorySheetState();
+  ConsumerState<_AddCategorySheet> createState() => _AddCategorySheetState();
 }
 
 class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
@@ -48,9 +46,7 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
       _error = null;
       _success = false;
     });
-    final result = await ref
-        .read(inventoryProvider.notifier)
-        .addCategory(name);
+    final result = await ref.read(inventoryProvider.notifier).addCategory(name);
     if (mounted) {
       if (result) {
         setState(() {
@@ -96,15 +92,25 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text('New Category',
-              style:
-                  TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: BrandColors.ink)),
+          const Text(
+            'New Category',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.ink,
+            ),
+          ),
           const SizedBox(height: 6),
-          const Text('Add a category to organise your products.',
-              style:
-                  TextStyle(color: BrandColors.muted, fontSize: 13, fontWeight: FontWeight.w500)),
+          const Text(
+            'Add a category to organise your products.',
+            style: TextStyle(
+              color: BrandColors.muted,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           const SizedBox(height: 24),
-          
+
           ActionStatusOverlay(
             isSaving: _saving,
             error: _error,

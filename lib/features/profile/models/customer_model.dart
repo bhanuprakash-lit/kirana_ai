@@ -40,8 +40,12 @@ class Customer {
       phone: json['phone'] as String? ?? '',
       email: json['email'] as String?,
       householdSize: (json['household_size'] as num?)?.toInt() ?? 4,
-      createdAt: json['created_at'] != null ? parseAsUtc(json['created_at'] as String) : null,
-      lastOrderDate: json['last_order_date'] != null ? DateTime.tryParse(json['last_order_date'] as String) : null,
+      createdAt: json['created_at'] != null
+          ? parseAsUtc(json['created_at'] as String)
+          : null,
+      lastOrderDate: json['last_order_date'] != null
+          ? DateTime.tryParse(json['last_order_date'] as String)
+          : null,
       totalSpent: (json['total_spent'] as num?)?.toDouble() ?? 0.0,
       totalOrders: (json['total_orders'] as num?)?.toInt() ?? 0,
       currentBalance: (json['balance'] as num?)?.toDouble() ?? 0.0,
@@ -66,7 +70,8 @@ class Customer {
     if (currentBalance > 0) segs.add('credit');
     if (!isInactive && totalSpent >= 10000) segs.add('bulk');
     if (!isInactive && orders30d >= 3) segs.add('regular');
-    if (!isInactive && !segs.contains('regular') && orders90d >= 1) segs.add('occasional');
+    if (!isInactive && !segs.contains('regular') && orders90d >= 1)
+      segs.add('occasional');
     if (!isInactive && segs.isEmpty) segs.add('impulse');
 
     return segs;
@@ -111,7 +116,9 @@ class Customer {
       currentBalance: currentBalance ?? this.currentBalance,
       orders30d: orders30d ?? this.orders30d,
       orders90d: orders90d ?? this.orders90d,
-      associationId: associationId == _sentinel ? this.associationId : associationId as int?,
+      associationId: associationId == _sentinel
+          ? this.associationId
+          : associationId as int?,
     );
   }
 }

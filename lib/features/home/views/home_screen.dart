@@ -22,16 +22,18 @@ class HomeScreen extends ConsumerWidget {
                 color: BrandColors.primary,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.storefront_rounded,
-                  size: 18, color: Colors.white),
+              child: const Icon(
+                Icons.storefront_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 10),
             Text(
               'Kirana AI',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontSize: 18),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontSize: 18),
             ),
           ],
         ),
@@ -71,8 +73,11 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.storefront_rounded,
-                    size: 44, color: Colors.white),
+                child: const Icon(
+                  Icons.storefront_rounded,
+                  size: 44,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 28),
               Text(
@@ -83,9 +88,9 @@ class HomeScreen extends ConsumerWidget {
               Text(
                 'Dashboard is on its way.\nWe\'re building something great for you.',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.6,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(height: 1.6),
               ),
             ],
           ),

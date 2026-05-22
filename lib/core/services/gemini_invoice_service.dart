@@ -12,11 +12,13 @@ class GeminiInvoiceService {
   GeminiInvoiceService(this._client);
 
   Future<({InvoiceExtraction extraction, Map<String, dynamic>? aiStatus})>
-      extractInvoice(Uint8List bytes, String mimeType) async {
-    final data = await _client.post('/kirana/ai/invoice', {
-      'data_b64': base64Encode(bytes),
-      'mime_type': mimeType,
-    }) as Map<String, dynamic>;
+  extractInvoice(Uint8List bytes, String mimeType) async {
+    final data =
+        await _client.post('/kirana/ai/invoice', {
+              'data_b64': base64Encode(bytes),
+              'mime_type': mimeType,
+            })
+            as Map<String, dynamic>;
 
     final aiStatus = data['ai_status'] as Map<String, dynamic>?;
     // Remove ai_status before parsing invoice so fromJson doesn't choke on it

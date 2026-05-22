@@ -28,15 +28,9 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       values = {
         'api_base_url': remoteConfig.getString('api_base_url'),
-        'backend_api_base_url': remoteConfig.getString(
-          'backend_api_base_url',
-        ),
-        'kirana_api_base_url': remoteConfig.getString(
-          'kirana_api_base_url',
-        ),
-        'pos_api_base_url': remoteConfig.getString(
-          'pos_api_base_url',
-        ),
+        'backend_api_base_url': remoteConfig.getString('backend_api_base_url'),
+        'kirana_api_base_url': remoteConfig.getString('kirana_api_base_url'),
+        'pos_api_base_url': remoteConfig.getString('pos_api_base_url'),
 
         // extra metadata
         'lastFetchStatus': remoteConfig.lastFetchStatus.name,
@@ -57,9 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
               flex: 2,
               child: Text(
                 key,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(width: 12),
@@ -67,9 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
               flex: 3,
               child: Text(
                 value.toString(),
-                style: const TextStyle(
-                  color: Colors.blueGrey,
-                ),
+                style: const TextStyle(color: Colors.blueGrey),
               ),
             ),
           ],
@@ -86,9 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Firebase Remote Config'),
-      ),
+      appBar: AppBar(title: const Text('Firebase Remote Config')),
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: ListView(
@@ -96,9 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             const SizedBox(height: 16),
 
-            ...values.entries.map(
-              (e) => buildRow(e.key, e.value),
-            ),
+            ...values.entries.map((e) => buildRow(e.key, e.value)),
 
             const SizedBox(height: 24),
 

@@ -6,8 +6,7 @@ import 'package:intl/intl.dart';
 DateTime parseAsUtc(String? s) {
   if (s == null || s.isEmpty) return DateTime.now();
   final t = s.trim();
-  final hasOffset =
-      t.endsWith('Z') || RegExp(r'[+-]\d{2}:\d{2}$').hasMatch(t);
+  final hasOffset = t.endsWith('Z') || RegExp(r'[+-]\d{2}:\d{2}$').hasMatch(t);
   return DateTime.parse(hasOffset ? t : '${t}Z').toLocal();
 }
 

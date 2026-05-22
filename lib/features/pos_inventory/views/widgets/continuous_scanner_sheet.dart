@@ -28,7 +28,8 @@ Future<List<ScanSessionItem>?> showContinuousScannerSheet(
     context,
     MaterialPageRoute(
       fullscreenDialog: true,
-      builder: (_) => _ContinuousScannerSheet(ref: ref, onUnknownBarcode: onUnknownBarcode),
+      builder: (_) =>
+          _ContinuousScannerSheet(ref: ref, onUnknownBarcode: onUnknownBarcode),
     ),
   );
 }
@@ -41,7 +42,8 @@ class _ContinuousScannerSheet extends StatefulWidget {
   const _ContinuousScannerSheet({required this.ref, this.onUnknownBarcode});
 
   @override
-  State<_ContinuousScannerSheet> createState() => _ContinuousScannerSheetState();
+  State<_ContinuousScannerSheet> createState() =>
+      _ContinuousScannerSheetState();
 }
 
 class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
@@ -66,7 +68,9 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
     if (format == BarcodeFormat.qrCode) return false;
     if (format == BarcodeFormat.aztec ||
         format == BarcodeFormat.dataMatrix ||
-        format == BarcodeFormat.pdf417) { return false; }
+        format == BarcodeFormat.pdf417) {
+      return false;
+    }
     if (value.contains('://')) return false;
     if (value.startsWith('KIRANA_REF:')) return false;
     return true;
@@ -82,7 +86,12 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
     if (last != null && now.difference(last) < _cooldown) {
       // Within cooldown — show brief "already added" hint only if it's in the list
       final existing = _items.indexWhere((i) => i.product.barcode == raw);
-      if (existing >= 0) { _showFlash('${_items[existing].product.name} already in list', error: false); }
+      if (existing >= 0) {
+        _showFlash(
+          '${_items[existing].product.name} already in list',
+          error: false,
+        );
+      }
       return;
     }
     _lastScan[raw] = now;
@@ -111,31 +120,49 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
 
     // 3. Network fallback — add a placeholder while fetching
     final placeholder = ScanSessionItem(
-      PosProduct(productId: -1, name: 'Looking up…', price: 0, stockQuantity: 0,
-          barcode: barcode, isPerishable: false, isLoose: false, categoryId: 0),
+      PosProduct(
+        productId: -1,
+        name: 'Looking up…',
+        price: 0,
+        stockQuantity: 0,
+        barcode: barcode,
+        isPerishable: false,
+        isLoose: false,
+        categoryId: 0,
+      ),
     );
     setState(() => _items.insert(0, placeholder));
 
-    notifier.lookupBarcode(barcode).then((product) {
-      if (!mounted) return;
-      final pi = _items.indexWhere((i) => i.product.barcode == barcode && i.product.productId == -1);
-      if (product != null) {
-        setState(() => _items[pi] = ScanSessionItem(product));
-        _showFlash('${product.name} added');
-      } else {
-        setState(() => _items.removeAt(pi));
-        _showFlash('Not found — tap to add manually', error: true);
-        widget.onUnknownBarcode?.call(barcode);
-      }
-    }).catchError((_) {
-      if (!mounted) return;
-      final pi = _items.indexWhere((i) => i.product.barcode == barcode && i.product.productId == -1);
-      if (pi >= 0) setState(() => _items.removeAt(pi));
-    });
+    notifier
+        .lookupBarcode(barcode)
+        .then((product) {
+          if (!mounted) return;
+          final pi = _items.indexWhere(
+            (i) => i.product.barcode == barcode && i.product.productId == -1,
+          );
+          if (product != null) {
+            setState(() => _items[pi] = ScanSessionItem(product));
+            _showFlash('${product.name} added');
+          } else {
+            setState(() => _items.removeAt(pi));
+            _showFlash('Not found — tap to add manually', error: true);
+            widget.onUnknownBarcode?.call(barcode);
+          }
+        })
+        .catchError((_) {
+          if (!mounted) return;
+          final pi = _items.indexWhere(
+            (i) => i.product.barcode == barcode && i.product.productId == -1,
+          );
+          if (pi >= 0) setState(() => _items.removeAt(pi));
+        });
   }
 
   void _showFlash(String msg, {bool error = false}) {
-    setState(() { _flashMessage = msg; _flashError = error; });
+    setState(() {
+      _flashMessage = msg;
+      _flashError = error;
+    });
     Future.delayed(const Duration(milliseconds: 1400), () {
       if (mounted) setState(() => _flashMessage = null);
     });
@@ -159,7 +186,7 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
     final total = _items.fold<double>(0, (s, i) => s + i.product.price * i.qty);
     final hasItems = _items.isNotEmpty;
     final pendingCount = _items.where((i) => i.product.productId == -1).length;
-    final validCount   = _items.where((i) => i.product.productId != -1).length;
+    final validCount = _items.where((i) => i.product.productId != -1).length;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -170,7 +197,12 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
             _Header(
               itemCount: validCount,
               onClose: () => Navigator.pop(context, null),
-              onClear: hasItems ? () => setState(() { _items.clear(); _lastScan.clear(); }) : null,
+              onClear: hasItems
+                  ? () => setState(() {
+                      _items.clear();
+                      _lastScan.clear();
+                    })
+                  : null,
             ),
 
             // ── Scanner — top 40% ────────────────────────────────────────
@@ -222,13 +254,20 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
                               backgroundColor: BrandColors.primary,
                               foregroundColor: Colors.white,
                               disabledBackgroundColor: BrandColors.muted,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
                             child: pendingCount > 0
-                                ? Text('Looking up $pendingCount item${pendingCount > 1 ? 's' : ''}…')
+                                ? Text(
+                                    'Looking up $pendingCount item${pendingCount > 1 ? 's' : ''}…',
+                                  )
                                 : Text(
                                     'Add $validCount item${validCount > 1 ? 's' : ''} to Cart  ·  ₹${total.toStringAsFixed(0)}',
-                                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 15,
+                                    ),
                                   ),
                           ),
                         ),
@@ -259,18 +298,30 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          IconButton(onPressed: onClose, icon: const Icon(Icons.close, color: Colors.white)),
+          IconButton(
+            onPressed: onClose,
+            icon: const Icon(Icons.close, color: Colors.white),
+          ),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
-              itemCount > 0 ? '$itemCount item${itemCount > 1 ? 's' : ''} scanned' : 'Scan items',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
+              itemCount > 0
+                  ? '$itemCount item${itemCount > 1 ? 's' : ''} scanned'
+                  : 'Scan items',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
             ),
           ),
           if (onClear != null)
             TextButton(
               onPressed: onClear,
-              child: const Text('Clear all', style: TextStyle(color: Colors.white54, fontSize: 13)),
+              child: const Text(
+                'Clear all',
+                style: TextStyle(color: Colors.white54, fontSize: 13),
+              ),
             ),
         ],
       ),
@@ -283,7 +334,12 @@ class _ScannerView extends StatelessWidget {
   final void Function(BarcodeCapture) onDetect;
   final String? flashMessage;
   final bool flashError;
-  const _ScannerView({required this.controller, required this.onDetect, this.flashMessage, this.flashError = false});
+  const _ScannerView({
+    required this.controller,
+    required this.onDetect,
+    this.flashMessage,
+    this.flashError = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +351,8 @@ class _ScannerView extends StatelessWidget {
         // Reticle
         Center(
           child: Container(
-            width: 260, height: 100,
+            width: 260,
+            height: 100,
             decoration: BoxDecoration(
               border: Border.all(color: BrandColors.accent, width: 2.5),
               borderRadius: BorderRadius.circular(12),
@@ -313,15 +370,24 @@ class _ScannerView extends StatelessWidget {
               opacity: 1.0,
               duration: const Duration(milliseconds: 150),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: flashError ? Colors.red.shade800 : Colors.green.shade700,
+                  color: flashError
+                      ? Colors.red.shade800
+                      : Colors.green.shade700,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   flashMessage!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),
@@ -335,7 +401,11 @@ class _ItemRow extends StatelessWidget {
   final ScanSessionItem item;
   final VoidCallback onRemove;
   final ValueChanged<int> onQtyChange;
-  const _ItemRow({required this.item, required this.onRemove, required this.onQtyChange});
+  const _ItemRow({
+    required this.item,
+    required this.onRemove,
+    required this.onQtyChange,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -349,28 +419,39 @@ class _ItemRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(children: [
-                  if (isPending) ...[
-                    const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5)),
-                    const SizedBox(width: 8),
-                  ],
-                  Flexible(
-                    child: Text(
-                      item.product.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: isPending ? BrandColors.muted : BrandColors.ink,
+                Row(
+                  children: [
+                    if (isPending) ...[
+                      const SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 1.5),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      const SizedBox(width: 8),
+                    ],
+                    Flexible(
+                      child: Text(
+                        item.product.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: isPending
+                              ? BrandColors.muted
+                              : BrandColors.ink,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
                 if (!isPending)
                   Text(
                     '₹${item.product.price.toStringAsFixed(0)} × ${item.qty}  =  ₹${(item.product.price * item.qty).toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
                   ),
               ],
             ),
@@ -378,10 +459,17 @@ class _ItemRow extends StatelessWidget {
 
           // Qty stepper
           if (!isPending) ...[
-            _QtyButton(icon: Icons.remove, onTap: item.qty > 1 ? () => onQtyChange(-1) : null),
+            _QtyButton(
+              icon: Icons.remove,
+              onTap: item.qty > 1 ? () => onQtyChange(-1) : null,
+            ),
             SizedBox(
               width: 28,
-              child: Text('${item.qty}', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700)),
+              child: Text(
+                '${item.qty}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
             ),
             _QtyButton(icon: Icons.add, onTap: () => onQtyChange(1)),
             const SizedBox(width: 4),
@@ -392,7 +480,11 @@ class _ItemRow extends StatelessWidget {
             onTap: onRemove,
             child: const Padding(
               padding: EdgeInsets.all(4),
-              child: Icon(Icons.close_rounded, size: 18, color: BrandColors.muted),
+              child: Icon(
+                Icons.close_rounded,
+                size: 18,
+                color: BrandColors.muted,
+              ),
             ),
           ),
         ],
@@ -411,12 +503,19 @@ class _QtyButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 26, height: 26,
+        width: 26,
+        height: 26,
         decoration: BoxDecoration(
-          color: onTap != null ? BrandColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+          color: onTap != null
+              ? BrandColors.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
-        child: Icon(icon, size: 16, color: onTap != null ? BrandColors.primary : BrandColors.muted),
+        child: Icon(
+          icon,
+          size: 16,
+          color: onTap != null ? BrandColors.primary : BrandColors.muted,
+        ),
       ),
     );
   }
@@ -431,11 +530,21 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.qr_code_scanner_rounded, size: 40, color: BrandColors.muted),
+          Icon(
+            Icons.qr_code_scanner_rounded,
+            size: 40,
+            color: BrandColors.muted,
+          ),
           SizedBox(height: 10),
-          Text('Point camera at a barcode', style: TextStyle(color: BrandColors.muted, fontSize: 14)),
+          Text(
+            'Point camera at a barcode',
+            style: TextStyle(color: BrandColors.muted, fontSize: 14),
+          ),
           SizedBox(height: 4),
-          Text('Items appear here as you scan', style: TextStyle(color: BrandColors.muted, fontSize: 12)),
+          Text(
+            'Items appear here as you scan',
+            style: TextStyle(color: BrandColors.muted, fontSize: 12),
+          ),
         ],
       ),
     );

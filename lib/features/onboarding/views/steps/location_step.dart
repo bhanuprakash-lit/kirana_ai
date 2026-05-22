@@ -36,7 +36,8 @@ class _LocationStepState extends ConsumerState<LocationStep> {
     if (address.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Please detect or enter your store address.')),
+          content: Text('Please detect or enter your store address.'),
+        ),
       );
       return;
     }
@@ -142,49 +143,55 @@ class _LocationStepState extends ConsumerState<LocationStep> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.my_location_rounded),
-            label: Text(state.isLocationLoading
-                ? 'Detecting location…'
-                : 'Detect My Location'),
+            label: Text(
+              state.isLocationLoading
+                  ? 'Detecting location…'
+                  : 'Detect My Location',
+            ),
             style: OutlinedButton.styleFrom(
               foregroundColor: BrandColors.primary,
               side: const BorderSide(color: BrandColors.primary),
               minimumSize: const Size.fromHeight(52),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
           if (state.errorMessage != null) ...[
             const SizedBox(height: 12),
             Text(
               state.errorMessage!,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: BrandColors.error),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: BrandColors.error),
             ).animate().fadeIn(duration: 300.ms),
           ],
           if (state.data.latitude != null) ...[
             const SizedBox(height: 16),
             _LocationBadge(
-              lat: state.data.latitude!,
-              lon: state.data.longitude!,
-              location: state.data.location,
-              region: state.data.region,
-            )
+                  lat: state.data.latitude!,
+                  lon: state.data.longitude!,
+                  location: state.data.location,
+                  region: state.data.region,
+                )
                 .animate()
                 .fadeIn(duration: 400.ms)
                 .scale(begin: const Offset(0.92, 0.92)),
           ],
           const SizedBox(height: 24),
-          Row(children: [
-            const Expanded(child: Divider()),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Text('or enter manually',
-                  style: Theme.of(context).textTheme.bodyMedium),
-            ),
-            const Expanded(child: Divider()),
-          ]),
+          Row(
+            children: [
+              const Expanded(child: Divider()),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Text(
+                  'or enter manually',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              const Expanded(child: Divider()),
+            ],
+          ),
           const SizedBox(height: 24),
           BrandTextField(
             controller: _addressCtrl,
@@ -242,8 +249,11 @@ class _LocationBadge extends StatelessWidget {
               color: BrandColors.success.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.location_on_rounded,
-                color: BrandColors.success, size: 20),
+            child: const Icon(
+              Icons.location_on_rounded,
+              color: BrandColors.success,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -253,9 +263,9 @@ class _LocationBadge extends StatelessWidget {
                 Text(
                   location.isNotEmpty ? location : 'Location detected',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: BrandColors.success,
-                        fontSize: 13,
-                      ),
+                    color: BrandColors.success,
+                    fontSize: 13,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -263,16 +273,18 @@ class _LocationBadge extends StatelessWidget {
                   region.isNotEmpty
                       ? region
                       : '${lat.toStringAsFixed(4)}°N, ${lon.toStringAsFixed(4)}°E',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(fontSize: 12),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontSize: 12),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.check_circle_rounded,
-              color: BrandColors.success, size: 20),
+          const Icon(
+            Icons.check_circle_rounded,
+            color: BrandColors.success,
+            size: 20,
+          ),
         ],
       ),
     );

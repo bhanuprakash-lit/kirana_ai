@@ -5,11 +5,16 @@ enum SubTier { none, pending, trial, basic, pro }
 extension SubTierX on SubTier {
   String displayName({String trialTier = 'basic'}) {
     switch (this) {
-      case SubTier.none: return 'No Subscription';
-      case SubTier.pending: return 'Awaiting Activation';
-      case SubTier.trial: return trialTier == 'pro' ? 'Pro (Free Trial)' : 'Basic (Free Trial)';
-      case SubTier.basic: return 'Basic';
-      case SubTier.pro: return 'Pro';
+      case SubTier.none:
+        return 'No Subscription';
+      case SubTier.pending:
+        return 'Awaiting Activation';
+      case SubTier.trial:
+        return trialTier == 'pro' ? 'Pro (Free Trial)' : 'Basic (Free Trial)';
+      case SubTier.basic:
+        return 'Basic';
+      case SubTier.pro:
+        return 'Pro';
     }
   }
 
@@ -18,11 +23,16 @@ extension SubTierX on SubTier {
 
   String get priceLabel {
     switch (this) {
-      case SubTier.none: return '';
-      case SubTier.pending: return 'Free';
-      case SubTier.trial: return 'Free';
-      case SubTier.basic: return '₹200/mo · just ₹7/day';
-      case SubTier.pro: return '₹500/mo · just ₹17/day';
+      case SubTier.none:
+        return '';
+      case SubTier.pending:
+        return 'Free';
+      case SubTier.trial:
+        return 'Free';
+      case SubTier.basic:
+        return '₹200/mo · just ₹7/day';
+      case SubTier.pro:
+        return '₹500/mo · just ₹17/day';
     }
   }
 
@@ -70,11 +80,15 @@ class SubscriptionInfo {
   bool get canAccessReferral => tier == SubTier.pro || _isProTrial;
 
   /// App access (trial, basic, pro — not none/pending/expired)
-  bool get hasAppAccess => (tier == SubTier.trial || tier == SubTier.basic || tier == SubTier.pro) && !isExpired;
+  bool get hasAppAccess =>
+      (tier == SubTier.trial || tier == SubTier.basic || tier == SubTier.pro) &&
+      !isExpired;
 
   bool get isActive => hasAppAccess && !isExpired;
   // Server is authoritative; fall back to local clock if server didn't send the flag.
-  bool get isExpired => serverExpired || (isTrial && trialEndsAt != null && trialEndsAt!.isBefore(DateTime.now()));
+  bool get isExpired =>
+      serverExpired ||
+      (isTrial && trialEndsAt != null && trialEndsAt!.isBefore(DateTime.now()));
   bool get isPending => tier == SubTier.pending;
 
   // Server explicitly told us this trial is expired.

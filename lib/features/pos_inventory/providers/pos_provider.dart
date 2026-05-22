@@ -51,32 +51,40 @@ class PosState {
     String? referralReferrerName,
     PendingReferralScan? pendingReferral,
     bool clearReferral = false,
-  }) =>
-      PosState(
-        products: products ?? this.products,
-        isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
-        cart: cart ?? this.cart,
-        isPlacingOrder: isPlacingOrder ?? this.isPlacingOrder,
-        error: clearError ? null : (error ?? this.error),
-        selectedCustomerId: clearCustomer ? null : (selectedCustomerId ?? this.selectedCustomerId),
-        selectedCustomerName: clearCustomer ? null : (selectedCustomerName ?? this.selectedCustomerName),
-        referralDiscountPct: clearReferral ? null : (referralDiscountPct ?? this.referralDiscountPct),
-        referralReferrerName: clearReferral ? null : (referralReferrerName ?? this.referralReferrerName),
-        pendingReferral: clearReferral ? null : (pendingReferral ?? this.pendingReferral),
-      );
+  }) => PosState(
+    products: products ?? this.products,
+    isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
+    cart: cart ?? this.cart,
+    isPlacingOrder: isPlacingOrder ?? this.isPlacingOrder,
+    error: clearError ? null : (error ?? this.error),
+    selectedCustomerId: clearCustomer
+        ? null
+        : (selectedCustomerId ?? this.selectedCustomerId),
+    selectedCustomerName: clearCustomer
+        ? null
+        : (selectedCustomerName ?? this.selectedCustomerName),
+    referralDiscountPct: clearReferral
+        ? null
+        : (referralDiscountPct ?? this.referralDiscountPct),
+    referralReferrerName: clearReferral
+        ? null
+        : (referralReferrerName ?? this.referralReferrerName),
+    pendingReferral: clearReferral
+        ? null
+        : (pendingReferral ?? this.pendingReferral),
+  );
 
-  double get subtotal =>
-      cart.fold(0, (sum, item) => sum + item.lineTotal);
+  double get subtotal => cart.fold(0, (sum, item) => sum + item.lineTotal);
 
   double get discountedSubtotal {
-    if (referralDiscountPct == null || referralDiscountPct! <= 0) return subtotal;
+    if (referralDiscountPct == null || referralDiscountPct! <= 0)
+      return subtotal;
     return subtotal * (1 - referralDiscountPct! / 100);
   }
 
   double get discountAmount => subtotal - discountedSubtotal;
 
-  double get cartItemCount =>
-      cart.fold(0, (sum, item) => sum + item.quantity);
+  double get cartItemCount => cart.fold(0, (sum, item) => sum + item.quantity);
 
   bool get hasToken => true; // checked at runtime
 }
@@ -100,8 +108,12 @@ class PosNotifier extends Notifier<PosState> {
     final storeId = _storeId!;
 
     final productsFuture = client.posGetList(
-        '/pos/products?store_id=$storeId&limit=1000');
-    final pricingFuture = client.getOltp('pricing', filters: {'store_id': '$storeId'});
+      '/pos/products?store_id=$storeId&limit=1000',
+    );
+    final pricingFuture = client.getOltp(
+      'pricing',
+      filters: {'store_id': '$storeId'},
+    );
 
     try {
       final res = await productsFuture;
@@ -116,8 +128,9 @@ class PosNotifier extends Notifier<PosState> {
       }
 
       final pricingMap = <int, Map<String, dynamic>>{};
-      for (final row in ((pricingRes['rows'] as List<dynamic>?) ?? [])
-          .cast<Map<String, dynamic>>()) {
+      for (final row
+          in ((pricingRes['rows'] as List<dynamic>?) ?? [])
+              .cast<Map<String, dynamic>>()) {
         final id = (row['product_id'] as num?)?.toInt();
         if (id != null) pricingMap[id] = row;
       }
@@ -126,7 +139,12 @@ class PosNotifier extends Notifier<PosState> {
         final p = PosProduct.fromJson(j);
         final pricing = pricingMap[p.productId];
         if (pricing != null) {
-          final sp = (pricing['selling_price'] ?? pricing['price'] ?? pricing['unit_price'] ?? 0.0) as num;
+          final sp =
+              (pricing['selling_price'] ??
+                      pricing['price'] ??
+                      pricing['unit_price'] ??
+                      0.0)
+                  as num;
           final mrp = (pricing['mrp'] ?? p.mrp ?? 0.0) as num;
           return p.copyWith(
             price: sp > 0 ? sp.toDouble() : p.price,
@@ -140,7 +158,10 @@ class PosNotifier extends Notifier<PosState> {
     } on ApiException catch (e) {
       state = state.copyWith(isLoadingProducts: false, error: e.message);
     } catch (e) {
-      state = state.copyWith(isLoadingProducts: false, error: 'Error loading POS products: $e');
+      state = state.copyWith(
+        isLoadingProducts: false,
+        error: 'Error loading POS products: $e',
+      );
     }
   }
 
@@ -159,7 +180,8 @@ class PosNotifier extends Notifier<PosState> {
     final client = ref.read(apiClientProvider);
     try {
       final res = await client.posGet(
-          '/pos/products/barcode/$barcode?store_id=$storeId');
+        '/pos/products/barcode/$barcode?store_id=$storeId',
+      );
       if (res == null) return null;
       return PosProduct.fromJson(res);
     } on ApiException catch (e) {
@@ -178,11 +200,15 @@ class PosNotifier extends Notifier<PosState> {
   Future<void> _doPing({bool converted = false}) async {
     try {
       final client = ref.read(apiClientProvider);
-      final items = state.cart.map((i) => {
-        'product_id': i.product.productId,
-        'name': i.product.name,
-        'qty': i.quantity,
-      }).toList();
+      final items = state.cart
+          .map(
+            (i) => {
+              'product_id': i.product.productId,
+              'name': i.product.name,
+              'qty': i.quantity,
+            },
+          )
+          .toList();
       await client.post('/kirana/intelligence/cart-ping', {
         'item_count': converted ? 0 : state.cart.length,
         'items': converted ? [] : items,
@@ -197,24 +223,29 @@ class PosNotifier extends Notifier<PosState> {
 
   void addToCart(PosProduct product, {double qty = 1.0}) {
     final existing = state.cart.indexWhere(
-        (i) => i.product.productId == product.productId);
+      (i) => i.product.productId == product.productId,
+    );
     if (existing >= 0) {
       final updated = List<CartItem>.from(state.cart);
-      updated[existing] =
-          updated[existing].copyWith(quantity: updated[existing].quantity + qty);
+      updated[existing] = updated[existing].copyWith(
+        quantity: updated[existing].quantity + qty,
+      );
       state = state.copyWith(cart: updated);
     } else {
       state = state.copyWith(
-          cart: [...state.cart, CartItem(product: product, quantity: qty)]);
+        cart: [
+          ...state.cart,
+          CartItem(product: product, quantity: qty),
+        ],
+      );
     }
     _schedulePing();
   }
 
   void removeFromCart(int productId) {
     state = state.copyWith(
-        cart: state.cart
-            .where((i) => i.product.productId != productId)
-            .toList());
+      cart: state.cart.where((i) => i.product.productId != productId).toList(),
+    );
     _schedulePing();
   }
 
@@ -224,16 +255,21 @@ class PosNotifier extends Notifier<PosState> {
       return;
     }
     final updated = state.cart
-        .map((i) => i.product.productId == productId
-            ? i.copyWith(quantity: qty)
-            : i)
+        .map(
+          (i) =>
+              i.product.productId == productId ? i.copyWith(quantity: qty) : i,
+        )
         .toList();
     state = state.copyWith(cart: updated);
     _schedulePing();
   }
 
   void clearCart() {
-    state = state.copyWith(cart: const [], clearCustomer: true, clearReferral: true);
+    state = state.copyWith(
+      cart: const [],
+      clearCustomer: true,
+      clearReferral: true,
+    );
     _cartPingTimer?.cancel();
     _doPing(converted: false);
   }
@@ -330,12 +366,14 @@ class PosNotifier extends Notifier<PosState> {
         'payment_method': paymentMethod,
         'customer_id': customerId,
         'items': state.cart
-            .map((i) => {
-                  'product_id': i.product.productId,
-                  'quantity': i.quantity,
-                  'selling_price': i.product.price,
-                  'unit_price': i.product.price,
-                })
+            .map(
+              (i) => {
+                'product_id': i.product.productId,
+                'quantity': i.quantity,
+                'selling_price': i.product.price,
+                'unit_price': i.product.price,
+              },
+            )
             .toList(),
       };
       final order = await client.posPost('/pos/orders', body);
@@ -376,11 +414,12 @@ class PosNotifier extends Notifier<PosState> {
         return mutable;
       }
       state = state.copyWith(
-          isPlacingOrder: false, error: 'Failed to place order.');
+        isPlacingOrder: false,
+        error: 'Failed to place order.',
+      );
       return null;
     } catch (e) {
-      state = state.copyWith(
-          isPlacingOrder: false, error: 'Order failed: $e');
+      state = state.copyWith(isPlacingOrder: false, error: 'Order failed: $e');
       return null;
     }
   }
@@ -399,14 +438,12 @@ class PosNotifier extends Notifier<PosState> {
     final prefs = await SharedPreferences.getInstance();
     final storeId = prefs.getInt('store_id') ?? 1;
 
-    final params = <String, String>{
-      'store_id': '$storeId',
-      'limit': '$limit',
-    };
+    final params = <String, String>{'store_id': '$storeId', 'limit': '$limit'};
     if (status != null) params['status'] = status;
     if (paymentMethod != null) params['payment_method'] = paymentMethod;
     if (customerId != null) params['customer_id'] = '$customerId';
-    if (startDate != null) params['start_date'] = startDate.toUtc().toIso8601String();
+    if (startDate != null)
+      params['start_date'] = startDate.toUtc().toIso8601String();
     if (endDate != null) params['end_date'] = endDate.toUtc().toIso8601String();
     if (minAmount != null) params['min_amount'] = '$minAmount';
     if (maxAmount != null) params['max_amount'] = '$maxAmount';
@@ -428,12 +465,13 @@ class PosNotifier extends Notifier<PosState> {
 
     try {
       final res = await client.posGetList(
-          '/pos/orders?store_id=$storeId&limit=200');
+        '/pos/orders?store_id=$storeId&limit=200',
+      );
       if (res == null) return [];
-      
+
       final now = DateTime.now();
       final todayStart = DateTime(now.year, now.month, now.day);
-      
+
       return res.cast<Map<String, dynamic>>().where((o) {
         String dateStr = o['order_date'] as String? ?? '';
         if (dateStr.isEmpty) return false;
@@ -453,4 +491,6 @@ class PosNotifier extends Notifier<PosState> {
   }
 }
 
-final posProvider = NotifierProvider.autoDispose<PosNotifier, PosState>(PosNotifier.new);
+final posProvider = NotifierProvider.autoDispose<PosNotifier, PosState>(
+  PosNotifier.new,
+);

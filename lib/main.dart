@@ -43,7 +43,8 @@ class KiranaApp extends ConsumerStatefulWidget {
   ConsumerState<KiranaApp> createState() => _KiranaAppState();
 }
 
-class _KiranaAppState extends ConsumerState<KiranaApp> with WidgetsBindingObserver {
+class _KiranaAppState extends ConsumerState<KiranaApp>
+    with WidgetsBindingObserver {
   DateTime? _foregroundStart;
 
   @override
@@ -79,7 +80,9 @@ class _KiranaAppState extends ConsumerState<KiranaApp> with WidgetsBindingObserv
     try {
       final body = <String, dynamic>{'event': event};
       if (durationSec != null) body['duration_sec'] = durationSec;
-      await ref.read(apiClientProvider).post('/kirana/tracking/app-event', body);
+      await ref
+          .read(apiClientProvider)
+          .post('/kirana/tracking/app-event', body);
     } catch (_) {
       // Silently ignore — user may not be logged in yet
     }

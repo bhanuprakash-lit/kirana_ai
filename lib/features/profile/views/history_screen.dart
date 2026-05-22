@@ -14,7 +14,8 @@ class HistoryScreen extends ConsumerStatefulWidget {
   ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends ConsumerState<HistoryScreen> with SingleTickerProviderStateMixin {
+class _HistoryScreenState extends ConsumerState<HistoryScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -28,7 +29,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> with SingleTicker
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('All History', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'All History',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
@@ -44,10 +48,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> with SingleTicker
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          _PurchaseHistoryList(),
-          _PosOrderHistorySummary(),
-        ],
+        children: const [_PurchaseHistoryList(), _PosOrderHistorySummary()],
       ),
     );
   }
@@ -86,7 +87,9 @@ class _PurchaseTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(order.purchaseDate.toLocal());
+    final dateStr = DateFormat(
+      'dd MMM yyyy, hh:mm a',
+    ).format(order.purchaseDate.toLocal());
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -104,15 +107,30 @@ class _PurchaseTile extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(order.supplierName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(
+                      order.supplierName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     Text(
                       dateStr,
-                      style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ),
               ),
-              Text('₹${order.totalAmount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(
+                '₹${order.totalAmount.toStringAsFixed(0)}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
             ],
           ),
           const Divider(height: 24),
@@ -122,15 +140,21 @@ class _PurchaseTile extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (order.status.name == 'received' ? BrandColors.success : Colors.orange).withValues(alpha: 0.1),
+                  color:
+                      (order.status.name == 'received'
+                              ? BrandColors.success
+                              : Colors.orange)
+                          .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   order.status.name.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 10, 
-                    fontWeight: FontWeight.bold, 
-                    color: order.status.name == 'received' ? BrandColors.success : Colors.orange
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: order.status.name == 'received'
+                        ? BrandColors.success
+                        : Colors.orange,
                   ),
                 ),
               ),
@@ -146,16 +170,25 @@ class _PurchaseTile extends ConsumerWidget {
   }
 
   void _showPurchaseDetails(BuildContext context, WidgetRef ref) {
-    final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(order.purchaseDate.toLocal());
+    final dateStr = DateFormat(
+      'dd MMM yyyy, hh:mm a',
+    ).format(order.purchaseDate.toLocal());
 
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (ctx) => FutureBuilder<List<PurchaseItem>>(
-        future: ref.read(procurementProvider.notifier).fetchPurchaseItems(order.purchaseId),
+        future: ref
+            .read(procurementProvider.notifier)
+            .fetchPurchaseItems(order.purchaseId),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+            return const SizedBox(
+              height: 200,
+              child: Center(child: CircularProgressIndicator()),
+            );
           }
           final items = snapshot.data ?? [];
           return Container(
@@ -167,32 +200,61 @@ class _PurchaseTile extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Purchase Details', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Purchase Details',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     Text(
                       dateStr,
-                      style: const TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text('From ${order.supplierName}', style: const TextStyle(color: BrandColors.muted)),
+                Text(
+                  'From ${order.supplierName}',
+                  style: const TextStyle(color: BrandColors.muted),
+                ),
                 const Divider(height: 32),
-                ...items.map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(item.productName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text('Qty: ${item.quantity.toStringAsFixed(0)} × ₹${item.costPrice.toStringAsFixed(0)}'),
-                    ],
+                ...items.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          item.productName,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'Qty: ${item.quantity.toStringAsFixed(0)} × ₹${item.costPrice.toStringAsFixed(0)}',
+                        ),
+                      ],
+                    ),
                   ),
-                )),
+                ),
                 const Divider(height: 32),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total Amount', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('₹${order.totalAmount.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const Text(
+                      'Total Amount',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '₹${order.totalAmount.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -220,12 +282,20 @@ class _PosOrderHistorySummary extends ConsumerWidget {
               color: BrandColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.point_of_sale_rounded, size: 64, color: BrandColors.primary),
+            child: const Icon(
+              Icons.point_of_sale_rounded,
+              size: 64,
+              color: BrandColors.primary,
+            ),
           ),
           const SizedBox(height: 24),
           const Text(
             'Sales Transaction History',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: BrandColors.ink),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: BrandColors.ink,
+            ),
           ),
           const SizedBox(height: 8),
           const Padding(
@@ -245,13 +315,18 @@ class _PosOrderHistorySummary extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: BrandColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 elevation: 0,
               ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Open Sales History', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                  Text(
+                    'Open Sales History',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                  ),
                   SizedBox(width: 8),
                   Icon(Icons.arrow_forward_rounded, size: 18),
                 ],

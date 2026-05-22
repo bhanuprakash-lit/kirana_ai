@@ -10,8 +10,8 @@ import '../models/cashflow_model.dart';
 
 final cashflowStatusProvider =
     AsyncNotifierProvider<CashflowNotifier, CashflowStatus>(
-  CashflowNotifier.new,
-);
+      CashflowNotifier.new,
+    );
 
 class CashflowNotifier extends AsyncNotifier<CashflowStatus> {
   @override
@@ -27,12 +27,14 @@ class CashflowNotifier extends AsyncNotifier<CashflowStatus> {
 
     final res = await http.get(
       Uri.parse(
-          '${AppConfig.apiBaseUrl}/kirana/cashflow/status?store_id=$storeId'),
+        '${AppConfig.apiBaseUrl}/kirana/cashflow/status?store_id=$storeId',
+      ),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (res.statusCode == 200) {
       return CashflowStatus.fromJson(
-          jsonDecode(res.body) as Map<String, dynamic>);
+        jsonDecode(res.body) as Map<String, dynamic>,
+      );
     }
     return CashflowStatus.empty;
   }

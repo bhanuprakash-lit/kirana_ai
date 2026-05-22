@@ -46,7 +46,8 @@ class AuthRepository {
     await _storage.write(key: _tokenKey, value: result.accessToken);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('user_id', result.user.userId);
-    if (result.user.storeId != null) await prefs.setInt('store_id', result.user.storeId!);
+    if (result.user.storeId != null)
+      await prefs.setInt('store_id', result.user.storeId!);
     await prefs.setString('username', result.user.username);
     await prefs.setString('full_name', result.user.fullName);
     await prefs.setString('role', result.user.role);
@@ -119,13 +120,17 @@ class AuthRepository {
     if (token == null) throw const ApiException(401, 'Not authenticated');
 
     try {
-      final res = await http.get(
-        Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/me'),
-        headers: {'Authorization': 'Bearer $token'},
-      ).timeout(const Duration(seconds: 8));
+      final res = await http
+          .get(
+            Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/me'),
+            headers: {'Authorization': 'Bearer $token'},
+          )
+          .timeout(const Duration(seconds: 8));
 
       if (res.statusCode == 200) {
-        final user = AppUser.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+        final user = AppUser.fromJson(
+          jsonDecode(res.body) as Map<String, dynamic>,
+        );
         // Refresh local cache on successful fetch
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt('user_id', user.userId);

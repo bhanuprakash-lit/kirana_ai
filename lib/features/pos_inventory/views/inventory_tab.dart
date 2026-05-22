@@ -288,19 +288,22 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
           }
 
           // Only show categories that actually have items in this store's inventory
-          final categories = data.items
-              .map((i) => i.categoryName)
-              .whereType<String>()
-              .toSet()
-              .toList()
-            ..sort();
-          
+          final categories =
+              data.items
+                  .map((i) => i.categoryName)
+                  .whereType<String>()
+                  .toSet()
+                  .toList()
+                ..sort();
+
           final q = _searchQuery.toLowerCase().trim();
           final filteredItems = data.items.where((item) {
-            final matchesCategory = _selectedCategory == null || 
+            final matchesCategory =
+                _selectedCategory == null ||
                 item.categoryName == _selectedCategory;
-            final matchesSearch = q.isEmpty || 
-                item.name.toLowerCase().contains(q) || 
+            final matchesSearch =
+                q.isEmpty ||
+                item.name.toLowerCase().contains(q) ||
                 (item.categoryName?.toLowerCase().contains(q) ?? false) ||
                 (item.brand?.toLowerCase().contains(q) ?? false);
             return matchesCategory && matchesSearch;
@@ -328,27 +331,39 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                             onChanged: (v) => setState(() => _searchQuery = v),
                             decoration: InputDecoration(
                               hintText: 'Search items or categories...',
-                              prefixIcon: const Icon(Icons.search_rounded,
-                                  size: 20, color: BrandColors.muted),
+                              prefixIcon: const Icon(
+                                Icons.search_rounded,
+                                size: 20,
+                                color: BrandColors.muted,
+                              ),
                               suffixIcon: _searchQuery.isNotEmpty
                                   ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded, size: 18),
+                                      icon: const Icon(
+                                        Icons.clear_rounded,
+                                        size: 18,
+                                      ),
                                       onPressed: () {
                                         _searchCtrl.clear();
                                         setState(() => _searchQuery = '');
                                       },
                                     )
                                   : null,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                              ),
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(color: BrandColors.border),
+                                borderSide: const BorderSide(
+                                  color: BrandColors.border,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(color: BrandColors.border),
+                                borderSide: const BorderSide(
+                                  color: BrandColors.border,
+                                ),
                               ),
                             ),
                           ),
@@ -363,8 +378,11 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                               color: BrandColors.primary,
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            child: const Icon(Icons.qr_code_scanner_rounded,
-                                color: Colors.white, size: 22),
+                            child: const Icon(
+                              Icons.qr_code_scanner_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
                           ),
                         ),
                       ],
@@ -381,9 +399,9 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                       builder: (context, constraints) {
                         final allCategories = ['All', ...categories];
                         final initialCount = constraints.maxWidth > 400 ? 6 : 4;
-                        
-                        final displayCategories = _isExpanded 
-                            ? allCategories 
+
+                        final displayCategories = _isExpanded
+                            ? allCategories
                             : allCategories.take(initialCount).toList();
 
                         return Column(
@@ -396,18 +414,23 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                                 for (final cat in displayCategories)
                                   _CategoryChip(
                                     label: cat,
-                                    isSelected: cat == 'All' 
-                                        ? _selectedCategory == null 
+                                    isSelected: cat == 'All'
+                                        ? _selectedCategory == null
                                         : _selectedCategory == cat,
                                     onTap: () => setState(() {
-                                      _selectedCategory = cat == 'All' ? null : cat;
+                                      _selectedCategory = cat == 'All'
+                                          ? null
+                                          : cat;
                                     }),
                                   ),
-                                
-                                if (!_isExpanded && allCategories.length > initialCount)
+
+                                if (!_isExpanded &&
+                                    allCategories.length > initialCount)
                                   _ViewMoreChip(
-                                    label: '+${allCategories.length - initialCount} more',
-                                    onTap: () => setState(() => _isExpanded = true),
+                                    label:
+                                        '+${allCategories.length - initialCount} more',
+                                    onTap: () =>
+                                        setState(() => _isExpanded = true),
                                   ),
                               ],
                             ),
@@ -415,9 +438,19 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton.icon(
-                                  onPressed: () => setState(() => _isExpanded = false),
-                                  icon: const Icon(Icons.keyboard_arrow_up_rounded, size: 18),
-                                  label: const Text('Show Less', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                  onPressed: () =>
+                                      setState(() => _isExpanded = false),
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_up_rounded,
+                                    size: 18,
+                                  ),
+                                  label: const Text(
+                                    'Show Less',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                   style: TextButton.styleFrom(
                                     foregroundColor: BrandColors.primary,
                                     visualDensity: VisualDensity.compact,
@@ -439,11 +472,12 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                       delegate: SliverChildBuilderDelegate(
                         (_, i) => _PendingTile(
                           pending: data.pendingItems[i],
-                          onRetry: data.pendingItems[i].status ==
+                          onRetry:
+                              data.pendingItems[i].status ==
                                   PendingStatus.failed
                               ? () => ref
-                                  .read(inventoryProvider.notifier)
-                                  .retryPending(data.pendingItems[i].tempId)
+                                    .read(inventoryProvider.notifier)
+                                    .retryPending(data.pendingItems[i].tempId)
                               : null,
                         ),
                         childCount: data.pendingItems.length,
@@ -455,8 +489,10 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                   const SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
-                      child: Text('No matches found',
-                          style: TextStyle(color: BrandColors.muted)),
+                      child: Text(
+                        'No matches found',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
                     ),
                   )
                 else
@@ -482,7 +518,8 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                     ),
                   ],
                 const SliverToBoxAdapter(
-                    child: SizedBox(height: 100)), // FAB clearance
+                  child: SizedBox(height: 100),
+                ), // FAB clearance
               ],
             ),
           );
@@ -577,17 +614,18 @@ class _CategoryHeader extends StatelessWidget {
             child: Text(
               name,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: BrandColors.muted,
-                  ),
+                fontWeight: FontWeight.w800,
+                color: BrandColors.muted,
+              ),
             ),
           ),
           Text(
             '$count',
             style: const TextStyle(
-                color: BrandColors.muted,
-                fontSize: 11,
-                fontWeight: FontWeight.w700),
+              color: BrandColors.muted,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -643,11 +681,11 @@ class _InventoryTile extends StatelessWidget {
   }
 
   Widget _iconBox(Color catColor) => Container(
-        width: 40,
-        height: 40,
-        color: catColor.withValues(alpha: 0.1),
-        child: Icon(_categoryIcon(item.categoryName), color: catColor, size: 20),
-      );
+    width: 40,
+    height: 40,
+    color: catColor.withValues(alpha: 0.1),
+    child: Icon(_categoryIcon(item.categoryName), color: catColor, size: 20),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -701,14 +739,14 @@ class _InventoryTile extends StatelessWidget {
             Text(
               'Stock: ${item.stockLabel}',
               style: TextStyle(
-                color: item.isOutOfStock 
-                  ? BrandColors.error 
-                  : item.isLowStock 
-                    ? BrandColors.accent 
+                color: item.isOutOfStock
+                    ? BrandColors.error
+                    : item.isLowStock
+                    ? BrandColors.accent
                     : BrandColors.muted,
-                fontWeight: item.isLowStock || item.isOutOfStock 
-                  ? FontWeight.w700 
-                  : FontWeight.normal,
+                fontWeight: item.isLowStock || item.isOutOfStock
+                    ? FontWeight.w700
+                    : FontWeight.normal,
                 fontSize: 12,
               ),
             ),
@@ -752,8 +790,10 @@ class _PendingTile extends StatelessWidget {
         child: ListTile(
           dense: true,
           visualDensity: VisualDensity.compact,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 4,
+          ),
           leading: SizedBox(
             width: 40,
             height: 40,
@@ -770,9 +810,10 @@ class _PendingTile extends StatelessWidget {
           title: Text(
             pending.name,
             style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-                color: BrandColors.ink),
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              color: BrandColors.ink,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -814,20 +855,24 @@ class _EmptyInventory extends StatelessWidget {
                 color: BrandColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: const Icon(Icons.inventory_2_outlined,
-                  size: 40, color: BrandColors.primary),
+              child: const Icon(
+                Icons.inventory_2_outlined,
+                size: 40,
+                color: BrandColors.primary,
+              ),
             ),
             const SizedBox(height: 20),
-            Text('No inventory yet',
-                style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'No inventory yet',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
             Text(
               'Tap + to add your first product.\nCreate a category first, then add items.',
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(height: 1.5),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(height: 1.5),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -855,20 +900,26 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off_rounded,
-                size: 48, color: BrandColors.muted),
+            const Icon(
+              Icons.cloud_off_rounded,
+              size: 48,
+              color: BrandColors.muted,
+            ),
             const SizedBox(height: 16),
-            Text('Could not load inventory',
-                style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Could not load inventory',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
-            Text(message,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(fontSize: 12),
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis),
+            Text(
+              message,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 12),
+              textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: onRetry,

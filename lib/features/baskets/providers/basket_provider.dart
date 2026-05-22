@@ -34,8 +34,11 @@ class BasketNotifier extends AsyncNotifier<List<Basket>> {
 
   Future<Map<String, dynamic>> alertCustomers(int basketId) async {
     final client = ref.read(apiClientProvider);
-    return await client.post('/kirana/baskets/$basketId/alert', {}) as Map<String, dynamic>;
+    return await client.post('/kirana/baskets/$basketId/alert', {})
+        as Map<String, dynamic>;
   }
 }
 
-final basketProvider = AsyncNotifierProvider<BasketNotifier, List<Basket>>(BasketNotifier.new);
+final basketProvider = AsyncNotifierProvider<BasketNotifier, List<Basket>>(
+  BasketNotifier.new,
+);

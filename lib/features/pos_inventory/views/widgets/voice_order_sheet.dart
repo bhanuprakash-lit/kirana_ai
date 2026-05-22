@@ -73,11 +73,14 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
   void initState() {
     super.initState();
     _svc = GeminiAudioService(ref.read(apiClientProvider));
-    _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
-      ..repeat(reverse: true);
-    _pulseAnim = Tween<double>(begin: 1.0, end: 1.15).animate(
-      CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
-    );
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _pulseAnim = Tween<double>(
+      begin: 1.0,
+      end: 1.15,
+    ).animate(CurvedAnimation(parent: _pulse, curve: Curves.easeInOut));
     _pulse.stop();
   }
 
@@ -96,7 +99,8 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
     if (!granted.isGranted) {
       setState(() {
         _status = _VoiceState.error;
-        _errorMsg = 'Microphone permission denied. Please enable it in Settings.';
+        _errorMsg =
+            'Microphone permission denied. Please enable it in Settings.';
       });
       return;
     }
@@ -111,7 +115,8 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
     }
 
     final dir = await getTemporaryDirectory();
-    final path = '${dir.path}/voice_order_${DateTime.now().millisecondsSinceEpoch}.aac';
+    final path =
+        '${dir.path}/voice_order_${DateTime.now().millisecondsSinceEpoch}.aac';
 
     await _svc.startRecording(path);
     setState(() {
@@ -148,7 +153,9 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
       });
       // Server already recorded the use; apply the inline status update instantly
       if (result.aiStatus != null) {
-        ref.read(usageLimitsProvider.notifier).applyInlineUpdate(kFeatureVoice, result.aiStatus!);
+        ref
+            .read(usageLimitsProvider.notifier)
+            .applyInlineUpdate(kFeatureVoice, result.aiStatus!);
       }
     } catch (e) {
       setState(() {
@@ -163,7 +170,10 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
 
   void _linkProduct(int index, PosProduct product) {
     setState(() {
-      _matches[index] = _MatchedItem(gemini: _matches[index].gemini, product: product);
+      _matches[index] = _MatchedItem(
+        gemini: _matches[index].gemini,
+        product: product,
+      );
     });
   }
 
@@ -174,7 +184,8 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _InlinePickerSheet(products: products, initialQuery: initial),
+      builder: (_) =>
+          _InlinePickerSheet(products: products, initialQuery: initial),
     );
     if (picked != null && mounted) _linkProduct(index, picked);
   }
@@ -190,11 +201,15 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
       added++;
     }
     if (mounted) Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('$added item${added != 1 ? 's' : ''} added to cart from voice order'),
-      backgroundColor: BrandColors.success,
-      duration: const Duration(milliseconds: 1800),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '$added item${added != 1 ? 's' : ''} added to cart from voice order',
+        ),
+        backgroundColor: BrandColors.success,
+        duration: const Duration(milliseconds: 1800),
+      ),
+    );
   }
 
   // ── UI ────────────────────────────────────────────────────────────────────
@@ -207,12 +222,13 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
 
   @override
   Widget build(BuildContext context) {
-    final matched   = _matches.where((m) => m.inStock).length;
-    final subInfo   = ref.watch(subInfoProvider);
-    final isPro     = subInfo.effectiveTier == SubTier.pro;
+    final matched = _matches.where((m) => m.inStock).length;
+    final subInfo = ref.watch(subInfoProvider);
+    final isPro = subInfo.effectiveTier == SubTier.pro;
     final limitsAsync = ref.watch(usageLimitsProvider);
-    final canUse    = isPro && (limitsAsync.value?.canUseVoice ?? true);
-    final remaining = limitsAsync.value?.voiceRemaining ?? kDailyLimits[kFeatureVoice]!;
+    final canUse = isPro && (limitsAsync.value?.canUseVoice ?? true);
+    final remaining =
+        limitsAsync.value?.voiceRemaining ?? kDailyLimits[kFeatureVoice]!;
 
     return Container(
       decoration: const BoxDecoration(
@@ -221,7 +237,9 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 28,
-        left: 24, right: 24, top: 12,
+        left: 24,
+        right: 24,
+        top: 12,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -229,8 +247,12 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
           // Drag handle
           Center(
             child: Container(
-              width: 40, height: 4,
-              decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
           const SizedBox(height: 18),
@@ -244,15 +266,29 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                   color: BrandColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.mic_rounded, color: BrandColors.primary, size: 20),
+                child: const Icon(
+                  Icons.mic_rounded,
+                  color: BrandColors.primary,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 10),
               const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Voice Order', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink)),
-                    Text('Speak in any Indian language', style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+                    Text(
+                      'Voice Order',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: BrandColors.ink,
+                      ),
+                    ),
+                    Text(
+                      'Speak in any Indian language',
+                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                    ),
                   ],
                 ),
               ),
@@ -271,7 +307,9 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
               color: BrandColors.orange,
               message: 'Voice Order is a Pro feature. Upgrade to access.',
               actionLabel: 'Upgrade',
-              onAction: () { Navigator.pop(context); },
+              onAction: () {
+                Navigator.pop(context);
+              },
             )
           else if (!canUse)
             AiGateBanner(
@@ -279,15 +317,24 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
               color: BrandColors.error,
               message: 'No voice orders left today. Get more credits.',
               actionLabel: 'Get Credits',
-              onAction: () => showCreditsPurchaseSheet(context, ref, highlightFeature: kFeatureVoice),
+              onAction: () => showCreditsPurchaseSheet(
+                context,
+                ref,
+                highlightFeature: kFeatureVoice,
+              ),
             )
           else
-            AiUsageBadge(remaining: remaining, total: kDailyLimits[kFeatureVoice]!, label: 'voice'),
+            AiUsageBadge(
+              remaining: remaining,
+              total: kDailyLimits[kFeatureVoice]!,
+              label: 'voice',
+            ),
 
           const SizedBox(height: 20),
 
           // Mic area
-          if (_status == _VoiceState.idle || _status == _VoiceState.recording) ...[
+          if (_status == _VoiceState.idle ||
+              _status == _VoiceState.recording) ...[
             _MicButton(
               status: _status,
               pulseAnim: _pulseAnim,
@@ -295,7 +342,9 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
               maxSeconds: kVoiceMaxSeconds,
               onTap: (!isPro || !canUse) && _status == _VoiceState.idle
                   ? null
-                  : _status == _VoiceState.idle ? _startRecording : _stopAndProcess,
+                  : _status == _VoiceState.idle
+                  ? _startRecording
+                  : _stopAndProcess,
             ),
             const SizedBox(height: 8),
             Text(
@@ -313,7 +362,10 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                 children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 14),
-                  Text('Kirana AI is processing…', style: TextStyle(color: BrandColors.muted, fontSize: 13)),
+                  Text(
+                    'Kirana AI is processing…',
+                    style: TextStyle(color: BrandColors.muted, fontSize: 13),
+                  ),
                 ],
               ),
             ),
@@ -328,15 +380,30 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded, color: BrandColors.error, size: 18),
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: BrandColors.error,
+                    size: 18,
+                  ),
                   const SizedBox(width: 10),
-                  Expanded(child: Text(_errorMsg, style: const TextStyle(color: BrandColors.error, fontSize: 13))),
+                  Expanded(
+                    child: Text(
+                      _errorMsg,
+                      style: const TextStyle(
+                        color: BrandColors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 14),
             TextButton.icon(
-              onPressed: () => setState(() { _status = _VoiceState.idle; _seconds = 0; }),
+              onPressed: () => setState(() {
+                _status = _VoiceState.idle;
+                _seconds = 0;
+              }),
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Try Again'),
             ),
@@ -357,9 +424,24 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Heard', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: BrandColors.muted, letterSpacing: 1)),
+                    const Text(
+                      'Heard',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: BrandColors.muted,
+                        letterSpacing: 1,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(_transcript, style: const TextStyle(fontSize: 13, color: BrandColors.ink, fontStyle: FontStyle.italic)),
+                    Text(
+                      _transcript,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: BrandColors.ink,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -370,7 +452,10 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
             if (_matches.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
-                child: Text('No items detected. Please try again.', style: TextStyle(color: BrandColors.muted)),
+                child: Text(
+                  'No items detected. Please try again.',
+                  style: TextStyle(color: BrandColors.muted),
+                ),
               )
             else
               ConstrainedBox(
@@ -378,10 +463,13 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: _matches.length,
-                  separatorBuilder: (context2, index2) => const Divider(height: 1),
+                  separatorBuilder: (context2, index2) =>
+                      const Divider(height: 1),
                   itemBuilder: (_, i) => _MatchTile(
                     match: _matches[i],
-                    onLink: _matches[i].found ? null : () => _showInventoryPicker(i),
+                    onLink: _matches[i].found
+                        ? null
+                        : () => _showInventoryPicker(i),
                   ),
                 ),
               ),
@@ -446,12 +534,20 @@ class _LanguageBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.language_rounded, size: 14, color: BrandColors.primary),
+          const Icon(
+            Icons.language_rounded,
+            size: 14,
+            color: BrandColors.primary,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Auto-detects: Telugu · Hindi · Urdu · Tamil · Kannada · Malayalam · English',
-              style: TextStyle(fontSize: 11, color: BrandColors.primary.withValues(alpha: 0.85), fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 11,
+                color: BrandColors.primary.withValues(alpha: 0.85),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -491,7 +587,8 @@ class _MicButton extends StatelessWidget {
               child: child,
             ),
             child: Container(
-              width: 80, height: 80,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
@@ -518,30 +615,40 @@ class _MicButton extends StatelessWidget {
             children: [
               Text(
                 timerLabel,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: BrandColors.error, fontFeatures: [FontFeature.tabularFigures()]),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: BrandColors.error,
+                  fontFeatures: [FontFeature.tabularFigures()],
+                ),
               ),
               const SizedBox(width: 8),
-              Text('/ ${maxSeconds}s', style: const TextStyle(fontSize: 13, color: BrandColors.muted)),
+              Text(
+                '/ ${maxSeconds}s',
+                style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+              ),
             ],
           ),
           const SizedBox(height: 6),
           // Progress bar toward auto-cut
-          Builder(builder: (ctx) {
-            final secs = int.tryParse(timerLabel.split(':').last) ?? 0;
-            final mins = int.tryParse(timerLabel.split(':').first) ?? 0;
-            final total = mins * 60 + secs;
-            final progress = (total / maxSeconds).clamp(0.0, 1.0);
-            return SizedBox(
-              width: 160,
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: BrandColors.border,
-                color: progress > 0.8 ? BrandColors.error : Colors.orange,
-                minHeight: 4,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            );
-          }),
+          Builder(
+            builder: (ctx) {
+              final secs = int.tryParse(timerLabel.split(':').last) ?? 0;
+              final mins = int.tryParse(timerLabel.split(':').first) ?? 0;
+              final total = mins * 60 + secs;
+              final progress = (total / maxSeconds).clamp(0.0, 1.0);
+              return SizedBox(
+                width: 160,
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: BrandColors.border,
+                  color: progress > 0.8 ? BrandColors.error : Colors.orange,
+                  minHeight: 4,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              );
+            },
+          ),
         ],
       ],
     );
@@ -558,20 +665,20 @@ class _MatchTile extends StatelessWidget {
     final color = match.inStock
         ? BrandColors.success
         : match.found
-            ? Colors.orange
-            : BrandColors.muted;
+        ? Colors.orange
+        : BrandColors.muted;
 
     final icon = match.inStock
         ? Icons.check_circle_rounded
         : match.found
-            ? Icons.warning_amber_rounded
-            : Icons.cancel_rounded;
+        ? Icons.warning_amber_rounded
+        : Icons.cancel_rounded;
 
     final statusLabel = match.inStock
         ? 'In stock'
         : match.found
-            ? 'Low stock'
-            : 'Not found';
+        ? 'Low stock'
+        : 'Not found';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -594,7 +701,13 @@ class _MatchTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (!match.found)
-                  Text('"${match.gemini.name}"', style: const TextStyle(fontSize: 11, color: BrandColors.muted)),
+                  Text(
+                    '"${match.gemini.name}"',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: BrandColors.muted,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -607,11 +720,20 @@ class _MatchTile extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
-              child: const Text('Pick', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+              child: const Text(
+                'Pick',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              ),
             )
           else ...[
-            Text(match.gemini.quantity,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: BrandColors.ink)),
+            Text(
+              match.gemini.quantity,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
@@ -619,7 +741,14 @@ class _MatchTile extends StatelessWidget {
                 color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: Text(statusLabel, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w700)),
+              child: Text(
+                statusLabel,
+                style: TextStyle(
+                  fontSize: 10,
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ],
         ],
@@ -633,7 +762,10 @@ class _MatchTile extends StatelessWidget {
 class _InlinePickerSheet extends StatefulWidget {
   final List<PosProduct> products;
   final String initialQuery;
-  const _InlinePickerSheet({required this.products, required this.initialQuery});
+  const _InlinePickerSheet({
+    required this.products,
+    required this.initialQuery,
+  });
 
   @override
   State<_InlinePickerSheet> createState() => _InlinePickerSheetState();
@@ -651,14 +783,18 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final filtered = widget.products.where((p) {
       if (_query.isEmpty) return true;
       final q = _query.toLowerCase();
-      return p.name.toLowerCase().contains(q) || (p.brand?.toLowerCase().contains(q) ?? false);
+      return p.name.toLowerCase().contains(q) ||
+          (p.brand?.toLowerCase().contains(q) ?? false);
     }).toList();
 
     return DraggableScrollableSheet(
@@ -673,14 +809,24 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 14),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Pick from Inventory', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                  const Text(
+                    'Pick from Inventory',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: _ctrl,
@@ -688,12 +834,29 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       hintText: 'Search products…',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 18, color: BrandColors.muted),
-                      filled: true, fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 18,
+                        color: BrandColors.muted,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       suffixIcon: _query.isNotEmpty
-                          ? IconButton(icon: const Icon(Icons.clear_rounded, size: 16), onPressed: () { _ctrl.clear(); setState(() => _query = ''); })
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 16),
+                              onPressed: () {
+                                _ctrl.clear();
+                                setState(() => _query = '');
+                              },
+                            )
                           : null,
                     ),
                   ),
@@ -703,7 +866,12 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(child: Text('No products found', style: TextStyle(color: BrandColors.muted)))
+                  ? const Center(
+                      child: Text(
+                        'No products found',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    )
                   : ListView.builder(
                       controller: ctrl,
                       padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -711,10 +879,27 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                       itemBuilder: (_, i) {
                         final p = filtered[i];
                         return ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          title: Text(p.displayName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                          subtitle: Text('${p.priceLabel} · Stock: ${p.stockLabel}', style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
-                          trailing: const Icon(Icons.add_circle_rounded, color: BrandColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          title: Text(
+                            p.displayName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${p.priceLabel} · Stock: ${p.stockLabel}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.add_circle_rounded,
+                            color: BrandColors.primary,
+                          ),
                           onTap: () => Navigator.pop(context, p),
                         );
                       },
@@ -726,4 +911,3 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
     );
   }
 }
-

@@ -8,12 +8,13 @@ class StoreSettingsScreen extends ConsumerStatefulWidget {
   const StoreSettingsScreen({super.key});
 
   @override
-  ConsumerState<StoreSettingsScreen> createState() => _StoreSettingsScreenState();
+  ConsumerState<StoreSettingsScreen> createState() =>
+      _StoreSettingsScreenState();
 }
 
 class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController _nameCtrl;
   late TextEditingController _typeCtrl;
   late TextEditingController _footfallCtrl;
@@ -60,12 +61,22 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
           if (!_isSaving)
             TextButton(
               onPressed: _save,
-              child: const Text('SAVE', style: TextStyle(fontWeight: FontWeight.bold, color: BrandColors.primary)),
+              child: const Text(
+                'SAVE',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: BrandColors.primary,
+                ),
+              ),
             ),
           if (_isSaving)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             ),
         ],
       ),
@@ -85,34 +96,65 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                 children: [
                   _sectionHeader('Basic Information'),
                   const SizedBox(height: 16),
-                  _buildTextField(_nameCtrl, 'Store Name', Icons.storefront_rounded),
-                  _buildTextField(_typeCtrl, 'Store Type (e.g. Kirana, Supermarket)', Icons.category_rounded),
-                  
+                  _buildTextField(
+                    _nameCtrl,
+                    'Store Name',
+                    Icons.storefront_rounded,
+                  ),
+                  _buildTextField(
+                    _typeCtrl,
+                    'Store Type (e.g. Kirana, Supermarket)',
+                    Icons.category_rounded,
+                  ),
+
                   const SizedBox(height: 32),
                   _sectionHeader('Business Intelligence'),
                   const SizedBox(height: 8),
-                  Text(isFootfallLocked 
-                    ? 'Average footfall is automatically computed based on your sales.'
-                    : 'Provide initial values to help our AI optimize your business.', 
-                    style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                  Text(
+                    isFootfallLocked
+                        ? 'Average footfall is automatically computed based on your sales.'
+                        : 'Provide initial values to help our AI optimize your business.',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   _buildTextField(
-                    _footfallCtrl, 
-                    'Avg Daily Footfall', 
-                    Icons.people_rounded, 
+                    _footfallCtrl,
+                    'Avg Daily Footfall',
+                    Icons.people_rounded,
                     keyboardType: TextInputType.number,
                     readOnly: isFootfallLocked,
                     helperText: isFootfallLocked ? 'AI Auto-Updating' : null,
                   ),
-                  _buildTextField(_budgetCtrl, 'Monthly Stock Budget', Icons.account_balance_wallet_rounded, keyboardType: TextInputType.number),
-                  _buildTextField(_dailyBudgetCtrl, 'Daily Expense Buffer', Icons.payments_rounded, keyboardType: TextInputType.number),
-                  
+                  _buildTextField(
+                    _budgetCtrl,
+                    'Monthly Stock Budget',
+                    Icons.account_balance_wallet_rounded,
+                    keyboardType: TextInputType.number,
+                  ),
+                  _buildTextField(
+                    _dailyBudgetCtrl,
+                    'Daily Expense Buffer',
+                    Icons.payments_rounded,
+                    keyboardType: TextInputType.number,
+                  ),
+
                   const SizedBox(height: 32),
                   _sectionHeader('Location Details'),
                   const SizedBox(height: 16),
-                  _buildTextField(_locationCtrl, 'City / Area', Icons.location_on_rounded),
-                  _buildTextField(_regionCtrl, 'State / Region', Icons.map_rounded),
-                  
+                  _buildTextField(
+                    _locationCtrl,
+                    'City / Area',
+                    Icons.location_on_rounded,
+                  ),
+                  _buildTextField(
+                    _regionCtrl,
+                    'State / Region',
+                    Icons.map_rounded,
+                  ),
+
                   const SizedBox(height: 40),
                 ],
               ),
@@ -124,12 +166,19 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
   }
 
   Widget _sectionHeader(String title) {
-    return Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: 0.5));
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.5,
+      ),
+    );
   }
 
   Widget _buildTextField(
-    TextEditingController ctrl, 
-    String label, 
+    TextEditingController ctrl,
+    String label,
     IconData icon, {
     TextInputType keyboardType = TextInputType.text,
     bool readOnly = false,
@@ -147,8 +196,14 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
           prefixIcon: Icon(icon, size: 20, color: BrandColors.muted),
           filled: true,
           fillColor: readOnly ? BrandColors.surfaceTint : Colors.white,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: BrandColors.border)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: BrandColors.border)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: BrandColors.border),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: BrandColors.border),
+          ),
         ),
         validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
       ),
@@ -174,11 +229,21 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
 
       await ref.read(storeSettingsProvider.notifier).updateStore(updated);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings saved successfully!'), backgroundColor: BrandColors.success));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Settings saved successfully!'),
+            backgroundColor: BrandColors.success,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to save: $e'), backgroundColor: BrandColors.error));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save: $e'),
+            backgroundColor: BrandColors.error,
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);

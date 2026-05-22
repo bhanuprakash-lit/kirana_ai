@@ -51,7 +51,9 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
       setState(() => _error = 'Milestone count must be at least 1');
       return;
     }
-    if (milestoneReward == null || milestoneReward <= 0 || milestoneReward > 100) {
+    if (milestoneReward == null ||
+        milestoneReward <= 0 ||
+        milestoneReward > 100) {
       setState(() => _error = 'Enter a valid reward % (1–100)');
       return;
     }
@@ -66,7 +68,9 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
       _error = null;
     });
 
-    final ok = await ref.read(referralCampaignsProvider.notifier).createCampaign(
+    final ok = await ref
+        .read(referralCampaignsProvider.notifier)
+        .createCampaign(
           name: name,
           referralDiscountPct: discount,
           milestoneEveryN: milestoneN,
@@ -90,7 +94,9 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: 24, right: 24, top: 24,
+        left: 24,
+        right: 24,
+        top: 24,
         bottom: MediaQuery.of(context).viewInsets.bottom + 32,
       ),
       child: Column(
@@ -100,11 +106,14 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('New Referral Campaign',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: BrandColors.ink)),
+              const Text(
+                'New Referral Campaign',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: BrandColors.ink,
+                ),
+              ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close_rounded),
@@ -117,43 +126,50 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
           TextField(
             controller: _nameCtrl,
             decoration: const InputDecoration(
-                hintText: 'e.g. Summer Referral Drive'),
+              hintText: 'e.g. Summer Referral Drive',
+            ),
           ),
           const SizedBox(height: 16),
 
-          Row(children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _Label('New Customer Discount %'),
-                  TextField(
-                    controller: _discountCtrl,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                        hintText: '10', suffixText: '%'),
-                  ),
-                ],
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Label('New Customer Discount %'),
+                    TextField(
+                      controller: _discountCtrl,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        hintText: '10',
+                        suffixText: '%',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _Label('Milestone Reward %'),
-                  TextField(
-                    controller: _milestoneRewardCtrl,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                        hintText: '5', suffixText: '%'),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Label('Milestone Reward %'),
+                    TextField(
+                      controller: _milestoneRewardCtrl,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        hintText: '5',
+                        suffixText: '%',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ]),
+            ],
+          ),
           const SizedBox(height: 16),
 
           _Label('Reward Every N Referrals'),
@@ -162,9 +178,10 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
-                hintText: '10',
-                helperText:
-                    'Referrer earns a milestone reward every N new customers they bring'),
+              hintText: '10',
+              helperText:
+                  'Referrer earns a milestone reward every N new customers they bring',
+            ),
           ),
           const SizedBox(height: 16),
           _Label('Max Referrals per Customer'),
@@ -173,15 +190,18 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
-                hintText: '50',
-                helperText:
-                    'Stop rewarding a customer after this many successful referrals'),
+              hintText: '50',
+              helperText:
+                  'Stop rewarding a customer after this many successful referrals',
+            ),
           ),
 
           if (_error != null) ...[
             const SizedBox(height: 12),
-            Text(_error!,
-                style: const TextStyle(fontSize: 13, color: BrandColors.error)),
+            Text(
+              _error!,
+              style: const TextStyle(fontSize: 13, color: BrandColors.error),
+            ),
           ],
 
           const SizedBox(height: 24),
@@ -194,7 +214,10 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Create Campaign'),
             ),
           ),
@@ -209,11 +232,14 @@ class _Label extends StatelessWidget {
   const _Label(this.text);
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: BrandColors.muted)),
-      );
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Text(
+      text,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        color: BrandColors.muted,
+      ),
+    ),
+  );
 }

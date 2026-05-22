@@ -49,17 +49,25 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
     setState(() => _saving = true);
     try {
       await ref.read(configProvider.notifier).save(_draft!);
-      await ref.read(posPrefsProvider.notifier).setDefaultPaymentMethod(_defaultPayment ?? 'cash');
+      await ref
+          .read(posPrefsProvider.notifier)
+          .setDefaultPaymentMethod(_defaultPayment ?? 'cash');
       setState(() => _dirty = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Settings saved'), backgroundColor: BrandColors.success),
+          const SnackBar(
+            content: Text('Settings saved'),
+            backgroundColor: BrandColors.success,
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Save failed: $e'), backgroundColor: BrandColors.error),
+          SnackBar(
+            content: Text('Save failed: $e'),
+            backgroundColor: BrandColors.error,
+          ),
         );
       }
     } finally {
@@ -72,13 +80,24 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Reset to defaults', style: TextStyle(fontWeight: FontWeight.w800)),
-        content: const Text('All settings will be reset to their default values.'),
+        title: const Text(
+          'Reset to defaults',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        content: const Text(
+          'All settings will be reset to their default values.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reset', style: TextStyle(color: BrandColors.error)),
+            child: const Text(
+              'Reset',
+              style: TextStyle(color: BrandColors.error),
+            ),
           ),
         ],
       ),
@@ -94,9 +113,9 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
         _dirty = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reset to defaults')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Reset to defaults')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -109,11 +128,13 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
     final paymentAsync = ref.watch(posPrefsProvider);
 
     return prefsAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
       data: (prefs) {
         return paymentAsync.when(
-          loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+          loading: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
           error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
           data: (payment) {
             _init(prefs, payment);
@@ -132,7 +153,10 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                     onPressed: _saving ? null : _reset,
                     child: const Text(
                       'Reset',
-                      style: TextStyle(color: BrandColors.muted, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: BrandColors.muted,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],
@@ -175,8 +199,8 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                         onSelectionChanged: (val) => _updatePayment(val.first),
                         style: SegmentedButton.styleFrom(
                           backgroundColor: BrandColors.surfaceTint,
-                          selectedBackgroundColor:
-                              BrandColors.primary.withValues(alpha: 0.1),
+                          selectedBackgroundColor: BrandColors.primary
+                              .withValues(alpha: 0.1),
                           selectedForegroundColor: BrandColors.primary,
                         ),
                       ),
@@ -208,8 +232,10 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                       const _Divider(),
                       _SettingLabel(
                         label: 'Stockout Risk Threshold',
-                        hint: 'Show stockout alert when 7-day risk exceeds this',
-                        value: '${(d.alertStockoutThreshold * 100).toStringAsFixed(0)}%',
+                        hint:
+                            'Show stockout alert when 7-day risk exceeds this',
+                        value:
+                            '${(d.alertStockoutThreshold * 100).toStringAsFixed(0)}%',
                       ),
                       Slider(
                         value: d.alertStockoutThreshold,
@@ -225,8 +251,10 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                       const _Divider(),
                       _SettingLabel(
                         label: 'Min Velocity Threshold',
-                        hint: 'Items selling slower than this are flagged as dead stock',
-                        value: '${(d.alertMinVelocity * 100).toStringAsFixed(0)}%',
+                        hint:
+                            'Items selling slower than this are flagged as dead stock',
+                        value:
+                            '${(d.alertMinVelocity * 100).toStringAsFixed(0)}%',
                       ),
                       Slider(
                         value: d.alertMinVelocity,
@@ -253,7 +281,8 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                     children: [
                       _SettingLabel(
                         label: 'Reorder Alert Days',
-                        hint: 'Alert when projected stock will run out within N days',
+                        hint:
+                            'Alert when projected stock will run out within N days',
                         value: '${d.alertReorderDays} days',
                       ),
                       const SizedBox(height: 6),
@@ -281,7 +310,8 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                       const _Divider(),
                       _SettingLabel(
                         label: 'Expiry Alert Days',
-                        hint: 'Alert this many days before a batch/item expires',
+                        hint:
+                            'Alert this many days before a batch/item expires',
                         value: '${d.alertExpiryDays} days before',
                       ),
                       const SizedBox(height: 6),
@@ -307,9 +337,11 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                       _ToggleRow(
                         icon: Icons.storefront_rounded,
                         label: 'Allow LohiyaAI to Market My Store',
-                        hint: 'We promote your store on Facebook, Instagram & WhatsApp on your behalf',
+                        hint:
+                            'We promote your store on Facebook, Instagram & WhatsApp on your behalf',
                         value: d.allowSocialMarketing,
-                        onChanged: (v) => _update(d.copyWith(allowSocialMarketing: v)),
+                        onChanged: (v) =>
+                            _update(d.copyWith(allowSocialMarketing: v)),
                       ),
                     ],
                   ),
@@ -336,12 +368,14 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                         label: 'WhatsApp Notifications',
                         hint: 'Send restocking and udhaar alerts via WhatsApp',
                         value: d.notifyWhatsapp,
-                        onChanged: (v) => _update(d.copyWith(notifyWhatsapp: v)),
+                        onChanged: (v) =>
+                            _update(d.copyWith(notifyWhatsapp: v)),
                       ),
                       const _Divider(),
                       _SettingLabel(
                         label: 'Quiet Hours',
-                        hint: 'No notifications will be sent during this window',
+                        hint:
+                            'No notifications will be sent during this window',
                         value:
                             '${_fmtHour(d.quietHoursStart)} – ${_fmtHour(d.quietHoursEnd)}',
                       ),
@@ -357,8 +391,11 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Icon(Icons.arrow_forward_rounded,
-                              size: 16, color: BrandColors.muted),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 16,
+                            color: BrandColors.muted,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: _HourDropdown(
@@ -560,8 +597,7 @@ class _ChipSelector<T> extends StatelessWidget {
                   : BrandColors.surfaceTint,
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                color:
-                    isSelected ? BrandColors.primary : BrandColors.border,
+                color: isSelected ? BrandColors.primary : BrandColors.border,
                 width: isSelected ? 1.5 : 1,
               ),
             ),
@@ -743,7 +779,10 @@ class _SaveBar extends StatelessWidget {
                       )
                     : const Text(
                         'Save Changes',
-                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
                       ),
               ),
             )

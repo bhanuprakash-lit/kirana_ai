@@ -1,0 +1,140 @@
+# Azure DevOps pipeline for kirana_ai
+# Mirrors the GitHub Actions workflow at .github/workflows/ci.yml.
+#
+# Setup:
+#   1. In Azure DevOps, create a new pipeline pointing at this repo.
+#   2. Select "Existing Azure Pipelines YAML file" and pick `azure-pipelines.yml`.
+#   3. The pipeline uses Microsoft-hosted ubuntu-latest agents (1,800 free
+#      minutes / month on a free tier).
+
+trigger:
+  branches:
+    include:
+      - master
+      - main
+
+pr:
+  branches:
+    include:
+      - master
+      - main
+
+variables:
+  flutterVersion: "3.41.6"
+  flutterChannel: stable
+
+stages:
+  - stage: AnalyzeAndTest
+    displayName: Analyze + Test
+    jobs:
+      - job: AnalyzeAndTest
+        pool:
+          vmImage: ubuntu-latest
+        timeoutInMinutes: 20
+
+        steps:
+          - task: JavaToolInstaller@0
+            displayName: Install Java 17
+            inputs:
+              versionSpec: "17"
+              jdkArchitectureOption: x64
+              jdkSourceOption: PreInstalled
+
+          # Cache the Flutter SDK between runs so subsequent runs are quick.
+          - task: Cache@2
+            displayName: Cache Flutter SDK
+            inputs:
+              key: 'flutter | "$(Agent.OS)" | $(flutterVersion)'
+              path: $(Agent.ToolsDirectory)/flutter
+
+          - bash: |
+              set -euxo pipefail
+              FLUTTER_DIR="$(Agent.ToolsDirectory)/flutter"
+              if [ ! -d "$FLUTTER_DIR/bin" ]; then
+                echo "Downloading Flutter $(flutterVersion) ($(flutterChannel))…"
+                git clone --depth 1 --branch $(flutterVersion) https://github.com/flutter/flutter.git "$FLUTTER_DIR"
+              fi
+              echo "##vso[task.prependpath]$FLUTTER_DIR/bin"
+            displayName: Install Flutter
+
+          - bash: flutter --version
+            displayName: Show Flutter version
+
+          - bash: flutter pub get
+            displayName: Pub get
+
+          - bash: dart format --output=none --set-exit-if-changed .
+            displayName: Format check
+
+          - bash: flutter analyze --no-fatal-infos
+            displayName: Static analysis
+
+          - bash: flutter test --coverage --reporter expanded --machine > test-results.json
+            displayName: Run tests with coverage
+            continueOnError: true
+
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: always()
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: "test-results.json"
+              failTaskOnFailedTests: true
+              # The Flutter `--machine` reporter emits Dart JSON, not VSTest XML.
+              # If you want richer test reporting in ADO, add `junitreport` to
+              # dev_dependencies and run:
+              #   `dart pub global activate junitreport`
+              #   `flutter test --machine | tojunit -o junit.xml`
+              # then publish `junit.xml` with `testResultsFormat: JUnit`.
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish coverage
+            condition: always()
+            inputs:
+              targetPath: coverage/lcov.info
+              artifact: coverage-lcov
+
+  - stage: BuildAndroid
+    displayName: Build Android (debug APK)
+    dependsOn: AnalyzeAndTest
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
+    jobs:
+      - job: BuildAndroid
+        pool:
+          vmImage: ubuntu-latest
+        timeoutInMinutes: 30
+
+        steps:
+          - task: JavaToolInstaller@0
+            displayName: Install Java 17
+            inputs:
+              versionSpec: "17"
+              jdkArchitectureOption: x64
+              jdkSourceOption: PreInstalled
+
+          - task: Cache@2
+            displayName: Cache Flutter SDK
+            inputs:
+              key: 'flutter | "$(Agent.OS)" | $(flutterVersion)'
+              path: $(Agent.ToolsDirectory)/flutter
+
+          - bash: |
+              set -euxo pipefail
+              FLUTTER_DIR="$(Agent.ToolsDirectory)/flutter"
+              if [ ! -d "$FLUTTER_DIR/bin" ]; then
+                git clone --depth 1 --branch $(flutterVersion) https://github.com/flutter/flutter.git "$FLUTTER_DIR"
+              fi
+              echo "##vso[task.prependpath]$FLUTTER_DIR/bin"
+            displayName: Install Flutter
+
+          - bash: flutter pub get
+            displayName: Pub get
+
+          - bash: flutter build apk --debug
+            displayName: Build debug APK
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish APK
+            inputs:
+              targetPath: build/app/outputs/flutter-apk/app-debug.apk
+              artifact: kirana-ai-debug-apk

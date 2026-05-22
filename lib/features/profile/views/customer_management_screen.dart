@@ -14,11 +14,26 @@ import '../models/customer_model.dart';
 
 const _kSegments = [
   _SegmentMeta('regular', 'Regular', Icons.star_rounded, Color(0xFF059669)),
-  _SegmentMeta('occasional', 'Occasional', Icons.calendar_month_rounded, Color(0xFF0891B2)),
+  _SegmentMeta(
+    'occasional',
+    'Occasional',
+    Icons.calendar_month_rounded,
+    Color(0xFF0891B2),
+  ),
   _SegmentMeta('impulse', 'Impulse', Icons.bolt_rounded, Color(0xFFEA580C)),
   _SegmentMeta('bulk', 'Bulk', Icons.inventory_2_rounded, Color(0xFF7C3AED)),
-  _SegmentMeta('credit', 'Credit', Icons.account_balance_wallet_rounded, Color(0xFFDC2626)),
-  _SegmentMeta('inactive', 'Inactive', Icons.bedtime_rounded, Color(0xFF6B7280)),
+  _SegmentMeta(
+    'credit',
+    'Credit',
+    Icons.account_balance_wallet_rounded,
+    Color(0xFFDC2626),
+  ),
+  _SegmentMeta(
+    'inactive',
+    'Inactive',
+    Icons.bedtime_rounded,
+    Color(0xFF6B7280),
+  ),
 ];
 
 class _SegmentMeta {
@@ -35,10 +50,12 @@ class CustomerManagementScreen extends ConsumerStatefulWidget {
   const CustomerManagementScreen({super.key});
 
   @override
-  ConsumerState<CustomerManagementScreen> createState() => _CustomerManagementScreenState();
+  ConsumerState<CustomerManagementScreen> createState() =>
+      _CustomerManagementScreenState();
 }
 
-class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScreen> {
+class _CustomerManagementScreenState
+    extends ConsumerState<CustomerManagementScreen> {
   bool _isSyncing = false;
   final _searchCtrl = TextEditingController();
 
@@ -68,12 +85,19 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('Customer Relations', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'Customer Relations',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         actions: [
           if (_isSyncing)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             )
           else
             IconButton(
@@ -92,7 +116,10 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
         onPressed: () => _showAddCustomerSheet(context, ref),
         backgroundColor: BrandColors.primary,
         icon: const Icon(Icons.person_add_rounded, color: Colors.white),
-        label: const Text('Add Customer', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        label: const Text(
+          'Add Customer',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
       ),
       body: Column(
         children: [
@@ -108,7 +135,10 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
                   onChanged: (v) => notifier.setSearchQuery(v),
                   decoration: InputDecoration(
                     hintText: 'Search by name or phone...',
-                    prefixIcon: const Icon(Icons.search_rounded, color: BrandColors.muted),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: BrandColors.muted,
+                    ),
                     filled: true,
                     fillColor: BrandColors.background,
                     border: OutlineInputBorder(
@@ -135,7 +165,8 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
                         meta: seg,
                         count: count,
                         isSelected: isSelected,
-                        onTap: () => notifier.setSegment(isSelected ? null : seg.id),
+                        onTap: () =>
+                            notifier.setSegment(isSelected ? null : seg.id),
                       );
                     },
                   ),
@@ -153,7 +184,11 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline_rounded, size: 48, color: BrandColors.error),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 48,
+                      color: BrandColors.error,
+                    ),
                     const SizedBox(height: 16),
                     Text(state.error!, textAlign: TextAlign.center),
                     TextButton(
@@ -170,13 +205,20 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.people_outline_rounded, size: 56, color: BrandColors.muted),
+                    const Icon(
+                      Icons.people_outline_rounded,
+                      size: 56,
+                      color: BrandColors.muted,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       state.selectedSegment != null
                           ? 'No ${state.selectedSegment} customers'
                           : 'No customers found.',
-                      style: const TextStyle(color: BrandColors.muted, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        color: BrandColors.muted,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -205,10 +247,17 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
       builder: (ctx) => AlertDialog(
         title: const Text('Sync Contacts?'),
         content: const Text(
-            'This will import your phone contacts into your customer list. Regular customers will be matched by phone number.'),
+          'This will import your phone contacts into your customer list. Regular customers will be matched by phone number.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Sync Now')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sync Now'),
+          ),
         ],
       ),
     );
@@ -234,15 +283,17 @@ class _CustomerManagementScreenState extends ConsumerState<CustomerManagementScr
         await ref.read(financeProvider.notifier).syncContacts(syncList);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Synced ${syncList.length} contacts successfully!')),
+            SnackBar(
+              content: Text('Synced ${syncList.length} contacts successfully!'),
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sync failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Sync failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSyncing = false);
@@ -291,7 +342,11 @@ class _SegmentChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(meta.icon, size: 14, color: isSelected ? Colors.white : meta.color),
+            Icon(
+              meta.icon,
+              size: 14,
+              color: isSelected ? Colors.white : meta.color,
+            ),
             const SizedBox(width: 6),
             Text(
               meta.label,
@@ -308,7 +363,9 @@ class _SegmentChip extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white70 : meta.color.withValues(alpha: 0.7),
+                  color: isSelected
+                      ? Colors.white70
+                      : meta.color.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -331,7 +388,10 @@ class _CustomerCard extends StatelessWidget {
     final isInactive = segs.contains('inactive');
     final primarySeg = _primarySegment(segs);
     final segMeta = primarySeg != null
-        ? _kSegments.firstWhere((s) => s.id == primarySeg, orElse: () => _kSegments.first)
+        ? _kSegments.firstWhere(
+            (s) => s.id == primarySeg,
+            orElse: () => _kSegments.first,
+          )
         : null;
 
     return Container(
@@ -350,7 +410,8 @@ class _CustomerCard extends StatelessWidget {
       child: Column(
         children: [
           InkWell(
-            onTap: () => context.push('/profile/customers/${customer.customerId}'),
+            onTap: () =>
+                context.push('/profile/customers/${customer.customerId}'),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -367,7 +428,9 @@ class _CustomerCard extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        customer.name.isNotEmpty ? customer.name[0].toUpperCase() : '?',
+                        customer.name.isNotEmpty
+                            ? customer.name[0].toUpperCase()
+                            : '?',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
@@ -383,23 +446,34 @@ class _CustomerCard extends StatelessWidget {
                       children: [
                         Text(
                           customer.name,
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           customer.phone,
                           style: const TextStyle(
-                              color: BrandColors.muted, fontSize: 13, fontWeight: FontWeight.w500),
+                            color: BrandColors.muted,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         if (segs.isNotEmpty) ...[
                           const SizedBox(height: 6),
                           Wrap(
                             spacing: 4,
                             children: segs.map((s) {
-                              final m = _kSegments.firstWhere((x) => x.id == s,
-                                  orElse: () => _kSegments.first);
+                              final m = _kSegments.firstWhere(
+                                (x) => x.id == s,
+                                orElse: () => _kSegments.first,
+                              );
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: m.color.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
@@ -419,7 +493,10 @@ class _CustomerCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.chevron_right_rounded, color: BrandColors.muted),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: BrandColors.muted,
+                  ),
                 ],
               ),
             ),
@@ -429,21 +506,31 @@ class _CustomerCard extends StatelessWidget {
           if (isInactive)
             InkWell(
               onTap: () => _sendWhatsAppReengagement(customer),
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(20),
+              ),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                   color: const Color(0xFF25D366).withValues(alpha: 0.06),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(20),
+                  ),
                   border: Border(
-                    top: BorderSide(color: BrandColors.border.withValues(alpha: 0.5)),
+                    top: BorderSide(
+                      color: BrandColors.border.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.chat_rounded, size: 16, color: Color(0xFF25D366)),
+                    const Icon(
+                      Icons.chat_rounded,
+                      size: 16,
+                      color: Color(0xFF25D366),
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Send WhatsApp Re-engagement',
@@ -463,21 +550,31 @@ class _CustomerCard extends StatelessWidget {
   }
 
   String? _primarySegment(Set<String> segs) {
-    for (final s in ['inactive', 'credit', 'bulk', 'regular', 'occasional', 'impulse']) {
+    for (final s in [
+      'inactive',
+      'credit',
+      'bulk',
+      'regular',
+      'occasional',
+      'impulse',
+    ]) {
       if (segs.contains(s)) return s;
     }
     return null;
   }
 
   Future<void> _sendWhatsAppReengagement(Customer customer) async {
-    final message = 'Hi ${customer.name.split(' ').first}! '
+    final message =
+        'Hi ${customer.name.split(' ').first}! '
         'We miss you at our store. It\'s been a while since your last visit, '
         'and we have fresh stock and great deals waiting for you. '
         'Come visit us soon — your favourite items are ready! '
         'See you soon!';
 
     final phone = customer.phone.replaceAll(RegExp(r'[^\d+]'), '');
-    final url = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
+    final url = Uri.parse(
+      'https://wa.me/$phone?text=${Uri.encodeComponent(message)}',
+    );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
@@ -526,107 +623,128 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          MediaQuery.of(context).viewInsets.bottom + 32,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.customer == null
+                      ? 'Add New Customer'
+                      : 'Edit Customer',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _nameController,
+              maxLength: 60,
+              inputFormatters: [
+                // Allow Unicode letters, spaces, dots, hyphens, apostrophes — block HTML/script chars
+                FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
+              ],
+              decoration: const InputDecoration(
+                labelText: 'Full Name',
+                prefixIcon: Icon(Icons.person_outline_rounded),
+                counterText: '',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              maxLength: 15,
+              inputFormatters: [
+                // Allow digits, leading +, spaces, hyphens only
+                FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]')),
+              ],
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                prefixIcon: Icon(Icons.phone_outlined),
+                counterText: '',
+                hintText: '+91 XXXXX XXXXX',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              maxLength: 100,
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
+              ],
+              decoration: const InputDecoration(
+                labelText: 'Email Address (Optional)',
+                prefixIcon: Icon(Icons.email_outlined),
+                counterText: '',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _householdController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'Household Size',
+                prefixIcon: Icon(Icons.group_outlined),
+              ),
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: _isSaving ? null : _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: BrandColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: _isSaving
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Save Customer',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
-      padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.customer == null ? 'Add New Customer' : 'Edit Customer',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-              ),
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close_rounded),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: _nameController,
-            maxLength: 60,
-            inputFormatters: [
-              // Allow Unicode letters, spaces, dots, hyphens, apostrophes — block HTML/script chars
-              FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
-            ],
-            decoration: const InputDecoration(
-              labelText: 'Full Name',
-              prefixIcon: Icon(Icons.person_outline_rounded),
-              counterText: '',
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            maxLength: 15,
-            inputFormatters: [
-              // Allow digits, leading +, spaces, hyphens only
-              FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]')),
-            ],
-            decoration: const InputDecoration(
-              labelText: 'Phone Number',
-              prefixIcon: Icon(Icons.phone_outlined),
-              counterText: '',
-              hintText: '+91 XXXXX XXXXX',
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            maxLength: 100,
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
-            ],
-            decoration: const InputDecoration(
-              labelText: 'Email Address (Optional)',
-              prefixIcon: Icon(Icons.email_outlined),
-              counterText: '',
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _householdController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              labelText: 'Household Size',
-              prefixIcon: Icon(Icons.group_outlined),
-            ),
-          ),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton(
-              onPressed: _isSaving ? null : _save,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: BrandColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              child: _isSaving
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Save Customer',
-                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-            ),
-          ),
-        ],
-      ),
-    ));
+    );
   }
 
   Future<void> _save() async {
     final name = _nameController.text.trim();
-    final phone = _phoneController.text.trim().replaceAll(' ', '').replaceAll('-', '');
+    final phone = _phoneController.text
+        .trim()
+        .replaceAll(' ', '')
+        .replaceAll('-', '');
     if (name.isEmpty || phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill name and phone')),
@@ -634,9 +752,13 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
       return;
     }
     final digits = phone.replaceAll('+', '');
-    if (digits.length < 7 || digits.length > 15 || !RegExp(r'^\+?\d+$').hasMatch(phone)) {
+    if (digits.length < 7 ||
+        digits.length > 15 ||
+        !RegExp(r'^\+?\d+$').hasMatch(phone)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid phone number (digits only)')),
+        const SnackBar(
+          content: Text('Enter a valid phone number (digits only)'),
+        ),
       );
       return;
     }
@@ -654,8 +776,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
     if (widget.customer == null) {
       success = await ref.read(customerProvider.notifier).createCustomer(data);
     } else {
-      success =
-          await ref.read(customerProvider.notifier).updateCustomer(widget.customer!.customerId, data);
+      success = await ref
+          .read(customerProvider.notifier)
+          .updateCustomer(widget.customer!.customerId, data);
     }
 
     if (mounted) {

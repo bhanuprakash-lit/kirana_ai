@@ -20,7 +20,7 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
 final _localNotifications = FlutterLocalNotificationsPlugin();
 
 const _androidChannel = AndroidNotificationChannel(
-  'kirana_ai_high',          // must match what FCM uses or what you send
+  'kirana_ai_high', // must match what FCM uses or what you send
   'Kirana AI Alerts',
   description: 'Important alerts from Kirana AI',
   importance: Importance.high,
@@ -29,7 +29,7 @@ const _androidChannel = AndroidNotificationChannel(
 
 Future<void> initLocalNotifications() async {
   const android = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const iOS    = DarwinInitializationSettings(
+  const iOS = DarwinInitializationSettings(
     requestAlertPermission: false, // already requested via FirebaseMessaging
     requestBadgePermission: false,
     requestSoundPermission: false,
@@ -41,7 +41,9 @@ Future<void> initLocalNotifications() async {
 
   // Create the Android notification channel
   await _localNotifications
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >()
       ?.createNotificationChannel(_androidChannel);
 }
 
@@ -82,7 +84,8 @@ class NotificationService {
       sound: true,
     );
 
-    final granted = settings.authorizationStatus == AuthorizationStatus.authorized ||
+    final granted =
+        settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
 
     if (!granted) return;
@@ -118,10 +121,10 @@ class NotificationService {
     final n = message.notification;
     if (n == null) return;
 
-    final data   = message.data;
-    final route  = data['route'] as String?;
+    final data = message.data;
+    final route = data['route'] as String?;
     final action = data['action'] as String?;
-    final logId  = data['log_id'] as String?;
+    final logId = data['log_id'] as String?;
 
     // Use route as payload so tapping the local notification deep-links correctly
     final payload = route ?? action;
@@ -153,9 +156,9 @@ class NotificationService {
   void _handleMessageTap(RemoteMessage message) {
     final data = message.data;
     // New intelligence notifications use 'route'; legacy ones use 'action'
-    final route  = data['route'] as String?;
+    final route = data['route'] as String?;
     final action = data['action'] as String?;
-    final logId  = data['log_id'] as String?;
+    final logId = data['log_id'] as String?;
 
     _pendingAction = route ?? action;
     _markOpened(logId);
@@ -171,7 +174,9 @@ class NotificationService {
     Future.microtask(() async {
       try {
         final client = _ref.read(apiClientProvider);
-        await client.post('/kirana/intelligence/notification-opened', {'log_id': id});
+        await client.post('/kirana/intelligence/notification-opened', {
+          'log_id': id,
+        });
       } catch (_) {}
     });
   }

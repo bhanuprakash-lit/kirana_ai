@@ -926,25 +926,29 @@ class _ProAlertsStrip extends ConsumerWidget {
   const _ProAlertsStrip();
 
   static const _typeColor = {
-    AlertType.lowStock:     Color(0xFFEF4444),
-    AlertType.expiry:       Color(0xFFF97316),
-    AlertType.udhaar:       Color(0xFF8B5CF6),
-    AlertType.performance:  Color(0xFF3B82F6),
+    AlertType.lowStock: Color(0xFFEF4444),
+    AlertType.expiry: Color(0xFFF97316),
+    AlertType.udhaar: Color(0xFF8B5CF6),
+    AlertType.performance: Color(0xFF3B82F6),
     AlertType.subscription: Color(0xFF10B981),
   };
 
   void _navigate(BuildContext context, WidgetRef ref, BusinessAlert alert) {
     switch (alert.type) {
       case AlertType.udhaar:
-        ref.read(dashboardTabProvider.notifier).switchTab(1);       // Finance
-        ref.read(financeSubTabProvider.notifier).setSubTab(0);      // Udhaar tab
+        ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
+        ref.read(financeSubTabProvider.notifier).setSubTab(0); // Udhaar tab
       case AlertType.performance:
-        ref.read(dashboardTabProvider.notifier).switchTab(1);       // Finance
-        ref.read(financeSubTabProvider.notifier).setSubTab(1);      // Distributor tab
+        ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
+        ref
+            .read(financeSubTabProvider.notifier)
+            .setSubTab(1); // Distributor tab
       case AlertType.lowStock:
       case AlertType.expiry:
-        ref.read(dashboardTabProvider.notifier).switchTab(2);       // POS/Inventory
-        ref.read(dashboardSubTabProvider.notifier).setSubTab(1);    // Inventory sub-tab
+        ref.read(dashboardTabProvider.notifier).switchTab(2); // POS/Inventory
+        ref
+            .read(dashboardSubTabProvider.notifier)
+            .setSubTab(1); // Inventory sub-tab
       case AlertType.subscription:
         context.push('/profile/subscription');
     }
@@ -957,7 +961,11 @@ class _ProAlertsStrip extends ConsumerWidget {
 
     final alerts = ref.watch(alertProvider);
     final visible = alerts
-        .where((a) => a.priority == AlertPriority.high || a.priority == AlertPriority.medium)
+        .where(
+          (a) =>
+              a.priority == AlertPriority.high ||
+              a.priority == AlertPriority.medium,
+        )
         .take(8)
         .toList();
     if (visible.isEmpty) return const SizedBox.shrink();
@@ -971,11 +979,31 @@ class _ProAlertsStrip extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(22, 0, 16, 8),
             child: Row(
               children: [
-                const Text('ALERTS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: BrandColors.muted)),
+                const Text(
+                  'ALERTS',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                    color: BrandColors.muted,
+                  ),
+                ),
                 const Spacer(),
                 GestureDetector(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
-                  child: const Text('See all', style: TextStyle(fontSize: 12, color: BrandColors.primary, fontWeight: FontWeight.w600)),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationsScreen(),
+                    ),
+                  ),
+                  child: const Text(
+                    'See all',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -994,18 +1022,30 @@ class _ProAlertsStrip extends ConsumerWidget {
                 return GestureDetector(
                   onTap: () => _navigate(context, ref, alert),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: isHigh ? 0.12 : 0.07),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: color.withValues(alpha: isHigh ? 0.4 : 0.2)),
+                      border: Border.all(
+                        color: color.withValues(alpha: isHigh ? 0.4 : 0.2),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(alert.icon, size: 13, color: color),
                         const SizedBox(width: 5),
-                        Text(alert.title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+                        Text(
+                          alert.title,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: color,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -1035,16 +1075,24 @@ class _KpiSummaryRow extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(22, 0, 22, 10),
           child: Row(
             children: [
-              const Icon(Icons.bar_chart_rounded, size: 16, color: BrandColors.primary),
+              const Icon(
+                Icons.bar_chart_rounded,
+                size: 16,
+                color: BrandColors.primary,
+              ),
               const SizedBox(width: 6),
-              Text('Store KPIs', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Store KPIs',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ],
           ),
         ),
         SizedBox(
           height: 88,
           child: asyncKpis.when(
-            loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            loading: () =>
+                const Center(child: CircularProgressIndicator(strokeWidth: 2)),
             error: (_, __) => const SizedBox.shrink(),
             data: (cards) => ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -1066,10 +1114,18 @@ class _KpiMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUp   = card.direction == 'up';
+    final isUp = card.direction == 'up';
     final isDown = card.direction == 'down';
-    final trendColor = isUp ? BrandColors.success : isDown ? BrandColors.error : BrandColors.muted;
-    final trendIcon  = isUp ? Icons.arrow_upward_rounded : isDown ? Icons.arrow_downward_rounded : Icons.remove_rounded;
+    final trendColor = isUp
+        ? BrandColors.success
+        : isDown
+        ? BrandColors.error
+        : BrandColors.muted;
+    final trendIcon = isUp
+        ? Icons.arrow_upward_rounded
+        : isDown
+        ? Icons.arrow_downward_rounded
+        : Icons.remove_rounded;
 
     return Container(
       width: 112,
@@ -1079,26 +1135,50 @@ class _KpiMiniCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: BrandColors.border.withValues(alpha: 0.8)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(card.label,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: BrandColors.muted),
-              maxLines: 1, overflow: TextOverflow.ellipsis),
-          Text(card.value,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink),
-              maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(
+            card.label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: BrandColors.muted,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            card.value,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.ink,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           Row(
             children: [
               Icon(trendIcon, size: 12, color: trendColor),
               const SizedBox(width: 3),
               Text(
-                card.pctChange != null ? '${card.pctChange!.abs().toStringAsFixed(1)}%' : '—',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: trendColor),
+                card.pctChange != null
+                    ? '${card.pctChange!.abs().toStringAsFixed(1)}%'
+                    : '—',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: trendColor,
+                ),
               ),
             ],
           ),

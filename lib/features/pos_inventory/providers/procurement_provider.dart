@@ -8,10 +8,7 @@ class ProcurementData {
   final List<Supplier> suppliers;
   final List<PurchaseOrder> purchases;
 
-  const ProcurementData({
-    required this.suppliers,
-    required this.purchases,
-  });
+  const ProcurementData({required this.suppliers, required this.purchases});
 }
 
 class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
@@ -31,20 +28,21 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
       client.getOltp('purchases'),
     ]);
 
-    final suppliersJson = results[0] as Map<String, dynamic>;
-    final purchasesJson = results[1] as Map<String, dynamic>;
+    final suppliersJson = results[0];
+    final purchasesJson = results[1];
 
     final suppliers = (suppliersJson['rows'] as List)
         .map((j) => Supplier.fromJson(j as Map<String, dynamic>))
         .toList();
     final supplierMap = {for (var s in suppliers) s.supplierId: s.name};
 
-    final purchases = (purchasesJson['rows'] as List)
-        .map((j) {
-          final sid = j['supplier_id'] as int;
-          return PurchaseOrder.fromJson(j as Map<String, dynamic>, supplierName: supplierMap[sid]);
-        })
-        .toList();
+    final purchases = (purchasesJson['rows'] as List).map((j) {
+      final sid = j['supplier_id'] as int;
+      return PurchaseOrder.fromJson(
+        j as Map<String, dynamic>,
+        supplierName: supplierMap[sid],
+      );
+    }).toList();
 
     return ProcurementData(suppliers: suppliers, purchases: purchases);
   }
@@ -57,11 +55,15 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   }) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.patchOltp('supplier', {
-        'name': name,
-        if (phone != null && phone.isNotEmpty) 'phone': phone,
-        if (category != null && category.isNotEmpty) 'category': category,
-      }, filters: {'supplier_id': supplierId.toString()});
+      await client.patchOltp(
+        'supplier',
+        {
+          'name': name,
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
+          if (category != null && category.isNotEmpty) 'category': category,
+        },
+        filters: {'supplier_id': supplierId.toString()},
+      );
       await refresh();
     } catch (e) {
       rethrow;
@@ -95,7 +97,8 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
     required List<Map<String, dynamic>> items,
     DateTime? dueDate,
     String? notes,
-    double? totalAmountOverride, // used when total is known externally (e.g. scanned invoice)
+    double?
+    totalAmountOverride, // used when total is known externally (e.g. scanned invoice)
   }) async {
     final client = ref.read(apiClientProvider);
     final prefs = await SharedPreferences.getInstance();
@@ -105,7 +108,8 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
       double totalAmount = totalAmountOverride ?? 0;
       if (totalAmountOverride == null) {
         for (var item in items) {
-          totalAmount += (item['quantity'] as num) * (item['cost_price'] as num);
+          totalAmount +=
+              (item['quantity'] as num) * (item['cost_price'] as num);
         }
       }
 
@@ -120,16 +124,20 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
         'payment_status': 'unpaid',
         'notes': notes,
       });
-      
+
       final purchaseId = res['row']['purchase_id'] as int;
 
       // 2. Create purchase items in parallel
-      await Future.wait(items.map((item) => client.postOltp('purchase_items', {
-        'purchase_id': purchaseId,
-        'product_id': item['product_id'],
-        'quantity': item['quantity'],
-        'cost_price': item['cost_price'],
-      })));
+      await Future.wait(
+        items.map(
+          (item) => client.postOltp('purchase_items', {
+            'purchase_id': purchaseId,
+            'product_id': item['product_id'],
+            'quantity': item['quantity'],
+            'cost_price': item['cost_price'],
+          }),
+        ),
+      );
 
       await refresh();
     } catch (e) {
@@ -140,11 +148,11 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   Future<void> markAsReceived(int purchaseId) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.patchOltp('purchases', {
-        'status': 'received',
-      }, filters: {
-        'purchase_id': purchaseId.toString(),
-      });
+      await client.patchOltp(
+        'purchases',
+        {'status': 'received'},
+        filters: {'purchase_id': purchaseId.toString()},
+      );
       await refresh();
     } catch (e) {
       rethrow;
@@ -154,11 +162,11 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   Future<void> markAsPaid(int purchaseId) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.patchOltp('purchases', {
-        'payment_status': 'paid',
-      }, filters: {
-        'purchase_id': purchaseId.toString(),
-      });
+      await client.patchOltp(
+        'purchases',
+        {'payment_status': 'paid'},
+        filters: {'purchase_id': purchaseId.toString()},
+      );
       await refresh();
     } catch (e) {
       rethrow;
@@ -168,11 +176,14 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   Future<List<PurchaseItem>> fetchPurchaseItems(int purchaseId) async {
     final client = ref.read(apiClientProvider);
     try {
-      final res = await client.getOltp('purchase_items', filters: {
-        'purchase_id': purchaseId.toString(),
-      });
-      
-      final items = (res['rows'] as List).map((j) => PurchaseItem.fromJson(j as Map<String, dynamic>)).toList();
+      final res = await client.getOltp(
+        'purchase_items',
+        filters: {'purchase_id': purchaseId.toString()},
+      );
+
+      final items = (res['rows'] as List)
+          .map((j) => PurchaseItem.fromJson(j as Map<String, dynamic>))
+          .toList();
       return items;
     } catch (e) {
       return [];
@@ -180,4 +191,7 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   }
 }
 
-final procurementProvider = AsyncNotifierProvider<ProcurementNotifier, ProcurementData>(ProcurementNotifier.new);
+final procurementProvider =
+    AsyncNotifierProvider<ProcurementNotifier, ProcurementData>(
+      ProcurementNotifier.new,
+    );

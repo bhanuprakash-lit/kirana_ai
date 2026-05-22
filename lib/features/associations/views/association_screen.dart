@@ -14,7 +14,10 @@ class AssociationScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: BrandColors.background,
         appBar: AppBar(
-          title: const Text('Area Associations', style: TextStyle(fontWeight: FontWeight.w800)),
+          title: const Text(
+            'Area Associations',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
           bottom: const TabBar(
             tabs: [
               Tab(text: 'My Areas'),
@@ -28,12 +31,7 @@ class AssociationScreen extends ConsumerWidget {
             ),
           ],
         ),
-        body: const TabBarView(
-          children: [
-            _AssociationsTab(),
-            _HeatmapTab(),
-          ],
-        ),
+        body: const TabBarView(children: [_AssociationsTab(), _HeatmapTab()]),
       ),
     );
   }
@@ -69,12 +67,19 @@ class _AssociationsTab extends ConsumerWidget {
                 children: [
                   const Text('🏘️', style: TextStyle(fontSize: 48)),
                   const SizedBox(height: 16),
-                  Text('No areas added yet', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'No areas added yet',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 8),
                   const Text(
                     'Add nearby apartments, hostels, schools or offices to get targeted campaign suggestions.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: BrandColors.muted, fontSize: 13, height: 1.5),
+                    style: TextStyle(
+                      color: BrandColors.muted,
+                      fontSize: 13,
+                      height: 1.5,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
@@ -91,7 +96,9 @@ class _AssociationsTab extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: BrandColors.primary,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ],
@@ -107,7 +114,8 @@ class _AssociationsTab extends ConsumerWidget {
             itemBuilder: (_, i) => _AssociationTile(
               assoc: list[i],
               onDelete: () => _confirmDelete(context, ref, list[i]),
-              onToggle: () => ref.read(associationProvider.notifier).toggleActive(list[i]),
+              onToggle: () =>
+                  ref.read(associationProvider.notifier).toggleActive(list[i]),
             ),
           ),
         );
@@ -115,14 +123,21 @@ class _AssociationsTab extends ConsumerWidget {
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, WidgetRef ref, StoreAssociation assoc) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    StoreAssociation assoc,
+  ) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Remove Area?'),
         content: Text('Remove "${assoc.name}" from your associations?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: BrandColors.error),
@@ -141,7 +156,11 @@ class _AssociationTile extends StatelessWidget {
   final StoreAssociation assoc;
   final VoidCallback onDelete;
   final VoidCallback onToggle;
-  const _AssociationTile({required this.assoc, required this.onDelete, required this.onToggle});
+  const _AssociationTile({
+    required this.assoc,
+    required this.onDelete,
+    required this.onToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -151,21 +170,35 @@ class _AssociationTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         leading: Container(
-          width: 44, height: 44,
+          width: 44,
+          height: 44,
           decoration: BoxDecoration(
             color: BrandColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Center(child: Text(assoc.areaType.emoji, style: const TextStyle(fontSize: 22))),
+          child: Center(
+            child: Text(
+              assoc.areaType.emoji,
+              style: const TextStyle(fontSize: 22),
+            ),
+          ),
         ),
-        title: Text(assoc.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(
+          assoc.name,
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(assoc.areaType.label, style: const TextStyle(color: BrandColors.muted, fontSize: 12)),
+            Text(
+              assoc.areaType.label,
+              style: const TextStyle(color: BrandColors.muted, fontSize: 12),
+            ),
             if (assoc.estimatedHouseholds != null)
-              Text('~${assoc.estimatedHouseholds} households',
-                  style: const TextStyle(color: BrandColors.muted, fontSize: 11)),
+              Text(
+                '~${assoc.estimatedHouseholds} households',
+                style: const TextStyle(color: BrandColors.muted, fontSize: 11),
+              ),
           ],
         ),
         trailing: Row(
@@ -178,7 +211,11 @@ class _AssociationTile extends StatelessWidget {
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline_rounded, color: BrandColors.muted, size: 20),
+              icon: const Icon(
+                Icons.delete_outline_rounded,
+                color: BrandColors.muted,
+                size: 20,
+              ),
               onPressed: onDelete,
             ),
           ],
@@ -209,13 +246,19 @@ class _HeatmapTab extends ConsumerWidget {
                 children: [
                   Text('📊', style: TextStyle(fontSize: 48)),
                   SizedBox(height: 16),
-                  Text('No heatmap data yet',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  Text(
+                    'No heatmap data yet',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
                   SizedBox(height: 8),
                   Text(
                     'Add areas and tag customers to those areas. Revenue data will appear here over time.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: BrandColors.muted, fontSize: 13, height: 1.5),
+                    style: TextStyle(
+                      color: BrandColors.muted,
+                      fontSize: 13,
+                      height: 1.5,
+                    ),
                   ),
                 ],
               ),
@@ -223,7 +266,10 @@ class _HeatmapTab extends ConsumerWidget {
           );
         }
 
-        final maxRevenue = rows.fold<double>(0, (m, r) => r.totalRevenue > m ? r.totalRevenue : m);
+        final maxRevenue = rows.fold<double>(
+          0,
+          (m, r) => r.totalRevenue > m ? r.totalRevenue : m,
+        );
 
         return RefreshIndicator(
           onRefresh: () => ref.read(heatmapProvider.notifier).refresh(),
@@ -232,8 +278,14 @@ class _HeatmapTab extends ConsumerWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.only(bottom: 12),
-                child: Text('Last 90 days · by revenue',
-                    style: TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w600)),
+                child: Text(
+                  'Last 90 days · by revenue',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.muted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
               ...rows.map((r) => _HeatmapRow(row: r, maxRevenue: maxRevenue)),
             ],
@@ -251,7 +303,9 @@ class _HeatmapRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pct = maxRevenue > 0 ? (row.totalRevenue / maxRevenue).clamp(0.0, 1.0) : 0.0;
+    final pct = maxRevenue > 0
+        ? (row.totalRevenue / maxRevenue).clamp(0.0, 1.0)
+        : 0.0;
     final hasData = row.totalOrders > 0;
 
     return Container(
@@ -273,14 +327,32 @@ class _HeatmapRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(row.areaName, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                    Text(row.areaType.label, style: const TextStyle(color: BrandColors.muted, fontSize: 11)),
+                    Text(
+                      row.areaName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      row.areaType.label,
+                      style: const TextStyle(
+                        color: BrandColors.muted,
+                        fontSize: 11,
+                      ),
+                    ),
                   ],
                 ),
               ),
               if (hasData)
-                Text('₹${row.totalRevenue.toStringAsFixed(0)}',
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: BrandColors.primary)),
+                Text(
+                  '₹${row.totalRevenue.toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    color: BrandColors.primary,
+                  ),
+                ),
             ],
           ),
           if (hasData) ...[
@@ -292,7 +364,9 @@ class _HeatmapRow extends StatelessWidget {
                 value: pct,
                 minHeight: 6,
                 backgroundColor: BrandColors.border,
-                valueColor: const AlwaysStoppedAnimation<Color>(BrandColors.primary),
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  BrandColors.primary,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -302,13 +376,18 @@ class _HeatmapRow extends StatelessWidget {
                 const SizedBox(width: 12),
                 _StatChip('🛒 ${row.totalOrders}', 'orders'),
                 const SizedBox(width: 12),
-                _StatChip('₹${row.avgOrderValue.toStringAsFixed(0)}', 'avg order'),
+                _StatChip(
+                  '₹${row.avgOrderValue.toStringAsFixed(0)}',
+                  'avg order',
+                ),
               ],
             ),
           ] else ...[
             const SizedBox(height: 8),
-            const Text('No orders yet — tag customers to this area to track',
-                style: TextStyle(fontSize: 11, color: BrandColors.muted)),
+            const Text(
+              'No orders yet — tag customers to this area to track',
+              style: TextStyle(fontSize: 11, color: BrandColors.muted),
+            ),
           ],
         ],
       ),
@@ -326,8 +405,14 @@ class _StatChip extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(value, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-        Text(label, style: const TextStyle(fontSize: 10, color: BrandColors.muted)),
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+        ),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 10, color: BrandColors.muted),
+        ),
       ],
     );
   }
@@ -345,7 +430,7 @@ class _AddAssociationSheet extends StatefulWidget {
 
 class _AddAssociationSheetState extends State<_AddAssociationSheet> {
   final _nameCtrl = TextEditingController();
-  final _hhCtrl   = TextEditingController();
+  final _hhCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   AreaType _selectedType = AreaType.apartment;
   bool _loading = false;
@@ -363,17 +448,24 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
     if (name.isEmpty) return;
     setState(() => _loading = true);
     try {
-      await widget.ref.read(associationProvider.notifier).add(
+      await widget.ref
+          .read(associationProvider.notifier)
+          .add(
             name: name,
             areaType: _selectedType,
             estimatedHouseholds: int.tryParse(_hhCtrl.text.trim()),
-            notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+            notes: _notesCtrl.text.trim().isEmpty
+                ? null
+                : _notesCtrl.text.trim(),
           );
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: BrandColors.error),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: BrandColors.error,
+          ),
         );
       }
     } finally {
@@ -384,7 +476,9 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -396,15 +490,27 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Container(width: 40, height: 4,
-                  decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: BrandColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
-            const Text('Add Nearby Area', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            const Text(
+              'Add Nearby Area',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 20),
 
             // Area type chips
-            const Text('Area Type', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            const Text(
+              'Area Type',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -415,12 +521,19 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
                   onTap: () => setState(() => _selectedType = t),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: selected ? BrandColors.primary : Colors.transparent,
+                      color: selected
+                          ? BrandColors.primary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: selected ? BrandColors.primary : BrandColors.border,
+                        color: selected
+                            ? BrandColors.primary
+                            : BrandColors.border,
                         width: selected ? 2 : 1,
                       ),
                     ),
@@ -429,12 +542,14 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
                       children: [
                         Text(t.emoji),
                         const SizedBox(width: 6),
-                        Text(t.label,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                              color: selected ? Colors.white : BrandColors.ink,
-                            )),
+                        Text(
+                          t.label,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: selected ? Colors.white : BrandColors.ink,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -447,7 +562,9 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
               controller: _nameCtrl,
               decoration: InputDecoration(
                 labelText: 'Name (e.g. Prestige Apartments)',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -456,7 +573,9 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: 'Estimated households (optional)',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -464,7 +583,9 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
               controller: _notesCtrl,
               decoration: InputDecoration(
                 labelText: 'Notes (optional)',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
 
@@ -477,11 +598,26 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
                   minimumSize: const Size.fromHeight(52),
                   backgroundColor: BrandColors.primary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 child: _loading
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Text('Add Area', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'Add Area',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
+                      ),
               ),
             ),
           ],

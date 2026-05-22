@@ -5,7 +5,8 @@ import '../../../core/theme/brand_theme.dart';
 
 class AppBlockedScreen extends StatelessWidget {
   final String reason;
-  final bool isStoreBlocked; // false = whole app blocked, true = just this store
+  final bool
+  isStoreBlocked; // false = whole app blocked, true = just this store
 
   const AppBlockedScreen({
     super.key,
@@ -17,7 +18,8 @@ class AppBlockedScreen extends StatelessWidget {
     final subject = isStoreBlocked
         ? 'Store Access Issue — Kirana AI'
         : 'App Access Issue — Kirana AI';
-    final body = 'Hello LohiyaAI Team,\n\n'
+    final body =
+        'Hello LohiyaAI Team,\n\n'
         'I am unable to access the Kirana AI app.\n\n'
         'Displayed reason: $reason\n\n'
         'Please help me restore access.\n\n'
@@ -42,8 +44,10 @@ class AppBlockedScreen extends StatelessWidget {
 
   String _encodeQuery(Map<String, String> params) {
     return params.entries
-        .map((e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
   }
 
@@ -74,7 +78,9 @@ class AppBlockedScreen extends StatelessWidget {
               const SizedBox(height: 28),
 
               Text(
-                isStoreBlocked ? 'Store Temporarily Unavailable' : 'App Temporarily Unavailable',
+                isStoreBlocked
+                    ? 'Store Temporarily Unavailable'
+                    : 'App Temporarily Unavailable',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 22,
@@ -137,8 +143,11 @@ class AppBlockedScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.storefront_rounded,
-                      size: 14, color: BrandColors.muted),
+                  const Icon(
+                    Icons.storefront_rounded,
+                    size: 14,
+                    color: BrandColors.muted,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Kirana AI by LohiyaAI',

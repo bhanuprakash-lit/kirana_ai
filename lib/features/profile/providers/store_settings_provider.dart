@@ -22,9 +22,12 @@ class StoreSettingsNotifier extends AsyncNotifier<StoreProfile> {
   Future<void> updateStore(StoreProfile profile) async {
     final client = ref.read(apiClientProvider);
     try {
-      final res = await client.patch('/kirana/stores/${profile.storeId}', profile.toJson());
+      final res = await client.patch(
+        '/kirana/stores/${profile.storeId}',
+        profile.toJson(),
+      );
       state = AsyncValue.data(StoreProfile.fromJson(res));
-      
+
       // Update local storage if name changed
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('store_name', profile.name);
@@ -39,4 +42,7 @@ class StoreSettingsNotifier extends AsyncNotifier<StoreProfile> {
   }
 }
 
-final storeSettingsProvider = AsyncNotifierProvider<StoreSettingsNotifier, StoreProfile>(StoreSettingsNotifier.new);
+final storeSettingsProvider =
+    AsyncNotifierProvider<StoreSettingsNotifier, StoreProfile>(
+      StoreSettingsNotifier.new,
+    );

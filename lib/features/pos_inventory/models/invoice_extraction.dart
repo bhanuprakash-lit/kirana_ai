@@ -7,11 +7,11 @@ class InvoiceVendor {
   const InvoiceVendor({this.name, this.gstin, this.address, this.phone});
 
   factory InvoiceVendor.fromJson(Map<String, dynamic> j) => InvoiceVendor(
-        name: j['vendor_name'] as String?,
-        gstin: j['vendor_gstin'] as String?,
-        address: j['vendor_address'] as String?,
-        phone: j['vendor_phone'] as String?,
-      );
+    name: j['vendor_name'] as String?,
+    gstin: j['vendor_gstin'] as String?,
+    address: j['vendor_address'] as String?,
+    phone: j['vendor_phone'] as String?,
+  );
 }
 
 class InvoiceDetails {
@@ -22,10 +22,10 @@ class InvoiceDetails {
   const InvoiceDetails({this.number, this.date, this.placeOfSupply});
 
   factory InvoiceDetails.fromJson(Map<String, dynamic> j) => InvoiceDetails(
-        number: j['invoice_number'] as String?,
-        date: j['invoice_date'] as String?,
-        placeOfSupply: j['place_of_supply'] as String?,
-      );
+    number: j['invoice_number'] as String?,
+    date: j['invoice_date'] as String?,
+    placeOfSupply: j['place_of_supply'] as String?,
+  );
 }
 
 class InvoiceLineItem {
@@ -48,14 +48,14 @@ class InvoiceLineItem {
   });
 
   factory InvoiceLineItem.fromJson(Map<String, dynamic> j) => InvoiceLineItem(
-        name: j['item_name'] as String?,
-        quantity: (j['quantity'] as num?)?.toDouble(),
-        unit: j['unit'] as String?,
-        pricePerUnit: (j['price_per_unit'] as num?)?.toDouble(),
-        finalAmount: (j['final_amount'] as num?)?.toDouble(),
-        cgstRate: (j['cgst_rate'] as num?)?.toDouble(),
-        sgstRate: (j['sgst_rate'] as num?)?.toDouble(),
-      );
+    name: j['item_name'] as String?,
+    quantity: (j['quantity'] as num?)?.toDouble(),
+    unit: j['unit'] as String?,
+    pricePerUnit: (j['price_per_unit'] as num?)?.toDouble(),
+    finalAmount: (j['final_amount'] as num?)?.toDouble(),
+    cgstRate: (j['cgst_rate'] as num?)?.toDouble(),
+    sgstRate: (j['sgst_rate'] as num?)?.toDouble(),
+  );
 
   double get effectiveCostPrice {
     if (quantity != null && quantity! > 0 && finalAmount != null) {
@@ -71,14 +71,19 @@ class InvoiceTotals {
   final double? cgstTotal;
   final double? sgstTotal;
 
-  const InvoiceTotals({this.subtotal, this.grandTotal, this.cgstTotal, this.sgstTotal});
+  const InvoiceTotals({
+    this.subtotal,
+    this.grandTotal,
+    this.cgstTotal,
+    this.sgstTotal,
+  });
 
   factory InvoiceTotals.fromJson(Map<String, dynamic> j) => InvoiceTotals(
-        subtotal: (j['subtotal'] as num?)?.toDouble(),
-        grandTotal: (j['grand_total'] as num?)?.toDouble(),
-        cgstTotal: (j['cgst_total'] as num?)?.toDouble(),
-        sgstTotal: (j['sgst_total'] as num?)?.toDouble(),
-      );
+    subtotal: (j['subtotal'] as num?)?.toDouble(),
+    grandTotal: (j['grand_total'] as num?)?.toDouble(),
+    cgstTotal: (j['cgst_total'] as num?)?.toDouble(),
+    sgstTotal: (j['sgst_total'] as num?)?.toDouble(),
+  );
 }
 
 class InvoiceExtraction {
@@ -100,16 +105,19 @@ class InvoiceExtraction {
 
   factory InvoiceExtraction.fromJson(Map<String, dynamic> j) {
     final vendor = InvoiceVendor.fromJson(
-        (j['vendor'] as Map<String, dynamic>?) ?? {});
+      (j['vendor'] as Map<String, dynamic>?) ?? {},
+    );
     final details = InvoiceDetails.fromJson(
-        (j['invoice_details'] as Map<String, dynamic>?) ?? {});
+      (j['invoice_details'] as Map<String, dynamic>?) ?? {},
+    );
     final items = ((j['items'] as List?) ?? [])
         .cast<Map<String, dynamic>>()
         .map(InvoiceLineItem.fromJson)
         .where((i) => i.name != null && i.name!.trim().isNotEmpty)
         .toList();
     final totals = InvoiceTotals.fromJson(
-        (j['totals'] as Map<String, dynamic>?) ?? {});
+      (j['totals'] as Map<String, dynamic>?) ?? {},
+    );
 
     return InvoiceExtraction(
       vendor: vendor,

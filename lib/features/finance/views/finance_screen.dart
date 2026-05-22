@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/brand_theme.dart';
-import '../../../features/dashboard/views/dashboard_screen.dart' show financeSubTabProvider;
+import '../../../features/dashboard/views/dashboard_screen.dart'
+    show financeSubTabProvider;
 import '../models/finance_models.dart';
 import '../providers/finance_provider.dart';
 import 'tabs/udhaar_tab.dart';
@@ -15,17 +16,24 @@ class FinanceScreen extends ConsumerStatefulWidget {
   ConsumerState<FinanceScreen> createState() => _FinanceScreenState();
 }
 
-class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTickerProviderStateMixin {
+class _FinanceScreenState extends ConsumerState<FinanceScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     final initialTab = ref.read(financeSubTabProvider).clamp(0, 1);
-    _tabController = TabController(length: 2, vsync: this, initialIndex: initialTab);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: initialTab,
+    );
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        ref.read(financeSubTabProvider.notifier).setSubTab(_tabController.index);
+        ref
+            .read(financeSubTabProvider.notifier)
+            .setSubTab(_tabController.index);
       }
     });
   }
@@ -50,18 +58,21 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         title: const Text('Finance'),
-        actions: const [
-          NotificationBell(),
-          SizedBox(width: 8),
-        ],
+        actions: const [NotificationBell(), SizedBox(width: 8)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(100),
           child: Column(
             children: [
               asyncData.when(
                 data: (data) => _MonthlySalesOverview(stats: data.stats),
-                loading: () => const SizedBox(height: 48, child: Center(child: LinearProgressIndicator())),
-                error: (_, _) => const SizedBox(height: 48, child: Center(child: Text('Error loading stats'))),
+                loading: () => const SizedBox(
+                  height: 48,
+                  child: Center(child: LinearProgressIndicator()),
+                ),
+                error: (_, _) => const SizedBox(
+                  height: 48,
+                  child: Center(child: Text('Error loading stats')),
+                ),
               ),
               TabBar(
                 controller: _tabController,
@@ -79,10 +90,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> with SingleTicker
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          UdhaarTab(),
-          DistributorTab(),
-        ],
+        children: const [UdhaarTab(), DistributorTab()],
       ),
     );
   }
@@ -138,13 +146,20 @@ class _StatItem extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: color),
             const SizedBox(width: 4),
-            Text(label, style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+            ),
           ],
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: BrandColors.ink),
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: BrandColors.ink,
+          ),
         ),
       ],
     );
@@ -162,11 +177,18 @@ class _UnderConstruction extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.construction_rounded, size: 48, color: BrandColors.muted),
+          const Icon(
+            Icons.construction_rounded,
+            size: 48,
+            color: BrandColors.muted,
+          ),
           const SizedBox(height: 16),
           Text(label, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
-          const Text('Will be available in future updates', style: TextStyle(color: BrandColors.muted)),
+          const Text(
+            'Will be available in future updates',
+            style: TextStyle(color: BrandColors.muted),
+          ),
         ],
       ),
     );

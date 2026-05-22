@@ -31,7 +31,9 @@ class CustomerState {
       isLoading: isLoading ?? this.isLoading,
       error: error,
       searchQuery: searchQuery ?? this.searchQuery,
-      selectedSegment: clearSegment ? null : (selectedSegment ?? this.selectedSegment),
+      selectedSegment: clearSegment
+          ? null
+          : (selectedSegment ?? this.selectedSegment),
     );
   }
 }
@@ -57,7 +59,10 @@ class CustomerNotifier extends Notifier<CustomerState> {
 
       state = state.copyWith(customers: customers, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Failed to fetch customers: $e');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to fetch customers: $e',
+      );
     }
   }
 
@@ -76,7 +81,9 @@ class CustomerNotifier extends Notifier<CustomerState> {
     var list = state.customers;
 
     if (state.selectedSegment != null) {
-      list = list.where((c) => c.segments.contains(state.selectedSegment)).toList();
+      list = list
+          .where((c) => c.segments.contains(state.selectedSegment))
+          .toList();
     }
 
     if (state.searchQuery.isNotEmpty) {
@@ -104,7 +111,11 @@ class CustomerNotifier extends Notifier<CustomerState> {
   Future<bool> updateCustomer(int customerId, Map<String, dynamic> data) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.patchOltp('customer', data, filters: {'customer_id': '$customerId'});
+      await client.patchOltp(
+        'customer',
+        data,
+        filters: {'customer_id': '$customerId'},
+      );
       await fetchCustomers();
       return true;
     } catch (e) {
@@ -116,7 +127,10 @@ class CustomerNotifier extends Notifier<CustomerState> {
   Future<String?> deleteCustomer(int customerId) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.deleteOltp('customer', filters: {'customer_id': '$customerId'});
+      await client.deleteOltp(
+        'customer',
+        filters: {'customer_id': '$customerId'},
+      );
       await fetchCustomers();
       return null; // success
     } catch (e) {
@@ -127,21 +141,30 @@ class CustomerNotifier extends Notifier<CustomerState> {
   }
 }
 
-final customerProvider = NotifierProvider<CustomerNotifier, CustomerState>(CustomerNotifier.new);
+final customerProvider = NotifierProvider<CustomerNotifier, CustomerState>(
+  CustomerNotifier.new,
+);
 
-final customerOrdersProvider = FutureProvider.autoDispose.family<List<Map<String, dynamic>>, int>((ref, customerId) async {
-  final client = ref.read(apiClientProvider);
-  final res = await client.posGetList('/pos/orders?customer_id=$customerId&limit=50');
-  return (res ?? []).cast<Map<String, dynamic>>();
-});
+final customerOrdersProvider = FutureProvider.autoDispose
+    .family<List<Map<String, dynamic>>, int>((ref, customerId) async {
+      final client = ref.read(apiClientProvider);
+      final res = await client.posGetList(
+        '/pos/orders?customer_id=$customerId&limit=50',
+      );
+      return (res ?? []).cast<Map<String, dynamic>>();
+    });
 
-final customerKhataProvider = FutureProvider.autoDispose.family<Map<String, dynamic>?, int>((ref, customerId) async {
-  final client = ref.read(apiClientProvider);
-  try {
-    final res = await client.getOltp('khata', filters: {'customer_id': '$customerId'});
-    final rows = (res['rows'] as List).cast<Map<String, dynamic>>();
-    return rows.isNotEmpty ? rows.first : null;
-  } catch (_) {
-    return null;
-  }
-});
+final customerKhataProvider = FutureProvider.autoDispose
+    .family<Map<String, dynamic>?, int>((ref, customerId) async {
+      final client = ref.read(apiClientProvider);
+      try {
+        final res = await client.getOltp(
+          'khata',
+          filters: {'customer_id': '$customerId'},
+        );
+        final rows = (res['rows'] as List).cast<Map<String, dynamic>>();
+        return rows.isNotEmpty ? rows.first : null;
+      } catch (_) {
+        return null;
+      }
+    });

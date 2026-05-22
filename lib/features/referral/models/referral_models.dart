@@ -40,18 +40,18 @@ class ReferralCampaign {
   });
 
   factory ReferralCampaign.fromJson(Map<String, dynamic> j) => ReferralCampaign(
-        campaignId: j['campaign_id'] as int,
-        storeId: j['store_id'] as int,
-        name: j['name'] as String,
-        referralDiscountPct: (j['referral_discount_pct'] as num).toDouble(),
-        milestoneEveryN: j['milestone_every_n'] as int,
-        milestoneRewardPct: (j['milestone_reward_pct'] as num).toDouble(),
-        isActive: j['is_active'] as bool,
-        tokenCount: (j['token_count'] as num?)?.toInt() ?? 0,
-        totalReferrals: (j['total_referrals'] as num?)?.toInt() ?? 0,
-        maxReferralsPerReferrer:
-            (j['max_referrals_per_referrer'] as num?)?.toInt() ?? 50,
-      );
+    campaignId: j['campaign_id'] as int,
+    storeId: j['store_id'] as int,
+    name: j['name'] as String,
+    referralDiscountPct: (j['referral_discount_pct'] as num).toDouble(),
+    milestoneEveryN: j['milestone_every_n'] as int,
+    milestoneRewardPct: (j['milestone_reward_pct'] as num).toDouble(),
+    isActive: j['is_active'] as bool,
+    tokenCount: (j['token_count'] as num?)?.toInt() ?? 0,
+    totalReferrals: (j['total_referrals'] as num?)?.toInt() ?? 0,
+    maxReferralsPerReferrer:
+        (j['max_referrals_per_referrer'] as num?)?.toInt() ?? 50,
+  );
 }
 
 class ReferralToken {
@@ -60,9 +60,9 @@ class ReferralToken {
   const ReferralToken({required this.tokenId, required this.tokenHash});
 
   factory ReferralToken.fromJson(Map<String, dynamic> j) => ReferralToken(
-        tokenId: j['token_id'] as int,
-        tokenHash: j['token_hash'] as String,
-      );
+    tokenId: j['token_id'] as int,
+    tokenHash: j['token_hash'] as String,
+  );
 }
 
 class TokenInfo {
@@ -79,11 +79,11 @@ class TokenInfo {
   });
 
   factory TokenInfo.fromJson(Map<String, dynamic> j) => TokenInfo(
-        referrerName: j['referrer_name'] as String,
-        campaignName: j['campaign_name'] as String,
-        referralDiscountPct: (j['referral_discount_pct'] as num).toDouble(),
-        isActive: j['is_active'] as bool,
-      );
+    referrerName: j['referrer_name'] as String,
+    campaignName: j['campaign_name'] as String,
+    referralDiscountPct: (j['referral_discount_pct'] as num).toDouble(),
+    isActive: j['is_active'] as bool,
+  );
 }
 
 class ReferralScanResult {
@@ -139,9 +139,9 @@ class ReferralVoucher {
   });
 
   factory ReferralVoucher.fromJson(Map<String, dynamic> j) => ReferralVoucher(
-        voucherId: j['voucher_id'] as int,
-        discountPct: (j['discount_pct'] as num).toDouble(),
-        campaignName: j['campaign_name'] as String,
-        earnedAt: j['earned_at'] as String,
-      );
+    voucherId: j['voucher_id'] as int,
+    discountPct: (j['discount_pct'] as num).toDouble(),
+    campaignName: j['campaign_name'] as String,
+    earnedAt: j['earned_at'] as String,
+  );
 }

@@ -139,7 +139,9 @@ ThemeData buildBrandTheme() {
         minimumSize: const Size.fromHeight(56),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        textStyle: baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        textStyle: baseTextTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
 
@@ -149,7 +151,9 @@ ThemeData buildBrandTheme() {
         minimumSize: const Size.fromHeight(56),
         side: const BorderSide(color: BrandColors.border),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        textStyle: baseTextTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        textStyle: baseTextTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
 
@@ -172,12 +176,16 @@ ThemeData buildBrandTheme() {
       indicatorColor: BrandColors.accent.withValues(alpha: 0.16),
       iconTheme: WidgetStateProperty.resolveWith(
         (states) => IconThemeData(
-          color: states.contains(WidgetState.selected) ? BrandColors.primary : BrandColors.muted,
+          color: states.contains(WidgetState.selected)
+              ? BrandColors.primary
+              : BrandColors.muted,
         ),
       ),
       labelTextStyle: WidgetStateProperty.resolveWith(
         (states) => baseTextTheme.labelMedium?.copyWith(
-          color: states.contains(WidgetState.selected) ? BrandColors.primary : BrandColors.muted,
+          color: states.contains(WidgetState.selected)
+              ? BrandColors.primary
+              : BrandColors.muted,
           fontWeight: FontWeight.w700,
         ),
       ),

@@ -77,8 +77,7 @@ class _BarcodeScannerOverlayState extends State<BarcodeScannerOverlay> {
             child: Text(
               'Align barcode within the frame',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                  color: Colors.white70, fontSize: 14),
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ),
         ],

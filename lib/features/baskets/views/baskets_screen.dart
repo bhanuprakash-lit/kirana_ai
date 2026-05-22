@@ -19,7 +19,10 @@ class BasketsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('My Baskets', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'My Baskets',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded),
@@ -33,13 +36,26 @@ class BasketsScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: BrandColors.error),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: BrandColors.error,
+              ),
               const SizedBox(height: 12),
-              const Text('Could not load baskets', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Could not load baskets',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 4),
-              const Text('Pull down to retry', style: TextStyle(color: BrandColors.muted)),
+              const Text(
+                'Pull down to retry',
+                style: TextStyle(color: BrandColors.muted),
+              ),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: () => ref.invalidate(basketProvider), child: const Text('Retry')),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(basketProvider),
+                child: const Text('Retry'),
+              ),
             ],
           ),
         ),
@@ -63,7 +79,10 @@ class BasketsScreen extends ConsumerWidget {
         onPressed: () => _showCreateSheet(context, ref),
         backgroundColor: BrandColors.primary,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text('New Basket', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        label: const Text(
+          'New Basket',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
       ),
     );
   }
@@ -75,14 +94,29 @@ class BasketsScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.shopping_basket_outlined, size: 72, color: BrandColors.border),
+            const Icon(
+              Icons.shopping_basket_outlined,
+              size: 72,
+              color: BrandColors.border,
+            ),
             const SizedBox(height: 20),
-            const Text('No baskets yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+            const Text(
+              'No baskets yet',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(height: 8),
             const Text(
               'Create combo deals and bundle offers.\nAlert all your customers via WhatsApp.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: BrandColors.muted, fontSize: 14, height: 1.5),
+              style: TextStyle(
+                color: BrandColors.muted,
+                fontSize: 14,
+                height: 1.5,
+              ),
             ),
             const SizedBox(height: 28),
             ElevatedButton.icon(
@@ -112,12 +146,17 @@ class BasketsScreen extends ConsumerWidget {
         title: const Text('Delete Basket?'),
         content: Text('Delete "${basket.name}"? This cannot be undone.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                await ref.read(basketProvider.notifier).deleteBasket(basket.basketId);
+                await ref
+                    .read(basketProvider.notifier)
+                    .deleteBasket(basket.basketId);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Basket deleted')),
@@ -126,34 +165,56 @@ class BasketsScreen extends ConsumerWidget {
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Could not delete basket. Please try again.'), backgroundColor: BrandColors.error),
+                    const SnackBar(
+                      content: Text(
+                        'Could not delete basket. Please try again.',
+                      ),
+                      backgroundColor: BrandColors.error,
+                    ),
                   );
                 }
               }
             },
-            child: const Text('Delete', style: TextStyle(color: BrandColors.error)),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: BrandColors.error),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _sendAlert(BuildContext context, WidgetRef ref, Basket basket) async {
+  Future<void> _sendAlert(
+    BuildContext context,
+    WidgetRef ref,
+    Basket basket,
+  ) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Send WhatsApp Alert?'),
-        content: Text('Send basket deal for "${basket.name}" to all your customers via WhatsApp?'),
+        content: Text(
+          'Send basket deal for "${basket.name}" to all your customers via WhatsApp?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Send')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Send'),
+          ),
         ],
       ),
     );
     if (confirm != true || !context.mounted) return;
 
     try {
-      final res = await ref.read(basketProvider.notifier).alertCustomers(basket.basketId);
+      final res = await ref
+          .read(basketProvider.notifier)
+          .alertCustomers(basket.basketId);
       if (context.mounted) {
         final sent = (res['sent'] as num?)?.toInt() ?? 0;
         final total = (res['total'] as num?)?.toInt() ?? 0;
@@ -166,17 +227,25 @@ class BasketsScreen extends ConsumerWidget {
           msg = 'No customers with phone numbers found.';
           bg = BrandColors.muted;
         } else {
-          msg = 'WhatsApp not active yet. Alert will auto-send to $total customers once enabled.';
+          msg =
+              'WhatsApp not active yet. Alert will auto-send to $total customers once enabled.';
           bg = const Color(0xFFE87722);
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg), backgroundColor: bg, duration: const Duration(seconds: 4)),
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: bg,
+            duration: const Duration(seconds: 4),
+          ),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed: $e'), backgroundColor: BrandColors.error),
+          SnackBar(
+            content: Text('Failed: $e'),
+            backgroundColor: BrandColors.error,
+          ),
         );
       }
     }
@@ -190,7 +259,11 @@ class _BasketCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onAlert;
 
-  const _BasketCard({required this.basket, required this.onDelete, required this.onAlert});
+  const _BasketCard({
+    required this.basket,
+    required this.onDelete,
+    required this.onAlert,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -223,42 +296,69 @@ class _BasketCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(basket.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 16,
-                                color: isExpired ? BrandColors.muted : BrandColors.ink,
-                              )),
+                          Text(
+                            basket.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                              color: isExpired
+                                  ? BrandColors.muted
+                                  : BrandColors.ink,
+                            ),
+                          ),
                           if (isExpired) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: BrandColors.error.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Text('Expired', style: TextStyle(fontSize: 10, color: BrandColors.error, fontWeight: FontWeight.w700)),
+                              child: const Text(
+                                'Expired',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: BrandColors.error,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ],
                         ],
                       ),
                       if (basket.description != null) ...[
                         const SizedBox(height: 3),
-                        Text(basket.description!, style: const TextStyle(fontSize: 13, color: BrandColors.muted)),
+                        Text(
+                          basket.description!,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: BrandColors.muted,
+                          ),
+                        ),
                       ],
                     ],
                   ),
                 ),
                 if (basket.price != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: BrandColors.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '₹${basket.price!.toStringAsFixed(0)}',
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: BrandColors.primary),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        color: BrandColors.primary,
+                      ),
                     ),
                   ),
               ],
@@ -269,18 +369,29 @@ class _BasketCard extends StatelessWidget {
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
-                children: basket.items.map((item) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: BrandColors.surfaceTint,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: BrandColors.border),
-                  ),
-                  child: Text(
-                    '${item.productName ?? "Item"} × ${item.qty.toStringAsFixed(item.qty == item.qty.roundToDouble() ? 0 : 1)}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: BrandColors.ink),
-                  ),
-                )).toList(),
+                children: basket.items
+                    .map(
+                      (item) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: BrandColors.surfaceTint,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: BrandColors.border),
+                        ),
+                        child: Text(
+                          '${item.productName ?? "Item"} × ${item.qty.toStringAsFixed(item.qty == item.qty.roundToDouble() ? 0 : 1)}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: BrandColors.ink,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
 
@@ -288,14 +399,21 @@ class _BasketCard extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  const Icon(Icons.calendar_today_rounded, size: 13, color: BrandColors.muted),
+                  const Icon(
+                    Icons.calendar_today_rounded,
+                    size: 13,
+                    color: BrandColors.muted,
+                  ),
                   const SizedBox(width: 5),
                   Text(
                     [
                       if (basket.validFrom != null) 'From ${basket.validFrom}',
                       if (basket.validTo != null) 'To ${basket.validTo}',
                     ].join('  ·  '),
-                    style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
                   ),
                 ],
               ),
@@ -308,7 +426,10 @@ class _BasketCard extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: isExpired ? null : onAlert,
                     icon: const Icon(Icons.message_rounded, size: 16),
-                    label: const Text('Alert Customers', style: TextStyle(fontSize: 13)),
+                    label: const Text(
+                      'Alert Customers',
+                      style: TextStyle(fontSize: 13),
+                    ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF25D366),
                       side: const BorderSide(color: Color(0xFF25D366)),
@@ -319,10 +440,16 @@ class _BasketCard extends StatelessWidget {
                 const SizedBox(width: 10),
                 IconButton(
                   onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outline_rounded, color: BrandColors.error, size: 20),
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    color: BrandColors.error,
+                    size: 20,
+                  ),
                   style: IconButton.styleFrom(
                     backgroundColor: BrandColors.error.withValues(alpha: 0.06),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ],
@@ -361,14 +488,14 @@ class _CreateBasketSheet extends ConsumerStatefulWidget {
 }
 
 class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
-  final _nameCtrl  = TextEditingController();
-  final _descCtrl  = TextEditingController();
+  final _nameCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
   final _priceCtrl = TextEditingController();
-  final _items     = <_SelectedItem>[];
+  final _items = <_SelectedItem>[];
 
   String? _validFrom;
   String? _validTo;
-  bool    _saving = false;
+  bool _saving = false;
   String? _error;
 
   @override
@@ -376,7 +503,9 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
     _nameCtrl.dispose();
     _descCtrl.dispose();
     _priceCtrl.dispose();
-    for (final i in _items) { i.dispose(); }
+    for (final i in _items) {
+      i.dispose();
+    }
     super.dispose();
   }
 
@@ -389,9 +518,13 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
       lastDate: now.add(const Duration(days: 365)),
     );
     if (picked == null || !mounted) return;
-    final label = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+    final label =
+        '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
     setState(() {
-      if (isFrom) _validFrom = label; else _validTo = label;
+      if (isFrom)
+        _validFrom = label;
+      else
+        _validTo = label;
     });
   }
 
@@ -399,16 +532,22 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
     final products = ref.read(posProvider).products;
     if (products.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No products in inventory. Please sync POS first.')),
+        const SnackBar(
+          content: Text('No products in inventory. Please sync POS first.'),
+        ),
       );
       return;
     }
     final alreadyAdded = _items.map((i) => i.productId).toSet();
-    final available = products.where((p) => !alreadyAdded.contains(p.productId)).toList();
+    final available = products
+        .where((p) => !alreadyAdded.contains(p.productId))
+        .toList();
 
     if (available.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('All products already added to this basket')),
+        const SnackBar(
+          content: Text('All products already added to this basket'),
+        ),
       );
       return;
     }
@@ -422,11 +561,13 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
 
     if (picked == null || !mounted) return;
     setState(() {
-      _items.add(_SelectedItem(
-        productId: picked.productId,
-        productName: picked.displayName,
-        price: picked.price,
-      ));
+      _items.add(
+        _SelectedItem(
+          productId: picked.productId,
+          productName: picked.displayName,
+          price: picked.price,
+        ),
+      );
     });
   }
 
@@ -439,26 +580,41 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
       setState(() => _error = 'Add at least one product from inventory');
       return;
     }
-    setState(() { _saving = true; _error = null; });
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
 
-    final items = _items.map((i) => {
-      'product_id': i.productId,
-      'product_name': i.productName,
-      'qty': double.tryParse(i.qtyCtrl.text) ?? 1.0,
-    }).toList();
+    final items = _items
+        .map(
+          (i) => {
+            'product_id': i.productId,
+            'product_name': i.productName,
+            'qty': double.tryParse(i.qtyCtrl.text) ?? 1.0,
+          },
+        )
+        .toList();
 
     try {
       await ref.read(basketProvider.notifier).createBasket({
         'name': _nameCtrl.text.trim(),
-        'description': _descCtrl.text.trim().isNotEmpty ? _descCtrl.text.trim() : null,
-        'price': _priceCtrl.text.isNotEmpty ? double.tryParse(_priceCtrl.text) : null,
+        'description': _descCtrl.text.trim().isNotEmpty
+            ? _descCtrl.text.trim()
+            : null,
+        'price': _priceCtrl.text.isNotEmpty
+            ? double.tryParse(_priceCtrl.text)
+            : null,
         'valid_from': _validFrom,
         'valid_to': _validTo,
         'items': items,
       });
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      if (mounted) setState(() { _saving = false; _error = e.toString(); });
+      if (mounted)
+        setState(() {
+          _saving = false;
+          _error = e.toString();
+        });
     }
   }
 
@@ -476,27 +632,56 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('New Basket', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                  const Text(
+                    'New Basket',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                  ),
                   TextButton(
                     onPressed: _saving ? null : _save,
                     child: _saving
-                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Text('Save', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text(
+                            'Save',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15,
+                            ),
+                          ),
                   ),
                 ],
               ),
             ),
             if (_error != null)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                child: Text(_error!, style: const TextStyle(color: BrandColors.error, fontSize: 13)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 4,
+                ),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(
+                    color: BrandColors.error,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             const Divider(height: 1),
             Expanded(
@@ -508,7 +693,10 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                   TextField(
                     controller: _nameCtrl,
                     enabled: !_saving,
-                    decoration: const InputDecoration(labelText: 'Basket Name *', hintText: 'e.g. Breakfast Bundle'),
+                    decoration: const InputDecoration(
+                      labelText: 'Basket Name *',
+                      hintText: 'e.g. Breakfast Bundle',
+                    ),
                   ),
                   const SizedBox(height: 14),
                   // Description
@@ -516,21 +704,41 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                     controller: _descCtrl,
                     enabled: !_saving,
                     maxLines: 2,
-                    decoration: const InputDecoration(labelText: 'Description (optional)', hintText: 'e.g. Milk + Bread + Eggs'),
+                    decoration: const InputDecoration(
+                      labelText: 'Description (optional)',
+                      hintText: 'e.g. Milk + Bread + Eggs',
+                    ),
                   ),
                   const SizedBox(height: 14),
                   // Bundle price
                   TextField(
                     controller: _priceCtrl,
                     enabled: !_saving,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
-                    decoration: const InputDecoration(labelText: 'Bundle Price (optional)', prefixText: '₹ '),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
+                    ],
+                    decoration: const InputDecoration(
+                      labelText: 'Bundle Price (optional)',
+                      prefixText: '₹ ',
+                    ),
                   ),
                   const SizedBox(height: 20),
 
                   // Validity dates
-                  const Text('VALIDITY', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: BrandColors.muted, letterSpacing: 1.2)),
+                  const Text(
+                    'VALIDITY',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11,
+                      color: BrandColors.muted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -538,36 +746,72 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                         child: GestureDetector(
                           onTap: _saving ? null : () => _pickDate(isFrom: true),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 13,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: BrandColors.border),
                             ),
-                            child: Row(children: [
-                              const Icon(Icons.calendar_today_rounded, size: 16, color: BrandColors.muted),
-                              const SizedBox(width: 8),
-                              Text(_validFrom ?? 'From date', style: TextStyle(fontSize: 13, color: _validFrom != null ? BrandColors.ink : BrandColors.muted)),
-                            ]),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today_rounded,
+                                  size: 16,
+                                  color: BrandColors.muted,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _validFrom ?? 'From date',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: _validFrom != null
+                                        ? BrandColors.ink
+                                        : BrandColors.muted,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: GestureDetector(
-                          onTap: _saving ? null : () => _pickDate(isFrom: false),
+                          onTap: _saving
+                              ? null
+                              : () => _pickDate(isFrom: false),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 13,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: BrandColors.border),
                             ),
-                            child: Row(children: [
-                              const Icon(Icons.event_rounded, size: 16, color: BrandColors.muted),
-                              const SizedBox(width: 8),
-                              Text(_validTo ?? 'To date', style: TextStyle(fontSize: 13, color: _validTo != null ? BrandColors.ink : BrandColors.muted)),
-                            ]),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.event_rounded,
+                                  size: 16,
+                                  color: BrandColors.muted,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _validTo ?? 'To date',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: _validTo != null
+                                        ? BrandColors.ink
+                                        : BrandColors.muted,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -579,12 +823,22 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('PRODUCTS', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: BrandColors.muted, letterSpacing: 1.2)),
+                      const Text(
+                        'PRODUCTS',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11,
+                          color: BrandColors.muted,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                       TextButton.icon(
                         onPressed: _saving ? null : _showProductPicker,
                         icon: const Icon(Icons.add_rounded, size: 16),
                         label: const Text('Add Product'),
-                        style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                        ),
                       ),
                     ],
                   ),
@@ -603,9 +857,19 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_shopping_cart_rounded, color: BrandColors.muted, size: 20),
+                            Icon(
+                              Icons.add_shopping_cart_rounded,
+                              color: BrandColors.muted,
+                              size: 20,
+                            ),
                             SizedBox(width: 8),
-                            Text('Tap to pick products from your inventory', style: TextStyle(color: BrandColors.muted, fontSize: 13)),
+                            Text(
+                              'Tap to pick products from your inventory',
+                              style: TextStyle(
+                                color: BrandColors.muted,
+                                fontSize: 13,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -613,7 +877,10 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                   else
                     for (int i = 0; i < _items.length; i++) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -627,13 +894,20 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                                 children: [
                                   Text(
                                     _items[i].productName,
-                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: BrandColors.ink),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                      color: BrandColors.ink,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
                                     '₹${_items[i].price.toStringAsFixed(0)} / unit',
-                                    style: const TextStyle(fontSize: 11, color: BrandColors.muted),
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: BrandColors.muted,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -644,19 +918,35 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                               child: TextField(
                                 controller: _items[i].qtyCtrl,
                                 enabled: !_saving,
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,1}'))],
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,1}'),
+                                  ),
+                                ],
                                 textAlign: TextAlign.center,
-                                decoration: const InputDecoration(labelText: 'Qty', isDense: true),
+                                decoration: const InputDecoration(
+                                  labelText: 'Qty',
+                                  isDense: true,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 4),
                             IconButton(
-                              onPressed: _saving ? null : () => setState(() {
-                                _items[i].dispose();
-                                _items.removeAt(i);
-                              }),
-                              icon: const Icon(Icons.remove_circle_outline_rounded, color: BrandColors.error, size: 20),
+                              onPressed: _saving
+                                  ? null
+                                  : () => setState(() {
+                                      _items[i].dispose();
+                                      _items.removeAt(i);
+                                    }),
+                              icon: const Icon(
+                                Icons.remove_circle_outline_rounded,
+                                color: BrandColors.error,
+                                size: 20,
+                              ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                             ),
@@ -669,7 +959,11 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                   const SizedBox(height: 20),
                   SizedBox(
                     height: 52,
-                    child: LoadingButton(label: 'Create Basket', isLoading: _saving, onPressed: _saving ? null : _save),
+                    child: LoadingButton(
+                      label: 'Create Basket',
+                      isLoading: _saving,
+                      onPressed: _saving ? null : _save,
+                    ),
                   ),
                   const SizedBox(height: 32),
                 ],
@@ -723,14 +1017,26 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Select Product', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900)),
+                  Text(
+                    'Select Product',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _searchCtrl,
@@ -738,15 +1044,28 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       hintText: 'Search products...',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 20, color: BrandColors.muted),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: BrandColors.muted,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       suffixIcon: _query.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear_rounded, size: 18),
-                              onPressed: () { _searchCtrl.clear(); setState(() => _query = ''); },
+                              onPressed: () {
+                                _searchCtrl.clear();
+                                setState(() => _query = '');
+                              },
                             )
                           : null,
                     ),
@@ -757,7 +1076,12 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(child: Text('No products found', style: TextStyle(color: BrandColors.muted)))
+                  ? const Center(
+                      child: Text(
+                        'No products found',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    )
                   : ListView.builder(
                       controller: scrollCtrl,
                       padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -765,20 +1089,44 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
                       itemBuilder: (_, i) {
                         final p = filtered[i];
                         return ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          title: Text(p.displayName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          title: Text(
+                            p.displayName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
                           subtitle: Text(
                             '${p.priceLabel} · Stock: ${p.stockLabel}',
-                            style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: BrandColors.muted,
+                            ),
                           ),
                           trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
                             decoration: BoxDecoration(
                               color: BrandColors.primary,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Text('Add', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
+                            child: const Text(
+                              'Add',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
                           ),
                           onTap: () => Navigator.pop(context, p),
                         );

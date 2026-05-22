@@ -10,19 +10,22 @@ class IntelligenceDetailScreen extends ConsumerStatefulWidget {
   const IntelligenceDetailScreen({super.key, required this.type});
 
   @override
-  ConsumerState<IntelligenceDetailScreen> createState() => _IntelligenceDetailScreenState();
+  ConsumerState<IntelligenceDetailScreen> createState() =>
+      _IntelligenceDetailScreenState();
 }
 
-class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScreen> {
+class _IntelligenceDetailScreenState
+    extends ConsumerState<IntelligenceDetailScreen> {
   String _searchQuery = '';
 
   String get _title {
     return {
-      'stockout': 'Stockout Risk',
-      'reorder': 'Reorder Required',
-      'fast_moving': 'Fast Moving Items',
-      'profit': 'High Profit Items',
-    }[widget.type] ?? 'Intelligence Detail';
+          'stockout': 'Stockout Risk',
+          'reorder': 'Reorder Required',
+          'fast_moving': 'Fast Moving Items',
+          'profit': 'High Profit Items',
+        }[widget.type] ??
+        'Intelligence Detail';
   }
 
   @override
@@ -34,7 +37,10 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: Text(_title, style: const TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(
+          _title,
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
         backgroundColor: Colors.white,
         foregroundColor: BrandColors.ink,
         elevation: 0,
@@ -47,13 +53,21 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, _) => _ErrorView(
                 message: err.toString(),
-                onRetry: () => ref.invalidate(intelligenceProvider(widget.type)),
+                onRetry: () =>
+                    ref.invalidate(intelligenceProvider(widget.type)),
               ),
               data: (items) {
-                final filtered = items.where((i) => 
-                  i.productName.toLowerCase().contains(_searchQuery.toLowerCase().trim()) ||
-                  i.categoryName.toLowerCase().contains(_searchQuery.toLowerCase().trim())
-                ).toList();
+                final filtered = items
+                    .where(
+                      (i) =>
+                          i.productName.toLowerCase().contains(
+                            _searchQuery.toLowerCase().trim(),
+                          ) ||
+                          i.categoryName.toLowerCase().contains(
+                            _searchQuery.toLowerCase().trim(),
+                          ),
+                    )
+                    .toList();
 
                 if (filtered.isEmpty) {
                   return _EmptyView(
@@ -63,12 +77,14 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
                 }
 
                 return RefreshIndicator(
-                  onRefresh: () async => ref.invalidate(intelligenceProvider(widget.type)),
+                  onRefresh: () async =>
+                      ref.invalidate(intelligenceProvider(widget.type)),
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: filtered.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) => _RecommendationTile(item: filtered[index]),
+                    itemBuilder: (context, index) =>
+                        _RecommendationTile(item: filtered[index]),
                   ),
                 );
               },
@@ -102,13 +118,22 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
           const SizedBox(height: 12),
           Row(
             children: [
-              const Text('Sort by:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: BrandColors.muted)),
+              const Text(
+                'Sort by:',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: BrandColors.muted,
+                ),
+              ),
               const SizedBox(width: 8),
               _FilterChip(
                 label: 'Profit',
                 selected: sortBy == 'expected_profit',
                 onSelected: (s) {
-                  ref.read(intelligenceSortProvider.notifier).setSort(widget.type, 'expected_profit');
+                  ref
+                      .read(intelligenceSortProvider.notifier)
+                      .setSort(widget.type, 'expected_profit');
                 },
               ),
               const SizedBox(width: 6),
@@ -116,7 +141,9 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
                 label: 'Demand',
                 selected: sortBy == 'forecast_demand',
                 onSelected: (s) {
-                  ref.read(intelligenceSortProvider.notifier).setSort(widget.type, 'forecast_demand');
+                  ref
+                      .read(intelligenceSortProvider.notifier)
+                      .setSort(widget.type, 'forecast_demand');
                 },
               ),
               if (widget.type == 'stockout' || widget.type == 'reorder') ...[
@@ -125,7 +152,9 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
                   label: 'Risk',
                   selected: sortBy == 'stockout_probability',
                   onSelected: (s) {
-                    ref.read(intelligenceSortProvider.notifier).setSort(widget.type, 'stockout_probability');
+                    ref
+                        .read(intelligenceSortProvider.notifier)
+                        .setSort(widget.type, 'stockout_probability');
                   },
                 ),
               ],
@@ -144,8 +173,8 @@ class _RecommendationTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final color = _getColor(item.type);
-    final days  = item.daysToStockout;
-    final prob  = item.stockoutProbability;
+    final days = item.daysToStockout;
+    final prob = item.stockoutProbability;
     final reorder = item.reorderQty;
     final isUrgent = item.type == 'stockout_risk' || item.type == 'reorder_now';
 
@@ -164,32 +193,56 @@ class _RecommendationTile extends ConsumerWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     item.priority.toUpperCase(),
-                    style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
                 const Spacer(),
                 if (item.currentStock != null)
                   Text(
                     'Stock: ${item.currentStock!.toStringAsFixed(0)}',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: BrandColors.muted),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: BrandColors.muted,
+                    ),
                   ),
               ],
             ),
             const SizedBox(height: 12),
 
             // ── Product name + category ──────────────────────────────────────
-            Text(item.productName,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+            Text(
+              item.productName,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(height: 3),
-            Text(item.categoryName,
-                style: const TextStyle(fontSize: 13, color: BrandColors.muted, fontWeight: FontWeight.w500)),
+            Text(
+              item.categoryName,
+              style: const TextStyle(
+                fontSize: 13,
+                color: BrandColors.muted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
 
             // ── Stockout timeline bar ────────────────────────────────────────
             if (days != null && days < 60) ...[
@@ -203,12 +256,27 @@ class _RecommendationTile extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Stock runway',
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
                             Text(
-                              days <= 0 ? 'OUT OF STOCK' : '~${days.toStringAsFixed(0)} days left',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800,
-                                  color: days <= 3 ? BrandColors.error : days <= 7 ? Colors.orange : BrandColors.success),
+                              'Stock runway',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: color,
+                              ),
+                            ),
+                            Text(
+                              days <= 0
+                                  ? 'OUT OF STOCK'
+                                  : '~${days.toStringAsFixed(0)} days left',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: days <= 3
+                                    ? BrandColors.error
+                                    : days <= 7
+                                    ? Colors.orange
+                                    : BrandColors.success,
+                              ),
                             ),
                           ],
                         ),
@@ -218,7 +286,11 @@ class _RecommendationTile extends ConsumerWidget {
                           child: LinearProgressIndicator(
                             value: (days / 30).clamp(0.0, 1.0),
                             backgroundColor: BrandColors.border,
-                            color: days <= 3 ? BrandColors.error : days <= 7 ? Colors.orange : BrandColors.success,
+                            color: days <= 3
+                                ? BrandColors.error
+                                : days <= 7
+                                ? Colors.orange
+                                : BrandColors.success,
                             minHeight: 6,
                           ),
                         ),
@@ -238,7 +310,11 @@ class _RecommendationTile extends ConsumerWidget {
                     _StatChip(
                       label: 'Stockout risk',
                       value: '${(prob * 100).toStringAsFixed(0)}%',
-                      color: prob >= 0.7 ? BrandColors.error : prob >= 0.4 ? Colors.orange : BrandColors.success,
+                      color: prob >= 0.7
+                          ? BrandColors.error
+                          : prob >= 0.4
+                          ? Colors.orange
+                          : BrandColors.success,
                     ),
                     const SizedBox(width: 8),
                   ],
@@ -257,18 +333,33 @@ class _RecommendationTile extends ConsumerWidget {
             const SizedBox(height: 12),
 
             // ── Message ──────────────────────────────────────────────────────
-            Text(item.message,
-                style: const TextStyle(fontSize: 13, color: BrandColors.ink, height: 1.4)),
+            Text(
+              item.message,
+              style: const TextStyle(
+                fontSize: 13,
+                color: BrandColors.ink,
+                height: 1.4,
+              ),
+            ),
 
-            if (item.expectedProfitImpact != null && item.expectedProfitImpact! > 0) ...[
+            if (item.expectedProfitImpact != null &&
+                item.expectedProfitImpact! > 0) ...[
               const SizedBox(height: 10),
               Row(
                 children: [
-                  const Icon(Icons.trending_up_rounded, size: 16, color: BrandColors.success),
+                  const Icon(
+                    Icons.trending_up_rounded,
+                    size: 16,
+                    color: BrandColors.success,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     '₹${item.expectedProfitImpact!.toStringAsFixed(0)} estimated weekly profit impact',
-                    style: const TextStyle(fontSize: 12, color: BrandColors.success, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.success,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -286,12 +377,24 @@ class _RecommendationTile extends ConsumerWidget {
                     ref.read(dashboardTabProvider.notifier).switchTab(2);
                     ref.read(dashboardSubTabProvider.notifier).setSubTab(2);
                   },
-                  icon: Icon(Icons.add_shopping_cart_rounded, size: 16, color: color),
-                  label: Text('Create Purchase Order · ${reorder.toStringAsFixed(0)} units',
-                      style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13)),
+                  icon: Icon(
+                    Icons.add_shopping_cart_rounded,
+                    size: 16,
+                    color: color,
+                  ),
+                  label: Text(
+                    'Create Purchase Order · ${reorder.toStringAsFixed(0)} units',
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: color.withValues(alpha: 0.4)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
@@ -305,11 +408,16 @@ class _RecommendationTile extends ConsumerWidget {
 
   Color _getColor(String type) {
     switch (type) {
-      case 'stockout_risk':     return BrandColors.error;
-      case 'reorder_now':       return BrandColors.accent;
-      case 'fast_moving':       return BrandColors.success;
-      case 'profit_opportunity':return BrandColors.primary;
-      default:                  return BrandColors.muted;
+      case 'stockout_risk':
+        return BrandColors.error;
+      case 'reorder_now':
+        return BrandColors.accent;
+      case 'fast_moving':
+        return BrandColors.success;
+      case 'profit_opportunity':
+        return BrandColors.primary;
+      default:
+        return BrandColors.muted;
     }
   }
 }
@@ -318,7 +426,11 @@ class _StatChip extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _StatChip({required this.label, required this.value, required this.color});
+  const _StatChip({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -333,8 +445,22 @@ class _StatChip extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.w600)),
-          Text(value,  style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.w900)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 9,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              color: color,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ],
       ),
     );
@@ -352,11 +478,18 @@ class _EmptyView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off_rounded, size: 48, color: BrandColors.muted.withValues(alpha: 0.3)),
+          Icon(
+            Icons.search_off_rounded,
+            size: 48,
+            color: BrandColors.muted.withValues(alpha: 0.3),
+          ),
           const SizedBox(height: 16),
           Text(
             query.isEmpty ? 'No items found' : 'No results for "$query"',
-            style: const TextStyle(fontWeight: FontWeight.w700, color: BrandColors.muted),
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: BrandColors.muted,
+            ),
           ),
           if (query.isNotEmpty)
             TextButton(onPressed: onClear, child: const Text('Clear search')),
@@ -379,11 +512,22 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off_rounded, size: 48, color: BrandColors.muted),
+            const Icon(
+              Icons.cloud_off_rounded,
+              size: 48,
+              color: BrandColors.muted,
+            ),
             const SizedBox(height: 16),
-            const Text('Connection Error', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+            const Text(
+              'Connection Error',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+            ),
             const SizedBox(height: 8),
-            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: BrandColors.muted)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: BrandColors.muted),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
           ],
@@ -398,7 +542,11 @@ class _FilterChip extends StatelessWidget {
   final bool selected;
   final ValueChanged<bool> onSelected;
 
-  const _FilterChip({required this.label, required this.selected, required this.onSelected});
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -413,7 +561,10 @@ class _FilterChip extends StatelessWidget {
         fontSize: 11,
       ),
       backgroundColor: BrandColors.surfaceTint,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide.none),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide.none,
+      ),
       showCheckmark: false,
       visualDensity: VisualDensity.compact,
     );

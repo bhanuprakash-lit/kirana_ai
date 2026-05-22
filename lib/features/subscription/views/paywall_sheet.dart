@@ -71,7 +71,11 @@ class _PaywallSheet extends StatelessWidget {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.workspace_premium_rounded, size: 14, color: Colors.white),
+                Icon(
+                  Icons.workspace_premium_rounded,
+                  size: 14,
+                  color: Colors.white,
+                ),
                 SizedBox(width: 6),
                 Text(
                   'PRO FEATURE',
@@ -129,7 +133,9 @@ class _PaywallSheet extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF7C3AED).withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.15)),
+              border: Border.all(
+                color: const Color(0xFF7C3AED).withValues(alpha: 0.15),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,26 +149,31 @@ class _PaywallSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                ..._proFeatures.map((f) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.check_circle_rounded,
-                          size: 16, color: Color(0xFF7C3AED)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          f,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: BrandColors.ink,
-                            fontWeight: FontWeight.w500,
+                ..._proFeatures.map(
+                  (f) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          size: 16,
+                          color: Color(0xFF7C3AED),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            f,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: BrandColors.ink,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                )),
+                ),
               ],
             ),
           ).animate().fadeIn(delay: 200.ms),
@@ -178,7 +189,8 @@ class _PaywallSheet extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   child: const Text('Not Now'),
                 ),
@@ -196,7 +208,8 @@ class _PaywallSheet extends StatelessWidget {
                     backgroundColor: const Color(0xFF7C3AED),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   child: const Text(
                     'Upgrade to Pro  ₹500/mo · just ₹17/day',

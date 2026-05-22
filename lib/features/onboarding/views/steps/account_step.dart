@@ -118,8 +118,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
 
   Future<void> _autoVerify(PhoneAuthCredential cred) async {
     try {
-      final userCred =
-          await FirebaseAuth.instance.signInWithCredential(cred);
+      final userCred = await FirebaseAuth.instance.signInWithCredential(cred);
       await _handleVerified(userCred);
     } catch (_) {}
   }
@@ -196,8 +195,9 @@ class _AccountStepState extends ConsumerState<AccountStep> {
     await Future.delayed(const Duration(milliseconds: 500));
     if (_lastCheck != now || !mounted) return;
     setState(() => _checkingUsername = true);
-    final available =
-        await ref.read(authRepositoryProvider).checkUsernameAvailable(uname);
+    final available = await ref
+        .read(authRepositoryProvider)
+        .checkUsernameAvailable(uname);
     if (!mounted) return;
     setState(() {
       _checkingUsername = false;
@@ -227,7 +227,10 @@ class _AccountStepState extends ConsumerState<AccountStep> {
 
     final notifier = ref.read(onboardingProvider.notifier);
     notifier.updateData(
-      ref.read(onboardingProvider).data.copyWith(
+      ref
+          .read(onboardingProvider)
+          .data
+          .copyWith(
             phoneNumber: _verifiedPhone ?? '',
             firebaseUid: _verifiedFirebaseUid ?? '',
             username: uname,
@@ -269,16 +272,15 @@ class _AccountStepState extends ConsumerState<AccountStep> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Verify your\nphone number',
-                style: Theme.of(context).textTheme.headlineMedium)
-            .animate()
-            .fadeIn(duration: 400.ms)
-            .slideY(begin: 0.2, end: 0),
+        Text(
+          'Verify your\nphone number',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 8),
-        Text('We\'ll send a one-time password to confirm your number.',
-                style: Theme.of(context).textTheme.bodyMedium)
-            .animate(delay: 50.ms)
-            .fadeIn(),
+        Text(
+          'We\'ll send a one-time password to confirm your number.',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ).animate(delay: 50.ms).fadeIn(),
         const SizedBox(height: 32),
         BrandTextField(
           controller: _phoneCtrl,
@@ -289,9 +291,13 @@ class _AccountStepState extends ConsumerState<AccountStep> {
           autofillHints: const [],
           prefix: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Text('+91',
-                style: TextStyle(
-                    fontWeight: FontWeight.w700, color: BrandColors.ink)),
+            child: Text(
+              '+91',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: BrandColors.ink,
+              ),
+            ),
           ),
         ).animate(delay: 100.ms).fadeIn().slideY(begin: 0.1, end: 0),
         if (_error != null) ...[
@@ -320,31 +326,35 @@ class _AccountStepState extends ConsumerState<AccountStep> {
                 _otpCtrl.clear();
                 _error = null;
               }),
-              child: const Icon(Icons.arrow_back_rounded,
-                  size: 20, color: BrandColors.muted),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                size: 20,
+                color: BrandColors.muted,
+              ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'OTP sent to +91 ${_phoneCtrl.text.trim()}',
                 style: const TextStyle(
-                    fontSize: 13,
-                    color: BrandColors.muted,
-                    fontWeight: FontWeight.w500),
+                  fontSize: 13,
+                  color: BrandColors.muted,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 20),
-        Text('Enter OTP',
-                style: Theme.of(context).textTheme.headlineMedium)
-            .animate()
-            .fadeIn(duration: 300.ms),
+        Text(
+          'Enter OTP',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ).animate().fadeIn(duration: 300.ms),
         const SizedBox(height: 8),
-        Text('6-digit code sent to your phone.',
-                style: Theme.of(context).textTheme.bodyMedium)
-            .animate(delay: 50.ms)
-            .fadeIn(),
+        Text(
+          '6-digit code sent to your phone.',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ).animate(delay: 50.ms).fadeIn(),
         const SizedBox(height: 28),
         BrandTextField(
           controller: _otpCtrl,
@@ -371,9 +381,13 @@ class _AccountStepState extends ConsumerState<AccountStep> {
         Center(
           child: TextButton(
             onPressed: _loading ? null : _sendOtp,
-            child: const Text('Resend OTP',
-                style: TextStyle(
-                    color: BrandColors.primary, fontWeight: FontWeight.w700)),
+            child: const Text(
+              'Resend OTP',
+              style: TextStyle(
+                color: BrandColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
       ],
@@ -391,29 +405,33 @@ class _AccountStepState extends ConsumerState<AccountStep> {
               color: BrandColors.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: BrandColors.success.withValues(alpha: 0.3)),
+                color: BrandColors.success.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle_rounded,
-                    size: 16, color: BrandColors.success),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  size: 16,
+                  color: BrandColors.success,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Phone verified: $_verifiedPhone',
                   style: const TextStyle(
-                      fontSize: 13,
-                      color: BrandColors.success,
-                      fontWeight: FontWeight.w700),
+                    fontSize: 13,
+                    color: BrandColors.success,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
           ).animate().fadeIn(duration: 300.ms),
         const SizedBox(height: 20),
-        Text('Choose a\nstore username',
-                style: Theme.of(context).textTheme.headlineMedium)
-            .animate()
-            .fadeIn(duration: 400.ms)
-            .slideY(begin: 0.2, end: 0),
+        Text(
+          'Choose a\nstore username',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 8),
         Text(
           'Your username is unique to your store and used to log in.',
@@ -436,12 +454,18 @@ class _AccountStepState extends ConsumerState<AccountStep> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : _usernameAvailable == true
-                  ? const Icon(Icons.check_circle_rounded,
-                      color: BrandColors.success, size: 20)
-                  : _usernameAvailable == false
-                      ? const Icon(Icons.cancel_rounded,
-                          color: BrandColors.error, size: 20)
-                      : null,
+              ? const Icon(
+                  Icons.check_circle_rounded,
+                  color: BrandColors.success,
+                  size: 20,
+                )
+              : _usernameAvailable == false
+              ? const Icon(
+                  Icons.cancel_rounded,
+                  color: BrandColors.error,
+                  size: 20,
+                )
+              : null,
         ).animate(delay: 100.ms).fadeIn().slideY(begin: 0.1, end: 0),
 
         if (_usernameAvailable == false)
@@ -491,15 +515,21 @@ class _ErrorBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline_rounded,
-              color: BrandColors.error, size: 16),
+          const Icon(
+            Icons.error_outline_rounded,
+            color: BrandColors.error,
+            size: 16,
+          ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(message,
-                style: const TextStyle(
-                    fontSize: 13,
-                    color: BrandColors.error,
-                    fontWeight: FontWeight.w500)),
+            child: Text(
+              message,
+              style: const TextStyle(
+                fontSize: 13,
+                color: BrandColors.error,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),

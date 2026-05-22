@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
 
-final _adminActivityProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  final client = ref.read(apiClientProvider);
-  final res = await client.get('/kirana/admin/user-activity') as Map<String, dynamic>;
-  return (res['users'] as List).cast<Map<String, dynamic>>();
-});
+final _adminActivityProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+      final client = ref.read(apiClientProvider);
+      final res =
+          await client.get('/kirana/admin/user-activity')
+              as Map<String, dynamic>;
+      return (res['users'] as List).cast<Map<String, dynamic>>();
+    });
 
 class AdminActivityScreen extends ConsumerWidget {
   const AdminActivityScreen({super.key});
@@ -20,7 +23,10 @@ class AdminActivityScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('User Activity', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'User Activity',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -34,7 +40,10 @@ class AdminActivityScreen extends ConsumerWidget {
         data: (users) {
           if (users.isEmpty) {
             return const Center(
-              child: Text('No users found', style: TextStyle(color: BrandColors.muted)),
+              child: Text(
+                'No users found',
+                style: TextStyle(color: BrandColors.muted),
+              ),
             );
           }
           return ListView.builder(
@@ -54,7 +63,8 @@ class _UserActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fullName = data['full_name'] as String? ?? data['username'] as String? ?? '—';
+    final fullName =
+        data['full_name'] as String? ?? data['username'] as String? ?? '—';
     final storeName = data['store_name'] as String? ?? 'No store';
     final lastSeen = data['last_seen'] as String?;
     // total_sessions kept for future use
@@ -64,8 +74,12 @@ class _UserActivityCard extends StatelessWidget {
     final salesToday = data['sales_today'] as int? ?? 0;
     final foregroundSec = data['foreground_sec_today'] as int? ?? 0;
 
-    final lastSeenDt = lastSeen != null ? DateTime.tryParse(lastSeen)?.toLocal() : null;
-    final lastSeenLabel = lastSeenDt != null ? _formatRelative(lastSeenDt) : 'Never';
+    final lastSeenDt = lastSeen != null
+        ? DateTime.tryParse(lastSeen)?.toLocal()
+        : null;
+    final lastSeenLabel = lastSeenDt != null
+        ? _formatRelative(lastSeenDt)
+        : 'Never';
     final openedToday = opensToday > 0;
     final madeSalesToday = salesToday > 0;
 
@@ -96,7 +110,9 @@ class _UserActivityCard extends StatelessWidget {
                 child: Text(
                   fullName.isNotEmpty ? fullName[0].toUpperCase() : '?',
                   style: TextStyle(
-                    color: openedToday ? BrandColors.primary : BrandColors.muted,
+                    color: openedToday
+                        ? BrandColors.primary
+                        : BrandColors.muted,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -106,12 +122,20 @@ class _UserActivityCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(fullName,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 15)),
-                    Text(storeName,
-                        style: const TextStyle(
-                            fontSize: 12, color: BrandColors.muted)),
+                    Text(
+                      fullName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      storeName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -196,19 +220,25 @@ class _StatBox extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon,
-                size: 16,
-                color: highlight ? BrandColors.primary : BrandColors.muted),
+            Icon(
+              icon,
+              size: 16,
+              color: highlight ? BrandColors.primary : BrandColors.muted,
+            ),
             const SizedBox(height: 4),
-            Text(value,
-                style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 13,
-                  color: highlight ? BrandColors.primary : BrandColors.ink,
-                )),
-            Text(label,
-                style: const TextStyle(fontSize: 9, color: BrandColors.muted),
-                textAlign: TextAlign.center),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+                color: highlight ? BrandColors.primary : BrandColors.ink,
+              ),
+            ),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 9, color: BrandColors.muted),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -232,9 +262,10 @@ class _Chip extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            color: color),
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
       ),
     );
   }

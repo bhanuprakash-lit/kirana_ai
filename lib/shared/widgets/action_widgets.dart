@@ -24,7 +24,9 @@ class LoadingButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: color ?? BrandColors.primary,
         foregroundColor: Colors.white,
-        disabledBackgroundColor: (color ?? BrandColors.primary).withValues(alpha: 0.6),
+        disabledBackgroundColor: (color ?? BrandColors.primary).withValues(
+          alpha: 0.6,
+        ),
       ),
       child: isLoading
           ? const SizedBox(
@@ -79,12 +81,19 @@ class ActionStatusOverlay extends StatelessWidget {
             const SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: BrandColors.primary),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: BrandColors.primary,
+              ),
             ),
             const SizedBox(width: 12),
             const Text(
               'Saving changes...',
-              style: TextStyle(color: BrandColors.primary, fontWeight: FontWeight.w600, fontSize: 13),
+              style: TextStyle(
+                color: BrandColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -100,18 +109,32 @@ class ActionStatusOverlay extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.error_outline_rounded, color: BrandColors.error, size: 18),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: BrandColors.error,
+              size: 18,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 error!,
-                style: const TextStyle(color: BrandColors.error, fontSize: 13, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  color: BrandColors.error,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             if (onRetry != null)
               TextButton(
                 onPressed: onRetry,
-                child: const Text('Retry', style: TextStyle(color: BrandColors.error, fontWeight: FontWeight.w700)),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(
+                    color: BrandColors.error,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
           ],
         ),
@@ -127,11 +150,19 @@ class ActionStatusOverlay extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.check_circle_outline_rounded, color: BrandColors.success, size: 18),
+            const Icon(
+              Icons.check_circle_outline_rounded,
+              color: BrandColors.success,
+              size: 18,
+            ),
             const SizedBox(width: 12),
             Text(
               successMessage ?? 'Saved successfully!',
-              style: const TextStyle(color: BrandColors.success, fontSize: 13, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                color: BrandColors.success,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

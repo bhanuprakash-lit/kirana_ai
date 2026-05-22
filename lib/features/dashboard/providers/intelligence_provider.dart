@@ -14,12 +14,18 @@ class IntelligenceSortNotifier extends Notifier<Map<String, String>> {
   }
 }
 
-final intelligenceSortProvider = NotifierProvider<IntelligenceSortNotifier, Map<String, String>>(IntelligenceSortNotifier.new);
+final intelligenceSortProvider =
+    NotifierProvider<IntelligenceSortNotifier, Map<String, String>>(
+      IntelligenceSortNotifier.new,
+    );
 
-final intelligenceProvider = FutureProvider.family<List<Recommendation>, String>((ref, type) async {
+final intelligenceProvider = FutureProvider.family<List<Recommendation>, String>((
+  ref,
+  type,
+) async {
   final sortMap = ref.watch(intelligenceSortProvider);
   final sortBy = sortMap[type] ?? 'expected_profit';
-  
+
   final client = ref.read(apiClientProvider);
   final prefs = await SharedPreferences.getInstance();
   final storeId = prefs.getInt('store_id') ?? 1;

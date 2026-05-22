@@ -106,7 +106,9 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
           if (status.hasRequest && !_submitted) {
             return _buildExistingRequest(status);
           }
-          if (_submitted) { return _buildSuccess(); }
+          if (_submitted) {
+            return _buildSuccess();
+          }
           return _buildContent(storeName, location, footfall);
         },
       ),

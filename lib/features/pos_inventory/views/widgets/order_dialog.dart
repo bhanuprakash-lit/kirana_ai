@@ -127,7 +127,11 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
       setState(() => _localError = 'Please select a customer for Udhaar sale');
       return;
     }
-    setState(() { _placing = true; _success = false; _localError = null; });
+    setState(() {
+      _placing = true;
+      _success = false;
+      _localError = null;
+    });
     final result = await ref
         .read(posProvider.notifier)
         .placeOrder(paymentMethod: _paymentMethod);
@@ -148,7 +152,10 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         ref.invalidate(financeProvider);
       }
       // Refresh overview stats after every order
-      setState(() { _placing = false; _success = true; });
+      setState(() {
+        _placing = false;
+        _success = true;
+      });
       await Future.delayed(const Duration(milliseconds: 600));
       if (mounted) Navigator.pop(context, result);
     } else {
@@ -203,7 +210,10 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             isSuccess: _success,
             successMessage: 'Order confirmed!',
           ),
-          if (_placing || _localError != null || state.error != null || _success)
+          if (_placing ||
+              _localError != null ||
+              state.error != null ||
+              _success)
             const SizedBox(height: 16),
 
           // Cart summary
@@ -361,12 +371,14 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                     final posState = ref.read(posProvider);
                     final selId = posState.selectedCustomerId;
                     if (selId != null) {
-                      final match = ref.read(customerProvider).customers
+                      final match = ref
+                          .read(customerProvider)
+                          .customers
                           .where((c) => c.customerId == selId)
                           .firstOrNull;
                       if (match != null) {
                         setState(() {
-                          _udhaarCustomerId   = match.customerId;
+                          _udhaarCustomerId = match.customerId;
                           _udhaarCustomerName = match.name;
                           _udhaarCustomerPhone = match.phone;
                         });

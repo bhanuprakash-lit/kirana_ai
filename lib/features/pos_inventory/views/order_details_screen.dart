@@ -33,7 +33,10 @@ class OrderDetailsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: Text('Order Details', style: const TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(
+          'Order Details',
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -120,7 +123,11 @@ class OrderDetailsScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.person_outline_rounded, size: 18, color: BrandColors.muted),
+                      const Icon(
+                        Icons.person_outline_rounded,
+                        size: 18,
+                        color: BrandColors.muted,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Customer ID: $customerId',
@@ -136,11 +143,15 @@ class OrderDetailsScreen extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 28),
           const Row(
             children: [
-              Icon(Icons.inventory_2_outlined, size: 20, color: BrandColors.primary),
+              Icon(
+                Icons.inventory_2_outlined,
+                size: 20,
+                color: BrandColors.primary,
+              ),
               SizedBox(width: 8),
               Text(
                 'Items Summary',
@@ -153,7 +164,7 @@ class OrderDetailsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -184,8 +195,10 @@ class OrderDetailsScreen extends ConsumerWidget {
                   final qty = (item['quantity'] as num?)?.toDouble() ?? 0;
                   final price = (item['unit_price'] as num?)?.toDouble() ?? 0;
                   final lineTotal = qty * price;
-                  
-                  final product = posState.products.where((p) => p.productId == productId).firstOrNull;
+
+                  final product = posState.products
+                      .where((p) => p.productId == productId)
+                      .firstOrNull;
                   final productName = product?.name ?? 'Product #$productId';
                   final unit = product?.unit ?? 'unit';
 
@@ -200,7 +213,11 @@ class OrderDetailsScreen extends ConsumerWidget {
                             color: BrandColors.surfaceTint,
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(Icons.shopping_bag_outlined, color: BrandColors.primary, size: 22),
+                          child: const Icon(
+                            Icons.shopping_bag_outlined,
+                            color: BrandColors.primary,
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -242,14 +259,16 @@ class OrderDetailsScreen extends ConsumerWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 32),
           // Total Summary
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: paymentMethod.toLowerCase() == 'udhaar'
-                  ? const Color(0xFFD97706)   // amber — neutral, doesn't imply unpaid
+                  ? const Color(
+                      0xFFD97706,
+                    ) // amber — neutral, doesn't imply unpaid
                   : BrandColors.primary,
               borderRadius: BorderRadius.circular(24),
             ),
@@ -273,9 +292,10 @@ class OrderDetailsScreen extends ConsumerWidget {
                       const Text(
                         'Recorded as credit — check Udhaar tab for balance',
                         style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500),
+                          color: Colors.white70,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                   ],
                 ),
@@ -302,7 +322,9 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = status.toLowerCase() == 'completed' ? BrandColors.success : BrandColors.warning;
+    final color = status.toLowerCase() == 'completed'
+        ? BrandColors.success
+        : BrandColors.warning;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(

@@ -10,8 +10,8 @@ import 'subscription_provider.dart';
 // ── State ─────────────────────────────────────────────────────────────────────
 
 class IapState {
-  final bool isAvailable;   // Play Billing available on device
-  final bool isProcessing;  // purchase in flight
+  final bool isAvailable; // Play Billing available on device
+  final bool isProcessing; // purchase in flight
   final String? error;
 
   const IapState({
@@ -20,7 +20,12 @@ class IapState {
     this.error,
   });
 
-  IapState copyWith({bool? isAvailable, bool? isProcessing, String? error, bool clearError = false}) {
+  IapState copyWith({
+    bool? isAvailable,
+    bool? isProcessing,
+    String? error,
+    bool clearError = false,
+  }) {
     return IapState(
       isAvailable: isAvailable ?? this.isAvailable,
       isProcessing: isProcessing ?? this.isProcessing,
@@ -52,7 +57,7 @@ class IapNotifier extends Notifier<IapState> {
     if (!available) return;
 
     _purchaseSub = service.purchases.listen(_onPurchase);
-    _errorSub    = service.errors.listen(_onError);
+    _errorSub = service.errors.listen(_onError);
   }
 
   void _dispose() {
@@ -67,7 +72,9 @@ class IapNotifier extends Notifier<IapState> {
   Future<void> purchase(String tier) async {
     final service = _service;
     if (service == null || !state.isAvailable) {
-      state = state.copyWith(error: 'Play Billing not available on this device.');
+      state = state.copyWith(
+        error: 'Play Billing not available on this device.',
+      );
       return;
     }
 
@@ -77,7 +84,8 @@ class IapNotifier extends Notifier<IapState> {
     if (product == null) {
       state = state.copyWith(
         isProcessing: false,
-        error: 'Product not found in Play Store. Ensure product IDs are configured in Play Console.',
+        error:
+            'Product not found in Play Store. Ensure product IDs are configured in Play Console.',
       );
       return;
     }

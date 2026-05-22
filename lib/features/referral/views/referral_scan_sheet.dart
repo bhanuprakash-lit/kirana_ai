@@ -19,7 +19,8 @@ Future<PendingReferralScan?> showReferralScanSheet(
     isScrollControlled: true,
     useSafeArea: true,
     shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (_) => _ReferralScanSheet(tokenHash: tokenHash),
   );
 }
@@ -111,33 +112,39 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
               child: Center(child: CircularProgressIndicator()),
             )
           : _infoError != null
-              ? _buildError()
-              : _buildForm(),
+          ? _buildError()
+          : _buildForm(),
     );
   }
 
   Widget _buildError() => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.error_outline_rounded,
-              size: 48, color: BrandColors.error),
-          const SizedBox(height: 12),
-          Text(_infoError!,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: BrandColors.error)),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Icon(
+        Icons.error_outline_rounded,
+        size: 48,
+        color: BrandColors.error,
+      ),
+      const SizedBox(height: 12),
+      Text(
+        _infoError!,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: BrandColors.error,
+        ),
+      ),
+      const SizedBox(height: 20),
+      SizedBox(
+        width: double.infinity,
+        child: OutlinedButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ),
+    ],
+  );
 
   Widget _buildForm() {
     final info = _tokenInfo!;
@@ -150,8 +157,9 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-                color: BrandColors.border,
-                borderRadius: BorderRadius.circular(2)),
+              color: BrandColors.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -161,27 +169,36 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
           decoration: BoxDecoration(
             color: BrandColors.success.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(16),
-            border:
-                Border.all(color: BrandColors.success.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: BrandColors.success.withValues(alpha: 0.2),
+            ),
           ),
           child: Row(
             children: [
-              const Icon(Icons.verified_user_rounded,
-                  color: BrandColors.success, size: 22),
+              const Icon(
+                Icons.verified_user_rounded,
+                color: BrandColors.success,
+                size: 22,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Referral from ${info.referrerName}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: BrandColors.success,
-                            fontSize: 14)),
+                    Text(
+                      'Referral from ${info.referrerName}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: BrandColors.success,
+                        fontSize: 14,
+                      ),
+                    ),
                     Text(
                       '${info.campaignName}  •  ${info.referralDiscountPct.toStringAsFixed(0)}% discount for new customer',
                       style: const TextStyle(
-                          fontSize: 12, color: BrandColors.muted),
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ),
@@ -191,16 +208,18 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
         ).animate().fadeIn(duration: 300.ms),
 
         const SizedBox(height: 20),
-        const Text('New Customer Details',
-            style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 15,
-                color: BrandColors.ink)),
+        const Text(
+          'New Customer Details',
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            color: BrandColors.ink,
+          ),
+        ),
         const SizedBox(height: 4),
         const Text(
           'Enter the new customer\'s phone. The discount will be applied when you place the order.',
-          style:
-              TextStyle(fontSize: 12, color: BrandColors.muted, height: 1.5),
+          style: TextStyle(fontSize: 12, color: BrandColors.muted, height: 1.5),
         ),
         const SizedBox(height: 16),
 
@@ -229,9 +248,10 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
 
         if (_error != null) ...[
           const SizedBox(height: 10),
-          Text(_error!,
-              style:
-                  const TextStyle(fontSize: 13, color: BrandColors.error)),
+          Text(
+            _error!,
+            style: const TextStyle(fontSize: 13, color: BrandColors.error),
+          ),
         ],
 
         const SizedBox(height: 20),

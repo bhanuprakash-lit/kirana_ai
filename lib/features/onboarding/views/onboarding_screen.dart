@@ -80,7 +80,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             if (state.currentStep > 0)
               Padding(
                 padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top),
+                  top: MediaQuery.of(context).padding.top,
+                ),
                 child: _buildHeader(context, state),
               ),
             Expanded(

@@ -30,8 +30,11 @@ class UdhaarTab extends ConsumerWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text('Please check your connection and try again.',
-                textAlign: TextAlign.center, style: TextStyle(color: BrandColors.muted)),
+            const Text(
+              'Please check your connection and try again.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: BrandColors.muted),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => ref.read(financeProvider.notifier).refresh(),
@@ -205,7 +208,8 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
                     if (contact != null) {
                       setState(() {
                         _selectedCustomer = null;
-                        widget.nameController.text = contact.name!.first.toString();
+                        widget.nameController.text = contact.name!.first
+                            .toString();
                         if (contact.phones.isNotEmpty) {
                           final p = ContactService.formatPhone(
                             contact.phones.first.number,
@@ -229,9 +233,14 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
           // Existing customer picker
           if (customers.isNotEmpty && !_saving && !_success) ...[
             GestureDetector(
-              onTap: _selectedCustomer != null ? _clearCustomer : _showCustomerPicker,
+              onTap: _selectedCustomer != null
+                  ? _clearCustomer
+                  : _showCustomerPicker,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: _selectedCustomer != null
                       ? BrandColors.primary.withValues(alpha: 0.06)
@@ -304,7 +313,10 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
                 Expanded(child: Divider()),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text('or enter manually', style: TextStyle(fontSize: 11, color: BrandColors.muted)),
+                  child: Text(
+                    'or enter manually',
+                    style: TextStyle(fontSize: 11, color: BrandColors.muted),
+                  ),
                 ),
                 Expanded(child: Divider()),
               ],
@@ -416,7 +428,10 @@ class _CustomerPickerSheet extends StatefulWidget {
   final List<Customer> customers;
   final ValueChanged<Customer> onSelected;
 
-  const _CustomerPickerSheet({required this.customers, required this.onSelected});
+  const _CustomerPickerSheet({
+    required this.customers,
+    required this.onSelected,
+  });
 
   @override
   State<_CustomerPickerSheet> createState() => _CustomerPickerSheetState();
@@ -434,13 +449,11 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = widget.customers
-        .where((c) {
-          if (_query.isEmpty) return true;
-          final q = _query.toLowerCase();
-          return c.name.toLowerCase().contains(q) || c.phone.contains(q);
-        })
-        .toList();
+    final filtered = widget.customers.where((c) {
+      if (_query.isEmpty) return true;
+      final q = _query.toLowerCase();
+      return c.name.toLowerCase().contains(q) || c.phone.contains(q);
+    }).toList();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
@@ -456,7 +469,8 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
           children: [
             const SizedBox(height: 12),
             Container(
-              width: 40, height: 4,
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
                 color: BrandColors.border,
                 borderRadius: BorderRadius.circular(2),
@@ -468,8 +482,10 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Select Customer',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+                  const Text(
+                    'Select Customer',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                  ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _searchCtrl,
@@ -477,18 +493,28 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       hintText: 'Search by name or phone...',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 20, color: BrandColors.muted),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: BrandColors.muted,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       suffixIcon: _query.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear_rounded, size: 18),
-                              onPressed: () { _searchCtrl.clear(); setState(() => _query = ''); },
+                              onPressed: () {
+                                _searchCtrl.clear();
+                                setState(() => _query = '');
+                              },
                             )
                           : null,
                     ),
@@ -500,8 +526,10 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
             Expanded(
               child: filtered.isEmpty
                   ? const Center(
-                      child: Text('No customers found',
-                          style: TextStyle(color: BrandColors.muted)),
+                      child: Text(
+                        'No customers found',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
                     )
                   : ListView.builder(
                       controller: scrollCtrl,
@@ -511,23 +539,35 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
                         final c = filtered[i];
                         return ListTile(
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           leading: CircleAvatar(
-                            backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
+                            backgroundColor: BrandColors.primary.withValues(
+                              alpha: 0.1,
+                            ),
                             child: Text(
                               c.name.isNotEmpty ? c.name[0].toUpperCase() : '?',
                               style: const TextStyle(
-                                  color: BrandColors.primary,
-                                  fontWeight: FontWeight.bold),
+                                color: BrandColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          title: Text(c.name,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 14)),
+                          title: Text(
+                            c.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
                           subtitle: c.phone.isNotEmpty
-                              ? Text(c.phone,
+                              ? Text(
+                                  c.phone,
                                   style: const TextStyle(
-                                      fontSize: 12, color: BrandColors.muted))
+                                    fontSize: 12,
+                                    color: BrandColors.muted,
+                                  ),
+                                )
                               : null,
                           onTap: () => widget.onSelected(c),
                         );
@@ -899,7 +939,10 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
                         return;
                       }
                       if (amount > widget.item.balance) {
-                        setState(() => _error = 'Amount cannot exceed balance ₹${widget.item.balance.toStringAsFixed(0)}');
+                        setState(
+                          () => _error =
+                              'Amount cannot exceed balance ₹${widget.item.balance.toStringAsFixed(0)}',
+                        );
                         return;
                       }
 
@@ -994,7 +1037,11 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
   Future<void> _load() async {
     try {
       final client = widget.ref.read(apiClientProvider);
-      final res = await client.get('/kirana/finance/udhaar/${widget.item.khataId}/history') as Map<String, dynamic>;
+      final res =
+          await client.get(
+                '/kirana/finance/udhaar/${widget.item.khataId}/history',
+              )
+              as Map<String, dynamic>;
       if (mounted) {
         setState(() {
           _payments = (res['payments'] as List).cast<Map<String, dynamic>>();
@@ -1003,7 +1050,10 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() { _loading = false; _error = e.toString(); });
+        setState(() {
+          _loading = false;
+          _error = e.toString();
+        });
       }
     }
   }
@@ -1023,7 +1073,14 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1033,20 +1090,39 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Recovery History', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
-                        Text(widget.item.customerName, style: const TextStyle(fontSize: 13, color: BrandColors.muted)),
+                        const Text(
+                          'Recovery History',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        Text(
+                          widget.item.customerName,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: BrandColors.muted,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: BrandColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       'Balance: ₹${widget.item.balance.toStringAsFixed(0)}',
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: BrandColors.error),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                        color: BrandColors.error,
+                      ),
                     ),
                   ),
                 ],
@@ -1058,52 +1134,88 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
-                      ? Center(child: Text(_error!, style: const TextStyle(color: BrandColors.error)))
-                      : _payments.isEmpty
-                          ? const Center(child: Text('No recoveries recorded yet.', style: TextStyle(color: BrandColors.muted)))
-                          : ListView.separated(
-                              controller: scrollCtrl,
-                              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                              itemCount: _payments.length,
-                              separatorBuilder: (context2, index2) => const Divider(height: 1),
-                              itemBuilder: (_, i) {
-                                final p = _payments[i];
-                                final amount = (p['amount'] as num?)?.toDouble() ?? 0.0;
-                                final paidAt = p['paid_at'] as String?;
-                                final dt = paidAt != null ? DateTime.tryParse(paidAt)?.toLocal() : null;
-                                final dateLabel = dt != null
-                                    ? '${dt.day}/${dt.month}/${dt.year}  ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}'
-                                    : '—';
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: BrandColors.success.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: const Icon(Icons.arrow_downward_rounded, color: BrandColors.success, size: 18),
-                                      ),
-                                      const SizedBox(width: 14),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Recovery #${_payments.length - i}',
-                                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                                            Text(dateLabel, style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
-                                          ],
-                                        ),
-                                      ),
-                                      Text('+ ₹${amount.toStringAsFixed(0)}',
-                                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: BrandColors.success)),
-                                    ],
+                  ? Center(
+                      child: Text(
+                        _error!,
+                        style: const TextStyle(color: BrandColors.error),
+                      ),
+                    )
+                  : _payments.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No recoveries recorded yet.',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    )
+                  : ListView.separated(
+                      controller: scrollCtrl,
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                      itemCount: _payments.length,
+                      separatorBuilder: (context2, index2) =>
+                          const Divider(height: 1),
+                      itemBuilder: (_, i) {
+                        final p = _payments[i];
+                        final amount = (p['amount'] as num?)?.toDouble() ?? 0.0;
+                        final paidAt = p['paid_at'] as String?;
+                        final dt = paidAt != null
+                            ? DateTime.tryParse(paidAt)?.toLocal()
+                            : null;
+                        final dateLabel = dt != null
+                            ? '${dt.day}/${dt.month}/${dt.year}  ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}'
+                            : '—';
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: BrandColors.success.withValues(
+                                    alpha: 0.1,
                                   ),
-                                );
-                              },
-                            ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_downward_rounded,
+                                  color: BrandColors.success,
+                                  size: 18,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Recovery #${_payments.length - i}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Text(
+                                      dateLabel,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: BrandColors.muted,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                '+ ₹${amount.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  color: BrandColors.success,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

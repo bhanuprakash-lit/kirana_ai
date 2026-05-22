@@ -17,12 +17,12 @@ class CampaignCard extends StatelessWidget {
   });
 
   static const _typeColors = <String, Color>{
-    'morning':  Color(0xFFF59E0B),
-    'monthly':  Color(0xFF3B82F6),
-    'school':   Color(0xFF10B981),
-    'weekend':  Color(0xFF8B5CF6),
+    'morning': Color(0xFFF59E0B),
+    'monthly': Color(0xFF3B82F6),
+    'school': Color(0xFF10B981),
+    'weekend': Color(0xFF8B5CF6),
     'festival': Color(0xFFEF4444),
-    'general':  Color(0xFF6B7280),
+    'general': Color(0xFF6B7280),
   };
 
   Color get _color => _typeColors[campaign.campaignType] ?? BrandColors.primary;
@@ -55,7 +55,9 @@ class CampaignCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
               decoration: BoxDecoration(
                 color: _color.withValues(alpha: 0.06),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(18),
+                ),
               ),
               child: Row(
                 children: [
@@ -65,17 +67,32 @@ class CampaignCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(campaign.name,
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: _color)),
-                        Text(campaign.description,
-                            style: const TextStyle(fontSize: 11, color: BrandColors.muted),
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text(
+                          campaign.name,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: _color,
+                          ),
+                        ),
+                        Text(
+                          campaign.description,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: BrandColors.muted,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
                     ),
                   ),
                   // Availability pill
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: allAvailable
                           ? Colors.green.withValues(alpha: 0.12)
@@ -87,7 +104,9 @@ class CampaignCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: allAvailable ? Colors.green.shade700 : Colors.orange.shade700,
+                        color: allAvailable
+                            ? Colors.green.shade700
+                            : Colors.orange.shade700,
                       ),
                     ),
                   ),
@@ -101,11 +120,16 @@ class CampaignCard extends StatelessWidget {
               child: Wrap(
                 spacing: 6,
                 runSpacing: 4,
-                children: campaign.items.take(5).map((item) => _ItemChip(
-                  label: item.product?.name ?? item.displayName,
-                  inStock: item.inStock,
-                  color: _color,
-                )).toList(),
+                children: campaign.items
+                    .take(5)
+                    .map(
+                      (item) => _ItemChip(
+                        label: item.product?.name ?? item.displayName,
+                        inStock: item.inStock,
+                        color: _color,
+                      ),
+                    )
+                    .toList(),
               ),
             ),
 
@@ -122,9 +146,19 @@ class CampaignCard extends StatelessWidget {
                       children: [
                         Text(
                           '₹${campaign.totalPrice.toStringAsFixed(0)}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: _color),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: _color,
+                          ),
                         ),
-                        const Text('est. total', style: TextStyle(fontSize: 11, color: BrandColors.muted)),
+                        const Text(
+                          'est. total',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: BrandColors.muted,
+                          ),
+                        ),
                       ],
                     )
                   else
@@ -133,15 +167,26 @@ class CampaignCard extends StatelessWidget {
                     constraints: const BoxConstraints(maxWidth: 160),
                     child: ElevatedButton.icon(
                       onPressed: stocked.isEmpty ? null : onAddAll,
-                      icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
+                      icon: const Icon(
+                        Icons.add_shopping_cart_rounded,
+                        size: 16,
+                      ),
                       label: const Text('Add All'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _color,
                         foregroundColor: Colors.white,
                         minimumSize: Size.zero,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
@@ -159,7 +204,8 @@ class CampaignCard extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => CampaignDetailSheet(campaign: campaign, onAddAll: onAddAll),
+      builder: (_) =>
+          CampaignDetailSheet(campaign: campaign, onAddAll: onAddAll),
     );
   }
 }
@@ -170,22 +216,34 @@ class _ItemChip extends StatelessWidget {
   final String label;
   final bool inStock;
   final Color color;
-  const _ItemChip({required this.label, required this.inStock, required this.color});
+  const _ItemChip({
+    required this.label,
+    required this.inStock,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: inStock ? color.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.08),
+        color: inStock
+            ? color.withValues(alpha: 0.08)
+            : Colors.grey.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: inStock ? color.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.2)),
+        border: Border.all(
+          color: inStock
+              ? color.withValues(alpha: 0.2)
+              : Colors.grey.withValues(alpha: 0.2),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            inStock ? Icons.check_circle_rounded : Icons.remove_circle_outline_rounded,
+            inStock
+                ? Icons.check_circle_rounded
+                : Icons.remove_circle_outline_rounded,
             size: 10,
             color: inStock ? color : BrandColors.muted,
           ),
@@ -209,15 +267,19 @@ class _ItemChip extends StatelessWidget {
 class CampaignDetailSheet extends StatelessWidget {
   final Campaign campaign;
   final VoidCallback onAddAll;
-  const CampaignDetailSheet({super.key, required this.campaign, required this.onAddAll});
+  const CampaignDetailSheet({
+    super.key,
+    required this.campaign,
+    required this.onAddAll,
+  });
 
   static const _typeColors = <String, Color>{
-    'morning':  Color(0xFFF59E0B),
-    'monthly':  Color(0xFF3B82F6),
-    'school':   Color(0xFF10B981),
-    'weekend':  Color(0xFF8B5CF6),
+    'morning': Color(0xFFF59E0B),
+    'monthly': Color(0xFF3B82F6),
+    'school': Color(0xFF10B981),
+    'weekend': Color(0xFF8B5CF6),
     'festival': Color(0xFFEF4444),
-    'general':  Color(0xFF6B7280),
+    'general': Color(0xFF6B7280),
   };
 
   Color get _color => _typeColors[campaign.campaignType] ?? BrandColors.primary;
@@ -240,8 +302,12 @@ class CampaignDetailSheet extends StatelessWidget {
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
-                width: 40, height: 4,
-                decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: BrandColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
 
@@ -256,10 +322,21 @@ class CampaignDetailSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(campaign.name,
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: _color)),
-                        Text(campaign.description,
-                            style: const TextStyle(fontSize: 13, color: BrandColors.muted)),
+                        Text(
+                          campaign.name,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: _color,
+                          ),
+                        ),
+                        Text(
+                          campaign.description,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: BrandColors.muted,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -280,13 +357,18 @@ class CampaignDetailSheet extends StatelessWidget {
                   final p = item.product;
                   return ListTile(
                     leading: Container(
-                      width: 40, height: 40,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: item.inStock ? _color.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.08),
+                        color: item.inStock
+                            ? _color.withValues(alpha: 0.1)
+                            : Colors.grey.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        item.inStock ? Icons.check_rounded : Icons.close_rounded,
+                        item.inStock
+                            ? Icons.check_rounded
+                            : Icons.close_rounded,
                         color: item.inStock ? _color : BrandColors.muted,
                         size: 20,
                       ),
@@ -296,16 +378,31 @@ class CampaignDetailSheet extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        color: item.inStock ? BrandColors.ink : BrandColors.muted,
+                        color: item.inStock
+                            ? BrandColors.ink
+                            : BrandColors.muted,
                       ),
                     ),
                     subtitle: item.inStock && p != null
-                        ? Text('Stock: ${p.stockQuantity.toStringAsFixed(0)} ${p.unit ?? 'pcs'}  ·  ₹${p.price.toStringAsFixed(0)}',
-                            style: const TextStyle(fontSize: 12))
-                        : Text('Not in stock', style: TextStyle(fontSize: 12, color: Colors.red.shade400)),
+                        ? Text(
+                            'Stock: ${p.stockQuantity.toStringAsFixed(0)} ${p.unit ?? 'pcs'}  ·  ₹${p.price.toStringAsFixed(0)}',
+                            style: const TextStyle(fontSize: 12),
+                          )
+                        : Text(
+                            'Not in stock',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.red.shade400,
+                            ),
+                          ),
                     trailing: item.inStock && p != null
-                        ? Text('₹${p.price.toStringAsFixed(0)}',
-                            style: TextStyle(fontWeight: FontWeight.w800, color: _color))
+                        ? Text(
+                            '₹${p.price.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: _color,
+                            ),
+                          )
                         : null,
                   );
                 },
@@ -314,26 +411,45 @@ class CampaignDetailSheet extends StatelessWidget {
 
             // Footer
             Padding(
-              padding: EdgeInsets.fromLTRB(20, 8, 20, MediaQuery.of(context).padding.bottom + 16),
+              padding: EdgeInsets.fromLTRB(
+                20,
+                8,
+                20,
+                MediaQuery.of(context).padding.bottom + 16,
+              ),
               child: Column(
                 children: [
                   if (campaign.totalPrice > 0)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Estimated Total', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                        Text('₹${campaign.totalPrice.toStringAsFixed(0)}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: _color)),
+                        const Text(
+                          'Estimated Total',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          '₹${campaign.totalPrice.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: _color,
+                          ),
+                        ),
                       ],
                     ),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: campaign.stockedItems.isEmpty ? null : () {
-                        Navigator.pop(context);
-                        onAddAll();
-                      },
+                      onPressed: campaign.stockedItems.isEmpty
+                          ? null
+                          : () {
+                              Navigator.pop(context);
+                              onAddAll();
+                            },
                       icon: const Icon(Icons.add_shopping_cart_rounded),
                       label: Text(
                         campaign.stockedItems.isEmpty
@@ -344,8 +460,13 @@ class CampaignDetailSheet extends StatelessWidget {
                         minimumSize: const Size.fromHeight(52),
                         backgroundColor: _color,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                        ),
                       ),
                     ),
                   ),

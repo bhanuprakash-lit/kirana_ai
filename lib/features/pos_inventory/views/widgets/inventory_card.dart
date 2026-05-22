@@ -62,14 +62,14 @@ class InventoryCard extends StatelessWidget {
   }
 
   Widget _iconBox(Color catColor) => Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: catColor.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(_categoryIcon(item.categoryName), size: 18, color: catColor),
-      );
+    width: 40,
+    height: 40,
+    decoration: BoxDecoration(
+      color: catColor.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Icon(_categoryIcon(item.categoryName), size: 18, color: catColor),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -145,9 +145,10 @@ class InventoryCard extends StatelessWidget {
                     ),
                     if (item.brand != null || item.weightLabel != null)
                       Text(
-                        [item.brand, item.weightLabel]
-                            .whereType<String>()
-                            .join(' · '),
+                        [
+                          item.brand,
+                          item.weightLabel,
+                        ].whereType<String>().join(' · '),
                         style: const TextStyle(
                           fontSize: 10,
                           color: BrandColors.muted,
@@ -262,8 +263,8 @@ class _ExpiryBadge extends StatelessWidget {
     final label = days <= 0
         ? 'Expired'
         : days == 1
-            ? '1d'
-            : '${days}d';
+        ? '1d'
+        : '${days}d';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -278,7 +279,11 @@ class _ExpiryBadge extends StatelessWidget {
           const SizedBox(width: 2),
           Text(
             label,
-            style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: color),
+            style: TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.w800,
+              color: color,
+            ),
           ),
         ],
       ),

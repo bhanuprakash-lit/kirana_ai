@@ -11,8 +11,14 @@ class GeminiVisionService {
 
   GeminiVisionService(this._client);
 
-  Future<({String transcript, List<GeminiItem> items, Map<String, dynamic>? aiStatus})>
-      processHandwriting(Uint8List pngBytes) async {
+  Future<
+    ({
+      String transcript,
+      List<GeminiItem> items,
+      Map<String, dynamic>? aiStatus,
+    })
+  >
+  processHandwriting(Uint8List pngBytes) async {
     final data = await _client.post('/kirana/ai/handwrite', {
       'image_b64': base64Encode(pngBytes),
     });

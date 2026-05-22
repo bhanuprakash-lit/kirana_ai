@@ -13,9 +13,7 @@ class NotificationsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: BrandColors.background,
-      appBar: AppBar(
-        title: const Text('Business Alerts'),
-      ),
+      appBar: AppBar(title: const Text('Business Alerts')),
       body: alerts.isEmpty
           ? _emptyState()
           : ListView.builder(
@@ -34,11 +32,24 @@ class NotificationsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_none_rounded, size: 64, color: BrandColors.muted.withValues(alpha: 0.3)),
+          Icon(
+            Icons.notifications_none_rounded,
+            size: 64,
+            color: BrandColors.muted.withValues(alpha: 0.3),
+          ),
           const SizedBox(height: 16),
-          const Text('All caught up!', style: TextStyle(color: BrandColors.muted, fontWeight: FontWeight.bold)),
+          const Text(
+            'All caught up!',
+            style: TextStyle(
+              color: BrandColors.muted,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 8),
-          const Text('No urgent alerts at the moment.', style: TextStyle(color: BrandColors.muted, fontSize: 12)),
+          const Text(
+            'No urgent alerts at the moment.',
+            style: TextStyle(color: BrandColors.muted, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -78,15 +89,31 @@ class _AlertTile extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(alert.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(
+                      alert.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
                     Text(
                       _formatTime(alert.timestamp),
-                      style: const TextStyle(fontSize: 11, color: BrandColors.muted),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(alert.message, style: const TextStyle(fontSize: 13, color: BrandColors.ink, height: 1.4)),
+                Text(
+                  alert.message,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: BrandColors.ink,
+                    height: 1.4,
+                  ),
+                ),
               ],
             ),
           ),

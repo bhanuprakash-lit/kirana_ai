@@ -11,19 +11,21 @@ import '../../providers/inventory_provider.dart';
 import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
 
-const _units = [
-  'pcs', 'kg', 'g', 'L', 'ml', 'dozen', 'pack', 'box', 'bundle',
-];
+const _units = ['pcs', 'kg', 'g', 'L', 'ml', 'dozen', 'pack', 'box', 'bundle'];
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 Future<void> showAddProductSheet(
-    BuildContext context, WidgetRef ref, {String? initialBarcode}) async {
+  BuildContext context,
+  WidgetRef ref, {
+  String? initialBarcode,
+}) async {
   await Navigator.push(
     context,
     MaterialPageRoute(
       fullscreenDialog: true,
-      builder: (_) => _AddProductScreen(ref: ref, initialBarcode: initialBarcode),
+      builder: (_) =>
+          _AddProductScreen(ref: ref, initialBarcode: initialBarcode),
     ),
   );
 }
@@ -60,25 +62,26 @@ class _CatalogProduct {
   });
 
   factory _CatalogProduct.fromJson(Map<String, dynamic> j) => _CatalogProduct(
-        productId: j['product_id'] as int,
-        name: j['name'] as String,
-        brand: j['brand'] as String?,
-        unit: j['unit'] as String?,
-        weight: (j['weight'] as num?)?.toDouble(),
-        barcode: j['barcode'] as String?,
-        isPerishable: j['is_perishable'] as bool? ?? false,
-        isLoose: j['is_loose'] as bool? ?? false,
-        imageUrl: j['image_url'] as String?,
-        categoryId: j['category_id'] as int,
-        categoryName: j['category_name'] as String?,
-        parentCategoryName: j['parent_category_name'] as String?,
-      );
+    productId: j['product_id'] as int,
+    name: j['name'] as String,
+    brand: j['brand'] as String?,
+    unit: j['unit'] as String?,
+    weight: (j['weight'] as num?)?.toDouble(),
+    barcode: j['barcode'] as String?,
+    isPerishable: j['is_perishable'] as bool? ?? false,
+    isLoose: j['is_loose'] as bool? ?? false,
+    imageUrl: j['image_url'] as String?,
+    categoryId: j['category_id'] as int,
+    categoryName: j['category_name'] as String?,
+    parentCategoryName: j['parent_category_name'] as String?,
+  );
 
   String get subtitle {
     final parts = <String>[];
     if (brand != null) parts.add(brand!);
     if (parentCategoryName != null) parts.add(parentCategoryName!);
-    if (categoryName != null && categoryName != parentCategoryName) parts.add(categoryName!);
+    if (categoryName != null && categoryName != parentCategoryName)
+      parts.add(categoryName!);
     return parts.join(' · ');
   }
 }
@@ -132,8 +135,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     if (widget.initialBarcode != null) {
       _variants[0].barcodeCtrl.text = widget.initialBarcode!;
       // auto-search by barcode
-      WidgetsBinding.instance.addPostFrameCallback((_) =>
-          _searchCatalog(barcode: widget.initialBarcode!));
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _searchCatalog(barcode: widget.initialBarcode!),
+      );
     }
   }
 
@@ -144,7 +148,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     _searchCtrl.dispose();
     _nameCtrl.dispose();
     _brandCtrl.dispose();
-    for (final v in _variants) { v.dispose(); }
+    for (final v in _variants) {
+      v.dispose();
+    }
     super.dispose();
   }
 
@@ -156,7 +162,11 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     _debounce?.cancel();
     final q = _searchCtrl.text.trim();
     if (q.length < 2) {
-      setState(() { _searchResults = []; _hasMore = false; _searchOffset = 0; });
+      setState(() {
+        _searchResults = [];
+        _hasMore = false;
+        _searchOffset = 0;
+      });
       return;
     }
     _debounce = Timer(const Duration(milliseconds: 350), () {
@@ -178,7 +188,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
       if (barcode.isNotEmpty) {
         uri = '/kirana/catalog/search?barcode=${Uri.encodeComponent(barcode)}';
       } else {
-        uri = '/kirana/catalog/search?q=${Uri.encodeComponent(query)}&limit=$_pageSize&offset=$_searchOffset';
+        uri =
+            '/kirana/catalog/search?q=${Uri.encodeComponent(query)}&limit=$_pageSize&offset=$_searchOffset';
       }
       final res = await client.get(uri) as Map<String, dynamic>;
       final products = (res['products'] as List<dynamic>? ?? [])
@@ -303,10 +314,16 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         return;
       }
     }
-    setState(() { _saving = true; _error = null; _success = false; });
+    setState(() {
+      _saving = true;
+      _error = null;
+      _success = false;
+    });
 
     final name = _toTitleCase(_nameCtrl.text.trim());
-    final brand = _brandCtrl.text.trim().isNotEmpty ? _brandCtrl.text.trim() : null;
+    final brand = _brandCtrl.text.trim().isNotEmpty
+        ? _brandCtrl.text.trim()
+        : null;
 
     String? firstError;
     for (int i = 0; i < _variants.length; i++) {
@@ -314,42 +331,67 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
       // Only the first variant reuses the catalog product_id.
       // Each additional variant must create its own product row so it gets
       // a unique product_id and a separate inventory entry.
-      final err = await ref.read(inventoryProvider.notifier).addProduct(
+      final err = await ref
+          .read(inventoryProvider.notifier)
+          .addProduct(
             name: name,
             categoryId: _selectedCategoryId!,
             sellingPrice: double.parse(v.priceCtrl.text),
-            initialStock: double.parse(v.stockCtrl.text.isEmpty ? '0' : v.stockCtrl.text),
+            initialStock: double.parse(
+              v.stockCtrl.text.isEmpty ? '0' : v.stockCtrl.text,
+            ),
             brand: brand,
             unit: v.selectedUnit,
-            weight: v.weightCtrl.text.trim().isNotEmpty ? double.tryParse(v.weightCtrl.text.trim()) : null,
-            barcode: v.barcodeCtrl.text.trim().isNotEmpty ? v.barcodeCtrl.text.trim() : null,
-            mrp: v.mrpCtrl.text.isNotEmpty ? double.tryParse(v.mrpCtrl.text) : null,
+            weight: v.weightCtrl.text.trim().isNotEmpty
+                ? double.tryParse(v.weightCtrl.text.trim())
+                : null,
+            barcode: v.barcodeCtrl.text.trim().isNotEmpty
+                ? v.barcodeCtrl.text.trim()
+                : null,
+            mrp: v.mrpCtrl.text.isNotEmpty
+                ? double.tryParse(v.mrpCtrl.text)
+                : null,
             isPerishable: _isPerishable,
             isLoose: _isLoose,
-            expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty ? v.expiryCtrl.text : null,
+            expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty
+                ? v.expiryCtrl.text
+                : null,
             existingProductId: i == 0 ? _linked?.productId : null,
             // V2+ create new product rows — copy catalog image so they show the same photo
             imageUrl: i == 0 ? null : _linked?.imageUrl,
           );
-      if (err != null) { firstError = err; break; }
+      if (err != null) {
+        firstError = err;
+        break;
+      }
     }
 
     if (!mounted) return;
     if (firstError == null) {
-      setState(() { _saving = false; _success = true; });
+      setState(() {
+        _saving = false;
+        _success = true;
+      });
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
         Navigator.pop(context);
         final count = _variants.length;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(count == 1 ? 'Product saved — syncing in background' : '$count variants saved — syncing in background'),
+            content: Text(
+              count == 1
+                  ? 'Product saved — syncing in background'
+                  : '$count variants saved — syncing in background',
+            ),
             duration: const Duration(seconds: 2),
           ),
         );
       }
     } else {
-      setState(() { _saving = false; _error = firstError; });
+      setState(() {
+        _saving = false;
+        _error = firstError;
+      });
     }
   }
 
@@ -364,14 +406,19 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         foregroundColor: BrandColors.ink,
         elevation: 0,
         title: Text(
-          _stage == _Stage.search ? 'Add Product' : (_linked != null ? 'Add from Catalog' : 'New Product'),
+          _stage == _Stage.search
+              ? 'Add Product'
+              : (_linked != null ? 'Add from Catalog' : 'New Product'),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           onPressed: () {
             if (_stage == _Stage.form) {
-              setState(() { _stage = _Stage.search; _linked = null; });
+              setState(() {
+                _stage = _Stage.search;
+                _linked = null;
+              });
             } else {
               Navigator.pop(context);
             }
@@ -384,10 +431,22 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
               child: TextButton(
                 onPressed: _saving ? null : _save,
                 child: _saving
-                    ? const SizedBox(width: 20, height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2.5, color: BrandColors.primary))
-                    : const Text('Save',
-                        style: TextStyle(color: BrandColors.primary, fontWeight: FontWeight.w800, fontSize: 15)),
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: BrandColors.primary,
+                        ),
+                      )
+                    : const Text(
+                        'Save',
+                        style: TextStyle(
+                          color: BrandColors.primary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
               ),
             ),
         ],
@@ -413,26 +472,43 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   autofocus: true,
                   decoration: InputDecoration(
                     hintText: 'Search product name...',
-                    prefixIcon: const Icon(Icons.search_rounded, color: BrandColors.muted, size: 20),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: BrandColors.muted,
+                      size: 20,
+                    ),
                     filled: true,
                     fillColor: BrandColors.surfaceTint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     suffixIcon: _searching
                         ? const Padding(
                             padding: EdgeInsets.all(12),
-                            child: SizedBox(width: 16, height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2)),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
                           )
                         : _searchCtrl.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded, size: 18, color: BrandColors.muted),
-                                onPressed: () { _searchCtrl.clear(); setState(() => _searchResults = []); },
-                              )
-                            : null,
+                        ? IconButton(
+                            icon: const Icon(
+                              Icons.clear_rounded,
+                              size: 18,
+                              color: BrandColors.muted,
+                            ),
+                            onPressed: () {
+                              _searchCtrl.clear();
+                              setState(() => _searchResults = []);
+                            },
+                          )
+                        : null,
                   ),
                 ),
               ),
@@ -440,12 +516,17 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
               GestureDetector(
                 onTap: _scanBarcodeFromSearch,
                 child: Container(
-                  width: 44, height: 44,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: BrandColors.primary,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
               ),
             ],
@@ -473,19 +554,30 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                         child: TextButton.icon(
                           onPressed: _searching ? null : _loadMore,
                           icon: _searching
-                              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
                               : const Icon(Icons.expand_more_rounded),
                           label: const Text('Load more results'),
                         ),
                       );
                     }
-                    if (!_hasMore && _searchResults.isNotEmpty && afterResults == 0) {
+                    if (!_hasMore &&
+                        _searchResults.isNotEmpty &&
+                        afterResults == 0) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Center(
                           child: Text(
                             'No more search results',
-                            style: TextStyle(color: BrandColors.muted, fontSize: 12),
+                            style: TextStyle(
+                              color: BrandColors.muted,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       );
@@ -504,9 +596,20 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
       children: [
         const Icon(Icons.search_rounded, size: 56, color: BrandColors.border),
         const SizedBox(height: 14),
-        const Text('Search the product catalog', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: BrandColors.ink)),
+        const Text(
+          'Search the product catalog',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: BrandColors.ink,
+          ),
+        ),
         const SizedBox(height: 6),
-        const Text('Type a name or scan a barcode.\nIf not found, add manually.', textAlign: TextAlign.center, style: TextStyle(color: BrandColors.muted, fontSize: 13, height: 1.5)),
+        const Text(
+          'Type a name or scan a barcode.\nIf not found, add manually.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: BrandColors.muted, fontSize: 13, height: 1.5),
+        ),
         const SizedBox(height: 28),
         _buildManualEntry(),
       ],
@@ -523,22 +626,42 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: BrandColors.border, style: BorderStyle.solid),
+            border: Border.all(
+              color: BrandColors.border,
+              style: BorderStyle.solid,
+            ),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: BrandColors.surfaceTint, borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.add_circle_outline_rounded, color: BrandColors.primary, size: 20),
+                decoration: BoxDecoration(
+                  color: BrandColors.surfaceTint,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.add_circle_outline_rounded,
+                  color: BrandColors.primary,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Add manually', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: BrandColors.ink)),
-                    Text('Product not in catalog? Enter details yourself.', style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+                    Text(
+                      'Add manually',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        color: BrandColors.ink,
+                      ),
+                    ),
+                    Text(
+                      'Product not in catalog? Enter details yourself.',
+                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                    ),
                   ],
                 ),
               ),
@@ -562,7 +685,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             isSaving: _saving,
             error: _error,
             isSuccess: _success,
-            successMessage: _variants.length == 1 ? 'Product added!' : '${_variants.length} variants added!',
+            successMessage: _variants.length == 1
+                ? 'Product added!'
+                : '${_variants.length} variants added!',
           ),
           if (_saving || _error != null || _success) const SizedBox(height: 16),
 
@@ -597,7 +722,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             enabled: _linked == null && !_saving && !_success,
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(labelText: 'Product name *'),
-            validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Required' : null,
           ),
           const SizedBox(height: 14),
           TextFormField(
@@ -614,9 +740,16 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                 child: GestureDetector(
                   onTap: (_saving || _success) ? null : _pickCategory,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
-                      border: Border.all(color: _selectedCategoryId == null ? BrandColors.border : BrandColors.primary.withValues(alpha: 0.5)),
+                      border: Border.all(
+                        color: _selectedCategoryId == null
+                            ? BrandColors.border
+                            : BrandColors.primary.withValues(alpha: 0.5),
+                      ),
                       borderRadius: BorderRadius.circular(14),
                       color: Colors.white,
                     ),
@@ -628,11 +761,17 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: _selectedCategoryId == null ? BrandColors.muted : BrandColors.ink,
+                              color: _selectedCategoryId == null
+                                  ? BrandColors.muted
+                                  : BrandColors.ink,
                             ),
                           ),
                         ),
-                        const Icon(Icons.keyboard_arrow_down_rounded, color: BrandColors.muted, size: 20),
+                        const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: BrandColors.muted,
+                          size: 20,
+                        ),
                       ],
                     ),
                   ),
@@ -642,13 +781,17 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
               GestureDetector(
                 onTap: (_saving || _success) ? null : _addNewCategory,
                 child: Container(
-                  width: 50, height: 50,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: BrandColors.surfaceTint,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: BrandColors.border),
                   ),
-                  child: const Icon(Icons.add_rounded, color: BrandColors.primary),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    color: BrandColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -656,7 +799,10 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           if (_error != null && _selectedCategoryId == null)
             const Padding(
               padding: EdgeInsets.only(top: 4, left: 4),
-              child: Text('Please select a category', style: TextStyle(fontSize: 12, color: BrandColors.error)),
+              child: Text(
+                'Please select a category',
+                style: TextStyle(fontSize: 12, color: BrandColors.error),
+              ),
             ),
           const SizedBox(height: 24),
 
@@ -676,20 +822,31 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _SectionHeader(_variants.length == 1 ? 'Size, Price & Stock' : 'Variants (${_variants.length})'),
+              _SectionHeader(
+                _variants.length == 1
+                    ? 'Size, Price & Stock'
+                    : 'Variants (${_variants.length})',
+              ),
               if (!_saving && !_success)
                 TextButton.icon(
                   onPressed: () => setState(() {
                     final v = _VariantData();
                     // Inherit unit from catalog so V2 matches V1's unit
-                    if (_linked != null) v.selectedUnit = _linked!.unit ?? 'pcs';
+                    if (_linked != null)
+                      v.selectedUnit = _linked!.unit ?? 'pcs';
                     _variants.add(v);
                   }),
                   icon: const Icon(Icons.add_rounded, size: 16),
-                  label: const Text('Add Variant', style: TextStyle(fontSize: 13)),
+                  label: const Text(
+                    'Add Variant',
+                    style: TextStyle(fontSize: 13),
+                  ),
                   style: TextButton.styleFrom(
                     foregroundColor: BrandColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     visualDensity: VisualDensity.compact,
                   ),
                 ),
@@ -706,7 +863,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           SizedBox(
             height: 56,
             child: LoadingButton(
-              label: _variants.length == 1 ? 'Save Product' : 'Save ${_variants.length} Variants',
+              label: _variants.length == 1
+                  ? 'Save Product'
+                  : 'Save ${_variants.length} Variants',
               isLoading: _saving,
               onPressed: _success ? null : _save,
             ),
@@ -757,7 +916,11 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                     _variants[idx].dispose();
                     _variants.removeAt(idx);
                   }),
-                  child: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: BrandColors.error),
+                  child: const Icon(
+                    Icons.remove_circle_outline_rounded,
+                    size: 20,
+                    color: BrandColors.error,
+                  ),
                 ),
             ],
           ),
@@ -769,10 +932,19 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   value: v.selectedUnit,
-                  decoration: const InputDecoration(labelText: 'Unit', isDense: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Unit',
+                    isDense: true,
+                  ),
                   isExpanded: true,
-                  items: _units.map((u) => DropdownMenuItem(value: u, child: Text(u))).toList(),
-                  onChanged: (_saving || _success) ? null : (val) => setState(() => v.selectedUnit = val ?? v.selectedUnit),
+                  items: _units
+                      .map((u) => DropdownMenuItem(value: u, child: Text(u)))
+                      .toList(),
+                  onChanged: (_saving || _success)
+                      ? null
+                      : (val) => setState(
+                          () => v.selectedUnit = val ?? v.selectedUnit,
+                        ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -785,8 +957,14 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                     hintText: 'e.g. 250',
                     isDense: true,
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d+\.?\d{0,2}'),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -795,38 +973,55 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 
           // Barcode — locked only when catalog already supplied one
           if (!_isLoose)
-            Builder(builder: (_) {
-              final catalogHasBarcode = _linked != null && isFirst && (_linked!.barcode?.isNotEmpty ?? false);
-              final barcodeEditable = !catalogHasBarcode && !_saving && !_success;
-              return Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: v.barcodeCtrl,
-                    enabled: barcodeEditable,
-                    decoration: InputDecoration(
-                      labelText: 'Barcode',
-                      hintText: catalogHasBarcode ? 'From catalog' : 'optional',
-                      isDense: true,
+            Builder(
+              builder: (_) {
+                final catalogHasBarcode =
+                    _linked != null &&
+                    isFirst &&
+                    (_linked!.barcode?.isNotEmpty ?? false);
+                final barcodeEditable =
+                    !catalogHasBarcode && !_saving && !_success;
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: v.barcodeCtrl,
+                        enabled: barcodeEditable,
+                        decoration: InputDecoration(
+                          labelText: 'Barcode',
+                          hintText: catalogHasBarcode
+                              ? 'From catalog'
+                              : 'optional',
+                          isDense: true,
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: barcodeEditable ? () => _scanBarcode(variantIndex: idx) : null,
-                  child: Container(
-                    width: 44, height: 44,
-                    decoration: BoxDecoration(
-                      color: barcodeEditable ? BrandColors.primary : BrandColors.border,
-                      borderRadius: BorderRadius.circular(12),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: barcodeEditable
+                          ? () => _scanBarcode(variantIndex: idx)
+                          : null,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: barcodeEditable
+                              ? BrandColors.primary
+                              : BrandColors.border,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.qr_code_scanner_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
-                    child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 20),
-                  ),
-                ),
-              ],
-            );
-            }),
+                  ],
+                );
+              },
+            ),
           const SizedBox(height: 10),
 
           // Price + MRP
@@ -838,12 +1033,20 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   autofocus: isFirst && _linked != null,
                   enabled: !_saving && !_success,
                   decoration: InputDecoration(
-                    labelText: _isLoose ? 'Price / ${v.selectedUnit} *' : 'Selling price *',
+                    labelText: _isLoose
+                        ? 'Price / ${v.selectedUnit} *'
+                        : 'Selling price *',
                     prefixText: '₹ ',
                     isDense: true,
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d+\.?\d{0,2}'),
+                    ),
+                  ],
                   validator: (val) {
                     if (val == null || val.isEmpty) return 'Required';
                     if (double.tryParse(val) == null) return 'Invalid';
@@ -856,9 +1059,19 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                 child: TextFormField(
                   controller: v.mrpCtrl,
                   enabled: !_saving && !_success,
-                  decoration: const InputDecoration(labelText: 'MRP', prefixText: '₹ ', isDense: true),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
+                  decoration: const InputDecoration(
+                    labelText: 'MRP',
+                    prefixText: '₹ ',
+                    isDense: true,
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d+\.?\d{0,2}'),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -870,11 +1083,15 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             controller: v.stockCtrl,
             enabled: !_saving && !_success,
             decoration: InputDecoration(
-              labelText: _isLoose ? 'Opening stock (${v.selectedUnit}) *' : 'Opening stock (units) *',
+              labelText: _isLoose
+                  ? 'Opening stock (${v.selectedUnit}) *'
+                  : 'Opening stock (units) *',
               isDense: true,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+            ],
           ),
 
           // Expiry (only if perishable)
@@ -890,7 +1107,10 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                 isDense: true,
               ),
               readOnly: true,
-              validator: (val) => (_isPerishable && (val == null || val.isEmpty)) ? 'Required for perishables' : null,
+              validator: (val) =>
+                  (_isPerishable && (val == null || val.isEmpty))
+                  ? 'Required for perishables'
+                  : null,
               onTap: () async {
                 if (_saving || _success) return;
                 final picked = await showDatePicker(
@@ -916,12 +1136,12 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 // ── Variant data holder ───────────────────────────────────────────────────────
 
 class _VariantData {
-  final weightCtrl  = TextEditingController(); // empty = no pack size
+  final weightCtrl = TextEditingController(); // empty = no pack size
   final barcodeCtrl = TextEditingController();
-  final priceCtrl   = TextEditingController();
-  final mrpCtrl     = TextEditingController();
-  final stockCtrl   = TextEditingController(text: '0');
-  final expiryCtrl  = TextEditingController();
+  final priceCtrl = TextEditingController();
+  final mrpCtrl = TextEditingController();
+  final stockCtrl = TextEditingController(text: '0');
+  final expiryCtrl = TextEditingController();
   String selectedUnit = 'pcs';
 
   void dispose() {
@@ -962,7 +1182,8 @@ class _CatalogResultTile extends StatelessWidget {
               child: product.imageUrl != null
                   ? Image.network(
                       product.imageUrl!,
-                      width: 48, height: 48,
+                      width: 48,
+                      height: 48,
                       fit: BoxFit.contain,
                       errorBuilder: (_, __, ___) => _iconFallback(),
                     )
@@ -973,22 +1194,42 @@ class _CatalogResultTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis),
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   if (product.subtitle.isNotEmpty)
-                    Text(product.subtitle,
-                        style: const TextStyle(fontSize: 12, color: BrandColors.muted),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
+                    Text(
+                      product.subtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   if (product.barcode != null)
-                    Text(product.barcode!,
-                        style: const TextStyle(fontSize: 10, color: BrandColors.muted, fontFamily: 'monospace')),
+                    Text(
+                      product.barcode!,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: BrandColors.muted,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
                 ],
               ),
             ),
-            const Icon(Icons.add_circle_rounded, color: BrandColors.primary, size: 22),
+            const Icon(
+              Icons.add_circle_rounded,
+              color: BrandColors.primary,
+              size: 22,
+            ),
           ],
         ),
       ),
@@ -996,10 +1237,15 @@ class _CatalogResultTile extends StatelessWidget {
   }
 
   Widget _iconFallback() => Container(
-        width: 48, height: 48,
-        color: BrandColors.surfaceTint,
-        child: const Icon(Icons.inventory_2_rounded, color: BrandColors.muted, size: 22),
-      );
+    width: 48,
+    height: 48,
+    color: BrandColors.surfaceTint,
+    child: const Icon(
+      Icons.inventory_2_rounded,
+      color: BrandColors.muted,
+      size: 22,
+    ),
+  );
 }
 
 // ── Linked chip ───────────────────────────────────────────────────────────────
@@ -1022,27 +1268,54 @@ class _LinkedChip extends StatelessWidget {
           if (product.imageUrl != null)
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(product.imageUrl!, width: 44, height: 44,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+              child: Image.network(
+                product.imageUrl!,
+                width: 44,
+                height: 44,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
             ),
           if (product.imageUrl != null) const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(children: [
-                  const Icon(Icons.link_rounded, size: 14, color: BrandColors.primary),
-                  const SizedBox(width: 4),
-                  const Text('Linked from catalog',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: BrandColors.primary)),
-                ]),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.link_rounded,
+                      size: 14,
+                      color: BrandColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Linked from catalog',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: BrandColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 2),
-                Text(product.name,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+                Text(
+                  product.name,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: BrandColors.ink,
+                  ),
+                ),
                 if (product.subtitle.isNotEmpty)
-                  Text(product.subtitle,
-                      style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                  Text(
+                    product.subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -1056,13 +1329,14 @@ class _LinkedChip extends StatelessWidget {
 
 /// Public entry point so other sheets can reuse the category picker.
 Future<Map<String, dynamic>?> showCategoryPicker(
-    BuildContext context, List<Map<String, dynamic>> categories) =>
-    showModalBottomSheet<Map<String, dynamic>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _CategoryPickerSheet(categories: categories),
-    );
+  BuildContext context,
+  List<Map<String, dynamic>> categories,
+) => showModalBottomSheet<Map<String, dynamic>>(
+  context: context,
+  isScrollControlled: true,
+  backgroundColor: Colors.transparent,
+  builder: (_) => _CategoryPickerSheet(categories: categories),
+);
 
 class _CategoryPickerSheet extends StatefulWidget {
   final List<Map<String, dynamic>> categories;
@@ -1077,16 +1351,21 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
   String _query = '';
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = widget.categories.where((c) {
-      if (_query.isEmpty) return true;
-      final name = (c['name'] as String? ?? '').toLowerCase();
-      return name.contains(_query.toLowerCase());
-    }).toList()
-      ..sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
+    final filtered =
+        widget.categories.where((c) {
+          if (_query.isEmpty) return true;
+          final name = (c['name'] as String? ?? '').toLowerCase();
+          return name.contains(_query.toLowerCase());
+        }).toList()..sort(
+          (a, b) => (a['name'] as String).compareTo(b['name'] as String),
+        );
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -1102,7 +1381,14 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
           children: [
             // Handle
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 16),
             // Header + search
             Padding(
@@ -1110,7 +1396,10 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Select Category', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+                  const Text(
+                    'Select Category',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                  ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _ctrl,
@@ -1118,13 +1407,29 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       hintText: 'Search categories...',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 20, color: BrandColors.muted),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: BrandColors.muted,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       suffixIcon: _query.isNotEmpty
-                          ? IconButton(icon: const Icon(Icons.clear_rounded, size: 18), onPressed: () { _ctrl.clear(); setState(() => _query = ''); })
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              onPressed: () {
+                                _ctrl.clear();
+                                setState(() => _query = '');
+                              },
+                            )
                           : null,
                     ),
                   ),
@@ -1135,7 +1440,12 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
             // List
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(child: Text('No categories found', style: TextStyle(color: BrandColors.muted)))
+                  ? const Center(
+                      child: Text(
+                        'No categories found',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    )
                   : ListView.builder(
                       controller: scrollCtrl,
                       padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -1143,9 +1453,21 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                       itemBuilder: (_, i) {
                         final cat = filtered[i];
                         return ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          title: Text(cat['name'] as String? ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                          trailing: const Icon(Icons.check_rounded, color: BrandColors.primary, size: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          title: Text(
+                            cat['name'] as String? ?? '',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.check_rounded,
+                            color: BrandColors.primary,
+                            size: 18,
+                          ),
                           onTap: () => Navigator.pop(context, cat),
                         );
                       },
@@ -1172,9 +1494,14 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-        title.toUpperCase(),
-        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, color: BrandColors.muted, letterSpacing: 1.2),
-      );
+    title.toUpperCase(),
+    style: const TextStyle(
+      fontWeight: FontWeight.w900,
+      fontSize: 11,
+      color: BrandColors.muted,
+      letterSpacing: 1.2,
+    ),
+  );
 }
 
 class _ToggleRow extends StatelessWidget {
@@ -1183,32 +1510,52 @@ class _ToggleRow extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   const _ToggleRow({
-    required this.label, required this.sublabel,
-    required this.value, this.enabled = true, required this.onChanged,
+    required this.label,
+    required this.sublabel,
+    required this.value,
+    this.enabled = true,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: BrandColors.surfaceTint,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: BrandColors.border),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                  const SizedBox(height: 2),
-                  Text(sublabel, style: const TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w500)),
-                ],
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    decoration: BoxDecoration(
+      color: BrandColors.surfaceTint,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: BrandColors.border),
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
               ),
-            ),
-            Switch(value: value, onChanged: enabled ? onChanged : null, activeTrackColor: BrandColors.primary),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                sublabel,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: BrandColors.muted,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
-      );
+        Switch(
+          value: value,
+          onChanged: enabled ? onChanged : null,
+          activeTrackColor: BrandColors.primary,
+        ),
+      ],
+    ),
+  );
 }

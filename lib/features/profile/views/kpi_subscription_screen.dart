@@ -13,7 +13,8 @@ class KpiSubscriptionScreen extends ConsumerStatefulWidget {
   const KpiSubscriptionScreen({super.key});
 
   @override
-  ConsumerState<KpiSubscriptionScreen> createState() => _KpiSubscriptionScreenState();
+  ConsumerState<KpiSubscriptionScreen> createState() =>
+      _KpiSubscriptionScreenState();
 }
 
 class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
@@ -99,7 +100,11 @@ class _KpiSelectionView extends ConsumerWidget {
   final KpiNotifier notifier;
   final VoidCallback onSave;
 
-  const _KpiSelectionView({required this.state, required this.notifier, required this.onSave});
+  const _KpiSelectionView({
+    required this.state,
+    required this.notifier,
+    required this.onSave,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -143,11 +148,15 @@ class _KpiSelectionView extends ConsumerWidget {
             itemBuilder: (context, i) {
               final categoryName = grouped.keys.elementAt(i);
               final items = grouped[categoryName]!;
-              final allSelected = items.every((e) => state.subscribedIds.contains(e.kpiId));
+              final allSelected = items.every(
+                (e) => state.subscribedIds.contains(e.kpiId),
+              );
               final categoryInfo = _getCategoryInfo(categoryName);
 
               return Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
                 child: ExpansionTile(
                   initiallyExpanded: i == 0,
                   leading: Container(
@@ -156,7 +165,11 @@ class _KpiSelectionView extends ConsumerWidget {
                       color: categoryInfo.color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(categoryInfo.icon, size: 18, color: categoryInfo.color),
+                    child: Icon(
+                      categoryInfo.icon,
+                      size: 18,
+                      color: categoryInfo.color,
+                    ),
                   ),
                   title: Text(
                     categoryName.toUpperCase(),
@@ -168,8 +181,11 @@ class _KpiSelectionView extends ConsumerWidget {
                     ),
                   ),
                   trailing: TextButton(
-                    onPressed: () => notifier.toggleCategory(categoryName, !allSelected),
-                    style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                    onPressed: () =>
+                        notifier.toggleCategory(categoryName, !allSelected),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                    ),
                     child: Text(allSelected ? 'Unselect' : 'Select All'),
                   ),
                   children: items.asMap().entries.map((entry) {
@@ -198,13 +214,22 @@ class _KpiSelectionView extends ConsumerWidget {
                               activeColor: BrandColors.primary,
                             )
                           : Container(
-                              width: 24, height: 24,
-                              margin: const EdgeInsets.symmetric(horizontal: 10),
+                              width: 24,
+                              height: 24,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                                color: const Color(
+                                  0xFF7C3AED,
+                                ).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Icon(Icons.lock_outline_rounded, size: 14, color: Color(0xFF7C3AED)),
+                              child: const Icon(
+                                Icons.lock_outline_rounded,
+                                size: 14,
+                                color: Color(0xFF7C3AED),
+                              ),
                             ),
                       title: Row(
                         children: [
@@ -214,18 +239,30 @@ class _KpiSelectionView extends ConsumerWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
-                                color: accessible ? BrandColors.ink : BrandColors.muted,
+                                color: accessible
+                                    ? BrandColors.ink
+                                    : BrandColors.muted,
                               ),
                             ),
                           ),
                           if (!accessible)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF7C3AED),
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              child: const Text('PRO', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800)),
+                              child: const Text(
+                                'PRO',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
                         ],
                       ),
@@ -233,7 +270,10 @@ class _KpiSelectionView extends ConsumerWidget {
                         kpi.why,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12, color: accessible ? null : BrandColors.muted),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: accessible ? null : BrandColors.muted,
+                        ),
                       ),
                     );
                   }).toList(),
@@ -249,7 +289,9 @@ class _KpiSelectionView extends ConsumerWidget {
               onPressed: onSave,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               child: const Text('Confirm Selections'),
             ),
@@ -272,11 +314,21 @@ class _KpiDashboardView extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.analytics_outlined, size: 64, color: BrandColors.muted),
+            const Icon(
+              Icons.analytics_outlined,
+              size: 64,
+              color: BrandColors.muted,
+            ),
             const SizedBox(height: 16),
-            const Text('No active KPIs', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+            const Text(
+              'No active KPIs',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+            ),
             const SizedBox(height: 8),
-            const Text('Manage your subscriptions to see insights', style: TextStyle(color: BrandColors.muted)),
+            const Text(
+              'Manage your subscriptions to see insights',
+              style: TextStyle(color: BrandColors.muted),
+            ),
           ],
         ),
       );
@@ -299,7 +351,11 @@ class _KpiDashboardView extends ConsumerWidget {
             child: ExpansionTile(
               initiallyExpanded: true,
               tilePadding: EdgeInsets.zero,
-              leading: Icon(categoryInfo.icon, color: categoryInfo.color, size: 20),
+              leading: Icon(
+                categoryInfo.icon,
+                color: categoryInfo.color,
+                size: 20,
+              ),
               title: Text(
                 categoryName,
                 style: const TextStyle(
@@ -310,7 +366,9 @@ class _KpiDashboardView extends ConsumerWidget {
               ),
               children: items.asMap().entries.map((entry) {
                 final kpi = entry.value;
-                final registryItem = state.registry.firstWhere((r) => r.kpiId == kpi.kpiId);
+                final registryItem = state.registry.firstWhere(
+                  (r) => r.kpiId == kpi.kpiId,
+                );
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
@@ -318,7 +376,13 @@ class _KpiDashboardView extends ConsumerWidget {
                     kpi: kpi,
                     index: entry.key,
                     categoryColor: categoryInfo.color,
-                    onTap: () => _showKpiDetail(context, ref, kpi, registryItem, categoryInfo),
+                    onTap: () => _showKpiDetail(
+                      context,
+                      ref,
+                      kpi,
+                      registryItem,
+                      categoryInfo,
+                    ),
                   ),
                 );
               }).toList(),
@@ -329,7 +393,13 @@ class _KpiDashboardView extends ConsumerWidget {
     );
   }
 
-  void _showKpiDetail(BuildContext context, WidgetRef ref, KpiData kpi, KpiRegistryItem registry, _CategoryInfo categoryInfo) {
+  void _showKpiDetail(
+    BuildContext context,
+    WidgetRef ref,
+    KpiData kpi,
+    KpiRegistryItem registry,
+    _CategoryInfo categoryInfo,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -355,7 +425,8 @@ class _KpiDetailBottomSheet extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<_KpiDetailBottomSheet> createState() => _KpiDetailBottomSheetState();
+  ConsumerState<_KpiDetailBottomSheet> createState() =>
+      _KpiDetailBottomSheetState();
 }
 
 class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
@@ -371,14 +442,16 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
 
   Future<void> _fetchDetail() async {
     if (widget.registry.endpoint == null) return;
-    
+
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
-    final data = await ref.read(kpiProvider.notifier).fetchKpiDetail(widget.registry.endpoint!);
-    
+    final data = await ref
+        .read(kpiProvider.notifier)
+        .fetchKpiDetail(widget.registry.endpoint!);
+
     if (mounted) {
       setState(() {
         _detailData = data;
@@ -389,7 +462,9 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
   }
 
   Future<void> _launchWhatsApp(String message) async {
-    final url = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(message)}');
+    final url = Uri.parse(
+      'https://wa.me/?text=${Uri.encodeComponent(message)}',
+    );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
@@ -401,7 +476,9 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
     IconData? icon;
     VoidCallback? onTap;
 
-    if (endpoint.contains('stock') || endpoint.contains('inventory') || endpoint.contains('readiness')) {
+    if (endpoint.contains('stock') ||
+        endpoint.contains('inventory') ||
+        endpoint.contains('readiness')) {
       label = 'Manage Inventory';
       icon = Icons.inventory_2_rounded;
       onTap = () {
@@ -410,10 +487,14 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
         ref.read(dashboardTabProvider.notifier).switchTab(2);
         ref.read(dashboardSubTabProvider.notifier).setSubTab(1);
       };
-    } else if (endpoint.contains('udhar') || endpoint.contains('customer') || endpoint.contains('credit')) {
+    } else if (endpoint.contains('udhar') ||
+        endpoint.contains('customer') ||
+        endpoint.contains('credit')) {
       label = 'Send Reminders';
       icon = Icons.mark_email_unread_rounded;
-      onTap = () => _launchWhatsApp('Hi, this is a reminder regarding your business with us. Please check your latest updates.');
+      onTap = () => _launchWhatsApp(
+        'Hi, this is a reminder regarding your business with us. Please check your latest updates.',
+      );
     } else if (endpoint.contains('revenue') || endpoint.contains('sales')) {
       label = 'New Sale';
       icon = Icons.point_of_sale_rounded;
@@ -437,7 +518,9 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
           minimumSize: const Size.fromHeight(52),
           backgroundColor: widget.categoryInfo.color,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
       ),
     );
@@ -464,7 +547,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
               ),
             ),
           ),
-          
+
           Expanded(
             child: CustomScrollView(
               slivers: [
@@ -479,10 +562,16 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: widget.categoryInfo.color.withValues(alpha: 0.1),
+                                color: widget.categoryInfo.color.withValues(
+                                  alpha: 0.1,
+                                ),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: Icon(widget.categoryInfo.icon, color: widget.categoryInfo.color, size: 24),
+                              child: Icon(
+                                widget.categoryInfo.icon,
+                                color: widget.categoryInfo.color,
+                                size: 24,
+                              ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -491,49 +580,80 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                                 children: [
                                   Text(
                                     widget.kpi.name,
-                                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: BrandColors.ink),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      color: BrandColors.ink,
+                                    ),
                                   ),
                                   Text(
                                     widget.registry.category,
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: widget.categoryInfo.color, letterSpacing: 0.5),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: widget.categoryInfo.color,
+                                      letterSpacing: 0.5,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 32),
-                        
-                        _SectionHeader(title: 'AI Summary', icon: Icons.auto_awesome_rounded),
+
+                        _SectionHeader(
+                          title: 'AI Summary',
+                          icon: Icons.auto_awesome_rounded,
+                        ),
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [BrandColors.primary.withValues(alpha: 0.05), Colors.white],
+                              colors: [
+                                BrandColors.primary.withValues(alpha: 0.05),
+                                Colors.white,
+                              ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: BrandColors.primary.withValues(alpha: 0.1)),
+                            border: Border.all(
+                              color: BrandColors.primary.withValues(alpha: 0.1),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 widget.registry.why,
-                                style: const TextStyle(fontSize: 14, color: BrandColors.ink, height: 1.5, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: BrandColors.ink,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               const Divider(height: 24),
                               Row(
                                 children: [
-                                  const Icon(Icons.support_agent_rounded, size: 14, color: BrandColors.primary),
+                                  const Icon(
+                                    Icons.support_agent_rounded,
+                                    size: 14,
+                                    color: BrandColors.primary,
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       'Powered by ${widget.registry.aiAgent}',
-                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: BrandColors.primary, letterSpacing: 0.3),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: BrandColors.primary,
+                                        letterSpacing: 0.3,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -543,16 +663,26 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                         ),
 
                         const SizedBox(height: 24),
-                        
+
                         Row(
                           children: [
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _SectionHeader(title: 'Target', icon: Icons.track_changes_rounded),
+                                  _SectionHeader(
+                                    title: 'Target',
+                                    icon: Icons.track_changes_rounded,
+                                  ),
                                   const SizedBox(height: 8),
-                                  Text(widget.registry.target, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+                                  Text(
+                                    widget.registry.target,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      color: BrandColors.ink,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -561,9 +691,19 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _SectionHeader(title: 'Baseline', icon: Icons.flag_rounded),
+                                  _SectionHeader(
+                                    title: 'Baseline',
+                                    icon: Icons.flag_rounded,
+                                  ),
                                   const SizedBox(height: 8),
-                                  Text(widget.registry.baseline, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+                                  Text(
+                                    widget.registry.baseline,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      color: BrandColors.ink,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -571,27 +711,43 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                         ),
 
                         const SizedBox(height: 32),
-                        
-                        _SectionHeader(title: 'Live Data Breakdown', icon: Icons.bar_chart_rounded),
+
+                        _SectionHeader(
+                          title: 'Live Data Breakdown',
+                          icon: Icons.bar_chart_rounded,
+                        ),
                         const SizedBox(height: 12),
-                        
+
                         if (_isLoading)
-                          const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()))
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(32),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
                         else if (_error != null)
                           _ErrorView(message: _error!, onRetry: _fetchDetail)
                         else if (_detailData != null) ...[
                           _DetailGrid(data: _detailData!),
                           if (_detailData!['ml_insights'] != null) ...[
                             const SizedBox(height: 24),
-                            _SectionHeader(title: 'MI Insights', icon: Icons.psychology_rounded),
+                            _SectionHeader(
+                              title: 'MI Insights',
+                              icon: Icons.psychology_rounded,
+                            ),
                             const SizedBox(height: 12),
-                            _MlInsightsView(insights: _detailData!['ml_insights']),
+                            _MlInsightsView(
+                              insights: _detailData!['ml_insights'],
+                            ),
                           ],
                         ] else
-                          const Text('No dynamic insights available for this KPI.'),
+                          const Text(
+                            'No dynamic insights available for this KPI.',
+                          ),
 
-                        _buildSmartAction(context, ref) ?? const SizedBox.shrink(),
-                          
+                        _buildSmartAction(context, ref) ??
+                            const SizedBox.shrink(),
+
                         const SizedBox(height: 40),
                       ],
                     ),
@@ -619,7 +775,12 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title.toUpperCase(),
-          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: BrandColors.muted, letterSpacing: 1.2),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            color: BrandColors.muted,
+            letterSpacing: 1.2,
+          ),
         ),
       ],
     );
@@ -632,8 +793,30 @@ class _DetailGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final excludedKeys = {'kpi_id', 'kpi_key', 'kpi_name', 'store_id', 'store_name', 'period_days', 'period_from', 'period_to', 'target', 'trend', 'last_updated', 'primary_field', 'primary_value', 'ml_insights'};
-    final entries = data.entries.where((e) => !excludedKeys.contains(e.key) && e.value is! List && e.value is! Map).toList();
+    final excludedKeys = {
+      'kpi_id',
+      'kpi_key',
+      'kpi_name',
+      'store_id',
+      'store_name',
+      'period_days',
+      'period_from',
+      'period_to',
+      'target',
+      'trend',
+      'last_updated',
+      'primary_field',
+      'primary_value',
+      'ml_insights',
+    };
+    final entries = data.entries
+        .where(
+          (e) =>
+              !excludedKeys.contains(e.key) &&
+              e.value is! List &&
+              e.value is! Map,
+        )
+        .toList();
 
     if (entries.isEmpty) return const SizedBox.shrink();
 
@@ -661,8 +844,23 @@ class _DetailGrid extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(key, style: const TextStyle(fontSize: 9, color: BrandColors.muted, fontWeight: FontWeight.w700), maxLines: 1),
-              Text(_formatVal(val), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+              Text(
+                key,
+                style: const TextStyle(
+                  fontSize: 9,
+                  color: BrandColors.muted,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 1,
+              ),
+              Text(
+                _formatVal(val),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: BrandColors.ink,
+                ),
+              ),
             ],
           ),
         );
@@ -683,7 +881,7 @@ class _MlInsightsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (insights is! Map) return Text(insights.toString());
-    
+
     final map = insights as Map<String, dynamic>;
     return Container(
       width: double.infinity,
@@ -696,14 +894,29 @@ class _MlInsightsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: map.entries.map((e) {
-          if (e.value is List) return const SizedBox.shrink(); // Skip complex lists for now
+          if (e.value is List)
+            return const SizedBox.shrink(); // Skip complex lists for now
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(e.key.replaceAll('_', ' ').titleCase, style: const TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w600)),
-                Text(e.value.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+                Text(
+                  e.key.replaceAll('_', ' ').titleCase,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.muted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  e.value.toString(),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: BrandColors.ink,
+                  ),
+                ),
               ],
             ),
           );
@@ -714,7 +927,13 @@ class _MlInsightsView extends StatelessWidget {
 }
 
 extension StringExtension on String {
-  String get titleCase => split(' ').map((e) => e.isEmpty ? '' : '${e[0].toUpperCase()}${e.substring(1).toLowerCase()}').join(' ');
+  String get titleCase => split(' ')
+      .map(
+        (e) => e.isEmpty
+            ? ''
+            : '${e[0].toUpperCase()}${e.substring(1).toLowerCase()}',
+      )
+      .join(' ');
 }
 
 class _CompactKpiTile extends StatelessWidget {
@@ -723,132 +942,162 @@ class _CompactKpiTile extends StatelessWidget {
   final Color categoryColor;
   final VoidCallback onTap;
 
-  const _CompactKpiTile({required this.kpi, required this.index, required this.categoryColor, required this.onTap});
+  const _CompactKpiTile({
+    required this.kpi,
+    required this.index,
+    required this.categoryColor,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final trendColor = kpi.trendDirection == 'up' 
-        ? BrandColors.success 
-        : kpi.trendDirection == 'down' 
-            ? BrandColors.error 
-            : BrandColors.muted;
+    final trendColor = kpi.trendDirection == 'up'
+        ? BrandColors.success
+        : kpi.trendDirection == 'down'
+        ? BrandColors.error
+        : BrandColors.muted;
 
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: BrandColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          children: [
-            Positioned(
-              right: 16,
-              bottom: 40,
-              top: 16,
-              width: 60,
-              child: CustomPaint(
-                painter: _SparklinePainter(
-                  color: trendColor,
-                  isUp: kpi.trendDirection == 'up',
-                ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: BrandColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
+            ],
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: 16,
+                  bottom: 40,
+                  top: 16,
+                  width: 60,
+                  child: CustomPaint(
+                    painter: _SparklinePainter(
+                      color: trendColor,
+                      isUp: kpi.trendDirection == 'up',
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: categoryColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(Icons.insights_rounded, size: 20, color: categoryColor),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              kpi.name,
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: BrandColors.ink),
-                            ),
-                            if (kpi.trendPctChange != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      kpi.trendDirection == 'up' ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                                      size: 12,
-                                      color: trendColor,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${kpi.trendPctChange!.abs().toStringAsFixed(1)}% vs last period',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: trendColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      Row(
                         children: [
-                          Text(
-                            _formatValue(kpi.value),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              color: BrandColors.ink,
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: categoryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.insights_rounded,
+                              size: 20,
+                              color: categoryColor,
                             ),
                           ),
-                          const Text(
-                            'current',
-                            style: TextStyle(fontSize: 10, color: BrandColors.muted, fontWeight: FontWeight.w700),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  kpi.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                    color: BrandColors.ink,
+                                  ),
+                                ),
+                                if (kpi.trendPctChange != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          kpi.trendDirection == 'up'
+                                              ? Icons.trending_up_rounded
+                                              : Icons.trending_down_rounded,
+                                          size: 12,
+                                          color: trendColor,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${kpi.trendPctChange!.abs().toStringAsFixed(1)}% vs last period',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: trendColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                _formatValue(kpi.value),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: BrandColors.ink,
+                                ),
+                              ),
+                              const Text(
+                                'current',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: BrandColors.muted,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Why this value?',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: categoryColor,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 10,
+                            color: categoryColor,
                           ),
                         ],
                       ),
                     ],
                   ),
-                  const Divider(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Why this value?',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: categoryColor),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_ios_rounded, size: 10, color: categoryColor),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(delay: Duration(milliseconds: 40 * index)).slideX(begin: 0.05, end: 0);
+          ),
+        )
+        .animate()
+        .fadeIn(delay: Duration(milliseconds: 40 * index))
+        .slideX(begin: 0.05, end: 0);
   }
 
   String _formatValue(dynamic v) {
@@ -883,18 +1132,44 @@ class _SparklinePainter extends CustomPainter {
     final path = Path();
     if (isUp) {
       path.moveTo(0, size.height * 0.7);
-      path.quadraticBezierTo(size.width * 0.3, size.height * 0.7, size.width * 0.5, size.height * 0.4);
-      path.quadraticBezierTo(size.width * 0.8, size.height * 0.2, size.width, size.height * 0.1);
+      path.quadraticBezierTo(
+        size.width * 0.3,
+        size.height * 0.7,
+        size.width * 0.5,
+        size.height * 0.4,
+      );
+      path.quadraticBezierTo(
+        size.width * 0.8,
+        size.height * 0.2,
+        size.width,
+        size.height * 0.1,
+      );
     } else {
       path.moveTo(0, size.height * 0.3);
-      path.quadraticBezierTo(size.width * 0.3, size.height * 0.3, size.width * 0.5, size.height * 0.6);
-      path.quadraticBezierTo(size.width * 0.8, size.height * 0.8, size.width, size.height * 0.9);
+      path.quadraticBezierTo(
+        size.width * 0.3,
+        size.height * 0.3,
+        size.width * 0.5,
+        size.height * 0.6,
+      );
+      path.quadraticBezierTo(
+        size.width * 0.8,
+        size.height * 0.8,
+        size.width,
+        size.height * 0.9,
+      );
     }
-    
+
     canvas.drawPath(path, paint);
-    
-    final dotPaint = Paint()..color = color..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(size.width, isUp ? size.height * 0.1 : size.height * 0.9), 2.5, dotPaint);
+
+    final dotPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(
+      Offset(size.width, isUp ? size.height * 0.1 : size.height * 0.9),
+      2.5,
+      dotPaint,
+    );
   }
 
   @override
@@ -909,13 +1184,26 @@ class _CategoryInfo {
 
 _CategoryInfo _getCategoryInfo(String category) {
   final cat = category.toLowerCase();
-  if (cat.contains('finance')) return const _CategoryInfo(Icons.account_balance_rounded, Color(0xFF0891B2));
-  if (cat.contains('sales')) return const _CategoryInfo(Icons.shopping_bag_rounded, Color(0xFFEA580C));
-  if (cat.contains('customer')) return const _CategoryInfo(Icons.people_rounded, Color(0xFF7C3AED));
-  if (cat.contains('inventory')) return const _CategoryInfo(Icons.inventory_2_rounded, Color(0xFF059669));
-  if (cat.contains('risk')) return const _CategoryInfo(Icons.warning_rounded, Color(0xFFDC2626));
-  if (cat.contains('operations')) return const _CategoryInfo(Icons.settings_suggest_rounded, Color(0xFF4B5563));
-  if (cat.contains('insights')) return const _CategoryInfo(Icons.stars_rounded, BrandColors.primary);
+  if (cat.contains('finance'))
+    return const _CategoryInfo(
+      Icons.account_balance_rounded,
+      Color(0xFF0891B2),
+    );
+  if (cat.contains('sales'))
+    return const _CategoryInfo(Icons.shopping_bag_rounded, Color(0xFFEA580C));
+  if (cat.contains('customer'))
+    return const _CategoryInfo(Icons.people_rounded, Color(0xFF7C3AED));
+  if (cat.contains('inventory'))
+    return const _CategoryInfo(Icons.inventory_2_rounded, Color(0xFF059669));
+  if (cat.contains('risk'))
+    return const _CategoryInfo(Icons.warning_rounded, Color(0xFFDC2626));
+  if (cat.contains('operations'))
+    return const _CategoryInfo(
+      Icons.settings_suggest_rounded,
+      Color(0xFF4B5563),
+    );
+  if (cat.contains('insights'))
+    return const _CategoryInfo(Icons.stars_rounded, BrandColors.primary);
   return const _CategoryInfo(Icons.analytics_rounded, BrandColors.muted);
 }
 
@@ -932,11 +1220,22 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off_rounded, size: 48, color: BrandColors.muted),
+            const Icon(
+              Icons.cloud_off_rounded,
+              size: 48,
+              color: BrandColors.muted,
+            ),
             const SizedBox(height: 16),
-            const Text('Oops! Something went wrong', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            const Text(
+              'Oops! Something went wrong',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            ),
             const SizedBox(height: 8),
-            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: BrandColors.muted, fontSize: 12)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: BrandColors.muted, fontSize: 12),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
           ],

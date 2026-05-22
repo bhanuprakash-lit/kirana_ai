@@ -13,11 +13,22 @@ import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
 
 const _editUnits = [
-  'pcs', 'kg', 'g', 'L', 'ml', 'dozen', 'pack', 'box', 'bundle',
+  'pcs',
+  'kg',
+  'g',
+  'L',
+  'ml',
+  'dozen',
+  'pack',
+  'box',
+  'bundle',
 ];
 
 Future<void> showEditProductSheet(
-    BuildContext context, WidgetRef ref, InventoryItem item) async {
+  BuildContext context,
+  WidgetRef ref,
+  InventoryItem item,
+) async {
   await Navigator.push(
     context,
     MaterialPageRoute(
@@ -41,16 +52,22 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
   late final _nameCtrl = TextEditingController(text: widget.item.name);
   late final _brandCtrl = TextEditingController(text: widget.item.brand ?? '');
   late final _weightCtrl = TextEditingController(
-      text: widget.item.weight != null ? widget.item.weight.toString() : '');
-  late final _barcodeCtrl =
-      TextEditingController(text: widget.item.barcode ?? '');
-  late final _priceCtrl =
-      TextEditingController(text: widget.item.price.toStringAsFixed(2));
+    text: widget.item.weight != null ? widget.item.weight.toString() : '',
+  );
+  late final _barcodeCtrl = TextEditingController(
+    text: widget.item.barcode ?? '',
+  );
+  late final _priceCtrl = TextEditingController(
+    text: widget.item.price.toStringAsFixed(2),
+  );
   late final _mrpCtrl = TextEditingController(
-      text: widget.item.mrp != null ? widget.item.mrp!.toStringAsFixed(2) : '');
+    text: widget.item.mrp != null ? widget.item.mrp!.toStringAsFixed(2) : '',
+  );
   late final _stockCtrl = TextEditingController(
-      text: widget.item.stockQuantity.toStringAsFixed(
-          widget.item.stockQuantity % 1 == 0 ? 0 : 2));
+    text: widget.item.stockQuantity.toStringAsFixed(
+      widget.item.stockQuantity % 1 == 0 ? 0 : 2,
+    ),
+  );
 
   late int _selectedCategoryId = widget.item.categoryId;
   late String? _selectedCategoryName = widget.item.categoryName;
@@ -64,9 +81,15 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
   @override
   void dispose() {
     for (final c in [
-      _nameCtrl, _brandCtrl, _weightCtrl, _barcodeCtrl,
-      _priceCtrl, _mrpCtrl, _stockCtrl,
-    ]) c.dispose();
+      _nameCtrl,
+      _brandCtrl,
+      _weightCtrl,
+      _barcodeCtrl,
+      _priceCtrl,
+      _mrpCtrl,
+      _stockCtrl,
+    ])
+      c.dispose();
     super.dispose();
   }
 
@@ -75,7 +98,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
     final result = await showCategoryPicker(context, allCats);
     if (result != null && mounted) {
       setState(() {
-        _selectedCategoryId = (result['category_id'] as num?)?.toInt() ?? _selectedCategoryId;
+        _selectedCategoryId =
+            (result['category_id'] as num?)?.toInt() ?? _selectedCategoryId;
         _selectedCategoryName = result['name'] as String?;
       });
     }
@@ -98,39 +122,53 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _saving = true; _error = null; _success = false; });
+    setState(() {
+      _saving = true;
+      _error = null;
+      _success = false;
+    });
 
-    final err = await ref.read(inventoryProvider.notifier).updateProduct(
-      productId: widget.item.productId,
-      name: _toTitleCase(_nameCtrl.text.trim()),
-      categoryId: _selectedCategoryId,
-      sellingPrice: double.parse(_priceCtrl.text),
-      stockQuantity: double.parse(_stockCtrl.text),
-      brand: _brandCtrl.text.trim().isNotEmpty ? _brandCtrl.text.trim() : null,
-      unit: _selectedUnit,
-      weight: _weightCtrl.text.trim().isNotEmpty
-          ? double.tryParse(_weightCtrl.text.trim())
-          : null,
-      barcode: _barcodeCtrl.text.trim().isNotEmpty
-          ? _barcodeCtrl.text.trim()
-          : null,
-      mrp: _mrpCtrl.text.isNotEmpty ? double.tryParse(_mrpCtrl.text) : null,
-      isPerishable: _isPerishable,
-      isLoose: _isLoose,
-    );
+    final err = await ref
+        .read(inventoryProvider.notifier)
+        .updateProduct(
+          productId: widget.item.productId,
+          name: _toTitleCase(_nameCtrl.text.trim()),
+          categoryId: _selectedCategoryId,
+          sellingPrice: double.parse(_priceCtrl.text),
+          stockQuantity: double.parse(_stockCtrl.text),
+          brand: _brandCtrl.text.trim().isNotEmpty
+              ? _brandCtrl.text.trim()
+              : null,
+          unit: _selectedUnit,
+          weight: _weightCtrl.text.trim().isNotEmpty
+              ? double.tryParse(_weightCtrl.text.trim())
+              : null,
+          barcode: _barcodeCtrl.text.trim().isNotEmpty
+              ? _barcodeCtrl.text.trim()
+              : null,
+          mrp: _mrpCtrl.text.isNotEmpty ? double.tryParse(_mrpCtrl.text) : null,
+          isPerishable: _isPerishable,
+          isLoose: _isLoose,
+        );
 
     if (!mounted) return;
     if (err == null) {
-      setState(() { _saving = false; _success = true; });
+      setState(() {
+        _saving = false;
+        _success = true;
+      });
       await Future.delayed(const Duration(milliseconds: 700));
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${widget.item.name} updated!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${widget.item.name} updated!')));
       }
     } else {
-      setState(() { _saving = false; _error = err; });
+      setState(() {
+        _saving = false;
+        _error = err;
+      });
     }
   }
 
@@ -142,7 +180,10 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
         backgroundColor: Colors.white,
         foregroundColor: BrandColors.ink,
         elevation: 0,
-        title: const Text('Edit Product', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'Edit Product',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           onPressed: () => Navigator.pop(context),
@@ -155,10 +196,21 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                 onPressed: _saving ? null : _save,
                 child: _saving
                     ? const SizedBox(
-                        width: 20, height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2.5, color: BrandColors.primary))
-                    : const Text('Save',
-                        style: TextStyle(color: BrandColors.primary, fontWeight: FontWeight.w800, fontSize: 15)),
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: BrandColors.primary,
+                        ),
+                      )
+                    : const Text(
+                        'Save',
+                        style: TextStyle(
+                          color: BrandColors.primary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
               ),
             ),
         ],
@@ -174,14 +226,16 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               isSuccess: _success,
               successMessage: 'Product updated successfully!',
             ),
-            if (_saving || _error != null || _success) const SizedBox(height: 16),
+            if (_saving || _error != null || _success)
+              const SizedBox(height: 16),
 
             // Product image preview (if available)
             if (widget.item.imageUrl != null)
               Center(
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 20),
-                  width: 80, height: 80,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     color: BrandColors.surfaceTint,
@@ -193,7 +247,10 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                       widget.item.imageUrl!,
                       fit: BoxFit.contain,
                       errorBuilder: (_, __, ___) => const Icon(
-                        Icons.inventory_2_rounded, color: BrandColors.muted, size: 36),
+                        Icons.inventory_2_rounded,
+                        color: BrandColors.muted,
+                        size: 36,
+                      ),
                     ),
                   ),
                 ),
@@ -219,7 +276,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               enabled: !_saving && !_success,
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(labelText: 'Product name *'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             const SizedBox(height: 14),
             TextFormField(
@@ -236,9 +294,14 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                   child: GestureDetector(
                     onTap: (_saving || _success) ? null : _pickCategory,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: BrandColors.primary.withValues(alpha: 0.5)),
+                        border: Border.all(
+                          color: BrandColors.primary.withValues(alpha: 0.5),
+                        ),
                         borderRadius: BorderRadius.circular(14),
                         color: Colors.white,
                       ),
@@ -256,8 +319,11 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                               ),
                             ),
                           ),
-                          const Icon(Icons.keyboard_arrow_down_rounded,
-                              color: BrandColors.muted, size: 20),
+                          const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: BrandColors.muted,
+                            size: 20,
+                          ),
                         ],
                       ),
                     ),
@@ -267,13 +333,17 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                 GestureDetector(
                   onTap: (_saving || _success) ? null : _addNewCategory,
                   child: Container(
-                    width: 50, height: 50,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
                       color: BrandColors.surfaceTint,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: BrandColors.border),
                     ),
-                    child: const Icon(Icons.add_rounded, color: BrandColors.primary),
+                    child: const Icon(
+                      Icons.add_rounded,
+                      color: BrandColors.primary,
+                    ),
                   ),
                 ),
               ],
@@ -286,7 +356,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedUnit,
-                    decoration: const InputDecoration(labelText: 'Selling unit'),
+                    decoration: const InputDecoration(
+                      labelText: 'Selling unit',
+                    ),
                     isExpanded: true,
                     items: _editUnits
                         .map((u) => DropdownMenuItem(value: u, child: Text(u)))
@@ -302,11 +374,16 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     controller: _weightCtrl,
                     enabled: !_isLoose && !_saving && !_success,
                     decoration: InputDecoration(
-                        labelText: _isLoose ? 'Base unit' : 'Pack size',
-                        hintText: 'e.g. 250'),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      labelText: _isLoose ? 'Base unit' : 'Pack size',
+                      hintText: 'e.g. 250',
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
                     ],
                   ),
                 ),
@@ -323,7 +400,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                       controller: _barcodeCtrl,
                       enabled: !_saving && !_success,
                       decoration: const InputDecoration(
-                          labelText: 'Barcode', hintText: 'optional'),
+                        labelText: 'Barcode',
+                        hintText: 'optional',
+                      ),
                       keyboardType: TextInputType.number,
                     ),
                   ),
@@ -331,15 +410,19 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                   GestureDetector(
                     onTap: (_saving || _success) ? null : _scanBarcode,
                     child: Container(
-                      width: 50, height: 50,
+                      width: 50,
+                      height: 50,
                       decoration: BoxDecoration(
                         color: (_saving || _success)
                             ? BrandColors.border
                             : BrandColors.primary,
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child: const Icon(Icons.qr_code_scanner_rounded,
-                          color: Colors.white, size: 22),
+                      child: const Icon(
+                        Icons.qr_code_scanner_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                   ),
                 ],
@@ -360,10 +443,13 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                           : 'Selling price *',
                       prefixText: '₹ ',
                     ),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
                     ],
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'Required';
@@ -378,11 +464,16 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     controller: _mrpCtrl,
                     enabled: !_saving && !_success,
                     decoration: const InputDecoration(
-                        labelText: 'MRP (optional)', prefixText: '₹ '),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                      labelText: 'MRP (optional)',
+                      prefixText: '₹ ',
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
                     ],
                   ),
                 ),
@@ -400,13 +491,13 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     ? 'Stock (in $_selectedUnit) *'
                     : 'Stock quantity *',
               ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
-              validator: (v) =>
-                  (v == null || v.isEmpty) ? 'Required' : null,
+              validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
             ),
             if (widget.item.isPerishable)
               Padding(
@@ -414,8 +505,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                 child: Text(
                   'For perishable batch details, use "Receive Batch" from inventory.',
                   style: TextStyle(
-                      fontSize: 12,
-                      color: BrandColors.muted.withValues(alpha: 0.8)),
+                    fontSize: 12,
+                    color: BrandColors.muted.withValues(alpha: 0.8),
+                  ),
                 ),
               ),
             const SizedBox(height: 24),
@@ -438,15 +530,26 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                   backgroundColor: BrandColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                   elevation: 0,
                 ),
                 child: _saving
                     ? const SizedBox(
-                        width: 22, height: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-                    : const Text('Save Changes',
-                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'Save Changes',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: 32),
@@ -469,13 +572,14 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-        title.toUpperCase(),
-        style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            fontSize: 11,
-            color: BrandColors.muted,
-            letterSpacing: 1.2),
-      );
+    title.toUpperCase(),
+    style: const TextStyle(
+      fontWeight: FontWeight.w900,
+      fontSize: 11,
+      color: BrandColors.muted,
+      letterSpacing: 1.2,
+    ),
+  );
 }
 
 class _ToggleRow extends StatelessWidget {
@@ -493,35 +597,43 @@ class _ToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: BrandColors.surfaceTint,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: BrandColors.border),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 14)),
-                  const SizedBox(height: 2),
-                  Text(sublabel,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: BrandColors.muted,
-                          fontWeight: FontWeight.w500)),
-                ],
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    decoration: BoxDecoration(
+      color: BrandColors.surfaceTint,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: BrandColors.border),
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
               ),
-            ),
-            Switch(
-                value: value,
-                onChanged: enabled ? onChanged : null,
-                activeTrackColor: BrandColors.primary),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                sublabel,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: BrandColors.muted,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
-      );
+        Switch(
+          value: value,
+          onChanged: enabled ? onChanged : null,
+          activeTrackColor: BrandColors.primary,
+        ),
+      ],
+    ),
+  );
 }

@@ -27,16 +27,15 @@ class PendingInventoryItem {
     PendingStatus? status,
     String? error,
     bool clearError = false,
-  }) =>
-      PendingInventoryItem(
-        tempId: tempId,
-        name: name,
-        brand: brand,
-        categoryName: categoryName,
-        price: price,
-        stockQuantity: stockQuantity,
-        status: status ?? this.status,
-        error: clearError ? null : (error ?? this.error),
-        params: params,
-      );
+  }) => PendingInventoryItem(
+    tempId: tempId,
+    name: name,
+    brand: brand,
+    categoryName: categoryName,
+    price: price,
+    stockQuantity: stockQuantity,
+    status: status ?? this.status,
+    error: clearError ? null : (error ?? this.error),
+    params: params,
+  );
 }

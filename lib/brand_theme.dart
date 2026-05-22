@@ -127,35 +127,22 @@ ThemeData buildBrandTheme() {
 
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(
-          color: BrandColors.primary,
-          width: 1.6,
-        ),
+        borderSide: const BorderSide(color: BrandColors.primary, width: 1.6),
       ),
 
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(
-          color: BrandColors.error,
-        ),
+        borderSide: const BorderSide(color: BrandColors.error),
       ),
 
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(
-          color: BrandColors.error,
-          width: 1.6,
-        ),
+        borderSide: const BorderSide(color: BrandColors.error, width: 1.6),
       ),
 
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 16,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
 
-      hintStyle: baseTextTheme.bodyMedium?.copyWith(
-        color: BrandColors.muted,
-      ),
+      hintStyle: baseTextTheme.bodyMedium?.copyWith(color: BrandColors.muted),
     ),
 
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -170,9 +157,7 @@ ThemeData buildBrandTheme() {
 
         elevation: 0,
 
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
 
         textStyle: baseTextTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.w700,
@@ -186,13 +171,9 @@ ThemeData buildBrandTheme() {
 
         minimumSize: const Size.fromHeight(56),
 
-        side: const BorderSide(
-          color: BrandColors.border,
-        ),
+        side: const BorderSide(color: BrandColors.border),
 
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
 
         textStyle: baseTextTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.w700,
@@ -207,9 +188,7 @@ ThemeData buildBrandTheme() {
 
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(999),
-        side: const BorderSide(
-          color: BrandColors.border,
-        ),
+        side: const BorderSide(color: BrandColors.border),
       ),
 
       labelStyle: baseTextTheme.labelMedium?.copyWith(
@@ -217,9 +196,7 @@ ThemeData buildBrandTheme() {
         fontWeight: FontWeight.w600,
       ),
 
-      side: const BorderSide(
-        color: BrandColors.border,
-      ),
+      side: const BorderSide(color: BrandColors.border),
     ),
 
     navigationBarTheme: NavigationBarThemeData(
@@ -254,15 +231,11 @@ ThemeData buildBrandTheme() {
     snackBarTheme: SnackBarThemeData(
       backgroundColor: BrandColors.ink,
 
-      contentTextStyle: baseTextTheme.bodyMedium?.copyWith(
-        color: Colors.white,
-      ),
+      contentTextStyle: baseTextTheme.bodyMedium?.copyWith(color: Colors.white),
 
       behavior: SnackBarBehavior.floating,
 
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
   );
 }

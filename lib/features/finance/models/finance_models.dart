@@ -16,12 +16,16 @@ class FinanceStats {
   });
 
   factory FinanceStats.fromJson(Map<String, dynamic> j) => FinanceStats(
-        monthlySalesAmount: (j['monthly_sales']?['amount'] as num?)?.toDouble() ?? 0.0,
-        monthlySkuCount: (j['monthly_sales']?['sku_count'] as num?)?.toInt() ?? 0,
-        totalUdhaarPending: (j['udhaar_stats']?['total_pending'] as num?)?.toDouble() ?? 0.0,
-        totalUdhaarRecovered: (j['udhaar_stats']?['total_recovered'] as num?)?.toDouble() ?? 0.0,
-        udhaarCustomerCount: (j['udhaar_stats']?['customer_count'] as num?)?.toInt() ?? 0,
-      );
+    monthlySalesAmount:
+        (j['monthly_sales']?['amount'] as num?)?.toDouble() ?? 0.0,
+    monthlySkuCount: (j['monthly_sales']?['sku_count'] as num?)?.toInt() ?? 0,
+    totalUdhaarPending:
+        (j['udhaar_stats']?['total_pending'] as num?)?.toDouble() ?? 0.0,
+    totalUdhaarRecovered:
+        (j['udhaar_stats']?['total_recovered'] as num?)?.toDouble() ?? 0.0,
+    udhaarCustomerCount:
+        (j['udhaar_stats']?['customer_count'] as num?)?.toInt() ?? 0,
+  );
 }
 
 class UdhaarItem {
@@ -46,13 +50,13 @@ class UdhaarItem {
   });
 
   factory UdhaarItem.fromJson(Map<String, dynamic> j) => UdhaarItem(
-        khataId: j['khata_id'] as int,
-        customerId: j['customer_id'] as int,
-        customerName: j['customer_name'] as String? ?? 'Unknown',
-        phone: j['phone'] as String? ?? '',
-        balance: (j['balance'] as num?)?.toDouble() ?? 0.0,
-        dateTaken: parseAsUtc(j['date_taken'] as String?),
-        daysPending: (j['days_pending'] as num?)?.toInt() ?? 0,
-        isRecovered: ((j['balance'] as num?) ?? 0) <= 0,
-      );
+    khataId: j['khata_id'] as int,
+    customerId: j['customer_id'] as int,
+    customerName: j['customer_name'] as String? ?? 'Unknown',
+    phone: j['phone'] as String? ?? '',
+    balance: (j['balance'] as num?)?.toDouble() ?? 0.0,
+    dateTaken: parseAsUtc(j['date_taken'] as String?),
+    daysPending: (j['days_pending'] as num?)?.toInt() ?? 0,
+    isRecovered: ((j['balance'] as num?) ?? 0) <= 0,
+  );
 }

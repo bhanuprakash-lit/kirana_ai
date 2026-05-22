@@ -39,11 +39,13 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     state = const AsyncLoading();
     try {
       final data = await _fetch();
-      state = AsyncData(InventoryData(
-        items: data.items,
-        categories: data.categories,
-        pendingItems: pendingSnapshot,
-      ));
+      state = AsyncData(
+        InventoryData(
+          items: data.items,
+          categories: data.categories,
+          pendingItems: pendingSnapshot,
+        ),
+      );
     } catch (e, st) {
       state = AsyncError(e, st);
     }
@@ -64,11 +66,11 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       client.getOltp('pricing', filters: {'store_id': '$storeId'}),
     ]);
 
-    final productsRes   = results[0] as List<dynamic>?;
+    final productsRes = results[0] as List<dynamic>?;
     final categoriesRes = results[1] as List<dynamic>?;
-    final recoRes       = results[2] as Map<String, dynamic>;
-    final snapshotRes   = results[3] as Map<String, dynamic>;
-    final pricingRes    = results[4] as Map<String, dynamic>;
+    final recoRes = results[2] as Map<String, dynamic>;
+    final snapshotRes = results[3] as Map<String, dynamic>;
+    final pricingRes = results[4] as Map<String, dynamic>;
 
     final categoryNameMap = <int, String>{};
     for (final cat in (categoriesRes ?? []).cast<Map<String, dynamic>>()) {
@@ -96,26 +98,24 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     }
 
     final pricingMap = <int, Map<String, dynamic>>{};
-    for (final row in ((pricingRes['rows'] as List<dynamic>?) ?? [])
-        .cast<Map<String, dynamic>>()) {
+    for (final row
+        in ((pricingRes['rows'] as List<dynamic>?) ?? [])
+            .cast<Map<String, dynamic>>()) {
       final id = (row['product_id'] as num?)?.toInt();
       if (id != null) pricingMap[id] = row;
     }
 
-    final items = (productsRes ?? [])
-        .cast<Map<String, dynamic>>()
-        .map((p) {
-          final productId = (p['product_id'] as num?)?.toInt() ?? 0;
-          return InventoryItem.fromSources(
-            product: p,
-            categoryName: categoryNameMap[(p['category_id'] as num?)?.toInt()],
-            recommendation: recoMap[productId],
-            pricing: pricingMap[productId],
-            soldToday: soldTodayMap[productId] ?? 0.0,
-            expiryDate: p['expiry_date'] as String?,
-          );
-        })
-        .toList();
+    final items = (productsRes ?? []).cast<Map<String, dynamic>>().map((p) {
+      final productId = (p['product_id'] as num?)?.toInt() ?? 0;
+      return InventoryItem.fromSources(
+        product: p,
+        categoryName: categoryNameMap[(p['category_id'] as num?)?.toInt()],
+        recommendation: recoMap[productId],
+        pricing: pricingMap[productId],
+        soldToday: soldTodayMap[productId] ?? 0.0,
+        expiryDate: p['expiry_date'] as String?,
+      );
+    }).toList();
 
     final categories = (categoriesRes ?? []).cast<Map<String, dynamic>>();
 
@@ -127,33 +127,41 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
   void _addPending(PendingInventoryItem p) {
     final cur = state.value;
     if (cur == null) return;
-    state = AsyncData(InventoryData(
-      items: cur.items,
-      categories: cur.categories,
-      pendingItems: [...cur.pendingItems, p],
-    ));
+    state = AsyncData(
+      InventoryData(
+        items: cur.items,
+        categories: cur.categories,
+        pendingItems: [...cur.pendingItems, p],
+      ),
+    );
   }
 
   void _updatePending(PendingInventoryItem updated) {
     final cur = state.value;
     if (cur == null) return;
-    state = AsyncData(InventoryData(
-      items: cur.items,
-      categories: cur.categories,
-      pendingItems: cur.pendingItems
-          .map((p) => p.tempId == updated.tempId ? updated : p)
-          .toList(),
-    ));
+    state = AsyncData(
+      InventoryData(
+        items: cur.items,
+        categories: cur.categories,
+        pendingItems: cur.pendingItems
+            .map((p) => p.tempId == updated.tempId ? updated : p)
+            .toList(),
+      ),
+    );
   }
 
   void _removePending(int tempId) {
     final cur = state.value;
     if (cur == null) return;
-    state = AsyncData(InventoryData(
-      items: cur.items,
-      categories: cur.categories,
-      pendingItems: cur.pendingItems.where((p) => p.tempId != tempId).toList(),
-    ));
+    state = AsyncData(
+      InventoryData(
+        items: cur.items,
+        categories: cur.categories,
+        pendingItems: cur.pendingItems
+            .where((p) => p.tempId != tempId)
+            .toList(),
+      ),
+    );
   }
 
   // ── Mutations ─────────────────────────────────────────────────────────────
@@ -268,8 +276,10 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
         } catch (_) {
           if (barcode != null) {
             try {
-              final lookup =
-                  await client.getOltp('product', filters: {'barcode': barcode});
+              final lookup = await client.getOltp(
+                'product',
+                filters: {'barcode': barcode},
+              );
               final rows = (lookup['rows'] as List<dynamic>?) ?? [];
               if (rows.isNotEmpty) {
                 productId = (rows.first['product_id'] as num?)?.toInt();
@@ -321,7 +331,9 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       _removePending(pending.tempId);
       await refresh();
       ref.read(posProvider.notifier).reloadProducts();
-      ref.read(overviewProvider.notifier).refresh(); // update SKU count on overview
+      ref
+          .read(overviewProvider.notifier)
+          .refresh(); // update SKU count on overview
       return;
     }
     // Auto-retry after 4 seconds
@@ -331,18 +343,25 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       _removePending(pending.tempId);
       await refresh();
       ref.read(posProvider.notifier).reloadProducts();
-      ref.read(overviewProvider.notifier).refresh(); // update SKU count on overview
+      ref
+          .read(overviewProvider.notifier)
+          .refresh(); // update SKU count on overview
     } else {
-      _updatePending(pending.copyWith(status: PendingStatus.failed, error: err));
+      _updatePending(
+        pending.copyWith(status: PendingStatus.failed, error: err),
+      );
     }
   }
 
   // Manual retry from UI.
   Future<void> retryPending(int tempId) async {
-    final pending =
-        state.value?.pendingItems.where((p) => p.tempId == tempId).firstOrNull;
+    final pending = state.value?.pendingItems
+        .where((p) => p.tempId == tempId)
+        .firstOrNull;
     if (pending == null) return;
-    _updatePending(pending.copyWith(status: PendingStatus.syncing, clearError: true));
+    _updatePending(
+      pending.copyWith(status: PendingStatus.syncing, clearError: true),
+    );
     await _syncPendingItem(pending);
   }
 
@@ -366,29 +385,36 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
 
     try {
       await Future.wait([
-        client.patchOltp('product', {
-          'name': name,
-          'category_id': categoryId,
-          'brand': brand,
-          'unit': unit,
-          'weight': weight,
-          'barcode': barcode,
-          'is_perishable': isPerishable,
-          'is_loose': isLoose,
-        }, filters: {'product_id': productId.toString()}),
-        client.patchOltp('pricing', {
-          'selling_price': sellingPrice,
-          'mrp': mrp,
-        }, filters: {
-          'store_id': storeId.toString(),
-          'product_id': productId.toString(),
-        }),
-        client.patchOltp('inventory', {
-          'quantity': stockQuantity,
-        }, filters: {
-          'store_id': storeId.toString(),
-          'product_id': productId.toString(),
-        }),
+        client.patchOltp(
+          'product',
+          {
+            'name': name,
+            'category_id': categoryId,
+            'brand': brand,
+            'unit': unit,
+            'weight': weight,
+            'barcode': barcode,
+            'is_perishable': isPerishable,
+            'is_loose': isLoose,
+          },
+          filters: {'product_id': productId.toString()},
+        ),
+        client.patchOltp(
+          'pricing',
+          {'selling_price': sellingPrice, 'mrp': mrp},
+          filters: {
+            'store_id': storeId.toString(),
+            'product_id': productId.toString(),
+          },
+        ),
+        client.patchOltp(
+          'inventory',
+          {'quantity': stockQuantity},
+          filters: {
+            'store_id': storeId.toString(),
+            'product_id': productId.toString(),
+          },
+        ),
       ]);
       await refresh();
       ref.read(posProvider.notifier).reloadProducts();
@@ -401,11 +427,11 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
   Future<bool> linkBarcode(int productId, String barcode) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.patchOltp('product', {
-        'barcode': barcode,
-      }, filters: {
-        'product_id': productId.toString(),
-      });
+      await client.patchOltp(
+        'product',
+        {'barcode': barcode},
+        filters: {'product_id': productId.toString()},
+      );
       await refresh();
       return true;
     } catch (_) {
@@ -419,12 +445,14 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     final storeId = prefs.getInt('store_id') ?? 1;
 
     try {
-      await client.patchOltp('inventory', {
-        'quantity': newQuantity,
-      }, filters: {
-        'store_id': storeId.toString(),
-        'product_id': productId.toString(),
-      });
+      await client.patchOltp(
+        'inventory',
+        {'quantity': newQuantity},
+        filters: {
+          'store_id': storeId.toString(),
+          'product_id': productId.toString(),
+        },
+      );
       await refresh();
       ref.read(posProvider.notifier).reloadProducts();
       return true;
@@ -451,12 +479,14 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
         'expiry_date': expiryDate,
         'qty_in_stock': quantity,
       });
-      await client.patchOltp('inventory', {
-        'quantity': currentStock + quantity,
-      }, filters: {
-        'store_id': storeId.toString(),
-        'product_id': productId.toString(),
-      });
+      await client.patchOltp(
+        'inventory',
+        {'quantity': currentStock + quantity},
+        filters: {
+          'store_id': storeId.toString(),
+          'product_id': productId.toString(),
+        },
+      );
       await refresh();
       ref.read(posProvider.notifier).reloadProducts();
       return true;
@@ -468,4 +498,5 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
 
 final inventoryProvider =
     AsyncNotifierProvider<InventoryNotifier, InventoryData>(
-        InventoryNotifier.new);
+      InventoryNotifier.new,
+    );

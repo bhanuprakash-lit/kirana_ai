@@ -5,9 +5,9 @@ class GeminiItem {
   const GeminiItem({required this.name, required this.quantity});
 
   factory GeminiItem.fromMap(Map<String, dynamic> m) => GeminiItem(
-        name: m['name'] as String? ?? '',
-        quantity: m['quantity'] as String? ?? '1',
-      );
+    name: m['name'] as String? ?? '',
+    quantity: m['quantity'] as String? ?? '1',
+  );
 
   /// Strips regional parenthetical: "Rice (బియ్యం)" → "rice"
   String get baseName => name.split('(').first.trim().toLowerCase();

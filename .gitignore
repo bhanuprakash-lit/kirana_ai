@@ -50,3 +50,17 @@ database_schemas_token_efficient.xlsx
 
 # Local secrets — never commit the real key file
 lib/core/config/secrets.dart
+
+# Claude Code local per-developer settings (team-shared settings.json is fine)
+.claude/settings.local.json
+
+# Test coverage output (also matched by /coverage above but be explicit)
+coverage/
+
+# Common editor / OS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*~

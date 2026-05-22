@@ -222,7 +222,9 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
 
   String _apiError(ApiException e) {
     final msg = e.message.toLowerCase();
-    if (e.statusCode == 409 || msg.contains('exists') || msg.contains('already')) {
+    if (e.statusCode == 409 ||
+        msg.contains('exists') ||
+        msg.contains('already')) {
       if (msg.contains('phone')) {
         return 'This phone number is already registered. Please sign in instead.';
       }

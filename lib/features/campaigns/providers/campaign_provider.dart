@@ -9,12 +9,14 @@ class CampaignNotifier extends AsyncNotifier<List<Campaign>> {
 
   Future<List<Campaign>> _fetch() async {
     final client = ref.read(apiClientProvider);
-    final prefs  = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     final storeId = prefs.getInt('store_id') ?? 1;
     try {
-      final res = await client.get(
-        '/kirana/campaigns/recommended?store_id=$storeId&limit=3',
-      ) as Map<String, dynamic>;
+      final res =
+          await client.get(
+                '/kirana/campaigns/recommended?store_id=$storeId&limit=3',
+              )
+              as Map<String, dynamic>;
       return (res['campaigns'] as List)
           .map((e) => Campaign.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -31,5 +33,5 @@ class CampaignNotifier extends AsyncNotifier<List<Campaign>> {
 
 final campaignProvider =
     AsyncNotifierProvider<CampaignNotifier, List<Campaign>>(
-  CampaignNotifier.new,
-);
+      CampaignNotifier.new,
+    );

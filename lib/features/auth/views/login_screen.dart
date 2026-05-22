@@ -55,24 +55,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Icons.storefront_rounded,
-                    size: 26, color: Colors.white),
+                child: const Icon(
+                  Icons.storefront_rounded,
+                  size: 26,
+                  color: Colors.white,
+                ),
               ).animate().scale(
-                    begin: const Offset(0.5, 0.5),
-                    duration: 500.ms,
-                    curve: Curves.elasticOut,
-                  ),
+                begin: const Offset(0.5, 0.5),
+                duration: 500.ms,
+                curve: Curves.elasticOut,
+              ),
               const SizedBox(height: 28),
-              Text('Welcome back',
-                      style: Theme.of(context).textTheme.headlineMedium)
-                  .animate(delay: 50.ms)
-                  .fadeIn()
-                  .slideY(begin: 0.2, end: 0),
+              Text(
+                'Welcome back',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ).animate(delay: 50.ms).fadeIn().slideY(begin: 0.2, end: 0),
               const SizedBox(height: 6),
-              Text('Sign in to your Kirana AI account.',
-                      style: Theme.of(context).textTheme.bodyMedium)
-                  .animate(delay: 100.ms)
-                  .fadeIn(),
+              Text(
+                'Sign in to your Kirana AI account.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ).animate(delay: 100.ms).fadeIn(),
               const SizedBox(height: 28),
 
               // ── Auth method tabs ──────────────────────────────────────────
@@ -84,9 +86,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 child: TabBar(
                   controller: _tab,
                   labelStyle: const TextStyle(
-                      fontWeight: FontWeight.w800, fontSize: 14),
-                  unselectedLabelStyle:
-                      const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                   labelColor: BrandColors.primary,
                   unselectedLabelColor: BrandColors.muted,
                   indicator: BoxDecoration(
@@ -120,10 +126,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 height: 340,
                 child: TabBarView(
                   controller: _tab,
-                  children: const [
-                    _PhoneLoginForm(),
-                    _EmailLoginForm(),
-                  ],
+                  children: const [_PhoneLoginForm(), _EmailLoginForm()],
                 ),
               ),
 
@@ -138,9 +141,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       children: [
                         TextSpan(
                           text: 'Create one',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
+                          style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: BrandColors.primary,
                                 fontWeight: FontWeight.w700,
@@ -281,8 +282,7 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
 
   Future<void> _signInWithCredential(PhoneAuthCredential cred) async {
     try {
-      final userCred =
-          await FirebaseAuth.instance.signInWithCredential(cred);
+      final userCred = await FirebaseAuth.instance.signInWithCredential(cred);
       final firebaseUser = userCred.user!;
       final phone = firebaseUser.phoneNumber!;
       final uid = firebaseUser.uid;
@@ -353,9 +353,13 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
             ],
             prefix: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text('+91',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700, color: BrandColors.ink)),
+              child: Text(
+                '+91',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: BrandColors.ink,
+                ),
+              ),
             ),
           ),
           if (_error != null) ...[
@@ -392,16 +396,20 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
                 _otpCtrl.clear();
                 _error = null;
               }),
-              child: const Icon(Icons.arrow_back_rounded,
-                  size: 20, color: BrandColors.muted),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                size: 20,
+                color: BrandColors.muted,
+              ),
             ),
             const SizedBox(width: 8),
             Text(
               'OTP sent to ${_phoneCtrl.text.trim()}',
               style: const TextStyle(
-                  fontSize: 13,
-                  color: BrandColors.muted,
-                  fontWeight: FontWeight.w500),
+                fontSize: 13,
+                color: BrandColors.muted,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -434,7 +442,9 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
             child: const Text(
               'Resend OTP',
               style: TextStyle(
-                  color: BrandColors.primary, fontWeight: FontWeight.w700),
+                color: BrandColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),
@@ -474,7 +484,9 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
       _error = null;
     });
     try {
-      await ref.read(authRepositoryProvider).login(
+      await ref
+          .read(authRepositoryProvider)
+          .login(
             username: _emailCtrl.text.trim(),
             password: _passwordCtrl.text,
           );
@@ -525,8 +537,7 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
                 color: BrandColors.muted,
                 size: 20,
               ),
-              onPressed: () =>
-                  setState(() => _showPassword = !_showPassword),
+              onPressed: () => setState(() => _showPassword = !_showPassword),
             ),
             validator: (v) =>
                 (v == null || v.isEmpty) ? 'Password is required' : null,
@@ -560,21 +571,24 @@ class _ErrorBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: BrandColors.error.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: BrandColors.error.withValues(alpha: 0.2)),
+        border: Border.all(color: BrandColors.error.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline_rounded,
-              color: BrandColors.error, size: 16),
+          const Icon(
+            Icons.error_outline_rounded,
+            color: BrandColors.error,
+            size: 16,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
               style: const TextStyle(
-                  fontSize: 13,
-                  color: BrandColors.error,
-                  fontWeight: FontWeight.w500),
+                fontSize: 13,
+                color: BrandColors.error,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],

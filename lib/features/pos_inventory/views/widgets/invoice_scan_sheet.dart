@@ -23,7 +23,10 @@ import 'ai_gate_widgets.dart';
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 Future<void> showInvoiceScanSheet(
-    BuildContext context, WidgetRef ref, List<Supplier> suppliers) {
+  BuildContext context,
+  WidgetRef ref,
+  List<Supplier> suppliers,
+) {
   return showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -74,15 +77,23 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
   // ── Pick & process ────────────────────────────────────────────────────────
 
   Future<void> _pickCamera() async {
-    final xf = await ImagePicker().pickImage(source: ImageSource.camera, imageQuality: 90);
+    final xf = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      imageQuality: 90,
+    );
     if (xf == null || !mounted) return;
     await _process(await xf.readAsBytes(), 'image/jpeg');
   }
 
   Future<void> _pickGallery() async {
-    final xf = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 90);
+    final xf = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 90,
+    );
     if (xf == null || !mounted) return;
-    final mime = xf.name.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+    final mime = xf.name.toLowerCase().endsWith('.png')
+        ? 'image/png'
+        : 'image/jpeg';
     await _process(await xf.readAsBytes(), mime);
   }
 
@@ -100,13 +111,16 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
     final mime = ext == 'pdf'
         ? 'application/pdf'
         : ext == 'png'
-            ? 'image/png'
-            : 'image/jpeg';
+        ? 'image/png'
+        : 'image/jpeg';
     await _process(bytes, mime);
   }
 
   Future<void> _process(Uint8List bytes, String mime) async {
-    setState(() { _state = _ScanState.processing; _errorMsg = ''; });
+    setState(() {
+      _state = _ScanState.processing;
+      _errorMsg = '';
+    });
     try {
       final result = await _svc.extractInvoice(bytes, mime);
       final extraction = result.extraction;
@@ -126,7 +140,9 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
 
       // Server already recorded the use; apply inline status update instantly
       if (result.aiStatus != null) {
-        ref.read(usageLimitsProvider.notifier).applyInlineUpdate(kFeatureInvoice, result.aiStatus!);
+        ref
+            .read(usageLimitsProvider.notifier)
+            .applyInlineUpdate(kFeatureInvoice, result.aiStatus!);
       }
 
       setState(() {
@@ -155,7 +171,10 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
       final pn = p.name.toLowerCase();
       if (pn.contains(base) || (base.contains(pn) && pn.length > 3)) return p;
     }
-    final words = base.split(RegExp(r'\s+')).where((w) => w.length >= 4).toList();
+    final words = base
+        .split(RegExp(r'\s+'))
+        .where((w) => w.length >= 4)
+        .toList();
     for (final word in words) {
       for (final p in products) {
         if (p.name.toLowerCase().contains(word)) return p;
@@ -170,7 +189,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
       if (s.name.toLowerCase() == v) return s;
     }
     for (final s in suppliers) {
-      if (s.name.toLowerCase().contains(v) || v.contains(s.name.toLowerCase())) return s;
+      if (s.name.toLowerCase().contains(v) || v.contains(s.name.toLowerCase()))
+        return s;
     }
     final words = v.split(RegExp(r'\s+')).where((w) => w.length >= 4).toList();
     for (final word in words) {
@@ -192,7 +212,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _ProductPickerSheet(products: products, initialQuery: query),
+      builder: (_) =>
+          _ProductPickerSheet(products: products, initialQuery: query),
     );
     if (picked != null && mounted) _linkProduct(index, picked);
   }
@@ -209,27 +230,37 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
     setState(() => _state = _ScanState.creating);
 
     try {
-      final matchedItems = _items.where((m) => m.matched && m.invoice.quantity != null).map((m) => {
-        'product_id': m.product!.productId,
-        'quantity': m.invoice.quantity!,
-        'cost_price': m.invoice.effectiveCostPrice,
-      }).toList();
+      final matchedItems = _items
+          .where((m) => m.matched && m.invoice.quantity != null)
+          .map(
+            (m) => {
+              'product_id': m.product!.productId,
+              'quantity': m.invoice.quantity!,
+              'cost_price': m.invoice.effectiveCostPrice,
+            },
+          )
+          .toList();
 
       final grand = _extraction?.totals.grandTotal;
       final inv = _extraction?.details;
 
-      await ref.read(procurementProvider.notifier).createPurchaseOrder(
-        supplierId: _selectedSupplier!.supplierId,
-        items: matchedItems,
-        notes: [
-          if (inv?.number != null) 'Invoice: ${inv!.number}',
-          if (inv?.date != null) 'Date: ${inv!.date}',
-        ].join(' · ').isEmpty ? 'From scanned invoice' : [
-          if (inv?.number != null) 'Invoice: ${inv!.number}',
-          if (inv?.date != null) 'Date: ${inv!.date}',
-        ].join(' · '),
-        totalAmountOverride: grand,
-      );
+      await ref
+          .read(procurementProvider.notifier)
+          .createPurchaseOrder(
+            supplierId: _selectedSupplier!.supplierId,
+            items: matchedItems,
+            notes:
+                [
+                  if (inv?.number != null) 'Invoice: ${inv!.number}',
+                  if (inv?.date != null) 'Date: ${inv!.date}',
+                ].join(' · ').isEmpty
+                ? 'From scanned invoice'
+                : [
+                    if (inv?.number != null) 'Invoice: ${inv!.number}',
+                    if (inv?.date != null) 'Date: ${inv!.date}',
+                  ].join(' · '),
+            totalAmountOverride: grand,
+          );
 
       if (mounted) setState(() => _state = _ScanState.done);
       await Future.delayed(const Duration(milliseconds: 800));
@@ -237,15 +268,17 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
 
       final unmatched = _items.where((m) => !m.matched).length;
       // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          unmatched > 0
-              ? 'Purchase order created! ($unmatched item${unmatched > 1 ? 's' : ''} not matched)'
-              : 'Purchase order created from invoice!',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            unmatched > 0
+                ? 'Purchase order created! ($unmatched item${unmatched > 1 ? 's' : ''} not matched)'
+                : 'Purchase order created from invoice!',
+          ),
+          backgroundColor: BrandColors.success,
+          duration: const Duration(seconds: 3),
         ),
-        backgroundColor: BrandColors.success,
-        duration: const Duration(seconds: 3),
-      ));
+      );
     } catch (e) {
       setState(() {
         _errorMsg = e.toString().replaceFirst('Exception: ', '');
@@ -262,7 +295,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
     final subInfo = ref.watch(subInfoProvider);
     final isPro = subInfo.effectiveTier == SubTier.pro;
     final limitsAsync = ref.watch(usageLimitsProvider);
-    final remaining = limitsAsync.value?.invoiceRemaining ?? kDailyLimits[kFeatureInvoice]!;
+    final remaining =
+        limitsAsync.value?.invoiceRemaining ?? kDailyLimits[kFeatureInvoice]!;
     final canUse = isPro && remaining > 0;
 
     return SizedBox(
@@ -275,7 +309,16 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)))),
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: BrandColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
             const SizedBox(height: 14),
 
             // Header
@@ -285,26 +328,58 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: BrandColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.document_scanner_rounded, color: BrandColors.primary, size: 20),
+                    decoration: BoxDecoration(
+                      color: BrandColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.document_scanner_rounded,
+                      color: BrandColors.primary,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Scan Invoice', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink)),
-                        Text('Camera · Gallery · PDF', style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+                        Text(
+                          'Scan Invoice',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: BrandColors.ink,
+                          ),
+                        ),
+                        Text(
+                          'Camera · Gallery · PDF',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: BrandColors.muted,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  if (isPro) AiUsageBadge(remaining: remaining, total: kDailyLimits[kFeatureInvoice]!, label: 'scans'),
+                  if (isPro)
+                    AiUsageBadge(
+                      remaining: remaining,
+                      total: kDailyLimits[kFeatureInvoice]!,
+                      label: 'scans',
+                    ),
                   if (_state == _ScanState.review) ...[
                     const SizedBox(width: 4),
                     IconButton(
-                      icon: const Icon(Icons.refresh_rounded, color: BrandColors.muted),
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        color: BrandColors.muted,
+                      ),
                       tooltip: 'Scan again',
-                      onPressed: () => setState(() { _state = _ScanState.idle; _extraction = null; _items = []; }),
+                      onPressed: () => setState(() {
+                        _state = _ScanState.idle;
+                        _extraction = null;
+                        _items = [];
+                      }),
                     ),
                   ],
                 ],
@@ -332,16 +407,18 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                   color: BrandColors.error,
                   message: 'Daily limit reached. Top up credits to continue.',
                   actionLabel: 'Buy Credits',
-                  onAction: () => showCreditsPurchaseSheet(context, ref, highlightFeature: kFeatureInvoice),
+                  onAction: () => showCreditsPurchaseSheet(
+                    context,
+                    ref,
+                    highlightFeature: kFeatureInvoice,
+                  ),
                 ),
               ),
             if (!canUse) const SizedBox(height: 4),
 
             const Divider(height: 1),
 
-            Expanded(
-              child: _buildBody(canUse: canUse),
-            ),
+            Expanded(child: _buildBody(canUse: canUse)),
           ],
         ),
       ),
@@ -357,23 +434,41 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
       case _ScanState.review:
         return _buildReview();
       case _ScanState.creating:
-        return const Center(child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Creating purchase order…', style: TextStyle(color: BrandColors.muted, fontSize: 13)),
-          ],
-        ));
+        return const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text(
+                'Creating purchase order…',
+                style: TextStyle(color: BrandColors.muted, fontSize: 13),
+              ),
+            ],
+          ),
+        );
       case _ScanState.done:
-        return const Center(child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.check_circle_rounded, color: BrandColors.success, size: 56),
-            SizedBox(height: 12),
-            Text('Purchase order created!', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: BrandColors.success)),
-          ],
-        ));
+        return const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.check_circle_rounded,
+                color: BrandColors.success,
+                size: 56,
+              ),
+              SizedBox(height: 12),
+              Text(
+                'Purchase order created!',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: BrandColors.success,
+                ),
+              ),
+            ],
+          ),
+        );
       case _ScanState.error:
         return Center(
           child: Padding(
@@ -381,9 +476,20 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline_rounded, color: BrandColors.error, size: 48),
+                const Icon(
+                  Icons.error_outline_rounded,
+                  color: BrandColors.error,
+                  size: 48,
+                ),
                 const SizedBox(height: 12),
-                Text(_errorMsg, textAlign: TextAlign.center, style: const TextStyle(color: BrandColors.error, fontSize: 13)),
+                Text(
+                  _errorMsg,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: BrandColors.error,
+                    fontSize: 13,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: () => setState(() => _state = _ScanState.idle),
@@ -412,32 +518,64 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
             ),
             child: Column(
               children: [
-                Icon(Icons.receipt_long_rounded, size: 56,
-                    color: (canUse ? BrandColors.primary : BrandColors.muted).withValues(alpha: 0.6)),
+                Icon(
+                  Icons.receipt_long_rounded,
+                  size: 56,
+                  color: (canUse ? BrandColors.primary : BrandColors.muted)
+                      .withValues(alpha: 0.6),
+                ),
                 const SizedBox(height: 12),
                 Text(
-                  canUse ? 'Capture or upload a supplier invoice' : 'Upgrade to Pro or top up credits',
+                  canUse
+                      ? 'Capture or upload a supplier invoice'
+                      : 'Upgrade to Pro or top up credits',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 14, color: BrandColors.muted, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: BrandColors.muted,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                const Text('Kirana AI reads items, totals & supplier details', textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+                const Text(
+                  'Kirana AI reads items, totals & supplier details',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 32),
           Row(
             children: [
-              Expanded(child: _PickButton(icon: Icons.camera_alt_rounded, label: 'Camera', color: BrandColors.primary, onTap: canUse ? _pickCamera : null)),
+              Expanded(
+                child: _PickButton(
+                  icon: Icons.camera_alt_rounded,
+                  label: 'Camera',
+                  color: BrandColors.primary,
+                  onTap: canUse ? _pickCamera : null,
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _PickButton(icon: Icons.photo_library_rounded, label: 'Gallery', color: const Color(0xFF7C3AED), onTap: canUse ? _pickGallery : null)),
+              Expanded(
+                child: _PickButton(
+                  icon: Icons.photo_library_rounded,
+                  label: 'Gallery',
+                  color: const Color(0xFF7C3AED),
+                  onTap: canUse ? _pickGallery : null,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
-            child: _PickButton(icon: Icons.picture_as_pdf_rounded, label: 'Upload PDF / Image File', color: BrandColors.muted, onTap: canUse ? _pickFile : null),
+            child: _PickButton(
+              icon: Icons.picture_as_pdf_rounded,
+              label: 'Upload PDF / Image File',
+              color: BrandColors.muted,
+              onTap: canUse ? _pickFile : null,
+            ),
           ),
         ],
       ),
@@ -451,9 +589,19 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
         children: [
           CircularProgressIndicator(),
           SizedBox(height: 20),
-          Text('Kirana AI is reading your invoice…', style: TextStyle(fontSize: 14, color: BrandColors.ink, fontWeight: FontWeight.w600)),
+          Text(
+            'Kirana AI is reading your invoice…',
+            style: TextStyle(
+              fontSize: 14,
+              color: BrandColors.ink,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           SizedBox(height: 6),
-          Text('Extracting items, quantities and totals', style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+          Text(
+            'Extracting items, quantities and totals',
+            style: TextStyle(fontSize: 12, color: BrandColors.muted),
+          ),
         ],
       ),
     );
@@ -494,14 +642,32 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (ext.vendor.name != null)
-                  Text(ext.vendor.name!, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                  Text(
+                    ext.vendor.name!,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                    ),
+                  ),
                 if (ext.vendor.gstin != null)
-                  Text('GSTIN: ${ext.vendor.gstin}', style: const TextStyle(fontSize: 11, color: BrandColors.muted)),
+                  Text(
+                    'GSTIN: ${ext.vendor.gstin}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: BrandColors.muted,
+                    ),
+                  ),
                 if (ext.details.number != null || ext.details.date != null) ...[
                   const SizedBox(height: 6),
                   Text(
-                    [if (ext.details.number != null) '# ${ext.details.number}', if (ext.details.date != null) ext.details.date!].join('  ·  '),
-                    style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                    [
+                      if (ext.details.number != null) '# ${ext.details.number}',
+                      if (ext.details.date != null) ext.details.date!,
+                    ].join('  ·  '),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
                   ),
                 ],
                 if (grand != null) ...[
@@ -509,9 +675,21 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Grand Total', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                      Text('₹${grand.toStringAsFixed(0)}',
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: BrandColors.primary)),
+                      const Text(
+                        'Grand Total',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        '₹${grand.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                          color: BrandColors.primary,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -521,7 +699,15 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
           const SizedBox(height: 16),
 
           // Supplier picker
-          const Text('SUPPLIER', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: BrandColors.muted, letterSpacing: 1.2)),
+          const Text(
+            'SUPPLIER',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: BrandColors.muted,
+              letterSpacing: 1.2,
+            ),
+          ),
           const SizedBox(height: 8),
           _SupplierPicker(
             suppliers: widget.suppliers,
@@ -535,8 +721,23 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('ITEMS (${_items.length})', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: BrandColors.muted, letterSpacing: 1.2)),
-              Text('$matched matched', style: TextStyle(fontSize: 11, color: matched > 0 ? BrandColors.success : BrandColors.muted, fontWeight: FontWeight.w600)),
+              Text(
+                'ITEMS (${_items.length})',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: BrandColors.muted,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              Text(
+                '$matched matched',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: matched > 0 ? BrandColors.success : BrandColors.muted,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -559,12 +760,21 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, size: 14, color: Colors.orange),
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    size: 14,
+                    color: Colors.orange,
+                  ),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(
-                    '${_items.where((m) => !m.matched).length} unmatched item${_items.where((m) => !m.matched).length > 1 ? 's' : ''} will not be added as line items, but the full invoice total will be recorded.',
-                    style: const TextStyle(fontSize: 11, color: Colors.orange),
-                  )),
+                  Expanded(
+                    child: Text(
+                      '${_items.where((m) => !m.matched).length} unmatched item${_items.where((m) => !m.matched).length > 1 ? 's' : ''} will not be added as line items, but the full invoice total will be recorded.',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.orange,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -583,8 +793,13 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                     : 'Create Purchase Order${grand != null ? ' · ₹${grand.toStringAsFixed(0)}' : ''}',
               ),
               style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
               ),
             ),
           ),
@@ -602,7 +817,12 @@ class _PickButton extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback? onTap;
-  const _PickButton({required this.icon, required this.label, required this.color, required this.onTap});
+  const _PickButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -623,7 +843,14 @@ class _PickButton extends StatelessWidget {
             children: [
               Icon(icon, color: effectiveColor, size: 28),
               const SizedBox(height: 8),
-              Text(label, style: TextStyle(color: effectiveColor, fontWeight: FontWeight.w700, fontSize: 13)),
+              Text(
+                label,
+                style: TextStyle(
+                  color: effectiveColor,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
             ],
           ),
         ),
@@ -639,16 +866,30 @@ class _ConfidenceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = (score * 100).round();
-    final color = score >= 0.85 ? BrandColors.success : score >= 0.65 ? Colors.orange : BrandColors.error;
+    final color = score >= 0.85
+        ? BrandColors.success
+        : score >= 0.65
+        ? Colors.orange
+        : BrandColors.error;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.auto_awesome_rounded, size: 13, color: color),
           const SizedBox(width: 4),
-          Text('$pct% confidence', style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w700)),
+          Text(
+            '$pct% confidence',
+            style: TextStyle(
+              fontSize: 12,
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -661,12 +902,30 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = status == 'valid' ? BrandColors.success : status == 'mismatch' ? BrandColors.error : BrandColors.muted;
-    final label = status == 'valid' ? '✓ Totals match' : status == 'mismatch' ? '⚠ Total mismatch' : 'Unverified';
+    final color = status == 'valid'
+        ? BrandColors.success
+        : status == 'mismatch'
+        ? BrandColors.error
+        : BrandColors.muted;
+    final label = status == 'valid'
+        ? '✓ Totals match'
+        : status == 'mismatch'
+        ? '⚠ Total mismatch'
+        : 'Unverified';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-      child: Text(label, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w700)),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          color: color,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 }
@@ -686,11 +945,21 @@ class _InvoiceItemTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: item.matched ? BrandColors.success.withValues(alpha: 0.3) : BrandColors.border),
+        border: Border.all(
+          color: item.matched
+              ? BrandColors.success.withValues(alpha: 0.3)
+              : BrandColors.border,
+        ),
       ),
       child: Row(
         children: [
-          Icon(item.matched ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded, color: color, size: 16),
+          Icon(
+            item.matched
+                ? Icons.check_circle_rounded
+                : Icons.radio_button_unchecked_rounded,
+            color: color,
+            size: 16,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -698,22 +967,37 @@ class _InvoiceItemTile extends StatelessWidget {
               children: [
                 Text(
                   item.matched ? item.product!.displayName : (inv.name ?? ''),
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: item.matched ? BrandColors.ink : BrandColors.muted),
-                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: item.matched ? BrandColors.ink : BrandColors.muted,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (!item.matched && inv.name != null)
-                  Text('"${inv.name}"', style: const TextStyle(fontSize: 10, color: BrandColors.muted)),
+                  Text(
+                    '"${inv.name}"',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: BrandColors.muted,
+                    ),
+                  ),
               ],
             ),
           ),
           const SizedBox(width: 8),
           if (inv.quantity != null)
-            Text('${inv.quantity!.toStringAsFixed(inv.quantity! == inv.quantity!.roundToDouble() ? 0 : 1)} ${inv.unit ?? ''}',
-                style: const TextStyle(fontSize: 11, color: BrandColors.muted)),
+            Text(
+              '${inv.quantity!.toStringAsFixed(inv.quantity! == inv.quantity!.roundToDouble() ? 0 : 1)} ${inv.unit ?? ''}',
+              style: const TextStyle(fontSize: 11, color: BrandColors.muted),
+            ),
           const SizedBox(width: 8),
           if (inv.finalAmount != null)
-            Text('₹${inv.finalAmount!.toStringAsFixed(0)}',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            Text(
+              '₹${inv.finalAmount!.toStringAsFixed(0)}',
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            ),
           if (!item.matched) ...[
             const SizedBox(width: 8),
             TextButton(
@@ -723,7 +1007,10 @@ class _InvoiceItemTile extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
-              child: const Text('Pick', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+              child: const Text(
+                'Pick',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         ],
@@ -754,24 +1041,49 @@ class _SupplierPicker extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: selected != null ? BrandColors.primary.withValues(alpha: 0.05) : BrandColors.surfaceTint,
+          color: selected != null
+              ? BrandColors.primary.withValues(alpha: 0.05)
+              : BrandColors.surfaceTint,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected != null ? BrandColors.primary.withValues(alpha: 0.3) : BrandColors.border),
+          border: Border.all(
+            color: selected != null
+                ? BrandColors.primary.withValues(alpha: 0.3)
+                : BrandColors.border,
+          ),
         ),
         child: Row(
           children: [
-            Icon(Icons.business_rounded, size: 18,
-                color: selected != null ? BrandColors.primary : BrandColors.muted),
+            Icon(
+              Icons.business_rounded,
+              size: 18,
+              color: selected != null ? BrandColors.primary : BrandColors.muted,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: selected != null
-                  ? Text(selected!.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: BrandColors.ink))
+                  ? Text(
+                      selected!.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: BrandColors.ink,
+                      ),
+                    )
                   : Text(
-                      vendorName != null ? 'No match for "$vendorName" — tap to select' : 'Select supplier',
-                      style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+                      vendorName != null
+                          ? 'No match for "$vendorName" — tap to select'
+                          : 'Select supplier',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: BrandColors.muted,
+                      ),
                     ),
             ),
-            const Icon(Icons.keyboard_arrow_down_rounded, color: BrandColors.muted, size: 20),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: BrandColors.muted,
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -820,17 +1132,33 @@ class _SupplierPickerSheet extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 14),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text('Select Supplier', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+              child: Text(
+                'Select Supplier',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+              ),
             ),
             const SizedBox(height: 8),
             const Divider(height: 1),
             Expanded(
               child: suppliers.isEmpty
-                  ? const Center(child: Text('No suppliers yet. Add suppliers in the Purchase tab.', textAlign: TextAlign.center, style: TextStyle(color: BrandColors.muted)))
+                  ? const Center(
+                      child: Text(
+                        'No suppliers yet. Add suppliers in the Purchase tab.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    )
                   : ListView.builder(
                       controller: ctrl,
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -838,15 +1166,29 @@ class _SupplierPickerSheet extends StatelessWidget {
                       itemBuilder: (_, i) {
                         final s = suppliers[i];
                         return ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          leading: CircleAvatar(
-                            backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
-                            child: const Icon(Icons.business_rounded, color: BrandColors.primary, size: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                          leading: CircleAvatar(
+                            backgroundColor: BrandColors.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            child: const Icon(
+                              Icons.business_rounded,
+                              color: BrandColors.primary,
+                              size: 18,
+                            ),
+                          ),
+                          title: Text(
+                            s.name,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
                           subtitle: s.phone != null ? Text(s.phone!) : null,
                           trailing: selected?.supplierId == s.supplierId
-                              ? const Icon(Icons.check_circle_rounded, color: BrandColors.primary)
+                              ? const Icon(
+                                  Icons.check_circle_rounded,
+                                  color: BrandColors.primary,
+                                )
                               : null,
                           onTap: () => onSelect(s),
                         );
@@ -865,7 +1207,10 @@ class _SupplierPickerSheet extends StatelessWidget {
 class _ProductPickerSheet extends StatefulWidget {
   final List<PosProduct> products;
   final String initialQuery;
-  const _ProductPickerSheet({required this.products, required this.initialQuery});
+  const _ProductPickerSheet({
+    required this.products,
+    required this.initialQuery,
+  });
 
   @override
   State<_ProductPickerSheet> createState() => _ProductPickerSheetState();
@@ -883,14 +1228,18 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final filtered = widget.products.where((p) {
       if (_query.isEmpty) return true;
       final q = _query.toLowerCase();
-      return p.name.toLowerCase().contains(q) || (p.brand?.toLowerCase().contains(q) ?? false);
+      return p.name.toLowerCase().contains(q) ||
+          (p.brand?.toLowerCase().contains(q) ?? false);
     }).toList();
 
     return DraggableScrollableSheet(
@@ -905,14 +1254,24 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 14),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Link to Inventory', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                  const Text(
+                    'Link to Inventory',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: _ctrl,
@@ -920,10 +1279,21 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       hintText: 'Search products…',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 18, color: BrandColors.muted),
-                      filled: true, fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 18,
+                        color: BrandColors.muted,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                 ],
@@ -932,7 +1302,12 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(child: Text('No products found', style: TextStyle(color: BrandColors.muted)))
+                  ? const Center(
+                      child: Text(
+                        'No products found',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    )
                   : ListView.builder(
                       controller: ctrl,
                       padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
@@ -940,10 +1315,27 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
                       itemBuilder: (_, i) {
                         final p = filtered[i];
                         return ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          title: Text(p.displayName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                          subtitle: Text('${p.priceLabel} · Stock: ${p.stockLabel}', style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
-                          trailing: const Icon(Icons.link_rounded, color: BrandColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          title: Text(
+                            p.displayName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${p.priceLabel} · Stock: ${p.stockLabel}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.link_rounded,
+                            color: BrandColors.primary,
+                          ),
                           onTap: () => Navigator.pop(context, p),
                         );
                       },

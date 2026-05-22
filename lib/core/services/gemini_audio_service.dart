@@ -26,8 +26,14 @@ class GeminiAudioService {
     );
   }
 
-  Future<({String transcript, List<GeminiItem> items, Map<String, dynamic>? aiStatus})>
-      stopAndProcess() async {
+  Future<
+    ({
+      String transcript,
+      List<GeminiItem> items,
+      Map<String, dynamic>? aiStatus,
+    })
+  >
+  stopAndProcess() async {
     final path = await _recorder.stop();
     if (path == null || path.isEmpty) throw Exception('No audio recorded');
 

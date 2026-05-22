@@ -87,7 +87,11 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
         Container(
           color: BrandColors.background,
           padding: EdgeInsets.fromLTRB(
-            28, 24, 28, 40 + MediaQuery.of(context).padding.bottom),
+            28,
+            24,
+            28,
+            40 + MediaQuery.of(context).padding.bottom,
+          ),
           child: Column(
             children: [
               SmoothPageIndicator(

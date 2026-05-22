@@ -56,10 +56,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/home',
         builder: (context, state) => const DashboardScreen(),
@@ -134,7 +131,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':id',
                 builder: (context, state) {
-                  final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+                  final id =
+                      int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
                   return CustomerDetailScreen(customerId: id);
                 },
               ),

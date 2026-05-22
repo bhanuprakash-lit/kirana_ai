@@ -20,23 +20,23 @@ class StoreProfile {
   });
 
   factory StoreProfile.fromJson(Map<String, dynamic> j) => StoreProfile(
-        storeId: j['store_id'] as int,
-        name: j['store_name'] as String? ?? 'My Store',
-        type: j['store_type'] as String? ?? 'kirana',
-        footfall: (j['footfall'] as num?)?.toInt() ?? 0,
-        budget: (j['budget'] as num?)?.toDouble() ?? 0.0,
-        dailyBudget: (j['daily_budget'] as num?)?.toDouble() ?? 0.0,
-        location: j['location'] as String?,
-        region: j['region'] as String?,
-      );
+    storeId: j['store_id'] as int,
+    name: j['store_name'] as String? ?? 'My Store',
+    type: j['store_type'] as String? ?? 'kirana',
+    footfall: (j['footfall'] as num?)?.toInt() ?? 0,
+    budget: (j['budget'] as num?)?.toDouble() ?? 0.0,
+    dailyBudget: (j['daily_budget'] as num?)?.toDouble() ?? 0.0,
+    location: j['location'] as String?,
+    region: j['region'] as String?,
+  );
 
   Map<String, dynamic> toJson() => {
-        'store_name': name,
-        'store_type': type,
-        'footfall': footfall,
-        'budget': budget,
-        'daily_budget': dailyBudget,
-        'location': location,
-        'region': region,
-      };
+    'store_name': name,
+    'store_type': type,
+    'footfall': footfall,
+    'budget': budget,
+    'daily_budget': dailyBudget,
+    'location': location,
+    'region': region,
+  };
 }

@@ -101,7 +101,9 @@ class KpiState {
   Map<String, List<KpiRegistryItem>> get groupedRegistry {
     final map = <String, List<KpiRegistryItem>>{};
     for (final item in registry) {
-      final cat = item.category.toLowerCase() == 'common' ? 'Core Insights' : item.category;
+      final cat = item.category.toLowerCase() == 'common'
+          ? 'Core Insights'
+          : item.category;
       map.putIfAbsent(cat, () => []).add(item);
     }
     return map;
@@ -129,7 +131,9 @@ class KpiState {
     final map = <String, List<KpiData>>{};
     final idToTheme = {
       for (final item in registry)
-        item.kpiId: item.category.toLowerCase() == 'common' ? 'Core Insights' : item.category,
+        item.kpiId: item.category.toLowerCase() == 'common'
+            ? 'Core Insights'
+            : item.category,
     };
 
     for (final data in subscribedData) {
@@ -170,14 +174,14 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
 
     // Fetch registry, summary, server prefs, and tier config in parallel
     final registryFuture = client.get('/kirana/kpis/registry');
-    final summaryFuture  = client.get('/kirana/kpis/summary?store_id=$storeId');
-    final prefsFuture    = client.get('/kirana/preferences');
-    final tiersFuture    = client.get('/kirana/kpis/tiers');
+    final summaryFuture = client.get('/kirana/kpis/summary?store_id=$storeId');
+    final prefsFuture = client.get('/kirana/preferences');
+    final tiersFuture = client.get('/kirana/kpis/tiers');
 
     final registryRes = await registryFuture;
-    final summaryRes  = await summaryFuture;
-    final prefsRes    = await prefsFuture;
-    final tiersRes    = await tiersFuture.catchError((_) => <String, dynamic>{});
+    final summaryRes = await summaryFuture;
+    final prefsRes = await prefsFuture;
+    final tiersRes = await tiersFuture.catchError((_) => <String, dynamic>{});
 
     final registry = (registryRes['kpis'] as List)
         .map((e) => KpiRegistryItem.fromJson(e as Map<String, dynamic>))
@@ -205,7 +209,10 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
         .where((k) => subscribedIds.contains(k.kpiId))
         .toList();
 
-    final rawTiers = (tiersRes as Map<String, dynamic>?)?['tiers'] as Map<String, dynamic>? ?? {};
+    final rawTiers =
+        (tiersRes as Map<String, dynamic>?)?['tiers']
+            as Map<String, dynamic>? ??
+        {};
     final tierConfig = rawTiers.map((k, v) => MapEntry(k, v as String));
 
     return KpiState(
@@ -254,7 +261,9 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
       final newSubscribedData = currentState.subscribedData
           .where((k) => currentState.subscribedIds.contains(k.kpiId))
           .toList();
-      state = AsyncData(currentState.copyWith(subscribedData: newSubscribedData));
+      state = AsyncData(
+        currentState.copyWith(subscribedData: newSubscribedData),
+      );
     }
   }
 
@@ -304,4 +313,6 @@ class KpiNotifier extends AsyncNotifier<KpiState> {
   }
 }
 
-final kpiProvider = AsyncNotifierProvider.autoDispose<KpiNotifier, KpiState>(KpiNotifier.new);
+final kpiProvider = AsyncNotifierProvider.autoDispose<KpiNotifier, KpiState>(
+  KpiNotifier.new,
+);

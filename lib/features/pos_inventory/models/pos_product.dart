@@ -88,14 +88,16 @@ class PosProduct {
     if (weight == null && unit == null) return null;
     final w = weight != null
         ? (weight! % 1 == 0
-            ? weight!.toInt().toString()
-            : weight!.toStringAsFixed(1))
+              ? weight!.toInt().toString()
+              : weight!.toStringAsFixed(1))
         : null;
     return [w, unit].whereType<String>().join(' ');
   }
 
   String get priceLabel {
-    final s = price % 1 == 0 ? price.toInt().toString() : price.toStringAsFixed(1);
+    final s = price % 1 == 0
+        ? price.toInt().toString()
+        : price.toStringAsFixed(1);
     if (isLoose) {
       return '₹$s / ${unit ?? "unit"}';
     }
@@ -103,7 +105,9 @@ class PosProduct {
   }
 
   String get stockLabel {
-    final qty = stockQuantity % 1 == 0 ? stockQuantity.toInt().toString() : stockQuantity.toStringAsFixed(2);
+    final qty = stockQuantity % 1 == 0
+        ? stockQuantity.toInt().toString()
+        : stockQuantity.toStringAsFixed(2);
     if (isLoose) {
       return '$qty ${unit ?? "units"}';
     }

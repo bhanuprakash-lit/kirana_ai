@@ -8,7 +8,8 @@ class TrialCountdownWidget extends ConsumerStatefulWidget {
   const TrialCountdownWidget({super.key});
 
   @override
-  ConsumerState<TrialCountdownWidget> createState() => _TrialCountdownWidgetState();
+  ConsumerState<TrialCountdownWidget> createState() =>
+      _TrialCountdownWidgetState();
 }
 
 class _TrialCountdownWidgetState extends ConsumerState<TrialCountdownWidget> {

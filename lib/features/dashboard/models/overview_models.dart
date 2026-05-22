@@ -18,14 +18,14 @@ class StoreInfo {
   });
 
   factory StoreInfo.fromJson(Map<String, dynamic> j) => StoreInfo(
-        storeId: j['store_id'] as int,
-        storeName: j['store_name'] as String,
-        storeType: j['store_type'] as String? ?? '',
-        footfall: (j['footfall'] as num?)?.toInt() ?? 0,
-        budget: (j['budget'] as num?)?.toDouble() ?? 0,
-        dailyBudget: (j['daily_budget'] as num?)?.toDouble() ?? 0,
-        skuCount: (j['sku_count'] as num?)?.toInt() ?? 0,
-      );
+    storeId: j['store_id'] as int,
+    storeName: j['store_name'] as String,
+    storeType: j['store_type'] as String? ?? '',
+    footfall: (j['footfall'] as num?)?.toInt() ?? 0,
+    budget: (j['budget'] as num?)?.toDouble() ?? 0,
+    dailyBudget: (j['daily_budget'] as num?)?.toDouble() ?? 0,
+    skuCount: (j['sku_count'] as num?)?.toInt() ?? 0,
+  );
 }
 
 class RecommendationSummary {
@@ -83,8 +83,12 @@ class DailySales {
     }
 
     return DailySales(
-      totalSales: extract(j['total_sales'] ?? j['total_revenue'] ?? j['revenue'] ?? 0.0),
-      totalOrders: ((j['total_orders'] ?? j['order_count'] ?? j['orders'] ?? 0) as num).toInt(),
+      totalSales: extract(
+        j['total_sales'] ?? j['total_revenue'] ?? j['revenue'] ?? 0.0,
+      ),
+      totalOrders:
+          ((j['total_orders'] ?? j['order_count'] ?? j['orders'] ?? 0) as num)
+              .toInt(),
       avgOrderValue: extract(j['avg_order_value'] ?? j['aov'] ?? 0.0),
       date: j['date'] as String? ?? '',
     );

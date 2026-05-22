@@ -23,22 +23,26 @@ class OverviewNotifier extends AsyncNotifier<OverviewData> {
     final storesFuture = client.get('/kirana/stores');
     final recoFuture = client.get('/kirana/stores/$storeId/recommendations');
     final salesFuture = client.posGet(
-        '/pos/reports/daily-sales?date=$today&store_id=$storeId');
+      '/pos/reports/daily-sales?date=$today&store_id=$storeId',
+    );
 
     final storesJson = await storesFuture;
     final recoJson = await recoFuture;
     final salesJson = await salesFuture;
 
     final storesList = storesJson['stores'] as List<dynamic>;
-    final storeJson = storesList.firstWhere(
-      (s) => (s as Map<String, dynamic>)['store_id'] == storeId,
-      orElse: () => storesList.first,
-    ) as Map<String, dynamic>;
+    final storeJson =
+        storesList.firstWhere(
+              (s) => (s as Map<String, dynamic>)['store_id'] == storeId,
+              orElse: () => storesList.first,
+            )
+            as Map<String, dynamic>;
 
     return OverviewData(
       store: StoreInfo.fromJson(storeJson),
       recommendations: RecommendationSummary.fromJson(
-          recoJson['summary'] as Map<String, dynamic>),
+        recoJson['summary'] as Map<String, dynamic>,
+      ),
       dailySales: salesJson != null ? DailySales.fromJson(salesJson) : null,
     );
   }
@@ -50,4 +54,6 @@ class OverviewNotifier extends AsyncNotifier<OverviewData> {
 }
 
 final overviewProvider =
-    AsyncNotifierProvider.autoDispose<OverviewNotifier, OverviewData>(OverviewNotifier.new);
+    AsyncNotifierProvider.autoDispose<OverviewNotifier, OverviewData>(
+      OverviewNotifier.new,
+    );

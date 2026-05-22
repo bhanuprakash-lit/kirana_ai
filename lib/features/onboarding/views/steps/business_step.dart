@@ -45,7 +45,10 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
     if (!_formKey.currentState!.validate()) return;
     final notifier = ref.read(onboardingProvider.notifier);
     notifier.updateData(
-      ref.read(onboardingProvider).data.copyWith(
+      ref
+          .read(onboardingProvider)
+          .data
+          .copyWith(
             ownerName: _ownerCtrl.text.trim(),
             storeName: _storeCtrl.text.trim(),
             email: _emailCtrl.text.trim(),
@@ -76,65 +79,82 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
             ).animate(delay: 50.ms).fadeIn(duration: 400.ms),
             const SizedBox(height: 32),
             BrandTextField(
-              controller: _ownerCtrl,
-              label: "Owner's full name",
-              hint: 'e.g. Ramesh Kumar',
-              autofocus: true,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Name is required' : null,
-            ).animate(delay: 100.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  controller: _ownerCtrl,
+                  label: "Owner's full name",
+                  hint: 'e.g. Ramesh Kumar',
+                  autofocus: true,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Name is required'
+                      : null,
+                )
+                .animate(delay: 100.ms)
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 16),
             BrandTextField(
-              controller: _storeCtrl,
-              label: 'Store name',
-              hint: 'e.g. Sri Lakshmi Stores',
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'Store name is required'
-                  : null,
-            ).animate(delay: 150.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  controller: _storeCtrl,
+                  label: 'Store name',
+                  hint: 'e.g. Sri Lakshmi Stores',
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Store name is required'
+                      : null,
+                )
+                .animate(delay: 150.ms)
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 16),
             BrandTextField(
-              controller: _emailCtrl,
-              label: 'Email address',
-              hint: 'you@example.com',
-              keyboardType: TextInputType.emailAddress,
-              validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Email is required';
-                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
-                  return 'Enter a valid email address';
-                }
-                return null;
-              },
-            ).animate(delay: 200.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  controller: _emailCtrl,
+                  label: 'Email address',
+                  hint: 'you@example.com',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty)
+                      return 'Email is required';
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
+                      return 'Enter a valid email address';
+                    }
+                    return null;
+                  },
+                )
+                .animate(delay: 200.ms)
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _selectedType,
-              decoration: const InputDecoration(labelText: 'Business type'),
-              hint: const Text('Select your store type'),
-              isExpanded: true,
-              items: _businessTypes
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                  .toList(),
-              onChanged: (v) => setState(() => _selectedType = v),
-              validator: (v) =>
-                  v == null ? 'Please select your business type' : null,
-            ).animate(delay: 250.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  value: _selectedType,
+                  decoration: const InputDecoration(labelText: 'Business type'),
+                  hint: const Text('Select your store type'),
+                  isExpanded: true,
+                  items: _businessTypes
+                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedType = v),
+                  validator: (v) =>
+                      v == null ? 'Please select your business type' : null,
+                )
+                .animate(delay: 250.ms)
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 16),
             TextFormField(
-              controller: _footfallCtrl,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Estimated daily customers',
-                hintText: 'e.g. 40',
-                suffixText: 'customers/day',
-              ),
-              validator: (v) {
-                final n = int.tryParse(v ?? '');
-                if (n == null || n < 1) return 'Enter a valid number';
-                return null;
-              },
-            ).animate(delay: 300.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  controller: _footfallCtrl,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'Estimated daily customers',
+                    hintText: 'e.g. 40',
+                    suffixText: 'customers/day',
+                  ),
+                  validator: (v) {
+                    final n = int.tryParse(v ?? '');
+                    if (n == null || n < 1) return 'Enter a valid number';
+                    return null;
+                  },
+                )
+                .animate(delay: 300.ms)
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 36),
             PrimaryButton(
               label: 'Continue',

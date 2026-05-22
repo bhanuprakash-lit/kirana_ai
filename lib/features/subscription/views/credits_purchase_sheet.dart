@@ -27,28 +27,28 @@ class _Pack {
 
 const _packs = [
   _Pack(
-    feature:  kFeatureInvoice,
-    emoji:    '📄',
-    name:     'Invoice Pack',
-    desc:     'Process 10 more supplier bills',
-    count:    10,
-    priceRs:  5,
+    feature: kFeatureInvoice,
+    emoji: '📄',
+    name: 'Invoice Pack',
+    desc: 'Process 10 more supplier bills',
+    count: 10,
+    priceRs: 5,
   ),
   _Pack(
-    feature:  kFeatureVoice,
-    emoji:    '🎙️',
-    name:     'Voice Pack',
-    desc:     'Add 10 more audio/voice orders',
-    count:    10,
-    priceRs:  2,
+    feature: kFeatureVoice,
+    emoji: '🎙️',
+    name: 'Voice Pack',
+    desc: 'Add 10 more audio/voice orders',
+    count: 10,
+    priceRs: 2,
   ),
   _Pack(
-    feature:  kFeatureHandwrite,
-    emoji:    '✍️',
-    name:     'Handwriting Pack',
-    desc:     'Scan 10 more handwritten notes',
-    count:    10,
-    priceRs:  3,
+    feature: kFeatureHandwrite,
+    emoji: '✍️',
+    name: 'Handwriting Pack',
+    desc: 'Scan 10 more handwritten notes',
+    count: 10,
+    priceRs: 3,
   ),
 ];
 
@@ -63,10 +63,8 @@ Future<void> showCreditsPurchaseSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _CreditsPurchaseSheet(
-      ref: ref,
-      highlightFeature: highlightFeature,
-    ),
+    builder: (_) =>
+        _CreditsPurchaseSheet(ref: ref, highlightFeature: highlightFeature),
   );
 }
 
@@ -103,18 +101,32 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Price', style: TextStyle(fontWeight: FontWeight.w600)),
-                Text('₹${pack.priceRs}',
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: BrandColors.primary)),
+                const Text(
+                  'Price',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  '₹${pack.priceRs}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    color: BrandColors.primary,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 4),
-            const Text('Credits do not expire — they roll over each day.',
-                style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+            const Text(
+              'Credits do not expire — they roll over each day.',
+              style: TextStyle(fontSize: 12, color: BrandColors.muted),
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text('Pay ₹${pack.priceRs}'),
@@ -124,12 +136,16 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
     );
 
     if (confirmed == true && mounted) {
-      await widget.ref.read(usageLimitsProvider.notifier).addCredits(pack.feature, pack.count);
+      await widget.ref
+          .read(usageLimitsProvider.notifier)
+          .addCredits(pack.feature, pack.count);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('${pack.count} ${pack.name} credits added!'),
-          backgroundColor: BrandColors.success,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${pack.count} ${pack.name} credits added!'),
+            backgroundColor: BrandColors.success,
+          ),
+        );
         Navigator.pop(context);
       }
     } else {
@@ -146,21 +162,40 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom + 28,
-        left: 24, right: 24, top: 12,
+        left: 24,
+        right: 24,
+        top: 12,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(child: Container(width: 40, height: 4,
-              decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)))),
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
           const SizedBox(height: 20),
 
           // Header
-          const Text('Top Up Your Credits', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: BrandColors.ink)),
+          const Text(
+            'Top Up Your Credits',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.ink,
+            ),
+          ),
           const SizedBox(height: 4),
-          const Text('Credits never expire — they roll over to tomorrow!',
-              style: TextStyle(fontSize: 13, color: BrandColors.muted)),
+          const Text(
+            'Credits never expire — they roll over to tomorrow!',
+            style: TextStyle(fontSize: 13, color: BrandColors.muted),
+          ),
           const SizedBox(height: 20),
 
           // Packs
@@ -199,10 +234,14 @@ class _PackCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: highlighted ? BrandColors.primary.withValues(alpha: 0.04) : Colors.white,
+        color: highlighted
+            ? BrandColors.primary.withValues(alpha: 0.04)
+            : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: highlighted ? BrandColors.primary.withValues(alpha: 0.4) : BrandColors.border,
+          color: highlighted
+              ? BrandColors.primary.withValues(alpha: 0.4)
+              : BrandColors.border,
           width: highlighted ? 1.5 : 1,
         ),
       ),
@@ -214,11 +253,30 @@ class _PackCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(pack.name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                Text(
+                  pack.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(pack.desc, style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                Text(
+                  pack.desc,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.muted,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('${pack.count} credits', style: const TextStyle(fontSize: 11, color: BrandColors.success, fontWeight: FontWeight.w700)),
+                Text(
+                  '${pack.count} credits',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: BrandColors.success,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ],
             ),
           ),
@@ -226,7 +284,14 @@ class _PackCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('₹${pack.priceRs}', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: BrandColors.primary)),
+              Text(
+                '₹${pack.priceRs}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  color: BrandColors.primary,
+                ),
+              ),
               const SizedBox(height: 6),
               SizedBox(
                 height: 32,
@@ -238,8 +303,18 @@ class _PackCard extends StatelessWidget {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   child: buying
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Buy', style: TextStyle(fontWeight: FontWeight.w700)),
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Buy',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                 ),
               ),
             ],

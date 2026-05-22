@@ -5,16 +5,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // ── Product IDs — must match exactly what's in Play Console ──────────────────
 const kIapBasicId = 'kirana_ai_basic_monthly';
-const kIapProId   = 'kirana_ai_pro_monthly';
+const kIapProId = 'kirana_ai_pro_monthly';
 
 const kTierToProductId = <String, String>{
   'basic': kIapBasicId,
-  'pro':   kIapProId,
+  'pro': kIapProId,
 };
 
 const kProductIdToTier = <String, String>{
   kIapBasicId: 'basic',
-  kIapProId:   'pro',
+  kIapProId: 'pro',
 };
 
 // ── IapService ────────────────────────────────────────────────────────────────
@@ -27,10 +27,10 @@ class IapService {
 
   // Broadcast stream — IapNotifier listens to this.
   final _purchaseCtrl = StreamController<PurchaseDetails>.broadcast();
-  final _errorCtrl    = StreamController<String>.broadcast();
+  final _errorCtrl = StreamController<String>.broadcast();
 
   Stream<PurchaseDetails> get purchases => _purchaseCtrl.stream;
-  Stream<String>          get errors    => _errorCtrl.stream;
+  Stream<String> get errors => _errorCtrl.stream;
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
 
@@ -38,9 +38,12 @@ class IapService {
     final available = await _iap.isAvailable();
     if (!available) return false;
 
-    _sub = _iap.purchaseStream.listen(_onPurchases, onError: (e) {
-      _errorCtrl.add(e.toString());
-    });
+    _sub = _iap.purchaseStream.listen(
+      _onPurchases,
+      onError: (e) {
+        _errorCtrl.add(e.toString());
+      },
+    );
     return true;
   }
 
@@ -99,7 +102,9 @@ class IapService {
       switch (p.status) {
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          _iap.completePurchase(p); // Acknowledge — required to avoid auto-refund
+          _iap.completePurchase(
+            p,
+          ); // Acknowledge — required to avoid auto-refund
           _purchaseCtrl.add(p);
         case PurchaseStatus.error:
           _errorCtrl.add(p.error?.message ?? 'Purchase failed');

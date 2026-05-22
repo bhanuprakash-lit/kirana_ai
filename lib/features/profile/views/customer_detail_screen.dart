@@ -14,7 +14,8 @@ class CustomerDetailScreen extends ConsumerStatefulWidget {
   const CustomerDetailScreen({super.key, required this.customerId});
 
   @override
-  ConsumerState<CustomerDetailScreen> createState() => _CustomerDetailScreenState();
+  ConsumerState<CustomerDetailScreen> createState() =>
+      _CustomerDetailScreenState();
 }
 
 class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
@@ -25,7 +26,11 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
     final state = ref.watch(customerProvider);
     final customer = state.customers.firstWhere(
       (c) => c.customerId == widget.customerId,
-      orElse: () => Customer(customerId: widget.customerId, name: 'Loading...', phone: ''),
+      orElse: () => Customer(
+        customerId: widget.customerId,
+        name: 'Loading...',
+        phone: '',
+      ),
     );
 
     final ordersAsync = ref.watch(customerOrdersProvider(widget.customerId));
@@ -34,14 +39,20 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('Customer Details', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'Customer Details',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => _showEditCustomerSheet(context, customer),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, color: BrandColors.error),
+            icon: const Icon(
+              Icons.delete_outline_rounded,
+              color: BrandColors.error,
+            ),
             onPressed: () => _confirmDelete(context, customer),
           ),
         ],
@@ -65,26 +76,43 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        customer.name.isNotEmpty ? customer.name[0].toUpperCase() : '?',
-                        style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: BrandColors.primary),
+                        customer.name.isNotEmpty
+                            ? customer.name[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: BrandColors.primary,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     customer.name,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: BrandColors.ink),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      color: BrandColors.ink,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     customer.phone,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: BrandColors.muted),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: BrandColors.muted,
+                    ),
                   ),
                   if (customer.email != null) ...[
                     const SizedBox(height: 4),
                     Text(
                       customer.email!,
-                      style: const TextStyle(fontSize: 14, color: BrandColors.muted),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ],
@@ -102,7 +130,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                     child: _StatCard(
                       label: 'Balance',
                       value: khataAsync.when(
-                        data: (khata) => '₹${(khata?['amount'] as num? ?? 0) - (khata?['amount_paid'] as num? ?? 0)}',
+                        data: (khata) =>
+                            '₹${(khata?['amount'] as num? ?? 0) - (khata?['amount_paid'] as num? ?? 0)}',
                         loading: () => '...',
                         error: (_, _) => 'N/A',
                       ),
@@ -116,7 +145,11 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                       label: 'Spent',
                       value: ordersAsync.when(
                         data: (orders) {
-                          final total = orders.fold<double>(0, (sum, o) => sum + (o['total_amount'] as num).toDouble());
+                          final total = orders.fold<double>(
+                            0,
+                            (sum, o) =>
+                                sum + (o['total_amount'] as num).toDouble(),
+                          );
                           return '₹${NumberFormat('#,##,###').format(total)}';
                         },
                         loading: () => '...',
@@ -156,12 +189,20 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
               ),
               child: Column(
                 children: [
-                  _InfoRow(label: 'Household Size', value: '${customer.householdSize} members', icon: Icons.group_outlined),
+                  _InfoRow(
+                    label: 'Household Size',
+                    value: '${customer.householdSize} members',
+                    icon: Icons.group_outlined,
+                  ),
                   const Divider(height: 32),
                   _InfoRow(
                     label: 'Joined On',
-                    value: customer.createdAt != null ? DateFormat('MMM dd, yyyy').format(customer.createdAt!.toLocal()) : 'Unknown',
-                    icon: Icons.calendar_today_outlined
+                    value: customer.createdAt != null
+                        ? DateFormat(
+                            'MMM dd, yyyy',
+                          ).format(customer.createdAt!.toLocal())
+                        : 'Unknown',
+                    icon: Icons.calendar_today_outlined,
                   ),
                   const Divider(height: 32),
                   _AssociationRow(
@@ -190,7 +231,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   itemCount: orders.length,
-                  separatorBuilder: (_,_) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final order = orders[index];
                     return _OrderListItem(order: order);
@@ -226,25 +267,37 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Customer?'),
-        content: Text('Are you sure you want to delete ${customer.name}? This action cannot be undone.'),
+        content: Text(
+          'Are you sure you want to delete ${customer.name}? This action cannot be undone.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () async {
-              final error = await ref.read(customerProvider.notifier).deleteCustomer(customer.customerId);
+              final error = await ref
+                  .read(customerProvider.notifier)
+                  .deleteCustomer(customer.customerId);
               if (!context.mounted) return;
               Navigator.pop(context); // close dialog
               if (error == null) {
                 context.pop(); // success — go back to list
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(error),
-                  backgroundColor: BrandColors.error,
-                  duration: const Duration(seconds: 4),
-                ));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(error),
+                    backgroundColor: BrandColors.error,
+                    duration: const Duration(seconds: 4),
+                  ),
+                );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: BrandColors.error)),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: BrandColors.error),
+            ),
           ),
         ],
       ),
@@ -261,7 +314,10 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update area: $e'), backgroundColor: BrandColors.error),
+          SnackBar(
+            content: Text('Failed to update area: $e'),
+            backgroundColor: BrandColors.error,
+          ),
         );
       }
     } finally {
@@ -277,7 +333,11 @@ class _AssociationRow extends ConsumerWidget {
   final bool saving;
   final ValueChanged<int?> onChanged;
 
-  const _AssociationRow({required this.customer, required this.saving, required this.onChanged});
+  const _AssociationRow({
+    required this.customer,
+    required this.saving,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -285,44 +345,86 @@ class _AssociationRow extends ConsumerWidget {
 
     return Row(
       children: [
-        const Icon(Icons.location_city_rounded, size: 20, color: BrandColors.muted),
+        const Icon(
+          Icons.location_city_rounded,
+          size: 20,
+          color: BrandColors.muted,
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Area / Association',
-                  style: TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w500)),
+              const Text(
+                'Area / Association',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: BrandColors.muted,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               const SizedBox(height: 4),
               assocAsync.when(
-                loading: () => const SizedBox(height: 20, width: 80, child: LinearProgressIndicator()),
-                error: (_, _) => const Text('Unable to load areas', style: TextStyle(fontSize: 13, color: BrandColors.muted)),
+                loading: () => const SizedBox(
+                  height: 20,
+                  width: 80,
+                  child: LinearProgressIndicator(),
+                ),
+                error: (_, _) => const Text(
+                  'Unable to load areas',
+                  style: TextStyle(fontSize: 13, color: BrandColors.muted),
+                ),
                 data: (list) {
                   if (list.isEmpty) {
                     return GestureDetector(
-                      onTap: () => Navigator.of(context).pushNamed('/profile/associations'),
-                      child: const Text('No areas — tap to add one',
-                          style: TextStyle(fontSize: 13, color: BrandColors.primary, fontWeight: FontWeight.w600)),
+                      onTap: () => Navigator.of(
+                        context,
+                      ).pushNamed('/profile/associations'),
+                      child: const Text(
+                        'No areas — tap to add one',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: BrandColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     );
                   }
 
                   final items = <DropdownMenuItem<int?>>[
-                    const DropdownMenuItem(value: null, child: Text('None', style: TextStyle(color: BrandColors.muted))),
-                    ...list.map((a) => DropdownMenuItem(
-                          value: a.associationId,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(a.areaType.emoji),
-                              const SizedBox(width: 6),
-                              Text(a.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                            ],
-                          ),
-                        )),
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text(
+                        'None',
+                        style: TextStyle(color: BrandColors.muted),
+                      ),
+                    ),
+                    ...list.map(
+                      (a) => DropdownMenuItem(
+                        value: a.associationId,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(a.areaType.emoji),
+                            const SizedBox(width: 6),
+                            Text(
+                              a.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ];
 
                   return saving
-                      ? const SizedBox(height: 20, width: 80, child: LinearProgressIndicator())
+                      ? const SizedBox(
+                          height: 20,
+                          width: 80,
+                          child: LinearProgressIndicator(),
+                        )
                       : DropdownButtonHideUnderline(
                           child: DropdownButton<int?>(
                             value: customer.associationId,
@@ -373,13 +475,26 @@ class _StatCard extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Icon(icon, size: 16, color: color),
           ),
           const SizedBox(height: 8),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 2),
-          Text(label, style: const TextStyle(fontSize: 11, color: BrandColors.muted, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              color: BrandColors.muted,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
@@ -398,7 +513,12 @@ class _SectionHeader extends StatelessWidget {
         children: [
           Text(
             title.toUpperCase(),
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: BrandColors.muted, letterSpacing: 1),
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.muted,
+              letterSpacing: 1,
+            ),
           ),
         ],
       ),
@@ -411,7 +531,11 @@ class _InfoRow extends StatelessWidget {
   final String value;
   final IconData icon;
 
-  const _InfoRow({required this.label, required this.value, required this.icon});
+  const _InfoRow({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -422,9 +546,23 @@ class _InfoRow extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w500)),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                color: BrandColors.muted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: BrandColors.ink)),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: BrandColors.ink,
+              ),
+            ),
           ],
         ),
       ],
@@ -458,22 +596,36 @@ class _OrderListItem extends StatelessWidget {
               children: [
                 Text(
                   'Order #${order['order_id']}',
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   DateFormat('MMM dd, hh:mm a').format(date),
-                  style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.muted,
+                  ),
                 ),
               ],
             ),
             const Spacer(),
             Text(
               '₹${amount.toStringAsFixed(1)}',
-              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: BrandColors.primary),
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                color: BrandColors.primary,
+              ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, size: 18, color: BrandColors.muted),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: BrandColors.muted,
+            ),
           ],
         ),
       ),

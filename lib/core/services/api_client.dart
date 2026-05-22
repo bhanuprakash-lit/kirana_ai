@@ -27,8 +27,7 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
-  Future<dynamic> post(
-      String path, dynamic body) async {
+  Future<dynamic> post(String path, dynamic body) async {
     final token = await _storage.read(key: 'auth_token');
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
@@ -44,8 +43,7 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
-  Future<dynamic> patch(
-      String path, dynamic body) async {
+  Future<dynamic> patch(String path, dynamic body) async {
     final token = await _storage.read(key: 'auth_token');
     final res = await http.patch(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
@@ -114,7 +112,9 @@ class ApiClient {
   }
 
   Future<Map<String, dynamic>?> posPost(
-      String path, Map<String, dynamic> body) async {
+    String path,
+    Map<String, dynamic> body,
+  ) async {
     final token = await _storage.read(key: 'pos_token');
     if (token == null) return null;
     try {
@@ -136,8 +136,10 @@ class ApiClient {
   }
 
   // Kirana token but returns a bare list (e.g. /oltp/category when listing)
-  Future<Map<String, dynamic>> getOltp(String table,
-      {Map<String, String>? filters}) async {
+  Future<Map<String, dynamic>> getOltp(
+    String table, {
+    Map<String, String>? filters,
+  }) async {
     final token = await _storage.read(key: 'auth_token');
     var path = '/oltp/$table';
     if (filters != null && filters.isNotEmpty) {
@@ -158,7 +160,9 @@ class ApiClient {
   }
 
   Future<Map<String, dynamic>> postOltp(
-      String table, Map<String, dynamic> body) async {
+    String table,
+    Map<String, dynamic> body,
+  ) async {
     final token = await _storage.read(key: 'auth_token');
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}/oltp/$table'),
@@ -175,8 +179,10 @@ class ApiClient {
   }
 
   Future<Map<String, dynamic>> patchOltp(
-      String table, Map<String, dynamic> body,
-      {Map<String, String>? filters}) async {
+    String table,
+    Map<String, dynamic> body, {
+    Map<String, String>? filters,
+  }) async {
     final token = await _storage.read(key: 'auth_token');
     var path = '/oltp/$table';
     if (filters != null && filters.isNotEmpty) {
@@ -198,8 +204,10 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
-  Future<Map<String, dynamic>> deleteOltp(String table,
-      {required Map<String, String> filters}) async {
+  Future<Map<String, dynamic>> deleteOltp(
+    String table, {
+    required Map<String, String> filters,
+  }) async {
     final token = await _storage.read(key: 'auth_token');
     final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
     final path = '/oltp/$table?$q';

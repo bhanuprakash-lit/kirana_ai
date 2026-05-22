@@ -5,36 +5,53 @@ enum AreaType { apartment, hostel, school, office, colony }
 extension AreaTypeX on AreaType {
   String get label {
     switch (this) {
-      case AreaType.apartment: return 'Apartment';
-      case AreaType.hostel:    return 'Hostel';
-      case AreaType.school:    return 'School';
-      case AreaType.office:    return 'Office';
-      case AreaType.colony:    return 'Colony';
+      case AreaType.apartment:
+        return 'Apartment';
+      case AreaType.hostel:
+        return 'Hostel';
+      case AreaType.school:
+        return 'School';
+      case AreaType.office:
+        return 'Office';
+      case AreaType.colony:
+        return 'Colony';
     }
   }
 
   String get emoji {
     switch (this) {
-      case AreaType.apartment: return '🏢';
-      case AreaType.hostel:    return '🏠';
-      case AreaType.school:    return '🏫';
-      case AreaType.office:    return '🏗️';
-      case AreaType.colony:    return '🏘️';
+      case AreaType.apartment:
+        return '🏢';
+      case AreaType.hostel:
+        return '🏠';
+      case AreaType.school:
+        return '🏫';
+      case AreaType.office:
+        return '🏗️';
+      case AreaType.colony:
+        return '🏘️';
     }
   }
 
   String get description {
     switch (this) {
-      case AreaType.apartment: return 'Monthly grocery subscriptions';
-      case AreaType.hostel:    return 'Snacks + instant food combos';
-      case AreaType.school:    return 'Tiffin snacks, stationery, juice';
-      case AreaType.office:    return 'Tea, snacks, quick lunch items';
-      case AreaType.colony:    return 'Sunday family basket';
+      case AreaType.apartment:
+        return 'Monthly grocery subscriptions';
+      case AreaType.hostel:
+        return 'Snacks + instant food combos';
+      case AreaType.school:
+        return 'Tiffin snacks, stationery, juice';
+      case AreaType.office:
+        return 'Tea, snacks, quick lunch items';
+      case AreaType.colony:
+        return 'Sunday family basket';
     }
   }
 
-  static AreaType fromString(String s) =>
-      AreaType.values.firstWhere((t) => t.name == s, orElse: () => AreaType.colony);
+  static AreaType fromString(String s) => AreaType.values.firstWhere(
+    (t) => t.name == s,
+    orElse: () => AreaType.colony,
+  );
 }
 
 class StoreAssociation {
@@ -59,17 +76,17 @@ class StoreAssociation {
   });
 
   factory StoreAssociation.fromJson(Map<String, dynamic> j) => StoreAssociation(
-        associationId: (j['association_id'] as num).toInt(),
-        storeId: (j['store_id'] as num).toInt(),
-        name: j['name'] as String,
-        areaType: AreaTypeX.fromString(j['area_type'] as String? ?? 'colony'),
-        estimatedHouseholds: (j['estimated_households'] as num?)?.toInt(),
-        notes: j['notes'] as String?,
-        isActive: j['is_active'] as bool? ?? true,
-        createdAt: j['created_at'] != null
-            ? parseAsUtc(j['created_at'] as String)
-            : null,
-      );
+    associationId: (j['association_id'] as num).toInt(),
+    storeId: (j['store_id'] as num).toInt(),
+    name: j['name'] as String,
+    areaType: AreaTypeX.fromString(j['area_type'] as String? ?? 'colony'),
+    estimatedHouseholds: (j['estimated_households'] as num?)?.toInt(),
+    notes: j['notes'] as String?,
+    isActive: j['is_active'] as bool? ?? true,
+    createdAt: j['created_at'] != null
+        ? parseAsUtc(j['created_at'] as String)
+        : null,
+  );
 }
 
 class AssociationHeatmap {
@@ -95,7 +112,8 @@ class AssociationHeatmap {
     this.lastOrderAt,
   });
 
-  factory AssociationHeatmap.fromJson(Map<String, dynamic> j) => AssociationHeatmap(
+  factory AssociationHeatmap.fromJson(Map<String, dynamic> j) =>
+      AssociationHeatmap(
         associationId: (j['association_id'] as num).toInt(),
         areaName: j['area_name'] as String,
         areaType: AreaTypeX.fromString(j['area_type'] as String? ?? 'colony'),

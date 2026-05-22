@@ -33,7 +33,16 @@ class AiGateBanner extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 10),
-          Expanded(child: Text(message, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600))),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 12,
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
           const SizedBox(width: 8),
           TextButton(
             onPressed: onAction,
@@ -42,7 +51,10 @@ class AiGateBanner extends StatelessWidget {
               visualDensity: VisualDensity.compact,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             ),
-            child: Text(actionLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+            child: Text(
+              actionLabel,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+            ),
           ),
         ],
       ),
@@ -55,18 +67,33 @@ class AiUsageBadge extends StatelessWidget {
   final int total;
   final String label;
 
-  const AiUsageBadge({super.key, required this.remaining, required this.total, required this.label});
+  const AiUsageBadge({
+    super.key,
+    required this.remaining,
+    required this.total,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final color = remaining > 1 ? BrandColors.success : remaining == 1 ? Colors.orange : BrandColors.error;
+    final color = remaining > 1
+        ? BrandColors.success
+        : remaining == 1
+        ? Colors.orange
+        : BrandColors.error;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.bolt_rounded, size: 14, color: color),
         const SizedBox(width: 4),
-        Text('$remaining/$total $label',
-            style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+        Text(
+          '$remaining/$total $label',
+          style: TextStyle(
+            fontSize: 11,
+            color: color,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
