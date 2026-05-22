@@ -40,13 +40,18 @@ android {
         versionName = flutter.versionName
     }
 
-    // ✅ MOVE THIS HERE
+    // Release signing — only created when key.properties is present.
+    // CI runners and fresh dev clones don't have the keystore; without this
+    // guard Gradle fails configuration ("null cannot be cast to non-null
+    // type kotlin.String") even for debug builds.
     signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
         }
     }
 
@@ -60,8 +65,14 @@ android {
 
     buildTypes {
         release {
-            // ✅ USE RELEASE KEY
-            signingConfig = signingConfigs.getByName("release")
+            // Use the release key when configured; otherwise fall back to debug
+            // signing so the project still configures without a keystore. Real
+            // release builds without key.properties will be debug-signed —
+            // intentional, so unsigned APKs are obvious in QA.
+            signingConfig = if (keystorePropertiesFile.exists())
+                signingConfigs.getByName("release")
+            else
+                signingConfigs.getByName("debug")
 
             isMinifyEnabled = true
             isShrinkResources = true
