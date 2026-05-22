@@ -214,7 +214,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     // Populate first variant from catalog data
     _variants[0].barcodeCtrl.text = p.barcode ?? '';
     _variants[0].selectedUnit = p.unit ?? 'pcs';
-    if (p.weight != null) _variants[0].weightCtrl.text = p.weight.toString();
+    _variants[0].weightCtrl.text = p.weight?.toString() ?? '';
     _selectedCategoryId = p.categoryId;
     _selectedCategoryName = p.categoryName;
     _isPerishable = p.isPerishable;
@@ -309,7 +309,11 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     final brand = _brandCtrl.text.trim().isNotEmpty ? _brandCtrl.text.trim() : null;
 
     String? firstError;
-    for (final v in _variants) {
+    for (int i = 0; i < _variants.length; i++) {
+      final v = _variants[i];
+      // Only the first variant reuses the catalog product_id.
+      // Each additional variant must create its own product row so it gets
+      // a unique product_id and a separate inventory entry.
       final err = await ref.read(inventoryProvider.notifier).addProduct(
             name: name,
             categoryId: _selectedCategoryId!,
@@ -323,7 +327,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             isPerishable: _isPerishable,
             isLoose: _isLoose,
             expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty ? v.expiryCtrl.text : null,
-            existingProductId: _linked?.productId,
+            existingProductId: i == 0 ? _linked?.productId : null,
+            // V2+ create new product rows — copy catalog image so they show the same photo
+            imageUrl: i == 0 ? null : _linked?.imageUrl,
           );
       if (err != null) { firstError = err; break; }
     }
@@ -673,7 +679,12 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
               _SectionHeader(_variants.length == 1 ? 'Size, Price & Stock' : 'Variants (${_variants.length})'),
               if (!_saving && !_success)
                 TextButton.icon(
-                  onPressed: () => setState(() => _variants.add(_VariantData())),
+                  onPressed: () => setState(() {
+                    final v = _VariantData();
+                    // Inherit unit from catalog so V2 matches V1's unit
+                    if (_linked != null) v.selectedUnit = _linked!.unit ?? 'pcs';
+                    _variants.add(v);
+                  }),
                   icon: const Icon(Icons.add_rounded, size: 16),
                   label: const Text('Add Variant', style: TextStyle(fontSize: 13)),
                   style: TextButton.styleFrom(
@@ -782,32 +793,40 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           ),
           const SizedBox(height: 10),
 
-          // Barcode
+          // Barcode — locked only when catalog already supplied one
           if (!_isLoose)
-            Row(
+            Builder(builder: (_) {
+              final catalogHasBarcode = _linked != null && isFirst && (_linked!.barcode?.isNotEmpty ?? false);
+              final barcodeEditable = !catalogHasBarcode && !_saving && !_success;
+              return Row(
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: v.barcodeCtrl,
-                    enabled: (_linked == null || !isFirst) && !_saving && !_success,
-                    decoration: const InputDecoration(labelText: 'Barcode', hintText: 'optional', isDense: true),
+                    enabled: barcodeEditable,
+                    decoration: InputDecoration(
+                      labelText: 'Barcode',
+                      hintText: catalogHasBarcode ? 'From catalog' : 'optional',
+                      isDense: true,
+                    ),
                     keyboardType: TextInputType.number,
                   ),
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: (_linked != null && isFirst || _saving || _success) ? null : () => _scanBarcode(variantIndex: idx),
+                  onTap: barcodeEditable ? () => _scanBarcode(variantIndex: idx) : null,
                   child: Container(
                     width: 44, height: 44,
                     decoration: BoxDecoration(
-                      color: (_linked != null && isFirst || _saving || _success) ? BrandColors.border : BrandColors.primary,
+                      color: barcodeEditable ? BrandColors.primary : BrandColors.border,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 20),
                   ),
                 ),
               ],
-            ),
+            );
+            }),
           const SizedBox(height: 10),
 
           // Price + MRP
@@ -897,7 +916,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 // ── Variant data holder ───────────────────────────────────────────────────────
 
 class _VariantData {
-  final weightCtrl  = TextEditingController(text: '1');
+  final weightCtrl  = TextEditingController(); // empty = no pack size
   final barcodeCtrl = TextEditingController();
   final priceCtrl   = TextEditingController();
   final mrpCtrl     = TextEditingController();

@@ -1,3 +1,5 @@
+import 'package:kirana_ai/core/utils/date_utils.dart';
+
 enum AreaType { apartment, hostel, school, office, colony }
 
 extension AreaTypeX on AreaType {
@@ -65,7 +67,7 @@ class StoreAssociation {
         notes: j['notes'] as String?,
         isActive: j['is_active'] as bool? ?? true,
         createdAt: j['created_at'] != null
-            ? DateTime.tryParse(j['created_at'] as String)
+            ? parseAsUtc(j['created_at'] as String)
             : null,
       );
 }

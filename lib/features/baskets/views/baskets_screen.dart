@@ -29,7 +29,20 @@ class BasketsScreen extends ConsumerWidget {
       ),
       body: asyncData.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: BrandColors.error),
+              const SizedBox(height: 12),
+              const Text('Could not load baskets', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              const Text('Pull down to retry', style: TextStyle(color: BrandColors.muted)),
+              const SizedBox(height: 16),
+              ElevatedButton(onPressed: () => ref.invalidate(basketProvider), child: const Text('Retry')),
+            ],
+          ),
+        ),
         data: (baskets) => baskets.isEmpty
             ? _buildEmpty(context, ref)
             : RefreshIndicator(
@@ -113,7 +126,7 @@ class BasketsScreen extends ConsumerWidget {
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed: $e'), backgroundColor: BrandColors.error),
+                    const SnackBar(content: Text('Could not delete basket. Please try again.'), backgroundColor: BrandColors.error),
                   );
                 }
               }

@@ -30,7 +30,8 @@ class UdhaarTab extends ConsumerWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(err.toString()),
+            const Text('Please check your connection and try again.',
+                textAlign: TextAlign.center, style: TextStyle(color: BrandColors.muted)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => ref.read(financeProvider.notifier).refresh(),
@@ -780,7 +781,8 @@ class _UdhaarTile extends ConsumerWidget {
   }
 
   String _formatDate(DateTime date) {
-    return "${date.day}/${date.month}/${date.year}";
+    final d = date.toLocal();
+    return "${d.day}/${d.month}/${d.year}";
   }
 
   void _showRecoveryBottomSheet(BuildContext context, WidgetRef ref) {
@@ -817,6 +819,12 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
   bool _saving = false;
   bool _success = false;
   String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

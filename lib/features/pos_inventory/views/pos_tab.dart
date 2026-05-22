@@ -6,6 +6,8 @@ import 'package:kirana_ai/features/pos_inventory/views/widgets/add_product_sheet
 import 'package:kirana_ai/features/referral/views/referral_scan_sheet.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../core/providers/usage_limits_provider.dart';
+import '../../../core/services/usage_limits_service.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../models/pos_product.dart';
 import '../providers/pos_provider.dart';
@@ -16,6 +18,8 @@ import 'widgets/order_dialog.dart';
 import 'widgets/today_orders_sheet.dart';
 import '../../baskets/models/basket_model.dart';
 import '../../baskets/providers/basket_provider.dart';
+import '../../subscription/models/subscription_model.dart';
+import '../../subscription/providers/subscription_provider.dart';
 import 'widgets/voice_order_sheet.dart';
 import 'widgets/handwriting_order_sheet.dart';
 import '../../campaigns/models/campaign_model.dart' as campaign_card_lib;
@@ -642,6 +646,27 @@ class _PosTabState extends ConsumerState<PosTab> {
                     Icons.receipt_long_rounded,
                     size: 20,
                     color: BrandColors.ink,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Tooltip(
+                message: 'Refresh Products',
+                child: GestureDetector(
+                  onTap: () => ref.read(posProvider.notifier).reloadProducts(),
+                  child: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: BrandColors.surfaceTint,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: BrandColors.border),
+                    ),
+                    child: const Icon(
+                      Icons.refresh_rounded,
+                      size: 20,
+                      color: BrandColors.ink,
+                    ),
                   ),
                 ),
               ),
@@ -1604,14 +1629,23 @@ class _BasketDetailSheet extends StatelessWidget {
 
 // ── AI Entry Strip ────────────────────────────────────────────────────────────
 
-class _AiEntryStrip extends StatelessWidget {
+class _AiEntryStrip extends ConsumerWidget {
   final VoidCallback onVoice;
   final VoidCallback onHandwrite;
 
   const _AiEntryStrip({required this.onVoice, required this.onHandwrite});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final subInfo = ref.watch(subInfoProvider);
+    final isPro = subInfo.effectiveTier == SubTier.pro;
+    final limits = ref.watch(usageLimitsProvider).value;
+
+    final voiceRemaining   = limits?.voiceRemaining   ?? kDailyLimits[kFeatureVoice]!;
+    final voiceTotal       = kDailyLimits[kFeatureVoice]!;
+    final handwriteRemaining = limits?.handwriteRemaining ?? kDailyLimits[kFeatureHandwrite]!;
+    final handwriteTotal   = kDailyLimits[kFeatureHandwrite]!;
+
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -1619,15 +1653,17 @@ class _AiEntryStrip extends StatelessWidget {
         children: [
           _AiPill(
             icon: Icons.mic_rounded,
-            label: 'Voice Order',
-            color: BrandColors.primary,
+            label: isPro ? 'Voice ($voiceRemaining/$voiceTotal)' : 'Voice Order',
+            color: isPro && voiceRemaining == 0 ? BrandColors.error : BrandColors.primary,
+            locked: !isPro,
             onTap: onVoice,
           ),
           const SizedBox(width: 8),
           _AiPill(
             icon: Icons.draw_rounded,
-            label: 'Handwrite',
-            color: const Color(0xFF7C3AED),
+            label: isPro ? 'Handwrite ($handwriteRemaining/$handwriteTotal)' : 'Handwrite',
+            color: isPro && handwriteRemaining == 0 ? BrandColors.error : BrandColors.purple,
+            locked: !isPro,
             onTap: onHandwrite,
           ),
           const Spacer(),
@@ -1651,9 +1687,10 @@ class _AiPill extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final bool locked;
   final VoidCallback onTap;
 
-  const _AiPill({required this.icon, required this.label, required this.color, required this.onTap});
+  const _AiPill({required this.icon, required this.label, required this.color, required this.onTap, this.locked = false});
 
   @override
   Widget build(BuildContext context) {
@@ -1672,6 +1709,10 @@ class _AiPill extends StatelessWidget {
             Icon(icon, size: 13, color: color),
             const SizedBox(width: 5),
             Text(label, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w700)),
+            if (locked) ...[
+              const SizedBox(width: 4),
+              Icon(Icons.lock_rounded, size: 10, color: color.withValues(alpha: 0.7)),
+            ],
           ],
         ),
       ),

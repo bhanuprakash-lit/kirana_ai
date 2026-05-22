@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../providers/intelligence_provider.dart';
 import '../../models/recommendation_model.dart';
+import '../dashboard_screen.dart';
 
 class IntelligenceDetailScreen extends ConsumerStatefulWidget {
   final String type;
@@ -136,85 +137,167 @@ class _IntelligenceDetailScreenState extends ConsumerState<IntelligenceDetailScr
   }
 }
 
-class _RecommendationTile extends StatelessWidget {
+class _RecommendationTile extends ConsumerWidget {
   final Recommendation item;
   const _RecommendationTile({required this.item});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = _getColor(item.type);
-    
+    final days  = item.daysToStockout;
+    final prob  = item.stockoutProbability;
+    final reorder = item.reorderQty;
+    final isUrgent = item.type == 'stockout_risk' || item.type == 'reorder_now';
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: BrandColors.border.withValues(alpha: 0.8)),
       ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Header row ──────────────────────────────────────────────────
+            Row(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        item.priority.toUpperCase(),
-                        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
-                      ),
-                    ),
-                    const Spacer(),
-                    if (item.currentStock != null)
-                      Text(
-                        'Stock: ${item.currentStock!.toStringAsFixed(0)}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: BrandColors.muted),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  item.productName,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: BrandColors.ink),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.categoryName,
-                  style: const TextStyle(fontSize: 13, color: BrandColors.muted, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 12),
-                const Divider(height: 1),
-                const SizedBox(height: 12),
-                Text(
-                  item.message,
-                  style: const TextStyle(fontSize: 13, color: BrandColors.ink, height: 1.4),
-                ),
-                if (item.expectedProfitImpact != null && item.expectedProfitImpact! > 0) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.trending_up_rounded, size: 16, color: BrandColors.success),
-                      const SizedBox(width: 6),
-                      Text(
-                        '₹${item.expectedProfitImpact!.toStringAsFixed(0)} expected profit impact',
-                        style: const TextStyle(fontSize: 12, color: BrandColors.success, fontWeight: FontWeight.w700),
-                      ),
-                    ],
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
+                  child: Text(
+                    item.priority.toUpperCase(),
+                    style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                  ),
+                ),
+                const Spacer(),
+                if (item.currentStock != null)
+                  Text(
+                    'Stock: ${item.currentStock!.toStringAsFixed(0)}',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: BrandColors.muted),
+                  ),
               ],
             ),
-          ),
+            const SizedBox(height: 12),
+
+            // ── Product name + category ──────────────────────────────────────
+            Text(item.productName,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+            const SizedBox(height: 3),
+            Text(item.categoryName,
+                style: const TextStyle(fontSize: 13, color: BrandColors.muted, fontWeight: FontWeight.w500)),
+
+            // ── Stockout timeline bar ────────────────────────────────────────
+            if (days != null && days < 60) ...[
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Stock runway',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+                            Text(
+                              days <= 0 ? 'OUT OF STOCK' : '~${days.toStringAsFixed(0)} days left',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800,
+                                  color: days <= 3 ? BrandColors.error : days <= 7 ? Colors.orange : BrandColors.success),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: (days / 30).clamp(0.0, 1.0),
+                            backgroundColor: BrandColors.border,
+                            color: days <= 3 ? BrandColors.error : days <= 7 ? Colors.orange : BrandColors.success,
+                            minHeight: 6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            // ── Stats row: probability + reorder qty ────────────────────────
+            if (prob != null || reorder != null) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  if (prob != null) ...[
+                    _StatChip(
+                      label: 'Stockout risk',
+                      value: '${(prob * 100).toStringAsFixed(0)}%',
+                      color: prob >= 0.7 ? BrandColors.error : prob >= 0.4 ? Colors.orange : BrandColors.success,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  if (reorder != null && reorder > 0)
+                    _StatChip(
+                      label: 'Reorder qty',
+                      value: '${reorder.toStringAsFixed(0)} units',
+                      color: BrandColors.primary,
+                    ),
+                ],
+              ),
+            ],
+
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+
+            // ── Message ──────────────────────────────────────────────────────
+            Text(item.message,
+                style: const TextStyle(fontSize: 13, color: BrandColors.ink, height: 1.4)),
+
+            if (item.expectedProfitImpact != null && item.expectedProfitImpact! > 0) ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  const Icon(Icons.trending_up_rounded, size: 16, color: BrandColors.success),
+                  const SizedBox(width: 6),
+                  Text(
+                    '₹${item.expectedProfitImpact!.toStringAsFixed(0)} estimated weekly profit impact',
+                    style: const TextStyle(fontSize: 12, color: BrandColors.success, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ],
+
+            // ── Action button for reorder/stockout items ─────────────────────
+            if (isUrgent && reorder != null && reorder > 0) ...[
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    // Navigate to procurement tab (tab 2, sub-tab 2)
+                    Navigator.of(context).pop();
+                    ref.read(dashboardTabProvider.notifier).switchTab(2);
+                    ref.read(dashboardSubTabProvider.notifier).setSubTab(2);
+                  },
+                  icon: Icon(Icons.add_shopping_cart_rounded, size: 16, color: color),
+                  label: Text('Create Purchase Order · ${reorder.toStringAsFixed(0)} units',
+                      style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13)),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: color.withValues(alpha: 0.4)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -222,12 +305,39 @@ class _RecommendationTile extends StatelessWidget {
 
   Color _getColor(String type) {
     switch (type) {
-      case 'stockout_risk': return BrandColors.error;
-      case 'reorder_now': return BrandColors.accent;
-      case 'fast_moving': return BrandColors.success;
-      case 'profit_opportunity': return BrandColors.primary;
-      default: return BrandColors.muted;
+      case 'stockout_risk':     return BrandColors.error;
+      case 'reorder_now':       return BrandColors.accent;
+      case 'fast_moving':       return BrandColors.success;
+      case 'profit_opportunity':return BrandColors.primary;
+      default:                  return BrandColors.muted;
     }
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+  const _StatChip({required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.w600)),
+          Text(value,  style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.w900)),
+        ],
+      ),
+    );
   }
 }
 

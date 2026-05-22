@@ -7,6 +7,7 @@ import '../../../../core/services/contact_service.dart';
 import '../../models/procurement_models.dart';
 import '../../providers/procurement_provider.dart';
 import '../../providers/inventory_provider.dart';
+import '../widgets/invoice_scan_sheet.dart';
 
 class ProcurementTab extends ConsumerWidget {
   const ProcurementTab({super.key});
@@ -35,9 +36,10 @@ class ProcurementTab extends ConsumerWidget {
             
             const SizedBox(height: 24),
             _sectionHeader(
-              context, 
-              'Recent Purchases', 
+              context,
+              'Recent Purchases',
               onAdd: data.suppliers.isEmpty ? null : () => _showAddPurchaseSheet(context, ref, data.suppliers),
+              onScan: () => showInvoiceScanSheet(context, ref, data.suppliers),
             ),
             if (data.suppliers.isEmpty) ...[
               const SizedBox(height: 8),
@@ -73,7 +75,7 @@ class ProcurementTab extends ConsumerWidget {
     );
   }
 
-  Widget _sectionHeader(BuildContext context, String title, {VoidCallback? onAdd}) {
+  Widget _sectionHeader(BuildContext context, String title, {VoidCallback? onAdd, VoidCallback? onScan}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -81,12 +83,27 @@ class ProcurementTab extends ConsumerWidget {
           title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        if (onAdd != null)
-          TextButton.icon(
-            onPressed: onAdd,
-            icon: const Icon(Icons.add_rounded, size: 18),
-            label: const Text('Add'),
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (onScan != null)
+              TextButton.icon(
+                onPressed: onScan,
+                icon: const Icon(Icons.document_scanner_rounded, size: 16),
+                label: const Text('Scan Invoice'),
+                style: TextButton.styleFrom(
+                  foregroundColor: BrandColors.primary,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            if (onAdd != null)
+              TextButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: const Text('Add'),
+              ),
+          ],
+        ),
       ],
     );
   }
@@ -112,7 +129,9 @@ class ProcurementTab extends ConsumerWidget {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
-          return Padding(
+          return GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Padding(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom,
               left: 24, right: 24, top: 24,
@@ -142,23 +161,52 @@ class ProcurementTab extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                TextField(controller: nameCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Supplier Name')),
+                TextField(
+                  controller: nameCtrl,
+                  enabled: !saving,
+                  maxLength: 60,
+                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']'))],
+                  decoration: const InputDecoration(labelText: 'Supplier Name', counterText: ''),
+                ),
                 const SizedBox(height: 16),
-                TextField(controller: phoneCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Phone Number'), keyboardType: TextInputType.phone),
+                TextField(
+                  controller: phoneCtrl,
+                  enabled: !saving,
+                  keyboardType: TextInputType.phone,
+                  maxLength: 15,
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]'))],
+                  decoration: const InputDecoration(labelText: 'Phone Number', counterText: '', hintText: '+91 XXXXX XXXXX'),
+                ),
                 const SizedBox(height: 16),
-                TextField(controller: categoryCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG, Beverages)')),
+                TextField(
+                  controller: categoryCtrl,
+                  enabled: !saving,
+                  maxLength: 40,
+                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']'))],
+                  decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG)', counterText: ''),
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: saving ? null : () async {
-                      if (nameCtrl.text.isEmpty) return;
+                      final name = nameCtrl.text.trim();
+                      final phone = phoneCtrl.text.trim().replaceAll(' ', '').replaceAll('-', '');
+                      if (name.isEmpty) return;
+                      if (phone.isNotEmpty) {
+                        final digits = phone.replaceAll('+', '');
+                        if (digits.length < 7 || !RegExp(r'^\+?\d+$').hasMatch(phone)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Enter a valid phone number')));
+                          return;
+                        }
+                      }
                       setModalState(() => saving = true);
                       try {
                         await ref.read(procurementProvider.notifier).createSupplier(
-                          name: nameCtrl.text,
-                          phone: phoneCtrl.text,
-                          category: categoryCtrl.text,
+                          name: name,
+                          phone: phone.isEmpty ? null : phone,
+                          category: categoryCtrl.text.trim(),
                         );
                       } catch (_) {
                         setModalState(() => saving = false);
@@ -174,7 +222,7 @@ class ProcurementTab extends ConsumerWidget {
                 const SizedBox(height: 24),
               ],
             ),
-          );
+          ));
         },
       ),
     );
@@ -192,7 +240,9 @@ class ProcurementTab extends ConsumerWidget {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
-          return Padding(
+          return GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Padding(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom,
               left: 24, right: 24, top: 24,
@@ -222,24 +272,53 @@ class ProcurementTab extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                TextField(controller: nameCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Supplier Name')),
+                TextField(
+                  controller: nameCtrl,
+                  enabled: !saving,
+                  maxLength: 60,
+                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']'))],
+                  decoration: const InputDecoration(labelText: 'Supplier Name', counterText: ''),
+                ),
                 const SizedBox(height: 16),
-                TextField(controller: phoneCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Phone Number'), keyboardType: TextInputType.phone),
+                TextField(
+                  controller: phoneCtrl,
+                  enabled: !saving,
+                  keyboardType: TextInputType.phone,
+                  maxLength: 15,
+                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]'))],
+                  decoration: const InputDecoration(labelText: 'Phone Number', counterText: '', hintText: '+91 XXXXX XXXXX'),
+                ),
                 const SizedBox(height: 16),
-                TextField(controller: categoryCtrl, enabled: !saving, decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG, Beverages)')),
+                TextField(
+                  controller: categoryCtrl,
+                  enabled: !saving,
+                  maxLength: 40,
+                  inputFormatters: [FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']'))],
+                  decoration: const InputDecoration(labelText: 'Category (e.g. Dairy, FMCG)', counterText: ''),
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: saving ? null : () async {
-                      if (nameCtrl.text.isEmpty) return;
+                      final name = nameCtrl.text.trim();
+                      final phone = phoneCtrl.text.trim().replaceAll(' ', '').replaceAll('-', '');
+                      if (name.isEmpty) return;
+                      if (phone.isNotEmpty) {
+                        final digits = phone.replaceAll('+', '');
+                        if (digits.length < 7 || !RegExp(r'^\+?\d+$').hasMatch(phone)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Enter a valid phone number')));
+                          return;
+                        }
+                      }
                       setModalState(() => saving = true);
                       try {
                         await ref.read(procurementProvider.notifier).updateSupplier(
                           supplierId: supplier.supplierId,
-                          name: nameCtrl.text,
-                          phone: phoneCtrl.text,
-                          category: categoryCtrl.text,
+                          name: name,
+                          phone: phone.isEmpty ? null : phone,
+                          category: categoryCtrl.text.trim(),
                         );
                       } catch (_) {
                         setModalState(() => saving = false);
@@ -255,7 +334,7 @@ class ProcurementTab extends ConsumerWidget {
                 const SizedBox(height: 24),
               ],
             ),
-          );
+          ));
         },
       ),
     );
@@ -365,7 +444,21 @@ class ProcurementTab extends ConsumerWidget {
                           _formSectionTitle('Items (${selectedItems.length})'),
                           TextButton.icon(
                             onPressed: () => _showInlineProductPicker(ctx, products, (item) {
-                              setState(() => selectedItems.add(item));
+                              setState(() {
+                                final idx = selectedItems.indexWhere(
+                                    (e) => e['product_id'] == item['product_id']);
+                                if (idx != -1) {
+                                  // Merge: add quantity, keep the new cost price
+                                  selectedItems[idx] = {
+                                    ...selectedItems[idx],
+                                    'quantity': (selectedItems[idx]['quantity'] as int) +
+                                        (item['quantity'] as int),
+                                    'cost_price': item['cost_price'],
+                                  };
+                                } else {
+                                  selectedItems.add(item);
+                                }
+                              });
                             }),
                             icon: const Icon(Icons.add_rounded, size: 18),
                             label: const Text('Add Item'),

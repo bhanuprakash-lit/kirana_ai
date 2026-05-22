@@ -404,11 +404,12 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
   }
 
   String _formatDate(DateTime dt) {
+    final d = dt.toLocal();
     final months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+    return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
 }
 

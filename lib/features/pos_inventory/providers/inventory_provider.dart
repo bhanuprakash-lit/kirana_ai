@@ -56,19 +56,19 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     final prefs = await SharedPreferences.getInstance();
     final storeId = prefs.getInt('store_id') ?? 1;
 
-    final productsFuture =
-        client.posGetList('/pos/products?store_id=$storeId&limit=1000');
-    final categoriesFuture = client.posGetList('/pos/categories');
-    final recoFuture = client.get('/kirana/stores/$storeId/recommendations');
-    final snapshotFuture = client.get('/kirana/stores/$storeId/snapshot');
-    final pricingFuture =
-        client.getOltp('pricing', filters: {'store_id': '$storeId'});
+    final results = await Future.wait([
+      client.posGetList('/pos/products?store_id=$storeId&limit=1000'),
+      client.posGetList('/pos/categories'),
+      client.get('/kirana/stores/$storeId/recommendations'),
+      client.get('/kirana/stores/$storeId/snapshot'),
+      client.getOltp('pricing', filters: {'store_id': '$storeId'}),
+    ]);
 
-    final productsRes = await productsFuture;
-    final categoriesRes = await categoriesFuture;
-    final recoRes = await recoFuture;
-    final snapshotRes = await snapshotFuture;
-    final pricingRes = await pricingFuture;
+    final productsRes   = results[0] as List<dynamic>?;
+    final categoriesRes = results[1] as List<dynamic>?;
+    final recoRes       = results[2] as Map<String, dynamic>;
+    final snapshotRes   = results[3] as Map<String, dynamic>;
+    final pricingRes    = results[4] as Map<String, dynamic>;
 
     final categoryNameMap = <int, String>{};
     for (final cat in (categoriesRes ?? []).cast<Map<String, dynamic>>()) {
@@ -188,6 +188,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     bool isLoose = false,
     String? expiryDate,
     int? existingProductId,
+    String? imageUrl,
   }) async {
     final params = <String, dynamic>{
       'name': name,
@@ -203,6 +204,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       'isLoose': isLoose,
       'expiryDate': expiryDate,
       'existingProductId': existingProductId,
+      'imageUrl': imageUrl,
     };
 
     final categoryName = state.value?.categories
@@ -245,6 +247,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     final isLoose = p['isLoose'] as bool;
     final expiryDate = p['expiryDate'] as String?;
     final existingProductId = p['existingProductId'] as int?;
+    final imageUrl = p['imageUrl'] as String?;
 
     try {
       int? productId = existingProductId;
@@ -259,6 +262,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
             'barcode': barcode,
             'is_perishable': isPerishable,
             'is_loose': isLoose,
+            if (imageUrl != null) 'image_url': imageUrl,
           });
           productId = (res['row']?['product_id'] as num?)?.toInt();
         } catch (_) {

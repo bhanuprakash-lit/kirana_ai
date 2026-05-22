@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -522,7 +523,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Container(
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -548,33 +551,52 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
           const SizedBox(height: 24),
           TextField(
             controller: _nameController,
+            maxLength: 60,
+            inputFormatters: [
+              // Allow Unicode letters, spaces, dots, hyphens, apostrophes — block HTML/script chars
+              FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
+            ],
             decoration: const InputDecoration(
               labelText: 'Full Name',
               prefixIcon: Icon(Icons.person_outline_rounded),
+              counterText: '',
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
+            maxLength: 15,
+            inputFormatters: [
+              // Allow digits, leading +, spaces, hyphens only
+              FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]')),
+            ],
             decoration: const InputDecoration(
               labelText: 'Phone Number',
               prefixIcon: Icon(Icons.phone_outlined),
+              counterText: '',
+              hintText: '+91 XXXXX XXXXX',
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
+            maxLength: 100,
+            inputFormatters: [
+              FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
+            ],
             decoration: const InputDecoration(
               labelText: 'Email Address (Optional)',
               prefixIcon: Icon(Icons.email_outlined),
+              counterText: '',
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _householdController,
             keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
               labelText: 'Household Size',
               prefixIcon: Icon(Icons.group_outlined),
@@ -599,13 +621,22 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _save() async {
-    if (_nameController.text.isEmpty || _phoneController.text.isEmpty) {
+    final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim().replaceAll(' ', '').replaceAll('-', '');
+    if (name.isEmpty || phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill name and phone')),
+      );
+      return;
+    }
+    final digits = phone.replaceAll('+', '');
+    if (digits.length < 7 || digits.length > 15 || !RegExp(r'^\+?\d+$').hasMatch(phone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid phone number (digits only)')),
       );
       return;
     }
@@ -613,8 +644,8 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
     setState(() => _isSaving = true);
 
     final data = {
-      'name': _nameController.text,
-      'phone': _phoneController.text,
+      'name': name,
+      'phone': phone,
       'email': _emailController.text.isEmpty ? null : _emailController.text,
       'household_size': int.tryParse(_householdController.text) ?? 4,
     };

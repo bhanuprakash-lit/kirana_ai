@@ -468,22 +468,34 @@ class _PaymentTile extends ConsumerWidget {
   }
 
   void _showDetails(BuildContext context, WidgetRef ref) {
+    // Fetch once before showing — prevents future recreation on every builder rebuild
+    final itemsFuture =
+        ref.read(procurementProvider.notifier).fetchPurchaseItems(order.purchaseId);
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => FutureBuilder<List<PurchaseItem>>(
-        future: ref.read(procurementProvider.notifier).fetchPurchaseItems(order.purchaseId),
-        builder: (ctx, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
-          }
-          final items = snapshot.data ?? [];
-          return Container(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.55,
+        minChildSize: 0.35,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scrollCtrl) => FutureBuilder<List<PurchaseItem>>(
+          future: itemsFuture,
+          builder: (ctx, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
+            }
+            final items = snapshot.data ?? [];
+            return ListView(
+              controller: scrollCtrl,
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               children: [
+                // Drag handle
+                Center(child: Container(width: 40, height: 4,
+                    decoration: BoxDecoration(color: BrandColors.border, borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 16),
                 Text(order.supplierName,
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 4),
@@ -491,7 +503,10 @@ class _PaymentTile extends ConsumerWidget {
                     style: const TextStyle(color: BrandColors.muted, fontSize: 13)),
                 const Divider(height: 28),
                 if (items.isEmpty)
-                  const Text('No items found.')
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Text('No items found.', style: TextStyle(color: BrandColors.muted)),
+                  )
                 else
                   ...items.map((item) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
@@ -523,11 +538,10 @@ class _PaymentTile extends ConsumerWidget {
                         style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: BrandColors.error)),
                   ],
                 ),
-                const SizedBox(height: 20),
               ],
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:kirana_ai/core/utils/date_utils.dart';
+
 class Customer {
   final int customerId;
   final String name;
@@ -38,7 +40,7 @@ class Customer {
       phone: json['phone'] as String? ?? '',
       email: json['email'] as String?,
       householdSize: (json['household_size'] as num?)?.toInt() ?? 4,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'] as String) : null,
+      createdAt: json['created_at'] != null ? parseAsUtc(json['created_at'] as String) : null,
       lastOrderDate: json['last_order_date'] != null ? DateTime.tryParse(json['last_order_date'] as String) : null,
       totalSpent: (json['total_spent'] as num?)?.toDouble() ?? 0.0,
       totalOrders: (json['total_orders'] as num?)?.toInt() ?? 0,

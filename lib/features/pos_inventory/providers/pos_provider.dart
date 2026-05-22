@@ -87,6 +87,7 @@ class PosNotifier extends Notifier<PosState> {
 
   @override
   PosState build() {
+    ref.onDispose(() => _cartPingTimer?.cancel());
     Future.microtask(_loadProducts);
     return const PosState();
   }

@@ -113,13 +113,16 @@ class CustomerNotifier extends Notifier<CustomerState> {
     }
   }
 
-  Future<void> deleteCustomer(int customerId) async {
+  Future<String?> deleteCustomer(int customerId) async {
     final client = ref.read(apiClientProvider);
     try {
       await client.deleteOltp('customer', filters: {'customer_id': '$customerId'});
       await fetchCustomers();
+      return null; // success
     } catch (e) {
-      state = state.copyWith(error: 'Delete failed: $e');
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      state = state.copyWith(error: msg);
+      return msg; // caller shows the error
     }
   }
 }

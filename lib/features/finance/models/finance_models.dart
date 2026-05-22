@@ -1,3 +1,5 @@
+import 'package:kirana_ai/core/utils/date_utils.dart';
+
 class FinanceStats {
   final double monthlySalesAmount;
   final int monthlySkuCount;
@@ -49,7 +51,7 @@ class UdhaarItem {
         customerName: j['customer_name'] as String? ?? 'Unknown',
         phone: j['phone'] as String? ?? '',
         balance: (j['balance'] as num?)?.toDouble() ?? 0.0,
-        dateTaken: DateTime.parse(j['date_taken'] as String? ?? DateTime.now().toIso8601String()),
+        dateTaken: parseAsUtc(j['date_taken'] as String?),
         daysPending: (j['days_pending'] as num?)?.toInt() ?? 0,
         isRecovered: ((j['balance'] as num?) ?? 0) <= 0,
       );

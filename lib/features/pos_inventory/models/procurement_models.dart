@@ -1,3 +1,5 @@
+import 'package:kirana_ai/core/utils/date_utils.dart';
+
 class Supplier {
   final int supplierId;
   final String name;
@@ -70,8 +72,8 @@ class PurchaseOrder {
         purchaseId: j['purchase_id'] as int,
         supplierId: j['supplier_id'] as int,
         supplierName: supplierName ?? 'Supplier #${j['supplier_id']}',
-        purchaseDate: DateTime.parse(j['order_date'] as String? ?? j['purchase_date'] as String? ?? DateTime.now().toIso8601String()),
-        dueDate: j['due_date'] != null ? DateTime.parse(j['due_date'] as String) : null,
+        purchaseDate: parseAsUtc(j['order_date'] as String? ?? j['purchase_date'] as String?),
+        dueDate: j['due_date'] != null ? parseAsUtc(j['due_date'] as String) : null,
         totalAmount: (j['total_amount'] as num?)?.toDouble() ?? 0.0,
         status: _parseStatus(j['status'] as String?),
         paymentStatus: j['payment_status'] as String? ?? 'unpaid',

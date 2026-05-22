@@ -160,7 +160,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                   const Divider(height: 32),
                   _InfoRow(
                     label: 'Joined On',
-                    value: customer.createdAt != null ? DateFormat('MMM dd, yyyy').format(customer.createdAt!) : 'Unknown',
+                    value: customer.createdAt != null ? DateFormat('MMM dd, yyyy').format(customer.createdAt!.toLocal()) : 'Unknown',
                     icon: Icons.calendar_today_outlined
                   ),
                   const Divider(height: 32),
@@ -231,10 +231,17 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
             onPressed: () async {
-              await ref.read(customerProvider.notifier).deleteCustomer(customer.customerId);
-              if (context.mounted) {
-                Navigator.pop(context);
-                context.pop();
+              final error = await ref.read(customerProvider.notifier).deleteCustomer(customer.customerId);
+              if (!context.mounted) return;
+              Navigator.pop(context); // close dialog
+              if (error == null) {
+                context.pop(); // success — go back to list
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(error),
+                  backgroundColor: BrandColors.error,
+                  duration: const Duration(seconds: 4),
+                ));
               }
             },
             child: const Text('Delete', style: TextStyle(color: BrandColors.error)),

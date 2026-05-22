@@ -58,7 +58,14 @@
       "Bash(dir assets *)",
       "PowerShell(cd \"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\FlutterProjects\\\\kirana_stt\"; ls -Recurse -Directory -Exclude \".dart_tool\",\"build\",\".idea\",\"ios\",\"android\",\"linux\",\"macos\",\"windows\" | ForEach-Object { $_.FullName.Replace\\(\"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\FlutterProjects\\\\kirana_stt\\\\\", \"\"\\) } | Sort-Object)",
       "Bash(flutter build *)",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Bhanuprakash\\\\Documents\\\\misc\\\\invoice_ocr\" -Recurse -Force)",
+      "Bash(Sort-Object FullName)",
+      "Bash(dart analyze *)",
+      "Bash(python *)",
+      "Bash(Get-ChildItem -Recurse)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "Bash(Get-ChildItem *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Bhanuprakash\\.claude\\projects\\c--Users-Bhanuprakash-Documents-FlutterProjects-kirana-ai\\memory"

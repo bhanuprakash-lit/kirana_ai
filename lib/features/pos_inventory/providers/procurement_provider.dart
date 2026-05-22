@@ -25,17 +25,20 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
 
   Future<ProcurementData> _fetch() async {
     final client = ref.read(apiClientProvider);
-    
-    // 1. Fetch suppliers
-    final suppliersJson = await client.getOltp('supplier');
+
+    final results = await Future.wait([
+      client.getOltp('supplier'),
+      client.getOltp('purchases'),
+    ]);
+
+    final suppliersJson = results[0] as Map<String, dynamic>;
+    final purchasesJson = results[1] as Map<String, dynamic>;
+
     final suppliers = (suppliersJson['rows'] as List)
         .map((j) => Supplier.fromJson(j as Map<String, dynamic>))
         .toList();
-    
     final supplierMap = {for (var s in suppliers) s.supplierId: s.name};
 
-    // 2. Fetch purchases
-    final purchasesJson = await client.getOltp('purchases');
     final purchases = (purchasesJson['rows'] as List)
         .map((j) {
           final sid = j['supplier_id'] as int;
@@ -43,10 +46,7 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
         })
         .toList();
 
-    return ProcurementData(
-      suppliers: suppliers,
-      purchases: purchases,
-    );
+    return ProcurementData(suppliers: suppliers, purchases: purchases);
   }
 
   Future<void> updateSupplier({
@@ -95,15 +95,18 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
     required List<Map<String, dynamic>> items,
     DateTime? dueDate,
     String? notes,
+    double? totalAmountOverride, // used when total is known externally (e.g. scanned invoice)
   }) async {
     final client = ref.read(apiClientProvider);
     final prefs = await SharedPreferences.getInstance();
     final storeId = prefs.getInt('store_id') ?? 1;
 
     try {
-      double totalAmount = 0;
-      for (var item in items) {
-        totalAmount += (item['quantity'] as num) * (item['cost_price'] as num);
+      double totalAmount = totalAmountOverride ?? 0;
+      if (totalAmountOverride == null) {
+        for (var item in items) {
+          totalAmount += (item['quantity'] as num) * (item['cost_price'] as num);
+        }
       }
 
       // 1. Create purchase header
@@ -120,15 +123,13 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
       
       final purchaseId = res['row']['purchase_id'] as int;
 
-      // 2. Create purchase items
-      for (var item in items) {
-        await client.postOltp('purchase_items', {
-          'purchase_id': purchaseId,
-          'product_id': item['product_id'],
-          'quantity': item['quantity'],
-          'cost_price': item['cost_price'],
-        });
-      }
+      // 2. Create purchase items in parallel
+      await Future.wait(items.map((item) => client.postOltp('purchase_items', {
+        'purchase_id': purchaseId,
+        'product_id': item['product_id'],
+        'quantity': item['quantity'],
+        'cost_price': item['cost_price'],
+      })));
 
       await refresh();
     } catch (e) {

@@ -7,6 +7,12 @@ class BrandColors {
   static const Color success = Color(0xFF16A34A);
   static const Color warning = Color(0xFFF59E0B);
 
+  /// Purple — used for handwriting/AI features
+  static const Color purple = Color(0xFF7C3AED);
+
+  /// Orange — used for upgrade/pro banners
+  static const Color orange = Color(0xFFE87722);
+
   static const Color background = Color(0xFFFFFDF8);
   static const Color surface = Colors.white;
   static const Color surfaceTint = Color(0xFFF6F4EE);

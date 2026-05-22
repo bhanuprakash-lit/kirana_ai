@@ -13,6 +13,7 @@ import '../../../subscription/models/subscription_model.dart';
 import '../../../subscription/providers/subscription_provider.dart';
 import '../../../subscription/widgets/trial_countdown_widget.dart';
 import '../../models/overview_models.dart';
+import '../../providers/kpi_provider.dart';
 import '../../providers/overview_provider.dart';
 import '../dashboard_screen.dart';
 
@@ -118,6 +119,8 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                   _IntelligenceStrip(reco: data.recommendations),
                   const SizedBox(height: 24),
                   _TodaySalesCard(sales: data.dailySales),
+                  const SizedBox(height: 16),
+                  const _KpiSummaryRow(),
                   const SizedBox(height: 16),
                   _StoreOverviewCard(store: data.store),
                   const SizedBox(height: 100),
@@ -1009,6 +1012,95 @@ class _ProAlertsStrip extends ConsumerWidget {
                 );
               },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── KPI Summary Row ───────────────────────────────────────────────────────────
+
+class _KpiSummaryRow extends ConsumerWidget {
+  const _KpiSummaryRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncKpis = ref.watch(kpiCardsProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(22, 0, 22, 10),
+          child: Row(
+            children: [
+              const Icon(Icons.bar_chart_rounded, size: 16, color: BrandColors.primary),
+              const SizedBox(width: 6),
+              Text('Store KPIs', style: Theme.of(context).textTheme.titleMedium),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 88,
+          child: asyncKpis.when(
+            loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (cards) => ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              scrollDirection: Axis.horizontal,
+              itemCount: cards.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) => _KpiMiniCard(card: cards[i]),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _KpiMiniCard extends StatelessWidget {
+  final KpiCard card;
+  const _KpiMiniCard({required this.card});
+
+  @override
+  Widget build(BuildContext context) {
+    final isUp   = card.direction == 'up';
+    final isDown = card.direction == 'down';
+    final trendColor = isUp ? BrandColors.success : isDown ? BrandColors.error : BrandColors.muted;
+    final trendIcon  = isUp ? Icons.arrow_upward_rounded : isDown ? Icons.arrow_downward_rounded : Icons.remove_rounded;
+
+    return Container(
+      width: 112,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border.withValues(alpha: 0.8)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(card.label,
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: BrandColors.muted),
+              maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(card.value,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink),
+              maxLines: 1, overflow: TextOverflow.ellipsis),
+          Row(
+            children: [
+              Icon(trendIcon, size: 12, color: trendColor),
+              const SizedBox(width: 3),
+              Text(
+                card.pctChange != null ? '${card.pctChange!.abs().toStringAsFixed(1)}%' : '—',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: trendColor),
+              ),
+            ],
           ),
         ],
       ),
