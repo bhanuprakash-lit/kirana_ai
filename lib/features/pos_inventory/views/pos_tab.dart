@@ -380,9 +380,7 @@ class _PosTabState extends ConsumerState<PosTab> {
     if (added == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'All items in "${basket.name}" are out of stock',
-          ),
+          content: Text('All items in "${basket.name}" are out of stock'),
         ),
       );
       return;
@@ -626,141 +624,94 @@ class _PosTabState extends ConsumerState<PosTab> {
       },
       child: Column(
         children: [
-        Container(
-          color: Colors.white,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchCtrl,
-                  onChanged: (v) => setState(() => _query = v),
-                  decoration: InputDecoration(
-                    hintText: 'Search products…',
-                    prefixIcon: const Icon(
-                      Icons.search_rounded,
-                      size: 20,
-                      color: BrandColors.muted,
-                    ),
-                    suffixIcon: _query.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18),
-                            onPressed: () {
-                              _searchCtrl.clear();
-                              setState(() => _query = '');
-                            },
-                          )
-                        : null,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                    filled: true,
-                    fillColor: BrandColors.surfaceTint,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: BrandColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: BrandColors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(
-                        color: BrandColors.primary,
-                        width: 1.5,
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchCtrl,
+                    onChanged: (v) => setState(() => _query = v),
+                    decoration: InputDecoration(
+                      hintText: 'Search products…',
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: BrandColors.muted,
+                      ),
+                      suffixIcon: _query.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              onPressed: () {
+                                _searchCtrl.clear();
+                                setState(() => _query = '');
+                              },
+                            )
+                          : null,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      filled: true,
+                      fillColor: BrandColors.surfaceTint,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: BrandColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: BrandColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(
+                          color: BrandColors.primary,
+                          width: 1.5,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Referral QR scan
-              Tooltip(
-                message: 'Scan Referral QR',
-                child: GestureDetector(
-                  onTap: _openReferralScanner,
+                const SizedBox(width: 8),
+                // Referral QR scan
+                Tooltip(
+                  message: 'Scan Referral QR',
+                  child: GestureDetector(
+                    onTap: _openReferralScanner,
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: BrandColors.accent,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.card_giftcard_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Product barcode scan
+                GestureDetector(
+                  onTap: _openScanner,
                   child: Container(
                     width: 46,
                     height: 46,
                     decoration: BoxDecoration(
-                      color: BrandColors.accent,
+                      color: BrandColors.primary,
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Icon(
-                      Icons.card_giftcard_rounded,
+                      Icons.qr_code_scanner_rounded,
                       color: Colors.white,
                       size: 22,
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Product barcode scan
-              GestureDetector(
-                onTap: _openScanner,
-                child: Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: BrandColors.primary,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(
-                    Icons.qr_code_scanner_rounded,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => showTodayOrdersSheet(context, ref),
-                child: Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: BrandColors.surfaceTint,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: BrandColors.border),
-                  ),
-                  child: const Icon(
-                    Icons.receipt_long_rounded,
-                    size: 20,
-                    color: BrandColors.ink,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Tooltip(
-                message: 'Refresh Products',
-                child: GestureDetector(
-                  onTap: () async {
-                    final messenger = ScaffoldMessenger.of(context);
-                    messenger.hideCurrentSnackBar();
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('Refreshing products...'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                    await ref.read(posProvider.notifier).reloadProducts();
-                    if (!context.mounted) return;
-                    final err = ref.read(posProvider).error;
-                    final count = ref.read(posProvider).products.length;
-                    messenger.hideCurrentSnackBar();
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          err != null
-                              ? 'Refresh failed: $err'
-                              : 'Products refreshed ($count items)',
-                        ),
-                        backgroundColor: err != null
-                            ? BrandColors.error
-                            : BrandColors.success,
-                        duration: const Duration(milliseconds: 1500),
-                      ),
-                    );
-                  },
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => showTodayOrdersSheet(context, ref),
                   child: Container(
                     width: 46,
                     height: 46,
@@ -770,166 +721,214 @@ class _PosTabState extends ConsumerState<PosTab> {
                       border: Border.all(color: BrandColors.border),
                     ),
                     child: const Icon(
-                      Icons.refresh_rounded,
+                      Icons.receipt_long_rounded,
                       size: 20,
                       color: BrandColors.ink,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-
-        // AI entry strip — always visible below search bar
-        if (!isSearching)
-          _AiEntryStrip(
-            onVoice: _showVoiceOrderSheet,
-            onHandwrite: _showHandwritingSheet,
-          ),
-
-        if (isSearching)
-          _SearchResults(
-            products: _filtered,
-            isLoading: state.isLoadingProducts,
-            onAdd: (p) {
-              _handleProductAdd(p);
-              _searchCtrl.clear();
-              setState(() => _query = '');
-            },
-          ),
-
-        Expanded(
-          child: state.isLoadingProducts && state.products.isEmpty
-              ? const Center(child: CircularProgressIndicator())
-              : cart.isEmpty
-              ? _EmptyCartWithCampaigns(
-                  // Treat as "POS Offline" only when we genuinely have no
-                  // products to sell. An order-placement failure also sets
-                  // state.error but isn't a connectivity issue — surfacing
-                  // it as "POS Offline" was misleading users into restarting.
-                  hasPosError: state.error != null && state.products.isEmpty,
-                  errorMsg: state.error,
-                  onAddCampaign: _addCampaignToCart,
-                  onAddBasket: _addBasketToCart,
-                )
-              : Column(
-                  children: [
-                    // Cart header with clear button
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 10, 12, 2),
-                      child: Row(
-                        children: [
-                          Text(
-                            '${cart.length} item${cart.length > 1 ? 's' : ''} in cart',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: BrandColors.muted,
-                            ),
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: 'Refresh Products',
+                  child: GestureDetector(
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      messenger.hideCurrentSnackBar();
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Refreshing products...'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      await ref.read(posProvider.notifier).reloadProducts();
+                      if (!context.mounted) return;
+                      final err = ref.read(posProvider).error;
+                      final count = ref.read(posProvider).products.length;
+                      messenger.hideCurrentSnackBar();
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            err != null
+                                ? 'Refresh failed: $err'
+                                : 'Products refreshed ($count items)',
                           ),
-                          const Spacer(),
-                          TextButton.icon(
-                            onPressed: () async {
-                              final ok = await showDialog<bool>(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  title: const Text('Clear Cart?'),
-                                  content: const Text(
-                                    'All items will be removed from the cart.',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(ctx, false),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(ctx, true),
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: BrandColors.error,
-                                      ),
-                                      child: const Text('Clear'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (ok == true)
-                                ref.read(posProvider.notifier).clearCart();
-                            },
-                            icon: const Icon(
-                              Icons.delete_sweep_rounded,
-                              size: 16,
-                            ),
-                            label: const Text('Clear'),
-                            style: TextButton.styleFrom(
-                              foregroundColor: BrandColors.error,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              visualDensity: VisualDensity.compact,
-                            ),
-                          ),
-                        ],
+                          backgroundColor: err != null
+                              ? BrandColors.error
+                              : BrandColors.success,
+                          duration: const Duration(milliseconds: 1500),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: BrandColors.surfaceTint,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: BrandColors.border),
+                      ),
+                      child: const Icon(
+                        Icons.refresh_rounded,
+                        size: 20,
+                        color: BrandColors.ink,
                       ),
                     ),
-                    Expanded(
-                      child: ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                        itemCount: cart.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 8),
-                        itemBuilder: (_, i) => Dismissible(
-                          key: ValueKey(cart[i].product.productId),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 20),
-                            decoration: BoxDecoration(
-                              color: BrandColors.error,
-                              borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // AI entry strip — always visible below search bar
+          if (!isSearching)
+            _AiEntryStrip(
+              onVoice: _showVoiceOrderSheet,
+              onHandwrite: _showHandwritingSheet,
+            ),
+
+          if (isSearching)
+            _SearchResults(
+              products: _filtered,
+              isLoading: state.isLoadingProducts,
+              onAdd: (p) {
+                _handleProductAdd(p);
+                _searchCtrl.clear();
+                setState(() => _query = '');
+              },
+            ),
+
+          Expanded(
+            child: state.isLoadingProducts && state.products.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : cart.isEmpty
+                ? _EmptyCartWithCampaigns(
+                    // Treat as "POS Offline" only when we genuinely have no
+                    // products to sell. An order-placement failure also sets
+                    // state.error but isn't a connectivity issue — surfacing
+                    // it as "POS Offline" was misleading users into restarting.
+                    hasPosError: state.error != null && state.products.isEmpty,
+                    errorMsg: state.error,
+                    onAddCampaign: _addCampaignToCart,
+                    onAddBasket: _addBasketToCart,
+                  )
+                : Column(
+                    children: [
+                      // Cart header with clear button
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 12, 2),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${cart.length} item${cart.length > 1 ? 's' : ''} in cart',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: BrandColors.muted,
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.delete_rounded,
-                              color: Colors.white,
+                            const Spacer(),
+                            TextButton.icon(
+                              onPressed: () async {
+                                final ok = await showDialog<bool>(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text('Clear Cart?'),
+                                    content: const Text(
+                                      'All items will be removed from the cart.',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(ctx, false),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(ctx, true),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: BrandColors.error,
+                                        ),
+                                        child: const Text('Clear'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (ok == true)
+                                  ref.read(posProvider.notifier).clearCart();
+                              },
+                              icon: const Icon(
+                                Icons.delete_sweep_rounded,
+                                size: 16,
+                              ),
+                              label: const Text('Clear'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: BrandColors.error,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                visualDensity: VisualDensity.compact,
+                              ),
                             ),
-                          ),
-                          onDismissed: (_) => ref
-                              .read(posProvider.notifier)
-                              .removeFromCart(cart[i].product.productId),
-                          child: _CartTile(
-                            item: cart[i],
-                            onEditLoose: (item) async {
-                              final qty = await _showWeightDialog(
-                                item.product,
-                                initialValue: item.quantity,
-                              );
-                              if (qty != null && qty > 0) {
-                                ref
-                                    .read(posProvider.notifier)
-                                    .updateQty(item.product.productId, qty);
-                              }
-                            },
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                          itemCount: cart.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
+                          itemBuilder: (_, i) => Dismissible(
+                            key: ValueKey(cart[i].product.productId),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              decoration: BoxDecoration(
+                                color: BrandColors.error,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.delete_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                            onDismissed: (_) => ref
+                                .read(posProvider.notifier)
+                                .removeFromCart(cart[i].product.productId),
+                            child: _CartTile(
+                              item: cart[i],
+                              onEditLoose: (item) async {
+                                final qty = await _showWeightDialog(
+                                  item.product,
+                                  initialValue: item.quantity,
+                                );
+                                if (qty != null && qty > 0) {
+                                  ref
+                                      .read(posProvider.notifier)
+                                      .updateQty(item.product.productId, qty);
+                                }
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-        ),
-
-        const _SmartAssortmentHints(),
-
-        if (cart.isNotEmpty)
-          _OrderFooter(
-            subtotal: state.subtotal,
-            itemCount: state.cartItemCount,
-            isPlacing: state.isPlacingOrder,
-            selectedCustomer: state.selectedCustomerName,
-            onSelectCustomer: _showCustomerSearchSheet,
-            onClearCustomer: () =>
-                ref.read(posProvider.notifier).clearCustomer(),
-            onOrder: () => showOrderDialog(context, ref),
+                    ],
+                  ),
           ),
+
+          const _SmartAssortmentHints(),
+
+          if (cart.isNotEmpty)
+            _OrderFooter(
+              subtotal: state.subtotal,
+              itemCount: state.cartItemCount,
+              isPlacing: state.isPlacingOrder,
+              selectedCustomer: state.selectedCustomerName,
+              onSelectCustomer: _showCustomerSearchSheet,
+              onClearCustomer: () =>
+                  ref.read(posProvider.notifier).clearCustomer(),
+              onOrder: () => showOrderDialog(context, ref),
+            ),
         ],
       ),
     );
