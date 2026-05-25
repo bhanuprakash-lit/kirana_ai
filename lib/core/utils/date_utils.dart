@@ -6,8 +6,16 @@ import 'package:intl/intl.dart';
 DateTime parseAsUtc(String? s) {
   if (s == null || s.isEmpty) return DateTime.now();
   final t = s.trim();
+  // Date-only (YYYY-MM-DD) → treat as UTC midnight.
+  if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(t)) {
+    return DateTime.parse('${t}T00:00:00Z').toLocal();
+  }
   final hasOffset = t.endsWith('Z') || RegExp(r'[+-]\d{2}:\d{2}$').hasMatch(t);
-  return DateTime.parse(hasOffset ? t : '${t}Z').toLocal();
+  try {
+    return DateTime.parse(hasOffset ? t : '${t}Z').toLocal();
+  } on FormatException {
+    return DateTime.parse(t).toLocal();
+  }
 }
 
 /// Format a DateTime for date-only display in IST.

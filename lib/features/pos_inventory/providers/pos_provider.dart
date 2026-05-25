@@ -167,6 +167,16 @@ class PosNotifier extends Notifier<PosState> {
 
   Future<void> reloadProducts() => _loadProducts();
 
+  /// Clears any transient error (e.g. an "Order failed: insufficient stock"
+  /// message). Call this when the order sheet is dismissed so the error
+  /// doesn't bleed into other surfaces like the empty-cart "POS Offline"
+  /// card.
+  void clearError() {
+    if (state.error != null) {
+      state = state.copyWith(clearError: true);
+    }
+  }
+
   // Sync local-cache lookup — no network, no async overhead.
   PosProduct? lookupBarcodeLocal(String barcode) {
     for (final p in state.products) {

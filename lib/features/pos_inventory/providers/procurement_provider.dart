@@ -117,8 +117,9 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
       final res = await client.postOltp('purchases', {
         'store_id': storeId,
         'supplier_id': supplierId,
-        'order_date': DateTime.now().toIso8601String(),
-        'due_date': dueDate?.toIso8601String(),
+        // Backend stores timestamps as UTC — must send UTC, not local time.
+        'order_date': DateTime.now().toUtc().toIso8601String(),
+        'due_date': dueDate?.toUtc().toIso8601String(),
         'total_amount': totalAmount,
         'status': 'ordered',
         'payment_status': 'unpaid',

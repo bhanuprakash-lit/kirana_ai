@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -305,7 +307,12 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
         'product_id': productId,
         'selling_price': sellingPrice,
         'mrp': mrp,
-        'valid_from': DateTime.now().toIso8601String(),
+        // Backend compares valid_from against datetime.utcnow() — must send UTC.
+        // Backdate by 1 minute so clock skew can't make the row "future-dated".
+        'valid_from': DateTime.now()
+            .toUtc()
+            .subtract(const Duration(minutes: 1))
+            .toIso8601String(),
       });
 
       if (isPerishable && expiryDate != null) {
@@ -401,7 +408,18 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
         ),
         client.patchOltp(
           'pricing',
-          {'selling_price': sellingPrice, 'mrp': mrp},
+          {
+            'selling_price': sellingPrice,
+            'mrp': mrp,
+            // Also reset valid_from to "now" (UTC, backdated 1 min) so older
+            // pricing rows that were written with a future-dated valid_from
+            // become active immediately. Without this, edits keep the row
+            // future-dated and the POS layer sees price as 0.
+            'valid_from': DateTime.now()
+                .toUtc()
+                .subtract(const Duration(minutes: 1))
+                .toIso8601String(),
+          },
           filters: {
             'store_id': storeId.toString(),
             'product_id': productId.toString(),
@@ -416,8 +434,12 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
           },
         ),
       ]);
-      await refresh();
-      ref.read(posProvider.notifier).reloadProducts();
+      // Refresh in the background — don't block the UI dismiss. If the device
+      // is on a flaky network, awaiting refresh() could hang one of the 5
+      // parallel calls indefinitely (http has no default timeout), leaving
+      // the "Saving..." spinner stuck forever even though the writes succeeded.
+      unawaited(refresh());
+      unawaited(ref.read(posProvider.notifier).reloadProducts());
       return null;
     } catch (e) {
       return e.toString();

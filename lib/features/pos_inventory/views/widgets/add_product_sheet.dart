@@ -8,6 +8,7 @@ import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/inventory_provider.dart';
+import '../../providers/pos_provider.dart';
 import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
 
@@ -45,6 +46,10 @@ class _CatalogProduct {
   final int categoryId;
   final String? categoryName;
   final String? parentCategoryName;
+  // Most-recent pricing for THIS user's store, joined server-side.
+  // Null when the store has no pricing row for this product yet.
+  final double? price;
+  final double? mrp;
 
   const _CatalogProduct({
     required this.productId,
@@ -59,6 +64,8 @@ class _CatalogProduct {
     required this.categoryId,
     this.categoryName,
     this.parentCategoryName,
+    this.price,
+    this.mrp,
   });
 
   factory _CatalogProduct.fromJson(Map<String, dynamic> j) => _CatalogProduct(
@@ -74,6 +81,8 @@ class _CatalogProduct {
     categoryId: j['category_id'] as int,
     categoryName: j['category_name'] as String?,
     parentCategoryName: j['parent_category_name'] as String?,
+    price: (j['price'] as num?)?.toDouble(),
+    mrp: (j['mrp'] as num?)?.toDouble(),
   );
 
   String get subtitle {
@@ -230,6 +239,42 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     _selectedCategoryName = p.categoryName;
     _isPerishable = p.isPerishable;
     _isLoose = p.isLoose;
+
+    // Prefill price / MRP / stock with this priority:
+    //   1. Local inventory row (this store already stocks the product) — most
+    //      authoritative; reflects whatever the shopkeeper last set.
+    //   2. Catalog row's price/mrp returned by /kirana/catalog/search — that
+    //      now joins the most-recent pricing row for this store server-side,
+    //      so brand-new products that haven't hit `inventory` yet still come
+    //      with sensible Blinkit-seeded numbers.
+    final v = _variants[0];
+    final localProducts = ref.read(posProvider).products;
+    final existing = localProducts
+        .where(
+          (lp) =>
+              lp.productId == p.productId ||
+              (p.barcode != null &&
+                  p.barcode!.isNotEmpty &&
+                  lp.barcode == p.barcode),
+        )
+        .firstOrNull;
+
+    final priceSource = existing?.price ?? p.price;
+    final mrpSource = existing?.mrp ?? p.mrp;
+    if (priceSource != null && priceSource > 0 && v.priceCtrl.text.isEmpty) {
+      v.priceCtrl.text = priceSource.toStringAsFixed(
+        priceSource % 1 == 0 ? 0 : 2,
+      );
+    }
+    if (mrpSource != null && mrpSource > 0 && v.mrpCtrl.text.isEmpty) {
+      v.mrpCtrl.text = mrpSource.toStringAsFixed(mrpSource % 1 == 0 ? 0 : 2);
+    }
+    if (existing != null && existing.stockQuantity > 0) {
+      v.stockCtrl.text = existing.stockQuantity.toStringAsFixed(
+        existing.stockQuantity % 1 == 0 ? 0 : 2,
+      );
+    }
+
     setState(() => _stage = _Stage.form);
   }
 

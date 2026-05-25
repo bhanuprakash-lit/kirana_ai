@@ -19,6 +19,11 @@ Future<void> showOrderDialog(BuildContext context, WidgetRef ref) async {
 
   if (result != null && context.mounted) {
     _showSuccessDialog(context, result);
+  } else {
+    // Sheet was dismissed (cancelled or closed after a failure). Wipe any
+    // lingering "Order failed: ..." from posProvider so it doesn't render as
+    // a "POS Offline" card on the empty-cart screen.
+    ref.read(posProvider.notifier).clearError();
   }
 }
 

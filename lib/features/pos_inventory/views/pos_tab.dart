@@ -300,20 +300,49 @@ class _PosTabState extends ConsumerState<PosTab> {
     ref.read(posProvider.notifier).setPendingReferral(pending);
   }
 
-  // Adds all in-stock campaign items to cart.
+  // Adds all in-stock campaign items to cart. Cross-checks local stock so a
+  // stale `in_stock` flag from the backend can't push 0-qty products into the
+  // cart (which would then fail at /pos/orders with "insufficient stock").
   void _addCampaignToCart(campaign_card_lib.Campaign campaign) {
     final notifier = ref.read(posProvider.notifier);
+    final localProducts = ref.read(posProvider).products;
+    int added = 0;
+    int skipped = 0;
     for (final item in campaign.stockedItems) {
       final p = item.product;
       if (p == null) continue;
-      notifier.addToCart(p.toPosProduct(), qty: item.quantity);
+      final local = localProducts
+          .where((lp) => lp.productId == p.productId)
+          .firstOrNull;
+      if (local == null || local.stockQuantity <= 0) {
+        skipped++;
+        continue;
+      }
+      final qty = item.quantity.clamp(0, local.stockQuantity).toDouble();
+      if (qty <= 0) {
+        skipped++;
+        continue;
+      }
+      notifier.addToCart(local, qty: qty);
+      added++;
+    }
+    if (added == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('All items in "${campaign.name}" are out of stock'),
+          duration: const Duration(milliseconds: 1800),
+        ),
+      );
+      return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${campaign.availableCount} items from "${campaign.name}" added to cart',
+          skipped == 0
+              ? '$added item${added == 1 ? '' : 's'} from "${campaign.name}" added'
+              : '$added added · $skipped skipped (out of stock)',
         ),
-        duration: const Duration(milliseconds: 1500),
+        duration: const Duration(milliseconds: 1800),
       ),
     );
   }
@@ -323,25 +352,36 @@ class _PosTabState extends ConsumerState<PosTab> {
   Future<void> _showHandwritingSheet() =>
       showHandwritingOrderSheet(context, ref);
 
-  // Adds all basket products (matched by productId) to cart.
+  // Adds basket products to cart — only those that are in stock locally.
+  // Quantities are clamped to available stock so /pos/orders won't reject
+  // the cart with an "insufficient stock" error.
   void _addBasketToCart(Basket basket) {
     final notifier = ref.read(posProvider.notifier);
     final products = ref.read(posProvider).products;
     int added = 0;
+    int skipped = 0;
     for (final item in basket.items) {
       final product = products
           .where((p) => p.productId == item.productId)
           .firstOrNull;
-      if (product == null) continue;
-      notifier.addToCart(product, qty: item.qty);
+      if (product == null || product.stockQuantity <= 0) {
+        skipped++;
+        continue;
+      }
+      final qty = item.qty.clamp(0, product.stockQuantity).toDouble();
+      if (qty <= 0) {
+        skipped++;
+        continue;
+      }
+      notifier.addToCart(product, qty: qty);
       added++;
     }
     if (!mounted) return;
     if (added == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'No matching products found in inventory for this basket',
+            'All items in "${basket.name}" are out of stock',
           ),
         ),
       );
@@ -350,9 +390,11 @@ class _PosTabState extends ConsumerState<PosTab> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '$added item${added != 1 ? 's' : ''} from "${basket.name}" added to cart',
+          skipped == 0
+              ? '$added item${added == 1 ? '' : 's'} from "${basket.name}" added'
+              : '$added added · $skipped skipped (out of stock)',
         ),
-        duration: const Duration(milliseconds: 1500),
+        duration: const Duration(milliseconds: 1800),
       ),
     );
   }
@@ -564,9 +606,26 @@ class _PosTabState extends ConsumerState<PosTab> {
     final state = ref.watch(posProvider);
     final cart = state.cart;
     final isSearching = _query.isNotEmpty;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
-    return Column(
-      children: [
+    return PopScope(
+      // Intercept back when there's something to clear on this screen first.
+      // Without this, hitting back while searching used to pop the POS tab
+      // (and Android would land you on the next visible tab, Stock).
+      canPop: !isSearching && !keyboardOpen,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        if (keyboardOpen) {
+          FocusManager.instance.primaryFocus?.unfocus();
+          return;
+        }
+        if (isSearching) {
+          _searchCtrl.clear();
+          setState(() => _query = '');
+        }
+      },
+      child: Column(
+        children: [
         Container(
           color: Colors.white,
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -674,7 +733,34 @@ class _PosTabState extends ConsumerState<PosTab> {
               Tooltip(
                 message: 'Refresh Products',
                 child: GestureDetector(
-                  onTap: () => ref.read(posProvider.notifier).reloadProducts(),
+                  onTap: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    messenger.hideCurrentSnackBar();
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Refreshing products...'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    await ref.read(posProvider.notifier).reloadProducts();
+                    if (!context.mounted) return;
+                    final err = ref.read(posProvider).error;
+                    final count = ref.read(posProvider).products.length;
+                    messenger.hideCurrentSnackBar();
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          err != null
+                              ? 'Refresh failed: $err'
+                              : 'Products refreshed ($count items)',
+                        ),
+                        backgroundColor: err != null
+                            ? BrandColors.error
+                            : BrandColors.success,
+                        duration: const Duration(milliseconds: 1500),
+                      ),
+                    );
+                  },
                   child: Container(
                     width: 46,
                     height: 46,
@@ -718,7 +804,11 @@ class _PosTabState extends ConsumerState<PosTab> {
               ? const Center(child: CircularProgressIndicator())
               : cart.isEmpty
               ? _EmptyCartWithCampaigns(
-                  hasPosError: state.error != null,
+                  // Treat as "POS Offline" only when we genuinely have no
+                  // products to sell. An order-placement failure also sets
+                  // state.error but isn't a connectivity issue — surfacing
+                  // it as "POS Offline" was misleading users into restarting.
+                  hasPosError: state.error != null && state.products.isEmpty,
                   errorMsg: state.error,
                   onAddCampaign: _addCampaignToCart,
                   onAddBasket: _addBasketToCart,
@@ -840,7 +930,8 @@ class _PosTabState extends ConsumerState<PosTab> {
                 ref.read(posProvider.notifier).clearCustomer(),
             onOrder: () => showOrderDialog(context, ref),
           ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -32,6 +32,9 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
       initialIndex: initialTab.clamp(0, 2),
     );
     _tabController.addListener(() {
+      // Dismiss any focused field (search box on Billing, etc.) so the keyboard
+      // doesn't linger after switching to Stock / Purchase.
+      FocusManager.instance.primaryFocus?.unfocus();
       if (!_tabController.indexIsChanging) {
         ref
             .read(dashboardSubTabProvider.notifier)
