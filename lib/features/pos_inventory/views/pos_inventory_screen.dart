@@ -102,7 +102,9 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
                     width: 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: posOnline ? BrandColors.success : BrandColors.error,
+                      color: posOnline
+                          ? BrandColors.success
+                          : BrandColors.error,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -112,8 +114,9 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color:
-                          posOnline ? BrandColors.success : BrandColors.error,
+                      color: posOnline
+                          ? BrandColors.success
+                          : BrandColors.error,
                     ),
                   ),
                 ],
@@ -167,7 +170,8 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
                 Consumer(
                   builder: (ctx, ref, _) {
                     final sub = ref.watch(subInfoProvider);
-                    if (sub.canAccessVendorManagement) return const ProcurementTab();
+                    if (sub.canAccessVendorManagement)
+                      return const ProcurementTab();
                     return _ProGateTab(
                       title: 'Purchase & Suppliers',
                       description:
@@ -228,7 +232,11 @@ class _PrinterStatusStrip extends ConsumerWidget {
               ),
             ),
             const Spacer(),
-            Icon(Icons.chevron_right_rounded, size: 14, color: color.withValues(alpha: 0.6)),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 14,
+              color: color.withValues(alpha: 0.6),
+            ),
           ],
         ),
       ),
@@ -242,10 +250,7 @@ class _PrinterPickerSheet extends ConsumerWidget {
   final Future<void> Function(PrinterDevice) onSelect;
   final Future<void> Function() onForget;
 
-  const _PrinterPickerSheet({
-    required this.onSelect,
-    required this.onForget,
-  });
+  const _PrinterPickerSheet({required this.onSelect, required this.onForget});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -353,8 +358,11 @@ class _PrinterPickerSheet extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.bluetooth_rounded,
-                          color: printer.statusColor, size: 20),
+                      Icon(
+                        Icons.bluetooth_rounded,
+                        color: printer.statusColor,
+                        size: 20,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
@@ -479,7 +487,8 @@ class _PrinterPickerSheet extends ConsumerWidget {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: BrandColors.primary,
                                 side: const BorderSide(
-                                    color: BrandColors.primary),
+                                  color: BrandColors.primary,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -513,13 +522,16 @@ class _PrinterPickerSheet extends ConsumerWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: isCurrent
-                                    ? BrandColors.primary.withValues(alpha: 0.05)
+                                    ? BrandColors.primary.withValues(
+                                        alpha: 0.05,
+                                      )
                                     : BrandColors.surfaceTint,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
                                   color: isCurrent
                                       ? BrandColors.primary.withValues(
-                                          alpha: 0.3)
+                                          alpha: 0.3,
+                                        )
                                       : BrandColors.border,
                                 ),
                               ),
@@ -615,8 +627,7 @@ class _ProGateTab extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: const Color(0xFF7C3AED),
                 borderRadius: BorderRadius.circular(12),

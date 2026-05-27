@@ -69,7 +69,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                 data: (data) => _MonthlySalesOverview(stats: data.stats),
                 loading: () => Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: CardShimmer(height: 48, radius: 12),
                 ),
                 error: (_, _) => const SizedBox(

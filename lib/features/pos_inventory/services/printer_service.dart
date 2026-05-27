@@ -125,7 +125,9 @@ class PrinterService {
     final targetMac = mac ?? (await getSelectedPrinter())?.address;
     if (targetMac == null) return false;
     await requestPermissions();
-    try { await PrintBluetoothThermal.disconnect; } catch (_) {}
+    try {
+      await PrintBluetoothThermal.disconnect;
+    } catch (_) {}
     await Future.delayed(const Duration(milliseconds: 700));
     return PrintBluetoothThermal.connect(macPrinterAddress: targetMac);
   }
@@ -166,8 +168,7 @@ class PrinterService {
     // Always convert to IST (UTC+5:30) explicitly.
     // Using toLocal() is unreliable — Android devices often stay in UTC.
     final dt = _toIst(data.orderDateTime);
-    final dateStr =
-        '${_pad(dt.day)}/${_pad(dt.month)}/${dt.year}';
+    final dateStr = '${_pad(dt.day)}/${_pad(dt.month)}/${dt.year}';
     final hour = dt.hour;
     final ampm = hour < 12 ? 'AM' : 'PM';
     final h = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
@@ -301,8 +302,7 @@ class PrinterService {
 
   /// Total row: label(20) amount(12) = 32 chars
   String _totalRow(String label, String amt) {
-    final l =
-        label.length > 20 ? label.substring(0, 20) : label.padRight(20);
+    final l = label.length > 20 ? label.substring(0, 20) : label.padRight(20);
     final a = amt.padLeft(12);
     return '$l$a';
   }

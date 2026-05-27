@@ -366,7 +366,8 @@ class _AssociationRow extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
               assocAsync.when(
-                loading: () => const ShimmerBox(width: 80, height: 20, radius: 6),
+                loading: () =>
+                    const ShimmerBox(width: 80, height: 20, radius: 6),
                 error: (_, _) => const Text(
                   'Unable to load areas',
                   style: TextStyle(fontSize: 13, color: BrandColors.muted),

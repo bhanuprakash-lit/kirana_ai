@@ -14,7 +14,8 @@ import '../models/pos_product.dart';
 import '../services/printer_service.dart';
 import '../../profile/models/store_model.dart';
 
-export '../services/printer_service.dart' show PrinterDevice, ReceiptData, ReceiptLineItem;
+export '../services/printer_service.dart'
+    show PrinterDevice, ReceiptData, ReceiptLineItem;
 
 // ── Status enum ───────────────────────────────────────────────────────────────
 
@@ -108,16 +109,15 @@ class PrinterStateData {
     bool clearPrinter = false,
     List<PrinterDevice>? pairedDevices,
     bool? loadingDevices,
-  }) =>
-      PrinterStateData(
-        status: status ?? this.status,
-        btEnabled: btEnabled ?? this.btEnabled,
-        selectedPrinter: clearPrinter
-            ? null
-            : (selectedPrinter ?? this.selectedPrinter),
-        pairedDevices: pairedDevices ?? this.pairedDevices,
-        loadingDevices: loadingDevices ?? this.loadingDevices,
-      );
+  }) => PrinterStateData(
+    status: status ?? this.status,
+    btEnabled: btEnabled ?? this.btEnabled,
+    selectedPrinter: clearPrinter
+        ? null
+        : (selectedPrinter ?? this.selectedPrinter),
+    pairedDevices: pairedDevices ?? this.pairedDevices,
+    loadingDevices: loadingDevices ?? this.loadingDevices,
+  );
 }
 
 // ── Notifier ──────────────────────────────────────────────────────────────────
@@ -344,5 +344,6 @@ class PrinterNotifier extends Notifier<PrinterStateData> {
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
-final printerProvider =
-    NotifierProvider<PrinterNotifier, PrinterStateData>(PrinterNotifier.new);
+final printerProvider = NotifierProvider<PrinterNotifier, PrinterStateData>(
+  PrinterNotifier.new,
+);

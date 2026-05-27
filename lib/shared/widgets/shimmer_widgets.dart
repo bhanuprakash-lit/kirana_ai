@@ -108,13 +108,13 @@ class _ShimmerBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: w,
-        height: h,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(r),
-        ),
-      );
+    width: w,
+    height: h,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(r),
+    ),
+  );
 }
 
 /// List skeleton: N shimmer rows (for orders, customers, etc.)

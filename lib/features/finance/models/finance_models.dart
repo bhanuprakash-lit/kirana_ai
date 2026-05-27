@@ -31,13 +31,13 @@ class FinanceStats {
 class UdhaarItem {
   final int khataId;
   final int customerId;
-  final int? orderId;        // linked POS order, if created from POS
+  final int? orderId; // linked POS order, if created from POS
   final String customerName;
   final String phone;
   final double originalAmount; // total credit extended at time of sale
-  final double amountPaid;     // how much has been recovered so far
-  final double balance;        // originalAmount - amountPaid
-  final String status;         // open | pending | settled | overdue | written_off
+  final double amountPaid; // how much has been recovered so far
+  final double balance; // originalAmount - amountPaid
+  final String status; // open | pending | settled | overdue | written_off
   final DateTime dateTaken;
   final int daysPending;
   final bool isRecovered;

@@ -42,10 +42,7 @@ void _showSuccessDialog(
 
   showDialog(
     context: context,
-    builder: (dialogContext) => _SuccessDialog(
-      order: order,
-      parentRef: ref,
-    ),
+    builder: (dialogContext) => _SuccessDialog(order: order, parentRef: ref),
   );
 }
 
@@ -85,11 +82,12 @@ class _SuccessDialog extends ConsumerWidget {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(ok ? 'Receipt sent to printer' : 'Print failed — check printer'),
+        content: Text(
+          ok ? 'Receipt sent to printer' : 'Print failed — check printer',
+        ),
         backgroundColor: ok ? BrandColors.success : BrandColors.error,
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -291,8 +289,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           if (!mounted) return;
           customers = ref.read(customerProvider).customers;
         }
-        final match =
-            customers.where((c) => c.customerId == selId).firstOrNull;
+        final match = customers.where((c) => c.customerId == selId).firstOrNull;
         if (match != null && mounted) {
           setState(() {
             _udhaarCustomerId = match.customerId;
@@ -306,8 +303,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
 
   Future<void> _confirm() async {
     if (_paymentMethod == 'udhaar' && _udhaarCustomerId == null) {
-      setState(
-          () => _localError = 'Please select a customer for Udhaar sale');
+      setState(() => _localError = 'Please select a customer for Udhaar sale');
       return;
     }
     setState(() {
@@ -321,18 +317,14 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
 
     final result = await ref
         .read(posProvider.notifier)
-        .placeOrder(
-          paymentMethod: _paymentMethod,
-          udhaarAmount: udhaarAmt,
-        );
+        .placeOrder(paymentMethod: _paymentMethod, udhaarAmount: udhaarAmt);
     if (!mounted) return;
     if (result != null) {
       if (_paymentMethod == 'udhaar' && _udhaarCustomerPhone != null) {
         // Use the slider value — not the full order total — so the finance
         // ledger records only the credit portion.
-        final creditAmount = udhaarAmt ??
-            (result['total_amount'] as num?)?.toDouble() ??
-            0.0;
+        final creditAmount =
+            udhaarAmt ?? (result['total_amount'] as num?)?.toDouble() ?? 0.0;
         // Only record udhaar if there's an actual credit amount (slider > 0).
         if (creditAmount > 0) {
           try {
@@ -357,8 +349,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         // Persist the split so OrderDetailsScreen can show the breakdown
         // even in the same session before backend returns the fields.
         if (_paymentMethod == 'udhaar' && udhaarAmt != null) {
-          final total =
-              (result['total_amount'] as num?)?.toDouble() ?? 0.0;
+          final total = (result['total_amount'] as num?)?.toDouble() ?? 0.0;
           enriched['udhaar_amount'] = udhaarAmt;
           enriched['cash_paid'] = total - udhaarAmt;
         }
@@ -830,8 +821,7 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                 children: [
                   const Text(
                     'Select Customer for Udhaar',
-                    style: TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.w900),
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -840,8 +830,7 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                     onChanged: (v) => setState(() => _q = v.toLowerCase()),
                     decoration: InputDecoration(
                       hintText: 'Search by name or phone…',
-                      prefixIcon:
-                          const Icon(Icons.search_rounded, size: 20),
+                      prefixIcon: const Icon(Icons.search_rounded, size: 20),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -868,8 +857,7 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                     )
                   : ListView.builder(
                       controller: sc,
-                      padding:
-                          const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                       itemCount: filtered.length,
                       itemBuilder: (_, i) {
                         final c = filtered[i];
@@ -878,12 +866,11 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           leading: CircleAvatar(
-                            backgroundColor:
-                                BrandColors.error.withValues(alpha: 0.1),
+                            backgroundColor: BrandColors.error.withValues(
+                              alpha: 0.1,
+                            ),
                             child: Text(
-                              c.name.isNotEmpty
-                                  ? c.name[0].toUpperCase()
-                                  : '?',
+                              c.name.isNotEmpty ? c.name[0].toUpperCase() : '?',
                               style: const TextStyle(
                                 color: BrandColors.error,
                                 fontWeight: FontWeight.bold,
@@ -900,12 +887,10 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                           subtitle: c.phone.isNotEmpty
                               ? Text(
                                   c.phone,
-                                  style:
-                                      const TextStyle(fontSize: 12),
+                                  style: const TextStyle(fontSize: 12),
                                 )
                               : null,
-                          trailing:
-                              const Icon(Icons.chevron_right_rounded),
+                          trailing: const Icon(Icons.chevron_right_rounded),
                           onTap: () => Navigator.pop(context, c),
                         );
                       },
@@ -979,17 +964,14 @@ class _UdhaarSplitSlider extends StatelessWidget {
               overlayColor: _udhaarColor.withValues(alpha: 0.12),
               inactiveTrackColor: _udhaarColor.withValues(alpha: 0.18),
               trackHeight: 4,
-              thumbShape:
-                  const RoundSliderThumbShape(enabledThumbRadius: 10),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
             ),
             child: Slider(
               value: credit,
               min: 0,
               max: total,
               divisions: divisions,
-              onChanged: enabled
-                  ? (v) => onChanged(v.roundToDouble())
-                  : null,
+              onChanged: enabled ? (v) => onChanged(v.roundToDouble()) : null,
             ),
           ),
 
@@ -999,12 +981,20 @@ class _UdhaarSplitSlider extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('₹0',
-                    style: const TextStyle(
-                        fontSize: 11, color: BrandColors.muted)),
-                Text(_fmt(total),
-                    style: const TextStyle(
-                        fontSize: 11, color: BrandColors.muted)),
+                Text(
+                  '₹0',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: BrandColors.muted,
+                  ),
+                ),
+                Text(
+                  _fmt(total),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: BrandColors.muted,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1017,13 +1007,15 @@ class _UdhaarSplitSlider extends StatelessWidget {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: BrandColors.success.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color:
-                            BrandColors.success.withValues(alpha: 0.3)),
+                      color: BrandColors.success.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1054,12 +1046,15 @@ class _UdhaarSplitSlider extends StatelessWidget {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: _udhaarColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color: _udhaarColor.withValues(alpha: 0.3)),
+                      color: _udhaarColor.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1133,9 +1128,7 @@ class _PaymentOption extends StatelessWidget {
             border: Border.all(
               color: selected
                   ? BrandColors.primary
-                  : BrandColors.border.withValues(
-                      alpha: enabled ? 1.0 : 0.5,
-                    ),
+                  : BrandColors.border.withValues(alpha: enabled ? 1.0 : 0.5),
               width: selected ? 1.8 : 1,
             ),
           ),

@@ -15,8 +15,7 @@ class OrderDetailsScreen extends ConsumerStatefulWidget {
   const OrderDetailsScreen({super.key, required this.order});
 
   @override
-  ConsumerState<OrderDetailsScreen> createState() =>
-      _OrderDetailsScreenState();
+  ConsumerState<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
 }
 
 class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
@@ -47,7 +46,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(ok ? 'Receipt sent to printer' : 'Print failed — check printer'),
+        content: Text(
+          ok ? 'Receipt sent to printer' : 'Print failed — check printer',
+        ),
         backgroundColor: ok ? BrandColors.success : BrandColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -69,8 +70,8 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     // Look up full customer record so we can show name + phone instead of raw ID.
     final customer = customerId != null
         ? customerState.customers
-            .where((c) => c.customerId == customerId)
-            .firstOrNull
+              .where((c) => c.customerId == customerId)
+              .firstOrNull
         : null;
 
     return Scaffold(
@@ -269,15 +270,13 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   final item = items[index];
                   final productId = item['product_id'] as int?;
                   final qty = (item['quantity'] as num?)?.toDouble() ?? 0;
-                  final price =
-                      (item['unit_price'] as num?)?.toDouble() ?? 0;
+                  final price = (item['unit_price'] as num?)?.toDouble() ?? 0;
                   final lineTotal = qty * price;
 
                   final product = posState.products
                       .where((p) => p.productId == productId)
                       .firstOrNull;
-                  final productName =
-                      product?.name ?? 'Product #$productId';
+                  final productName = product?.name ?? 'Product #$productId';
                   final unit = product?.unit ?? 'unit';
 
                   return Padding(
@@ -490,12 +489,13 @@ class _PaymentSummaryCard extends StatelessWidget {
 
     // Partial udhaar: udhaar_amount present, positive, and less than total.
     final udhaarAmt = (order['udhaar_amount'] as num?)?.toDouble();
-    final cashPaid  = (order['cash_paid']    as num?)?.toDouble();
-    final isPartial = isUdhaar &&
+    final cashPaid = (order['cash_paid'] as num?)?.toDouble();
+    final isPartial =
+        isUdhaar &&
         udhaarAmt != null &&
         udhaarAmt > 0 &&
-        cashPaid  != null &&
-        cashPaid  > 0 &&
+        cashPaid != null &&
+        cashPaid > 0 &&
         udhaarAmt < total;
 
     if (isPartial) {
@@ -505,7 +505,9 @@ class _PaymentSummaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFD97706).withValues(alpha: 0.3)),
+          border: Border.all(
+            color: const Color(0xFFD97706).withValues(alpha: 0.3),
+          ),
           boxShadow: [
             BoxShadow(
               color: BrandColors.ink.withValues(alpha: 0.04),
@@ -522,7 +524,9 @@ class _PaymentSummaryCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFD97706).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -575,16 +579,20 @@ class _PaymentSummaryCard extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.info_outline_rounded,
-                      size: 13, color: BrandColors.muted),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 13,
+                    color: BrandColors.muted,
+                  ),
                   SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'Udhaar portion recorded as credit — check Udhaar tab for balance',
                       style: TextStyle(
-                          fontSize: 11,
-                          color: BrandColors.muted,
-                          fontWeight: FontWeight.w500),
+                        fontSize: 11,
+                        color: BrandColors.muted,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],

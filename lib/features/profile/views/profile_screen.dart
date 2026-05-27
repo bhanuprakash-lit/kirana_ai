@@ -90,8 +90,11 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           storeAsync.when(
-                            loading: () =>
-                                const ShimmerBox(width: 100, height: 14, radius: 6),
+                            loading: () => const ShimmerBox(
+                              width: 100,
+                              height: 14,
+                              radius: 6,
+                            ),
                             error: (_, _) => const Text(
                               'Lohiya Store',
                               style: TextStyle(

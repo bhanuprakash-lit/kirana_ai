@@ -82,7 +82,9 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
           content: const Text('Print failed — check printer connection'),
           backgroundColor: BrandColors.error,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     }
@@ -275,8 +277,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                         color: BrandColors.success.withValues(
                                           alpha: 0.1,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(14),
+                                        borderRadius: BorderRadius.circular(14),
                                       ),
                                       child: const Icon(
                                         Icons.receipt_rounded,
@@ -338,14 +339,16 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                             decoration: BoxDecoration(
                                               color: printerState.isConnected
                                                   ? BrandColors.primary
-                                                      .withValues(alpha: 0.08)
+                                                        .withValues(alpha: 0.08)
                                                   : BrandColors.surfaceTint,
                                               borderRadius:
                                                   BorderRadius.circular(8),
                                               border: Border.all(
                                                 color: printerState.isConnected
                                                     ? BrandColors.primary
-                                                        .withValues(alpha: 0.3)
+                                                          .withValues(
+                                                            alpha: 0.3,
+                                                          )
                                                     : BrandColors.border,
                                               ),
                                             ),
@@ -355,8 +358,8 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                                 Icon(
                                                   Icons.print_rounded,
                                                   size: 12,
-                                                  color: printerState
-                                                          .isConnected
+                                                  color:
+                                                      printerState.isConnected
                                                       ? BrandColors.primary
                                                       : BrandColors.muted,
                                                 ),
@@ -365,10 +368,9 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                                   'Print',
                                                   style: TextStyle(
                                                     fontSize: 11,
-                                                    fontWeight:
-                                                        FontWeight.w700,
-                                                    color: printerState
-                                                            .isConnected
+                                                    fontWeight: FontWeight.w700,
+                                                    color:
+                                                        printerState.isConnected
                                                         ? BrandColors.primary
                                                         : BrandColors.muted,
                                                   ),

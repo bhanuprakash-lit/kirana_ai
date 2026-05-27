@@ -38,7 +38,11 @@ class CashflowTab extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: BrandColors.error),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: BrandColors.error,
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Failed to load cashflow data',
@@ -65,8 +69,10 @@ class CashflowTab extends ConsumerWidget {
             overviewAsync.whenOrNull(data: (d) => d.dailySales?.totalSales) ??
             0.0;
         final creditRatio = stats.monthlySalesAmount > 0
-            ? (stats.totalUdhaarPending / stats.monthlySalesAmount * 100)
-                .clamp(0.0, 100.0)
+            ? (stats.totalUdhaarPending / stats.monthlySalesAmount * 100).clamp(
+                0.0,
+                100.0,
+              )
             : 0.0;
         final ratioColor = creditRatio < 20
             ? BrandColors.success

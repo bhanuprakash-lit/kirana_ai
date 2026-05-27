@@ -129,10 +129,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
     return subAsync.when(
       loading: () => const Scaffold(
-        body: Padding(
-          padding: EdgeInsets.all(20),
-          child: OverviewShimmer(),
-        ),
+        body: Padding(padding: EdgeInsets.all(20), child: OverviewShimmer()),
       ),
       error: (_, _) => _buildDashboard(currentTab),
       data: (sub) {
