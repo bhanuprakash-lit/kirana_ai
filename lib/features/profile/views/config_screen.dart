@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/config_provider.dart';
 
 class ConfigScreen extends ConsumerStatefulWidget {
@@ -128,13 +129,21 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
     final paymentAsync = ref.watch(posPrefsProvider);
 
     return prefsAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(24),
+          child: ListShimmer(itemCount: 6, itemHeight: 64),
+        ),
+      ),
       error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
       data: (prefs) {
         return paymentAsync.when(
-          loading: () =>
-              const Scaffold(body: Center(child: CircularProgressIndicator())),
+          loading: () => const Scaffold(
+            body: Padding(
+              padding: EdgeInsets.all(24),
+              child: ListShimmer(itemCount: 4, itemHeight: 64),
+            ),
+          ),
           error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
           data: (payment) {
             _init(prefs, payment);

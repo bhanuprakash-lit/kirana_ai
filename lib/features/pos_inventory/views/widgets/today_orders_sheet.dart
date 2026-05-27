@@ -1,10 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../providers/pos_provider.dart';
+import '../../providers/printer_provider.dart';
+import '../../../profile/providers/store_settings_provider.dart';
 import '../order_details_screen.dart';
 
 void showTodayOrdersSheet(BuildContext context, WidgetRef ref) {
@@ -52,21 +56,48 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
 
   String _timeOf(String dateStr) {
     try {
-      final dt = DateTime.parse(dateStr).toLocal();
+      // Backend sends UTC without 'Z' — must append it before parsing.
+      var s = dateStr;
+      if (s.isNotEmpty && !s.endsWith('Z') && !s.contains('+')) s += 'Z';
+      final dt = DateTime.parse(s).toLocal();
       return DateFormat('hh:mm a').format(dt);
     } catch (_) {
       return '';
     }
   }
 
+  Future<void> _printOrder(Map<String, dynamic> order) async {
+    final store = ref.read(storeSettingsProvider).value;
+    final products = ref.read(posProvider).products;
+    final receipt = PrinterNotifier.buildReceipt(
+      order: order,
+      store: store,
+      products: products,
+    );
+    final ok = await ref.read(printerProvider.notifier).printOrder(receipt);
+    if (!mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Print failed — check printer connection'),
+          backgroundColor: BrandColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final printerState = ref.watch(printerProvider);
+
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       maxChildSize: 0.95,
       minChildSize: 0.5,
       builder: (_, scrollController) => GestureDetector(
-        onTap: () {}, // Prevent taps on the sheet itself from dismissing it
+        onTap: () {}, // prevent sheet dismissal on internal taps
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -106,9 +137,9 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Today's Orders",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
                               color: BrandColors.ink,
@@ -155,7 +186,10 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
               const Divider(height: 1),
               Expanded(
                 child: _loading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Padding(
+                        padding: EdgeInsets.all(20),
+                        child: ListShimmer(itemCount: 5),
+                      )
                     : _orders == null || _orders!.isEmpty
                     ? Center(
                         child: Column(
@@ -163,7 +197,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: BrandColors.surfaceTint,
                                 shape: BoxShape.circle,
                               ),
@@ -233,6 +267,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                 ),
                                 child: Row(
                                   children: [
+                                    // Icon
                                     Container(
                                       width: 48,
                                       height: 48,
@@ -240,7 +275,8 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                         color: BrandColors.success.withValues(
                                           alpha: 0.1,
                                         ),
-                                        borderRadius: BorderRadius.circular(14),
+                                        borderRadius:
+                                            BorderRadius.circular(14),
                                       ),
                                       child: const Icon(
                                         Icons.receipt_rounded,
@@ -249,6 +285,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                       ),
                                     ),
                                     const SizedBox(width: 16),
+                                    // Order info
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -274,13 +311,73 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                         ],
                                       ),
                                     ),
-                                    Text(
-                                      _fmt(amount),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 16,
-                                        color: BrandColors.success,
-                                      ),
+                                    // Amount + Print button
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          _fmt(amount),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 16,
+                                            color: BrandColors.success,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        // ── Print button ─────────────────
+                                        GestureDetector(
+                                          onTap: () => _printOrder(o),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: printerState.isConnected
+                                                  ? BrandColors.primary
+                                                      .withValues(alpha: 0.08)
+                                                  : BrandColors.surfaceTint,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: printerState.isConnected
+                                                    ? BrandColors.primary
+                                                        .withValues(alpha: 0.3)
+                                                    : BrandColors.border,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.print_rounded,
+                                                  size: 12,
+                                                  color: printerState
+                                                          .isConnected
+                                                      ? BrandColors.primary
+                                                      : BrandColors.muted,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  'Print',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight:
+                                                        FontWeight.w700,
+                                                    color: printerState
+                                                            .isConnected
+                                                        ? BrandColors.primary
+                                                        : BrandColors.muted,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),

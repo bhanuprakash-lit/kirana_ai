@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 
 final _adminActivityProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -35,7 +36,10 @@ class AdminActivityScreen extends ConsumerWidget {
         ],
       ),
       body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(20),
+          child: ListShimmer(itemCount: 6),
+        ),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (users) {
           if (users.isEmpty) {

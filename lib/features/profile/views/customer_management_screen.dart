@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/services/contact_service.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../finance/providers/finance_provider.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
@@ -177,7 +178,12 @@ class _CustomerManagementScreenState
           ),
 
           if (state.isLoading)
-            const Expanded(child: Center(child: CircularProgressIndicator()))
+            const Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: ListShimmer(itemCount: 7),
+              ),
+            )
           else if (state.error != null)
             Expanded(
               child: Center(

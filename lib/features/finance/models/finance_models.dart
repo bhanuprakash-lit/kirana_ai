@@ -31,9 +31,13 @@ class FinanceStats {
 class UdhaarItem {
   final int khataId;
   final int customerId;
+  final int? orderId;        // linked POS order, if created from POS
   final String customerName;
   final String phone;
-  final double balance;
+  final double originalAmount; // total credit extended at time of sale
+  final double amountPaid;     // how much has been recovered so far
+  final double balance;        // originalAmount - amountPaid
+  final String status;         // open | pending | settled | overdue | written_off
   final DateTime dateTaken;
   final int daysPending;
   final bool isRecovered;
@@ -41,22 +45,34 @@ class UdhaarItem {
   const UdhaarItem({
     required this.khataId,
     required this.customerId,
+    this.orderId,
     required this.customerName,
     required this.phone,
+    required this.originalAmount,
+    required this.amountPaid,
     required this.balance,
+    required this.status,
     required this.dateTaken,
     required this.daysPending,
     this.isRecovered = false,
   });
 
-  factory UdhaarItem.fromJson(Map<String, dynamic> j) => UdhaarItem(
-    khataId: j['khata_id'] as int,
-    customerId: j['customer_id'] as int,
-    customerName: j['customer_name'] as String? ?? 'Unknown',
-    phone: j['phone'] as String? ?? '',
-    balance: (j['balance'] as num?)?.toDouble() ?? 0.0,
-    dateTaken: parseAsUtc(j['date_taken'] as String?),
-    daysPending: (j['days_pending'] as num?)?.toInt() ?? 0,
-    isRecovered: ((j['balance'] as num?) ?? 0) <= 0,
-  );
+  factory UdhaarItem.fromJson(Map<String, dynamic> j) {
+    final bal = (j['balance'] as num?)?.toDouble() ?? 0.0;
+    final status = j['status'] as String? ?? 'open';
+    return UdhaarItem(
+      khataId: j['khata_id'] as int,
+      customerId: j['customer_id'] as int,
+      orderId: j['order_id'] as int?,
+      customerName: j['customer_name'] as String? ?? 'Unknown',
+      phone: j['phone'] as String? ?? '',
+      originalAmount: (j['original_amount'] as num?)?.toDouble() ?? bal,
+      amountPaid: (j['amount_paid'] as num?)?.toDouble() ?? 0.0,
+      balance: bal,
+      status: status,
+      dateTaken: parseAsUtc(j['date_taken'] as String?),
+      daysPending: (j['days_pending'] as num?)?.toInt() ?? 0,
+      isRecovered: status == 'settled' || bal <= 0,
+    );
+  }
 }

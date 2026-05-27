@@ -7,6 +7,7 @@ import '../../../core/config/app_config.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../../../shared/widgets/brand_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../../auth/repositories/auth_repository.dart';
 
 // ── Provider ──────────────────────────────────────────────────────────────────
@@ -69,7 +70,10 @@ class PasswordScreen extends ConsumerWidget {
         ),
       ),
       body: statusAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(24),
+          child: ListShimmer(itemCount: 3, itemHeight: 56),
+        ),
         error: (e, _) => Center(
           child: Text(
             'Could not load status: $e',

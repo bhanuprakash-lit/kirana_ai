@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../models/referral_models.dart';
 import '../providers/referral_provider.dart';
 import 'create_campaign_sheet.dart';
@@ -34,7 +35,10 @@ class ReferralScreen extends ConsumerWidget {
         ),
       ),
       body: campaignsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(20),
+          child: ListShimmer(itemCount: 5),
+        ),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (campaigns) => campaigns.isEmpty
             ? _buildEmpty(context, ref)

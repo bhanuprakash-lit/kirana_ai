@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,9 +6,12 @@ import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/pos_provider.dart';
+import '../../providers/printer_provider.dart';
+import '../order_details_screen.dart';
 import '../../../finance/providers/finance_provider.dart';
 import '../../../profile/models/customer_model.dart';
 import '../../../profile/providers/customer_provider.dart';
+import '../../../profile/providers/store_settings_provider.dart';
 
 Future<void> showOrderDialog(BuildContext context, WidgetRef ref) async {
   final result = await showModalBottomSheet<Map<String, dynamic>>(
@@ -18,19 +22,83 @@ Future<void> showOrderDialog(BuildContext context, WidgetRef ref) async {
   );
 
   if (result != null && context.mounted) {
-    _showSuccessDialog(context, result);
+    final autoPrint = result['auto_print'] as bool? ?? false;
+    _showSuccessDialog(context, ref, result, autoPrint: autoPrint);
   } else {
-    // Sheet was dismissed (cancelled or closed after a failure). Wipe any
-    // lingering "Order failed: ..." from posProvider so it doesn't render as
-    // a "POS Offline" card on the empty-cart screen.
     ref.read(posProvider.notifier).clearError();
   }
 }
 
-void _showSuccessDialog(BuildContext context, Map<String, dynamic> order) {
+void _showSuccessDialog(
+  BuildContext context,
+  WidgetRef ref,
+  Map<String, dynamic> order, {
+  bool autoPrint = false,
+}) {
+  // Trigger auto-print immediately (non-blocking)
+  if (autoPrint) {
+    _triggerPrint(ref, order);
+  }
+
   showDialog(
     context: context,
-    builder: (dialogContext) => AlertDialog(
+    builder: (dialogContext) => _SuccessDialog(
+      order: order,
+      parentRef: ref,
+    ),
+  );
+}
+
+/// Fire-and-forget receipt print (called after order confirmation).
+Future<void> _triggerPrint(WidgetRef ref, Map<String, dynamic> order) async {
+  try {
+    final store = ref.read(storeSettingsProvider).value;
+    final products = ref.read(posProvider).products;
+    final receipt = PrinterNotifier.buildReceipt(
+      order: order,
+      store: store,
+      products: products,
+    );
+    await ref.read(printerProvider.notifier).printOrder(receipt);
+  } catch (_) {
+    // Silent — user can retry from success dialog
+  }
+}
+
+// ── Success dialog ────────────────────────────────────────────────────────────
+
+class _SuccessDialog extends ConsumerWidget {
+  final Map<String, dynamic> order;
+  final WidgetRef parentRef;
+
+  const _SuccessDialog({required this.order, required this.parentRef});
+
+  Future<void> _printReceipt(BuildContext context, WidgetRef ref) async {
+    final store = ref.read(storeSettingsProvider).value;
+    final products = ref.read(posProvider).products;
+    final receipt = PrinterNotifier.buildReceipt(
+      order: order,
+      store: store,
+      products: products,
+    );
+    final ok = await ref.read(printerProvider.notifier).printOrder(receipt);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'Receipt sent to printer' : 'Print failed — check printer'),
+        backgroundColor: ok ? BrandColors.success : BrandColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final printerState = ref.watch(printerProvider);
+
+    return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       contentPadding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
       content: Column(
@@ -76,33 +144,104 @@ void _showSuccessDialog(BuildContext context, Map<String, dynamic> order) {
               color: BrandColors.ink,
             ),
           ),
+
+          // ── Printer status micro-text ──────────────────────────────────
+          if (printerState.status != PrinterStatus.noPrinterSaved) ...[
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.print_rounded,
+                  size: 12,
+                  color: printerState.statusColor,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  printerState.statusLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: printerState.statusColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
       actionsAlignment: MainAxisAlignment.center,
+      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       actions: [
-        SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: BrandColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // ── Print receipt button ─────────────────────────────────────
+            OutlinedButton.icon(
+              onPressed: () => _printReceipt(context, ref),
+              icon: const Icon(Icons.print_rounded, size: 18),
+              label: const Text(
+                'Print Receipt',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
               ),
-              elevation: 0,
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+                foregroundColor: BrandColors.primary,
+                side: BorderSide(
+                  color: BrandColors.primary.withValues(alpha: 0.4),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
             ),
-            child: const Text(
-              'New Sale',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+            const SizedBox(height: 10),
+            // ── New sale button ──────────────────────────────────────────
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size.fromHeight(52),
+                backgroundColor: BrandColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'New Sale',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+              ),
             ),
-          ),
+            const SizedBox(height: 4),
+            // ── View order details ───────────────────────────────────────
+            TextButton(
+              onPressed: () {
+                final navigator = Navigator.of(context);
+                navigator.pop(); // close dialog
+                navigator.push(
+                  MaterialPageRoute(
+                    builder: (_) => OrderDetailsScreen(order: order),
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                minimumSize: const Size.fromHeight(36),
+                foregroundColor: BrandColors.muted,
+              ),
+              child: const Text(
+                'View Order Details',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              ),
+            ),
+          ],
         ),
       ],
-    ),
-  );
+    );
+  }
 }
+
+// ── Order bottom sheet ────────────────────────────────────────────────────────
 
 class _OrderBottomSheet extends ConsumerStatefulWidget {
   final WidgetRef ref;
@@ -114,12 +253,16 @@ class _OrderBottomSheet extends ConsumerStatefulWidget {
 
 class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   String _paymentMethod = 'cash';
+  bool _autoPrint = true; // auto-print after order confirmation
   bool _placing = false;
   bool _success = false;
   String? _localError;
   int? _udhaarCustomerId;
   String? _udhaarCustomerName;
   String? _udhaarCustomerPhone;
+  // Partial-udhaar slider — how much of the order goes on credit.
+  // Initialised to the full order total when Udhaar is chosen.
+  double _udhaarAmount = 0;
 
   String _fmt(double v) {
     if (v >= 100000) return '₹${(v / 100000).toStringAsFixed(1)}L';
@@ -127,9 +270,44 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
     return '₹${v.toStringAsFixed(2)}';
   }
 
+  /// Switches to Udhaar payment mode and auto-fills the customer if one is
+  /// already selected on the POS screen.  Loads the customer list on demand
+  /// so the picker never silently blocks on an empty list.
+  Future<void> _onUdhaarSelected() async {
+    final total = ref.read(posProvider).discountedSubtotal;
+    setState(() {
+      _paymentMethod = 'udhaar';
+      _udhaarAmount = total; // default: full amount on credit
+    });
+
+    if (_udhaarCustomerId == null) {
+      final posState = ref.read(posProvider);
+      final selId = posState.selectedCustomerId;
+      if (selId != null) {
+        // Ensure customer list is loaded before trying to look up.
+        var customers = ref.read(customerProvider).customers;
+        if (customers.isEmpty && !ref.read(customerProvider).isLoading) {
+          await ref.read(customerProvider.notifier).fetchCustomers();
+          if (!mounted) return;
+          customers = ref.read(customerProvider).customers;
+        }
+        final match =
+            customers.where((c) => c.customerId == selId).firstOrNull;
+        if (match != null && mounted) {
+          setState(() {
+            _udhaarCustomerId = match.customerId;
+            _udhaarCustomerName = match.name;
+            _udhaarCustomerPhone = match.phone;
+          });
+        }
+      }
+    }
+  }
+
   Future<void> _confirm() async {
     if (_paymentMethod == 'udhaar' && _udhaarCustomerId == null) {
-      setState(() => _localError = 'Please select a customer for Udhaar sale');
+      setState(
+          () => _localError = 'Please select a customer for Udhaar sale');
       return;
     }
     setState(() {
@@ -137,32 +315,55 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
       _success = false;
       _localError = null;
     });
+    final udhaarAmt = _paymentMethod == 'udhaar'
+        ? _udhaarAmount.roundToDouble()
+        : null;
+
     final result = await ref
         .read(posProvider.notifier)
-        .placeOrder(paymentMethod: _paymentMethod);
+        .placeOrder(
+          paymentMethod: _paymentMethod,
+          udhaarAmount: udhaarAmt,
+        );
     if (!mounted) return;
     if (result != null) {
-      // If payment is Udhaar, also create a Khata entry
       if (_paymentMethod == 'udhaar' && _udhaarCustomerPhone != null) {
-        try {
-          final client = ref.read(apiClientProvider);
-          final amount = (result['total_amount'] as num?)?.toDouble() ?? 0.0;
-          await client.post('/kirana/finance/udhaar/add', {
-            'customer_name': _udhaarCustomerName ?? '',
-            'phone': _udhaarCustomerPhone!,
-            'amount': amount,
-          });
-        } catch (_) {}
-        // Refresh finance data so udhaar tab reflects the new entry
-        ref.invalidate(financeProvider);
+        // Use the slider value — not the full order total — so the finance
+        // ledger records only the credit portion.
+        final creditAmount = udhaarAmt ??
+            (result['total_amount'] as num?)?.toDouble() ??
+            0.0;
+        // Only record udhaar if there's an actual credit amount (slider > 0).
+        if (creditAmount > 0) {
+          try {
+            final client = ref.read(apiClientProvider);
+            await client.post('/kirana/finance/udhaar/add', {
+              'customer_name': _udhaarCustomerName ?? '',
+              'phone': _udhaarCustomerPhone!,
+              'amount': creditAmount,
+            });
+          } catch (_) {}
+          ref.invalidate(financeProvider);
+        }
       }
-      // Refresh overview stats after every order
       setState(() {
         _placing = false;
         _success = true;
       });
       await Future.delayed(const Duration(milliseconds: 600));
-      if (mounted) Navigator.pop(context, result);
+      if (mounted) {
+        final enriched = Map<String, dynamic>.from(result);
+        enriched['auto_print'] = _autoPrint;
+        // Persist the split so OrderDetailsScreen can show the breakdown
+        // even in the same session before backend returns the fields.
+        if (_paymentMethod == 'udhaar' && udhaarAmt != null) {
+          final total =
+              (result['total_amount'] as num?)?.toDouble() ?? 0.0;
+          enriched['udhaar_amount'] = udhaarAmt;
+          enriched['cash_paid'] = total - udhaarAmt;
+        }
+        Navigator.pop(context, enriched);
+      }
     } else {
       setState(() => _placing = false);
     }
@@ -172,6 +373,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   Widget build(BuildContext context) {
     final state = ref.watch(posProvider);
     final cart = state.cart;
+    final printerState = ref.watch(printerProvider);
 
     return Container(
       decoration: const BoxDecoration(
@@ -221,7 +423,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
               _success)
             const SizedBox(height: 16),
 
-          // Cart summary
+          // ── Cart summary ──────────────────────────────────────────────────
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.3,
@@ -263,6 +465,8 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             padding: EdgeInsets.symmetric(vertical: 20),
             child: Divider(height: 1),
           ),
+
+          // ── Referral discount ─────────────────────────────────────────────
           if (state.referralDiscountPct != null) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -320,6 +524,8 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             ),
             const SizedBox(height: 10),
           ],
+
+          // ── Grand total ───────────────────────────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -342,7 +548,8 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             ],
           ),
           const SizedBox(height: 28),
-          // Payment method
+
+          // ── Payment method ────────────────────────────────────────────────
           const Text(
             'Payment Method',
             style: TextStyle(
@@ -369,28 +576,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                 value: 'udhaar',
                 groupValue: _paymentMethod,
                 enabled: !_placing && !_success,
-                onTap: () {
-                  setState(() => _paymentMethod = 'udhaar');
-                  // Auto-fill from POS-selected customer so user doesn't have to pick again
-                  if (_udhaarCustomerId == null) {
-                    final posState = ref.read(posProvider);
-                    final selId = posState.selectedCustomerId;
-                    if (selId != null) {
-                      final match = ref
-                          .read(customerProvider)
-                          .customers
-                          .where((c) => c.customerId == selId)
-                          .firstOrNull;
-                      if (match != null) {
-                        setState(() {
-                          _udhaarCustomerId = match.customerId;
-                          _udhaarCustomerName = match.name;
-                          _udhaarCustomerPhone = match.phone;
-                        });
-                      }
-                    }
-                  }
-                },
+                onTap: () => _onUdhaarSelected(),
               ),
               const SizedBox(width: 12),
               _PaymentOption(
@@ -415,8 +601,76 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                 _udhaarCustomerPhone = c.phone;
               }),
             ),
+            const SizedBox(height: 12),
+            _UdhaarSplitSlider(
+              total: state.discountedSubtotal,
+              udhaarAmount: _udhaarAmount,
+              onChanged: (v) => setState(() => _udhaarAmount = v),
+              enabled: !_placing && !_success,
+            ),
           ],
-          const SizedBox(height: 32),
+
+          // ── Auto-print toggle ─────────────────────────────────────────────
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: BrandColors.surfaceTint,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: BrandColors.border),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.print_rounded,
+                  size: 18,
+                  color: _autoPrint
+                      ? printerState.statusColor
+                      : BrandColors.muted,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Print receipt automatically',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: BrandColors.ink,
+                        ),
+                      ),
+                      Text(
+                        _autoPrint
+                            ? (printerState.isConnected
+                                  ? 'Will print after order is placed'
+                                  : 'Printer: ${printerState.statusLabel}')
+                            : 'Disabled — print manually from order details',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: _autoPrint
+                              ? printerState.statusColor
+                              : BrandColors.muted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  value: _autoPrint,
+                  onChanged: _placing || _success
+                      ? null
+                      : (v) => setState(() => _autoPrint = v),
+                  activeThumbColor: BrandColors.primary,
+                  activeTrackColor: BrandColors.primary.withValues(alpha: 0.4),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 28),
           SizedBox(
             width: double.infinity,
             height: 56,
@@ -449,12 +703,20 @@ class _UdhaarCustomerPicker extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () async {
-        if (customers.isEmpty) return;
+        // Trigger load if the list is empty and not already loading.
+        // This prevents the sheet from silently doing nothing on first open.
+        var current = customers;
+        if (current.isEmpty && !ref.read(customerProvider).isLoading) {
+          await ref.read(customerProvider.notifier).fetchCustomers();
+          if (!context.mounted) return;
+          current = ref.read(customerProvider).customers;
+        }
+        if (!context.mounted) return;
         final result = await showModalBottomSheet<Customer>(
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder: (_) => _UdhaarCustomerSheet(customers: customers),
+          builder: (_) => _UdhaarCustomerSheet(customers: current),
         );
         if (result != null) onSelected(result);
       },
@@ -568,7 +830,8 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                 children: [
                   const Text(
                     'Select Customer for Udhaar',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                    style: TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -577,7 +840,8 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                     onChanged: (v) => setState(() => _q = v.toLowerCase()),
                     decoration: InputDecoration(
                       hintText: 'Search by name or phone…',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                      prefixIcon:
+                          const Icon(Icons.search_rounded, size: 20),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -604,7 +868,8 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                     )
                   : ListView.builder(
                       controller: sc,
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                      padding:
+                          const EdgeInsets.fromLTRB(16, 4, 16, 24),
                       itemCount: filtered.length,
                       itemBuilder: (_, i) {
                         final c = filtered[i];
@@ -613,11 +878,12 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           leading: CircleAvatar(
-                            backgroundColor: BrandColors.error.withValues(
-                              alpha: 0.1,
-                            ),
+                            backgroundColor:
+                                BrandColors.error.withValues(alpha: 0.1),
                             child: Text(
-                              c.name.isNotEmpty ? c.name[0].toUpperCase() : '?',
+                              c.name.isNotEmpty
+                                  ? c.name[0].toUpperCase()
+                                  : '?',
                               style: const TextStyle(
                                 color: BrandColors.error,
                                 fontWeight: FontWeight.bold,
@@ -634,10 +900,12 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                           subtitle: c.phone.isNotEmpty
                               ? Text(
                                   c.phone,
-                                  style: const TextStyle(fontSize: 12),
+                                  style:
+                                      const TextStyle(fontSize: 12),
                                 )
                               : null,
-                          trailing: const Icon(Icons.chevron_right_rounded),
+                          trailing:
+                              const Icon(Icons.chevron_right_rounded),
                           onTap: () => Navigator.pop(context, c),
                         );
                       },
@@ -649,6 +917,183 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
     );
   }
 }
+
+// ── Udhaar split slider ───────────────────────────────────────────────────────
+
+class _UdhaarSplitSlider extends StatelessWidget {
+  final double total;
+  final double udhaarAmount;
+  final ValueChanged<double> onChanged;
+  final bool enabled;
+
+  const _UdhaarSplitSlider({
+    required this.total,
+    required this.udhaarAmount,
+    required this.onChanged,
+    this.enabled = true,
+  });
+
+  static const _udhaarColor = Color(0xFFD97706); // amber-600
+
+  String _fmt(double v) => '₹${v.toStringAsFixed(0)}';
+
+  @override
+  Widget build(BuildContext context) {
+    final cashNow = (total - udhaarAmount).clamp(0.0, total);
+    final credit = udhaarAmount.clamp(0.0, total);
+    // Step: nearest ₹1; cap divisions so the slider doesn't get sluggish.
+    final divisions = total.round().clamp(2, 500);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: _udhaarColor.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _udhaarColor.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Header ──────────────────────────────────────────────────────
+          Row(
+            children: [
+              const Icon(Icons.tune_rounded, size: 16, color: _udhaarColor),
+              const SizedBox(width: 6),
+              const Text(
+                'How much goes on Udhaar?',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: _udhaarColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // ── Slider ───────────────────────────────────────────────────────
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: _udhaarColor,
+              thumbColor: _udhaarColor,
+              overlayColor: _udhaarColor.withValues(alpha: 0.12),
+              inactiveTrackColor: _udhaarColor.withValues(alpha: 0.18),
+              trackHeight: 4,
+              thumbShape:
+                  const RoundSliderThumbShape(enabledThumbRadius: 10),
+            ),
+            child: Slider(
+              value: credit,
+              min: 0,
+              max: total,
+              divisions: divisions,
+              onChanged: enabled
+                  ? (v) => onChanged(v.roundToDouble())
+                  : null,
+            ),
+          ),
+
+          // ── Min / max labels ─────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('₹0',
+                    style: const TextStyle(
+                        fontSize: 11, color: BrandColors.muted)),
+                Text(_fmt(total),
+                    style: const TextStyle(
+                        fontSize: 11, color: BrandColors.muted)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // ── Cash / Udhaar breakdown pills ────────────────────────────────
+          Row(
+            children: [
+              // Cash paid now
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: BrandColors.success.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color:
+                            BrandColors.success.withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Cash now',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: BrandColors.success,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _fmt(cashNow),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: BrandColors.success,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              // On Udhaar
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: _udhaarColor.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: _udhaarColor.withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'On Udhaar',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: _udhaarColor,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _fmt(credit),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: _udhaarColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Payment option chip ───────────────────────────────────────────────────────
 
 class _PaymentOption extends StatelessWidget {
   final IconData icon;
@@ -688,7 +1133,9 @@ class _PaymentOption extends StatelessWidget {
             border: Border.all(
               color: selected
                   ? BrandColors.primary
-                  : BrandColors.border.withValues(alpha: enabled ? 1.0 : 0.5),
+                  : BrandColors.border.withValues(
+                      alpha: enabled ? 1.0 : 0.5,
+                    ),
               width: selected ? 1.8 : 1,
             ),
           ),

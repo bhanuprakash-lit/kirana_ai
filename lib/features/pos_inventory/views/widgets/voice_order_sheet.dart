@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/providers/usage_limits_provider.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/services/gemini_audio_service.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../../../core/utils/product_matcher.dart';
 import '../../../../core/services/gemini_item.dart';
 import '../../../../core/services/usage_limits_service.dart';
@@ -360,7 +361,10 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Column(
                 children: [
-                  CircularProgressIndicator(),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    child: CardShimmer(height: 48, radius: 12),
+                  ),
                   SizedBox(height: 14),
                   Text(
                     'Kirana AI is processing…',

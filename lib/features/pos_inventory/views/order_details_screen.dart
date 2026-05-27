@@ -1,51 +1,102 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
 import '../../../../core/theme/brand_theme.dart';
 import '../providers/pos_provider.dart';
+import '../providers/printer_provider.dart';
+import '../../profile/providers/customer_provider.dart';
+import '../../profile/providers/store_settings_provider.dart';
 
-class OrderDetailsScreen extends ConsumerWidget {
+class OrderDetailsScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> order;
 
   const OrderDetailsScreen({super.key, required this.order});
 
+  @override
+  ConsumerState<OrderDetailsScreen> createState() =>
+      _OrderDetailsScreenState();
+}
+
+class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
   String _fmt(double v) => '₹${v.toStringAsFixed(2)}';
 
   String _formatDate(String dateStr) {
     try {
-      final dt = DateTime.parse(dateStr).toLocal();
+      // Backend sends UTC without 'Z' — append it so Dart parses as UTC,
+      // then toLocal() correctly converts to IST (same fix as fetchTodayOrders).
+      var s = dateStr;
+      if (s.isNotEmpty && !s.endsWith('Z') && !s.contains('+')) s += 'Z';
+      final dt = DateTime.parse(s).toLocal();
       return DateFormat('dd MMM yyyy, hh:mm a').format(dt);
     } catch (_) {
       return dateStr;
     }
   }
 
+  Future<void> _printReceipt(BuildContext context) async {
+    final store = ref.read(storeSettingsProvider).value;
+    final products = ref.read(posProvider).products;
+    final receipt = PrinterNotifier.buildReceipt(
+      order: widget.order,
+      store: store,
+      products: products,
+    );
+    final ok = await ref.read(printerProvider.notifier).printOrder(receipt);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ok ? 'Receipt sent to printer' : 'Print failed — check printer'),
+        backgroundColor: ok ? BrandColors.success : BrandColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final posState = ref.watch(posProvider);
-    final items = (order['items'] as List<dynamic>?) ?? [];
-    final total = (order['total_amount'] as num?)?.toDouble() ?? 0;
-    final status = order['order_status'] as String? ?? 'completed';
-    final paymentMethod = order['payment_method'] as String? ?? 'Cash';
-    final date = order['order_date'] as String? ?? '';
-    final customerId = order['customer_id'] as int?;
+    final printerState = ref.watch(printerProvider);
+    final customerState = ref.watch(customerProvider);
+    final items = (widget.order['items'] as List<dynamic>?) ?? [];
+    final total = (widget.order['total_amount'] as num?)?.toDouble() ?? 0;
+    final status = widget.order['order_status'] as String? ?? 'completed';
+    final paymentMethod = widget.order['payment_method'] as String? ?? 'Cash';
+    final date = widget.order['order_date'] as String? ?? '';
+    final customerId = widget.order['customer_id'] as int?;
+    // Look up full customer record so we can show name + phone instead of raw ID.
+    final customer = customerId != null
+        ? customerState.customers
+            .where((c) => c.customerId == customerId)
+            .firstOrNull
+        : null;
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Order Details',
-          style: const TextStyle(fontWeight: FontWeight.w800),
+          style: TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: BrandColors.ink,
+        actions: [
+          // Quick print from app bar
+          IconButton(
+            icon: const Icon(Icons.print_rounded),
+            tooltip: 'Print Receipt',
+            onPressed: () => _printReceipt(context),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // Header Card
+          // ── Header card ───────────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -68,7 +119,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Order #${order['order_id']}',
+                          'Order #${widget.order['order_id']}',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
@@ -123,18 +174,42 @@ class OrderDetailsScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(
-                        Icons.person_outline_rounded,
-                        size: 18,
-                        color: BrandColors.muted,
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: BrandColors.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.person_rounded,
+                          size: 18,
+                          color: BrandColors.primary,
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Customer ID: $customerId',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: BrandColors.ink,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              customer?.name ?? 'Customer #$customerId',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: BrandColors.ink,
+                              ),
+                            ),
+                            if (customer?.phone.isNotEmpty == true)
+                              Text(
+                                customer!.phone,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: BrandColors.muted,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],
@@ -165,6 +240,7 @@ class OrderDetailsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
+          // ── Items ─────────────────────────────────────────────────────────
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -193,13 +269,15 @@ class OrderDetailsScreen extends ConsumerWidget {
                   final item = items[index];
                   final productId = item['product_id'] as int?;
                   final qty = (item['quantity'] as num?)?.toDouble() ?? 0;
-                  final price = (item['unit_price'] as num?)?.toDouble() ?? 0;
+                  final price =
+                      (item['unit_price'] as num?)?.toDouble() ?? 0;
                   final lineTotal = qty * price;
 
                   final product = posState.products
                       .where((p) => p.productId == productId)
                       .firstOrNull;
-                  final productName = product?.name ?? 'Product #$productId';
+                  final productName =
+                      product?.name ?? 'Product #$productId';
                   final unit = product?.unit ?? 'unit';
 
                   return Padding(
@@ -234,7 +312,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${qty.toStringAsFixed(qty == qty.toInt() ? 0 : 2)} $unit x ${_fmt(price)}',
+                                '${qty.toStringAsFixed(qty == qty.toInt() ? 0 : 2)} $unit × ${_fmt(price)}',
                                 style: const TextStyle(
                                   color: BrandColors.muted,
                                   fontSize: 13,
@@ -261,55 +339,53 @@ class OrderDetailsScreen extends ConsumerWidget {
           ),
 
           const SizedBox(height: 32),
-          // Total Summary
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: paymentMethod.toLowerCase() == 'udhaar'
-                  ? const Color(
-                      0xFFD97706,
-                    ) // amber — neutral, doesn't imply unpaid
-                  : BrandColors.primary,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      paymentMethod.toLowerCase() == 'udhaar'
-                          ? 'Udhaar Sale'
-                          : 'Total Paid',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                      ),
-                    ),
-                    if (paymentMethod.toLowerCase() == 'udhaar')
-                      const Text(
-                        'Recorded as credit — check Udhaar tab for balance',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                  ],
+
+          // ── Total / payment breakdown card ────────────────────────────────
+          _PaymentSummaryCard(
+            order: widget.order,
+            total: total,
+            paymentMethod: paymentMethod,
+          ),
+
+          // ── Print receipt button ──────────────────────────────────────────
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: OutlinedButton.icon(
+              onPressed: () => _printReceipt(context),
+              icon: Icon(
+                Icons.print_rounded,
+                size: 18,
+                color: printerState.isConnected
+                    ? BrandColors.primary
+                    : BrandColors.muted,
+              ),
+              label: Text(
+                printerState.isConnected
+                    ? 'Print Receipt'
+                    : 'Print Receipt (${printerState.statusLabel})',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  color: printerState.isConnected
+                      ? BrandColors.primary
+                      : BrandColors.muted,
                 ),
-                Text(
-                  _fmt(total),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                  ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: printerState.isConnected
+                      ? BrandColors.primary.withValues(alpha: 0.5)
+                      : BrandColors.border,
                 ),
-              ],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
             ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -386,6 +462,228 @@ class _InfoTile extends StatelessWidget {
             fontWeight: FontWeight.w800,
             fontSize: 15,
             color: valueColor ?? BrandColors.ink,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Payment summary card ──────────────────────────────────────────────────────
+
+class _PaymentSummaryCard extends StatelessWidget {
+  final Map<String, dynamic> order;
+  final double total;
+  final String paymentMethod;
+
+  const _PaymentSummaryCard({
+    required this.order,
+    required this.total,
+    required this.paymentMethod,
+  });
+
+  String _fmt(double v) => '₹${v.toStringAsFixed(2)}';
+
+  @override
+  Widget build(BuildContext context) {
+    final isUdhaar = paymentMethod.toLowerCase() == 'udhaar';
+
+    // Partial udhaar: udhaar_amount present, positive, and less than total.
+    final udhaarAmt = (order['udhaar_amount'] as num?)?.toDouble();
+    final cashPaid  = (order['cash_paid']    as num?)?.toDouble();
+    final isPartial = isUdhaar &&
+        udhaarAmt != null &&
+        udhaarAmt > 0 &&
+        cashPaid  != null &&
+        cashPaid  > 0 &&
+        udhaarAmt < total;
+
+    if (isPartial) {
+      // ── Split payment breakdown ──────────────────────────────────────────
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFD97706).withValues(alpha: 0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: BrandColors.ink.withValues(alpha: 0.04),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD97706).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'SPLIT PAYMENT',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFD97706),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  _fmt(total),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 20,
+                    color: BrandColors.ink,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(height: 1),
+            const SizedBox(height: 14),
+            // Cash row
+            _SplitRow(
+              icon: Icons.payments_rounded,
+              label: 'Cash paid now',
+              amount: _fmt(cashPaid),
+              color: BrandColors.success,
+            ),
+            const SizedBox(height: 10),
+            // Udhaar row
+            _SplitRow(
+              icon: Icons.account_balance_wallet_outlined,
+              label: 'On Udhaar (credit)',
+              amount: _fmt(udhaarAmt),
+              color: const Color(0xFFD97706),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: BrandColors.surfaceTint,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline_rounded,
+                      size: 13, color: BrandColors.muted),
+                  SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Udhaar portion recorded as credit — check Udhaar tab for balance',
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: BrandColors.muted,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // ── Full udhaar or cash (existing solid card) ────────────────────────────
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isUdhaar ? const Color(0xFFD97706) : BrandColors.primary,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isUdhaar ? 'Udhaar Sale' : 'Total Paid',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+              if (isUdhaar)
+                const Text(
+                  'Recorded as credit — check Udhaar tab',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+            ],
+          ),
+          Text(
+            _fmt(total),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 22,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SplitRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String amount;
+  final Color color;
+
+  const _SplitRow({
+    required this.icon,
+    required this.label,
+    required this.amount,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 16, color: color),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: BrandColors.ink,
+            ),
+          ),
+        ),
+        Text(
+          amount,
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            color: color,
           ),
         ),
       ],

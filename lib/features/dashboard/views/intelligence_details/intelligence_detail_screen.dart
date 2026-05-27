@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../providers/intelligence_provider.dart';
 import '../../models/recommendation_model.dart';
 import '../dashboard_screen.dart';
@@ -50,7 +51,10 @@ class _IntelligenceDetailScreenState
           _buildSearchAndFilter(sortBy),
           Expanded(
             child: asyncData.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Padding(
+                padding: EdgeInsets.all(20),
+                child: ListShimmer(itemCount: 6),
+              ),
               error: (err, _) => _ErrorView(
                 message: err.toString(),
                 onRetry: () =>

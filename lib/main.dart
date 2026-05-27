@@ -9,6 +9,7 @@ import 'app_router.dart';
 import 'core/config/firebase_backend_config.dart';
 import 'core/services/api_client.dart';
 import 'core/theme/brand_theme.dart';
+import 'features/pos_inventory/providers/printer_provider.dart';
 import 'features/subscription/providers/iap_provider.dart';
 import 'features/support/providers/notification_provider.dart';
 
@@ -54,6 +55,11 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
     // App launched = first foreground event
     _foregroundStart = DateTime.now();
     _trackEvent('foreground');
+    // Request Bluetooth permissions early so the printer is ready before
+    // the user reaches the POS screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(printerProvider.notifier).init();
+    });
   }
 
   @override
@@ -67,6 +73,8 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
     if (state == AppLifecycleState.resumed) {
       _foregroundStart = DateTime.now();
       _trackEvent('foreground');
+      // Re-check Bluetooth state (user may have toggled it in system settings)
+      ref.read(printerProvider.notifier).onAppResumed();
     } else if (state == AppLifecycleState.paused) {
       final durationSec = _foregroundStart != null
           ? DateTime.now().difference(_foregroundStart!).inSeconds

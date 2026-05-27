@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
 import 'customer_management_screen.dart';
@@ -239,8 +240,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                 );
               },
               loading: () => const Padding(
-                padding: EdgeInsets.all(40),
-                child: CircularProgressIndicator(),
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: ListShimmer(itemCount: 3, itemHeight: 64),
               ),
               error: (err, _) => Padding(
                 padding: const EdgeInsets.all(40),
@@ -365,11 +366,7 @@ class _AssociationRow extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
               assocAsync.when(
-                loading: () => const SizedBox(
-                  height: 20,
-                  width: 80,
-                  child: LinearProgressIndicator(),
-                ),
+                loading: () => const ShimmerBox(width: 80, height: 20, radius: 6),
                 error: (_, _) => const Text(
                   'Unable to load areas',
                   style: TextStyle(fontSize: 13, color: BrandColors.muted),
@@ -420,11 +417,7 @@ class _AssociationRow extends ConsumerWidget {
                   ];
 
                   return saving
-                      ? const SizedBox(
-                          height: 20,
-                          width: 80,
-                          child: LinearProgressIndicator(),
-                        )
+                      ? const ShimmerBox(width: 80, height: 20, radius: 6)
                       : DropdownButtonHideUnderline(
                           child: DropdownButton<int?>(
                             value: customer.associationId,

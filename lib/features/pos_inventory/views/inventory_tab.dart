@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/inventory_item.dart';
 import '../models/pending_inventory_item.dart';
 import '../providers/inventory_provider.dart';
@@ -275,7 +276,10 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
         child: const Icon(Icons.add_rounded, color: Colors.white),
       ),
       body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(20),
+          child: ListShimmer(itemCount: 8),
+        ),
         error: (err, _) => _ErrorView(
           message: err.toString(),
           onRetry: () => ref.read(inventoryProvider.notifier).refresh(),

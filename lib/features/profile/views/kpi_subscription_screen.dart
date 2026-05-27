@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/kpi_provider.dart';
 import '../../dashboard/views/dashboard_screen.dart';
 import '../../subscription/providers/subscription_provider.dart';
@@ -29,7 +30,10 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
       loading: () => Scaffold(
         backgroundColor: BrandColors.background,
         appBar: AppBar(title: const Text('Your Insights')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Padding(
+          padding: EdgeInsets.all(20),
+          child: ListShimmer(itemCount: 6),
+        ),
       ),
       error: (err, _) => Scaffold(
         backgroundColor: BrandColors.background,
@@ -719,11 +723,9 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                         const SizedBox(height: 12),
 
                         if (_isLoading)
-                          const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(32),
-                              child: CircularProgressIndicator(),
-                            ),
+                          const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: CardShimmer(height: 120, radius: 16),
                           )
                         else if (_error != null)
                           _ErrorView(message: _error!, onRetry: _fetchDetail)

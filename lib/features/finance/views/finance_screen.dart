@@ -6,8 +6,10 @@ import '../../../features/dashboard/views/dashboard_screen.dart'
 import '../models/finance_models.dart';
 import '../providers/finance_provider.dart';
 import 'tabs/udhaar_tab.dart';
+import 'tabs/cashflow_tab.dart';
 import 'tabs/distributor_tab.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 
 class FinanceScreen extends ConsumerStatefulWidget {
   const FinanceScreen({super.key});
@@ -23,9 +25,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
   @override
   void initState() {
     super.initState();
-    final initialTab = ref.read(financeSubTabProvider).clamp(0, 1);
+    final initialTab = ref.read(financeSubTabProvider).clamp(0, 2);
     _tabController = TabController(
-      length: 2,
+      length: 3,
       vsync: this,
       initialIndex: initialTab,
     );
@@ -50,7 +52,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
 
     ref.listen(financeSubTabProvider, (prev, next) {
       if (next != _tabController.index) {
-        _tabController.animateTo(next.clamp(0, 1));
+        _tabController.animateTo(next.clamp(0, 2));
       }
     });
 
@@ -65,9 +67,10 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
             children: [
               asyncData.when(
                 data: (data) => _MonthlySalesOverview(stats: data.stats),
-                loading: () => const SizedBox(
-                  height: 48,
-                  child: Center(child: LinearProgressIndicator()),
+                loading: () => Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  child: CardShimmer(height: 48, radius: 12),
                 ),
                 error: (_, _) => const SizedBox(
                   height: 48,
@@ -81,6 +84,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                 unselectedLabelColor: BrandColors.muted,
                 tabs: const [
                   Tab(text: 'Udhaar'),
+                  Tab(text: 'Cashflow'),
                   Tab(text: 'Suppliers'),
                 ],
               ),
@@ -90,7 +94,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [UdhaarTab(), DistributorTab()],
+        children: const [UdhaarTab(), CashflowTab(), DistributorTab()],
       ),
     );
   }

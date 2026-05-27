@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:kirana_ai/core/theme/brand_theme.dart';
 import 'package:kirana_ai/features/pos_inventory/models/procurement_models.dart';
 import 'package:kirana_ai/features/pos_inventory/providers/procurement_provider.dart';
+import 'package:kirana_ai/shared/widgets/shimmer_widgets.dart';
 // import '../../pos_inventory/providers/pos_provider.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
@@ -62,7 +63,10 @@ class _PurchaseHistoryList extends ConsumerWidget {
     final asyncData = ref.watch(procurementProvider);
 
     return asyncData.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(16),
+        child: ListShimmer(itemCount: 6),
+      ),
       error: (err, _) => Center(child: Text('Error: $err')),
       data: (data) {
         if (data.purchases.isEmpty) {
@@ -185,9 +189,9 @@ class _PurchaseTile extends ConsumerWidget {
             .fetchPurchaseItems(order.purchaseId),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(
-              height: 200,
-              child: Center(child: CircularProgressIndicator()),
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: ListShimmer(itemCount: 3, itemHeight: 56),
             );
           }
           final items = snapshot.data ?? [];

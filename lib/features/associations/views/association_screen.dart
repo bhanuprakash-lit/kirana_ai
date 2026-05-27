@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/association_model.dart';
 import '../providers/association_provider.dart';
 
@@ -55,7 +56,10 @@ class _AssociationsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(associationProvider);
     return async.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(20),
+        child: ListShimmer(itemCount: 5),
+      ),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (list) {
         if (list.isEmpty) {
@@ -234,7 +238,10 @@ class _HeatmapTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(heatmapProvider);
     return async.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(20),
+        child: ListShimmer(itemCount: 5),
+      ),
       error: (e, _) => Center(child: Text('Error: $e')),
       data: (rows) {
         if (rows.isEmpty) {

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
 import '../../finance/views/finance_screen.dart';
 import '../../auth/providers/user_provider.dart';
@@ -127,8 +128,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final currentTab = ref.watch(dashboardTabProvider);
 
     return subAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(20),
+          child: OverviewShimmer(),
+        ),
+      ),
       error: (_, _) => _buildDashboard(currentTab),
       data: (sub) {
         if (sub.isPending)

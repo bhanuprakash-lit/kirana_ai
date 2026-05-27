@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
 import '../../../shared/widgets/action_widgets.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../../pos_inventory/models/pos_product.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../models/basket_model.dart';
@@ -31,7 +32,10 @@ class BasketsScreen extends ConsumerWidget {
         ],
       ),
       body: asyncData.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(20),
+          child: ListShimmer(itemCount: 5),
+        ),
         error: (e, _) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

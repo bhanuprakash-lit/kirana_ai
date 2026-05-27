@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kirana_ai/features/pos_inventory/models/procurement_models.dart';
 import 'package:kirana_ai/features/pos_inventory/providers/procurement_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
@@ -51,7 +52,10 @@ class DistributorTab extends ConsumerWidget {
     final asyncData = ref.watch(procurementProvider);
 
     return asyncData.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(20),
+        child: ListShimmer(itemCount: 6),
+      ),
       error: (err, _) => Center(child: Text('Error: $err')),
       data: (data) {
         final unpaid = data.purchases
@@ -632,9 +636,9 @@ class _PaymentTile extends ConsumerWidget {
           future: itemsFuture,
           builder: (ctx, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                height: 200,
-                child: Center(child: CircularProgressIndicator()),
+              return const Padding(
+                padding: EdgeInsets.all(16),
+                child: ListShimmer(itemCount: 3, itemHeight: 56),
               );
             }
             final items = snapshot.data ?? [];

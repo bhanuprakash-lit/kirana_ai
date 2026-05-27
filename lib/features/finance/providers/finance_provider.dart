@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_client.dart';
+import '../../dashboard/providers/overview_provider.dart';
 import '../../profile/providers/customer_provider.dart';
 import '../models/finance_models.dart';
 
@@ -66,6 +67,9 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
         'amount': amount,
       });
       await refresh();
+      // Invalidate the overview so the "Customer Dues" intelligence tile
+      // reflects the updated pending-dues count immediately.
+      ref.invalidate(overviewProvider);
     } catch (e) {
       rethrow;
     }

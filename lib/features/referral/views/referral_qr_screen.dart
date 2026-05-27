@@ -6,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../profile/models/customer_model.dart';
 import '../../profile/providers/customer_provider.dart';
 import '../models/referral_models.dart';
@@ -108,7 +109,7 @@ class _ReferralQrScreenState extends ConsumerState<ReferralQrScreen> {
           if (_loading)
             const Padding(
               padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(),
+              child: CardShimmer(height: 80, radius: 20),
             )
           else
             Expanded(

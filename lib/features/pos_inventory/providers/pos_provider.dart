@@ -352,6 +352,7 @@ class PosNotifier extends Notifier<PosState> {
 
   Future<Map<String, dynamic>?> placeOrder({
     String paymentMethod = 'cash',
+    double? udhaarAmount, // null = full amount is udhaar (or not applicable)
   }) async {
     if (state.cart.isEmpty) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
@@ -385,6 +386,12 @@ class PosNotifier extends Notifier<PosState> {
               },
             )
             .toList(),
+        // Partial-udhaar split — backend persists so order history can show
+        // the exact credit/cash breakdown.
+        if (udhaarAmount != null && paymentMethod == 'udhaar') ...{
+          'udhaar_amount': udhaarAmount,
+          'cash_paid': totalAmount - udhaarAmount,
+        },
       };
       final order = await client.posPost('/pos/orders', body);
       if (order != null) {

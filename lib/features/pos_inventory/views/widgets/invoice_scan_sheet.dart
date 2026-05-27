@@ -10,6 +10,7 @@ import '../../../../core/services/api_client.dart';
 import '../../../../core/services/gemini_invoice_service.dart';
 import '../../../../core/services/usage_limits_service.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../../subscription/models/subscription_model.dart';
 import '../../../subscription/providers/subscription_provider.dart';
 import '../../../subscription/views/credits_purchase_sheet.dart';
@@ -434,13 +435,13 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
       case _ScanState.review:
         return _buildReview();
       case _ScanState.creating:
-        return const Center(
+        return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text(
+              const CardShimmer(height: 56, radius: 28),
+              const SizedBox(height: 16),
+              const Text(
                 'Creating purchase order…',
                 style: TextStyle(color: BrandColors.muted, fontSize: 13),
               ),
@@ -583,13 +584,16 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
   }
 
   Widget _buildProcessing() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 20),
-          Text(
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: CardShimmer(height: 60, radius: 16),
+          ),
+          const SizedBox(height: 20),
+          const Text(
             'Kirana AI is reading your invoice…',
             style: TextStyle(
               fontSize: 14,
@@ -597,8 +601,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 6),
-          Text(
+          const SizedBox(height: 6),
+          const Text(
             'Extracting items, quantities and totals',
             style: TextStyle(fontSize: 12, color: BrandColors.muted),
           ),

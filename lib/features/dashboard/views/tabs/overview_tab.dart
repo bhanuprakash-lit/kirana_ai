@@ -3,9 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/models/alert_model.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../../../shared/providers/alert_provider.dart';
 import '../../../../shared/views/notifications_screen.dart';
 import '../../../../shared/widgets/notification_bell.dart';
@@ -103,9 +105,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
               ),
             ),
             asyncData.when(
-              loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              ),
+              loading: () => const SliverToBoxAdapter(child: OverviewShimmer()),
               error: (err, _) => SliverFillRemaining(
                 child: _ErrorView(
                   message: err.toString(),
@@ -1091,8 +1091,24 @@ class _KpiSummaryRow extends ConsumerWidget {
         SizedBox(
           height: 88,
           child: asyncKpis.when(
-            loading: () =>
-                const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            loading: () => Shimmer.fromColors(
+              baseColor: const Color(0xFFE5E7EB),
+              highlightColor: const Color(0xFFF9FAFB),
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                scrollDirection: Axis.horizontal,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 4,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (_, __) => Container(
+                  width: 110,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ),
             error: (_, __) => const SizedBox.shrink(),
             data: (cards) => ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 22),

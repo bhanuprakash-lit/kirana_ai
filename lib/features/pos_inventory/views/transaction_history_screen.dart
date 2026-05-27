@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/pos_provider.dart';
 import 'order_details_screen.dart';
 
@@ -69,7 +70,10 @@ class _TransactionHistoryScreenState
 
   String _formatDate(String dateStr) {
     try {
-      final dt = DateTime.parse(dateStr).toLocal();
+      // Backend sends UTC without 'Z' — must append it before parsing.
+      var s = dateStr;
+      if (s.isNotEmpty && !s.endsWith('Z') && !s.contains('+')) s += 'Z';
+      final dt = DateTime.parse(s).toLocal();
       return DateFormat('dd MMM, hh:mm a').format(dt);
     } catch (_) {
       return dateStr;
@@ -116,7 +120,10 @@ class _TransactionHistoryScreenState
             ),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: ListShimmer(itemCount: 8),
+                  )
                 : _orders == null || _orders!.isEmpty
                 ? _EmptyHistory(onReset: _resetFilters)
                 : RefreshIndicator(

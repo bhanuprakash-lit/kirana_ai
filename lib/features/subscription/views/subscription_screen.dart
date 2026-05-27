@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/subscription_model.dart';
 import '../providers/iap_provider.dart';
 import '../providers/subscription_provider.dart';
@@ -23,7 +24,10 @@ class SubscriptionScreen extends ConsumerWidget {
         ),
       ),
       body: subAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(24),
+          child: ListShimmer(itemCount: 4, itemHeight: 80),
+        ),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (info) => _SubscriptionBody(info: info),
       ),

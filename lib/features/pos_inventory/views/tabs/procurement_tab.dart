@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/services/contact_service.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../models/procurement_models.dart';
 import '../../providers/procurement_provider.dart';
 import '../../providers/inventory_provider.dart';
@@ -17,7 +18,10 @@ class ProcurementTab extends ConsumerWidget {
     final asyncData = ref.watch(procurementProvider);
 
     return asyncData.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(20),
+        child: ListShimmer(itemCount: 6),
+      ),
       error: (err, _) => Center(child: Text('Error: $err')),
       data: (data) => RefreshIndicator(
         onRefresh: () => ref.read(procurementProvider.notifier).refresh(),

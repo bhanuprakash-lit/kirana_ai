@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../models/store_model.dart';
 import '../providers/store_settings_provider.dart';
 
@@ -81,7 +82,10 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
         ],
       ),
       body: asyncProfile.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(24),
+          child: ListShimmer(itemCount: 5, itemHeight: 60),
+        ),
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (p) {
           _initFields(p);

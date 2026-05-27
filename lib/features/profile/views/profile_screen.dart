@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/providers/user_provider.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
@@ -28,7 +29,10 @@ class ProfileScreen extends ConsumerWidget {
         ),
       ),
       body: userAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(20),
+          child: ListShimmer(itemCount: 5),
+        ),
         error: (err, _) => Center(child: Text('Error loading profile: $err')),
         data: (user) {
           if (user == null) {
@@ -86,11 +90,8 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 4),
                           storeAsync.when(
-                            loading: () => const SizedBox(
-                              height: 14,
-                              width: 100,
-                              child: LinearProgressIndicator(),
-                            ),
+                            loading: () =>
+                                const ShimmerBox(width: 100, height: 14, radius: 6),
                             error: (_, _) => const Text(
                               'Lohiya Store',
                               style: TextStyle(

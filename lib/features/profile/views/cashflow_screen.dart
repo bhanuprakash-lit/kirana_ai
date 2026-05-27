@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/cashflow_provider.dart';
 import '../providers/store_settings_provider.dart';
 
@@ -100,7 +101,10 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
         ),
       ),
       body: statusAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Padding(
+          padding: EdgeInsets.all(24),
+          child: CardShimmer(height: 220, radius: 24),
+        ),
         error: (_, _) => _buildContent(storeName, location, footfall),
         data: (status) {
           if (status.hasRequest && !_submitted) {

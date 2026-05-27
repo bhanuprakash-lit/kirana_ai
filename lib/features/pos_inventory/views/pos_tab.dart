@@ -9,6 +9,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/providers/usage_limits_provider.dart';
 import '../../../core/services/usage_limits_service.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/pos_product.dart';
 import '../providers/pos_provider.dart';
 import '../providers/inventory_provider.dart';
@@ -183,8 +184,10 @@ class _PosTabState extends ConsumerState<PosTab> {
                 const Divider(height: 1),
                 Expanded(
                   child: inventoryAsync.when(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: ListShimmer(itemCount: 5, itemHeight: 60),
+                    ),
                     error: (err, _) =>
                         Center(child: Text('Error loading inventory: $err')),
                     data: (data) {
@@ -486,7 +489,10 @@ class _PosTabState extends ConsumerState<PosTab> {
                       .searchCustomers(searchCtrl.text),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: ListShimmer(itemCount: 4, itemHeight: 60),
+                      );
                     }
                     final customers = snapshot.data ?? [];
                     if (customers.isEmpty) {
@@ -799,7 +805,10 @@ class _PosTabState extends ConsumerState<PosTab> {
 
           Expanded(
             child: state.isLoadingProducts && state.products.isEmpty
-                ? const Center(child: CircularProgressIndicator())
+                ? const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: ListShimmer(itemCount: 5),
+                  )
                 : cart.isEmpty
                 ? _EmptyCartWithCampaigns(
                     // Treat as "POS Offline" only when we genuinely have no
@@ -1100,11 +1109,9 @@ class _SearchResults extends StatelessWidget {
         ],
       ),
       child: isLoading
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(),
-              ),
+          ? const Padding(
+              padding: EdgeInsets.all(16),
+              child: ListShimmer(itemCount: 3, itemHeight: 60),
             )
           : products.isEmpty
           ? const Padding(

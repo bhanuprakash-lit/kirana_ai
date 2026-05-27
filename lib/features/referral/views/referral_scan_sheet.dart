@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../models/referral_models.dart';
 import '../providers/referral_provider.dart';
 
@@ -108,8 +109,8 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
       ),
       child: _loadingInfo
           ? const Padding(
-              padding: EdgeInsets.all(40),
-              child: Center(child: CircularProgressIndicator()),
+              padding: EdgeInsets.all(24),
+              child: ListShimmer(itemCount: 3, itemHeight: 60),
             )
           : _infoError != null
           ? _buildError()

@@ -5,6 +5,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/services/contact_service.dart';
 import '../../../../shared/widgets/action_widgets.dart';
+import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../../profile/models/customer_model.dart';
 import '../../../profile/providers/customer_provider.dart';
 import '../../models/finance_models.dart';
@@ -18,7 +19,10 @@ class UdhaarTab extends ConsumerWidget {
     final asyncData = ref.watch(financeProvider);
 
     return asyncData.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Padding(
+        padding: EdgeInsets.all(20),
+        child: ListShimmer(itemCount: 6),
+      ),
       error: (err, _) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1132,7 +1136,10 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
             const Divider(height: 1),
             Expanded(
               child: _loading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: ListShimmer(itemCount: 4, itemHeight: 60),
+                    )
                   : _error != null
                   ? Center(
                       child: Text(
