@@ -326,7 +326,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
                     child: Row(
                       children: [
                         Expanded(
@@ -376,16 +376,16 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                         GestureDetector(
                           onTap: _scanBarcode,
                           child: Container(
-                            width: 46,
-                            height: 46,
+                            width: 42,
+                            height: 42,
                             decoration: BoxDecoration(
                               color: BrandColors.primary,
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
                               Icons.qr_code_scanner_rounded,
                               color: Colors.white,
-                              size: 22,
+                              size: 20,
                             ),
                           ),
                         ),
@@ -398,7 +398,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final allCategories = ['All', ...categories];
@@ -509,7 +509,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                         ),
                       ),
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (_, i) => _InventoryTile(
@@ -611,7 +611,7 @@ class _CategoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       child: Row(
         children: [
           Expanded(
@@ -723,7 +723,7 @@ class _InventoryTile extends StatelessWidget {
           item.displayName,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 14,
+            fontSize: 13,
             color: BrandColors.ink,
           ),
           maxLines: 1,

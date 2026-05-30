@@ -26,7 +26,7 @@ class ProcurementTab extends ConsumerWidget {
       data: (data) => RefreshIndicator(
         onRefresh: () => ref.read(procurementProvider.notifier).refresh(),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           children: [
             _sectionHeader(
               context,
@@ -1008,8 +1008,8 @@ class _SupplierTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -1018,6 +1018,7 @@ class _SupplierTile extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
+            radius: 18,
             backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
             child: const Icon(
               Icons.business_rounded,
@@ -1095,8 +1096,8 @@ class _PurchaseOrderTile extends ConsumerWidget {
     final statusColor = _statusColor(order.status);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

@@ -55,10 +55,12 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
     // App launched = first foreground event
     _foregroundStart = DateTime.now();
     _trackEvent('foreground');
-    // Request Bluetooth permissions early so the printer is ready before
-    // the user reaches the POS screen.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(printerProvider.notifier).init();
+    // Request Bluetooth first, then notification permissions — Android can only
+    // show one system dialog at a time; concurrent requests cause one to be
+    // silently dismissed.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(printerProvider.notifier).init();
+      ref.read(notificationServiceProvider).init();
     });
   }
 
@@ -99,8 +101,6 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
   @override
   Widget build(BuildContext context) {
     ref.watch(iapProvider); // Initialize IAP stream at app startup
-    // Initialize FCM listeners once; safe to call multiple times (idempotent via Provider)
-    ref.watch(notificationServiceProvider).init();
     final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
       title: 'Kirana AI',

@@ -34,21 +34,21 @@ extension PrinterStatusX on PrinterStatus {
   String get label {
     switch (this) {
       case PrinterStatus.noPrinterSaved:
-        return 'No Printer';
+        return 'No printer connected';
       case PrinterStatus.bluetoothOff:
-        return 'Bluetooth Off';
+        return 'Device Bluetooth is turned off';
       case PrinterStatus.disconnected:
-        return 'Disconnected';
+        return 'Printer disconnected';
       case PrinterStatus.connecting:
-        return 'Connecting...';
+        return 'Connecting to printer...';
       case PrinterStatus.printerNotFound:
-        return 'Printer Not Found';
+        return 'Printer not found nearby';
       case PrinterStatus.connected:
-        return 'Ready to Print';
+        return 'Ready to print receipt';
       case PrinterStatus.printing:
-        return 'Printing...';
+        return 'Printing receipt...';
       case PrinterStatus.error:
-        return 'Connection Failed';
+        return 'Printer connection failed';
     }
   }
 

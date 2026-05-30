@@ -57,6 +57,10 @@ lib/core/config/secrets.dart
 # Test coverage output (also matched by /coverage above but be explicit)
 coverage/
 
+firebase.json
+./android/app/google-services.json
+./ios/Runner/GoogleService-Info.plist
+
 # Common editor / OS junk
 Thumbs.db
 ehthumbs.db

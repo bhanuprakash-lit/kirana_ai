@@ -37,6 +37,7 @@ class PosTab extends ConsumerStatefulWidget {
 class _PosTabState extends ConsumerState<PosTab> {
   final _searchCtrl = TextEditingController();
   String _query = '';
+  bool _showActions = false;
 
   @override
   void dispose() {
@@ -438,6 +439,9 @@ class _PosTabState extends ConsumerState<PosTab> {
 
   void _showCustomerSearchSheet() {
     final searchCtrl = TextEditingController();
+    // Load all customers once when sheet opens; text changes only filter locally
+    // (avoids a fresh network/DB call on every keystroke).
+    final allFuture = ref.read(posProvider.notifier).searchCustomers('');
 
     showModalBottomSheet(
       context: context,
@@ -484,9 +488,7 @@ class _PosTabState extends ConsumerState<PosTab> {
               const SizedBox(height: 16),
               Expanded(
                 child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: ref
-                      .read(posProvider.notifier)
-                      .searchCustomers(searchCtrl.text),
+                  future: allFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Padding(
@@ -494,7 +496,16 @@ class _PosTabState extends ConsumerState<PosTab> {
                         child: ListShimmer(itemCount: 4, itemHeight: 60),
                       );
                     }
-                    final customers = snapshot.data ?? [];
+                    final all = snapshot.data ?? [];
+                    final q = searchCtrl.text.toLowerCase();
+                    final customers = q.isEmpty
+                        ? all
+                        : all.where((c) {
+                            final name =
+                                (c['name'] ?? '').toString().toLowerCase();
+                            final phone = (c['phone'] ?? '').toString();
+                            return name.contains(q) || phone.contains(q);
+                          }).toList();
                     if (customers.isEmpty) {
                       return const Center(child: Text('No customers found.'));
                     }
@@ -632,154 +643,255 @@ class _PosTabState extends ConsumerState<PosTab> {
         children: [
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            child: Row(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchCtrl,
-                    onChanged: (v) => setState(() => _query = v),
-                    decoration: InputDecoration(
-                      hintText: 'Search products…',
-                      prefixIcon: const Icon(
-                        Icons.search_rounded,
-                        size: 20,
-                        color: BrandColors.muted,
-                      ),
-                      suffixIcon: _query.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 18),
-                              onPressed: () {
-                                _searchCtrl.clear();
-                                setState(() => _query = '');
-                              },
-                            )
-                          : null,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      filled: true,
-                      fillColor: BrandColors.surfaceTint,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: BrandColors.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: BrandColors.border),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(
-                          color: BrandColors.primary,
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Referral QR scan
-                Tooltip(
-                  message: 'Scan Referral QR',
-                  child: GestureDetector(
-                    onTap: _openReferralScanner,
-                    child: Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: BrandColors.accent,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.card_giftcard_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Product barcode scan
-                GestureDetector(
-                  onTap: _openScanner,
-                  child: Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: BrandColors.primary,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(
-                      Icons.qr_code_scanner_rounded,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => showTodayOrdersSheet(context, ref),
-                  child: Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: BrandColors.surfaceTint,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: BrandColors.border),
-                    ),
-                    child: const Icon(
-                      Icons.receipt_long_rounded,
-                      size: 20,
-                      color: BrandColors.ink,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Tooltip(
-                  message: 'Refresh Products',
-                  child: GestureDetector(
-                    onTap: () async {
-                      final messenger = ScaffoldMessenger.of(context);
-                      messenger.hideCurrentSnackBar();
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('Refreshing products...'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                      await ref.read(posProvider.notifier).reloadProducts();
-                      if (!context.mounted) return;
-                      final err = ref.read(posProvider).error;
-                      final count = ref.read(posProvider).products.length;
-                      messenger.hideCurrentSnackBar();
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            err != null
-                                ? 'Refresh failed: $err'
-                                : 'Products refreshed ($count items)',
+                // Row 1: Search + toggle + QR scan
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchCtrl,
+                        onChanged: (v) => setState(() => _query = v),
+                        decoration: InputDecoration(
+                          hintText: 'Search products…',
+                          prefixIcon: const Icon(
+                            Icons.search_rounded,
+                            size: 20,
+                            color: BrandColors.muted,
                           ),
-                          backgroundColor: err != null
-                              ? BrandColors.error
-                              : BrandColors.success,
-                          duration: const Duration(milliseconds: 1500),
+                          suffixIcon: _query.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(
+                                    Icons.clear_rounded,
+                                    size: 18,
+                                  ),
+                                  onPressed: () {
+                                    _searchCtrl.clear();
+                                    setState(() => _query = '');
+                                  },
+                                )
+                              : null,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                          ),
+                          filled: true,
+                          fillColor: BrandColors.surfaceTint,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: BrandColors.border,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: BrandColors.border,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: BrandColors.primary,
+                              width: 1.5,
+                            ),
+                          ),
                         ),
-                      );
-                    },
-                    child: Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: BrandColors.surfaceTint,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: BrandColors.border),
-                      ),
-                      child: const Icon(
-                        Icons.refresh_rounded,
-                        size: 20,
-                        color: BrandColors.ink,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 6),
+                    // Toggle action chips row
+                    GestureDetector(
+                      onTap: () =>
+                          setState(() => _showActions = !_showActions),
+                      child: Container(
+                        width: 36,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: _showActions
+                              ? BrandColors.primary.withValues(alpha: 0.1)
+                              : BrandColors.surfaceTint,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _showActions
+                                ? BrandColors.primary.withValues(alpha: 0.3)
+                                : BrandColors.border,
+                          ),
+                        ),
+                        child: Icon(
+                          _showActions
+                              ? Icons.keyboard_arrow_up_rounded
+                              : Icons.keyboard_arrow_down_rounded,
+                          size: 18,
+                          color: _showActions
+                              ? BrandColors.primary
+                              : BrandColors.ink,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    // Barcode scan — icon only (widely understood)
+                    GestureDetector(
+                      onTap: _openScanner,
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: BrandColors.primary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.qr_code_scanner_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Row 2: labelled action chips (collapsible)
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                  child: _showActions
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: _openReferralScanner,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: BrandColors.accent.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: BrandColors.accent.withValues(
+                                        alpha: 0.35,
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.card_giftcard_rounded,
+                                        size: 13,
+                                        color: BrandColors.accent,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Referral Scan',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: BrandColors.accent,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () =>
+                                    showTodayOrdersSheet(context, ref),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: BrandColors.surfaceTint,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: BrandColors.border,
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.receipt_long_rounded,
+                                        size: 13,
+                                        color: BrandColors.ink,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Order History',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: BrandColors.ink,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              GestureDetector(
+                                onTap: () async {
+                                  final messenger =
+                                      ScaffoldMessenger.of(context);
+                                  messenger.hideCurrentSnackBar();
+                                  messenger.showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Refreshing products...'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                  await ref
+                                      .read(posProvider.notifier)
+                                      .reloadProducts();
+                                  if (!context.mounted) return;
+                                  final err = ref.read(posProvider).error;
+                                  final count =
+                                      ref.read(posProvider).products.length;
+                                  messenger.hideCurrentSnackBar();
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        err != null
+                                            ? 'Refresh failed: $err'
+                                            : 'Products refreshed ($count items)',
+                                      ),
+                                      backgroundColor: err != null
+                                          ? BrandColors.error
+                                          : BrandColors.success,
+                                      duration: const Duration(
+                                        milliseconds: 1500,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: BrandColors.surfaceTint,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: BrandColors.border,
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.refresh_rounded,
+                                    size: 16,
+                                    color: BrandColors.ink,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -2126,7 +2238,7 @@ class _OrderFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: BrandColors.border)),
@@ -2141,127 +2253,133 @@ class _OrderFooter extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (selectedCustomer != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: BrandColors.primary.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: BrandColors.primary.withValues(alpha: 0.1),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.person_outline_rounded,
-                      size: 16,
-                      color: BrandColors.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Customer: $selectedCustomer',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                          color: BrandColors.primary,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: onClearCustomer,
-                      child: const Icon(
-                        Icons.close_rounded,
-                        size: 16,
-                        color: BrandColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: InkWell(
-                onTap: onSelectCustomer,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: BrandColors.surfaceTint,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: BrandColors.border),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person_add_alt_1_rounded,
-                        size: 16,
-                        color: BrandColors.muted,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Add/Select Customer',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          color: BrandColors.muted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${itemCount % 1 == 0 ? itemCount.toInt() : itemCount.toStringAsFixed(2)} item${itemCount == 1 ? '' : 's'}',
-                style: const TextStyle(color: BrandColors.muted, fontSize: 13),
-              ),
-              Text(
-                'Subtotal: ${_fmt(subtotal)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
+          // Row 1: customer chip (left) + item count & total (right)
           Row(
             children: [
               Expanded(
-                child: ElevatedButton(
-                  onPressed: isPlacing ? null : onOrder,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  child: isPlacing
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Colors.white,
+                child: selectedCustomer != null
+                    ? GestureDetector(
+                        onTap: onSelectCustomer,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
                           ),
-                        )
-                      : Text('Place Order · ${_fmt(subtotal)}'),
-                ),
+                          decoration: BoxDecoration(
+                            color: BrandColors.primary.withValues(alpha: 0.07),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: BrandColors.primary.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.person_rounded,
+                                size: 14,
+                                color: BrandColors.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  selectedCustomer!,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: BrandColors.primary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: onClearCustomer,
+                                child: const Icon(
+                                  Icons.close_rounded,
+                                  size: 14,
+                                  color: BrandColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: onSelectCustomer,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: BrandColors.surfaceTint,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: BrandColors.border),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.person_add_alt_1_rounded,
+                                size: 14,
+                                color: BrandColors.muted,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Add Customer',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: BrandColors.muted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${itemCount % 1 == 0 ? itemCount.toInt() : itemCount.toStringAsFixed(2)} item${itemCount == 1 ? '' : 's'}',
+                    style: const TextStyle(
+                      color: BrandColors.muted,
+                      fontSize: 11,
+                    ),
+                  ),
+                  Text(
+                    _fmt(subtotal),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                      color: BrandColors.ink,
+                    ),
+                  ),
+                ],
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          // Row 2: Place Order button
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: ElevatedButton(
+              onPressed: isPlacing ? null : onOrder,
+              child: isPlacing
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text('Place Order · ${_fmt(subtotal)}'),
+            ),
           ),
         ],
       ),

@@ -75,6 +75,7 @@ class FirebaseBackendConfig {
   static void _apply(FirebaseRemoteConfig rc) {
     // ── Backend URL ────────────────────────────────────────────────────────────
     final url = rc.getString('backend_url').trim();
+    debugPrint('Remote Config backend_url: $url');
     AppConfig.updateFromRemote(url.isEmpty ? null : url);
 
     // ── App / store blocking ───────────────────────────────────────────────────

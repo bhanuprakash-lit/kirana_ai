@@ -403,6 +403,7 @@ class _IntelligenceStrip extends StatelessWidget {
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               crossAxisSpacing: 10,
@@ -937,12 +938,12 @@ class _ProAlertsStrip extends ConsumerWidget {
     switch (alert.type) {
       case AlertType.udhaar:
         ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
-        ref.read(financeSubTabProvider.notifier).setSubTab(0); // Udhaar tab
+        ref.read(financeSubTabProvider.notifier).setSubTab(1); // Customer Udhaar tab
       case AlertType.performance:
         ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
         ref
             .read(financeSubTabProvider.notifier)
-            .setSubTab(1); // Distributor tab
+            .setSubTab(2); // Supplier Udhaar tab
       case AlertType.lowStock:
       case AlertType.expiry:
         ref.read(dashboardTabProvider.notifier).switchTab(2); // POS/Inventory
@@ -1061,11 +1062,45 @@ class _ProAlertsStrip extends ConsumerWidget {
 
 // ── KPI Summary Row ───────────────────────────────────────────────────────────
 
-class _KpiSummaryRow extends ConsumerWidget {
+class _KpiSummaryRow extends ConsumerStatefulWidget {
   const _KpiSummaryRow();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_KpiSummaryRow> createState() => _KpiSummaryRowState();
+}
+
+class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
+  final _sc = ScrollController();
+  bool _showLeft = false;
+  bool _showRight = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _sc.addListener(_update);
+  }
+
+  @override
+  void dispose() {
+    _sc.dispose();
+    super.dispose();
+  }
+
+  void _update() {
+    if (!_sc.hasClients) return;
+    final pos = _sc.position;
+    final newLeft = pos.pixels > 4;
+    final newRight = pos.pixels < pos.maxScrollExtent - 4;
+    if (newLeft != _showLeft || newRight != _showRight) {
+      setState(() {
+        _showLeft = newLeft;
+        _showRight = newRight;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final asyncKpis = ref.watch(kpiCardsProvider);
 
     return Column(
@@ -1088,10 +1123,10 @@ class _KpiSummaryRow extends ConsumerWidget {
             ],
           ),
         ),
-        SizedBox(
-          height: 88,
-          child: asyncKpis.when(
-            loading: () => Shimmer.fromColors(
+        asyncKpis.when(
+          loading: () => SizedBox(
+            height: 88,
+            child: Shimmer.fromColors(
               baseColor: const Color(0xFFE5E7EB),
               highlightColor: const Color(0xFFF9FAFB),
               child: ListView.separated(
@@ -1109,15 +1144,79 @@ class _KpiSummaryRow extends ConsumerWidget {
                 ),
               ),
             ),
-            error: (_, __) => const SizedBox.shrink(),
-            data: (cards) => ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              scrollDirection: Axis.horizontal,
-              itemCount: cards.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (_, i) => _KpiMiniCard(card: cards[i]),
-            ),
           ),
+          error: (_, __) => const SizedBox.shrink(),
+          data: (cards) {
+            if (cards.isEmpty) return const SizedBox.shrink();
+            WidgetsBinding.instance.addPostFrameCallback((_) => _update());
+            return Stack(
+              children: [
+                SizedBox(
+                  height: 88,
+                  child: ListView.separated(
+                    controller: _sc,
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: cards.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 10),
+                    itemBuilder: (_, i) => _KpiMiniCard(card: cards[i]),
+                  ),
+                ),
+                if (_showLeft)
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 48,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              BrandColors.background,
+                              BrandColors.background.withValues(alpha: 0),
+                            ],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.chevron_left_rounded,
+                            color: BrandColors.muted,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (_showRight)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 48,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              BrandColors.background.withValues(alpha: 0),
+                              BrandColors.background,
+                            ],
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.chevron_right_rounded,
+                            color: BrandColors.muted,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ],
     );

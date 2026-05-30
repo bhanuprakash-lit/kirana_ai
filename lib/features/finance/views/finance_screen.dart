@@ -62,7 +62,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
         title: const Text('Finance'),
         actions: const [NotificationBell(), SizedBox(width: 8)],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(100),
+          preferredSize: const Size.fromHeight(92),
           child: Column(
             children: [
               asyncData.when(
@@ -70,12 +70,12 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                 loading: () => Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 8,
+                    vertical: 6,
                   ),
-                  child: CardShimmer(height: 48, radius: 12),
+                  child: CardShimmer(height: 40, radius: 12),
                 ),
                 error: (_, _) => const SizedBox(
-                  height: 48,
+                  height: 40,
                   child: Center(child: Text('Error loading stats')),
                 ),
               ),
@@ -84,10 +84,23 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                 indicatorColor: BrandColors.primary,
                 labelColor: BrandColors.primary,
                 unselectedLabelColor: BrandColors.muted,
+                labelStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+                unselectedLabelStyle: const TextStyle(fontSize: 12),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 8),
                 tabs: const [
-                  Tab(text: 'Udhaar'),
                   Tab(text: 'Cashflow'),
-                  Tab(text: 'Suppliers'),
+                  Tab(
+                    height: 44,
+                    child: Text(
+                      'Customer\nUdhaar',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12, height: 1.2),
+                    ),
+                  ),
+                  Tab(text: 'Supplier Udhaar'),
                 ],
               ),
             ],
@@ -96,7 +109,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [UdhaarTab(), CashflowTab(), DistributorTab()],
+        children: const [CashflowTab(), UdhaarTab(), DistributorTab()],
       ),
     );
   }
@@ -109,7 +122,7 @@ class _MonthlySalesOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [

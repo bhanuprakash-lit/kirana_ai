@@ -67,19 +67,35 @@ class _TrialCountdownWidgetState extends ConsumerState<TrialCountdownWidget> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: color.withValues(alpha: 0.5)),
         ),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.timer_outlined, size: 11, color: color),
-            const SizedBox(width: 4),
             Text(
-              _formatDuration(remaining),
+              'Free trial ends in',
               style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
+                fontSize: 8,
+                fontWeight: FontWeight.w700,
                 color: color,
-                fontFeatures: const [FontFeature.tabularFigures()],
+                letterSpacing: 0.2,
               ),
+            ),
+            const SizedBox(height: 2),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.timer_outlined, size: 10, color: color),
+                const SizedBox(width: 3),
+                Text(
+                  _formatDuration(remaining),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: color,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
             ),
           ],
         ),

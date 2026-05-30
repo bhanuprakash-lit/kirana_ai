@@ -264,19 +264,39 @@ class _HandwritingOrderSheetState
         ),
         child: Column(
           children: [
-            // Drag handle
-            const SizedBox(height: 12),
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: BrandColors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+            // Drag handle + close button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 4, 0),
+              child: Row(
+                children: [
+                  const Spacer(),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: BrandColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      size: 20,
+                      color: BrandColors.muted,
+                    ),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 6),
 
             // Title + clear
             Padding(

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "474247250950",
-    "project_id": "kirana-survey",
-    "storage_bucket": "kirana-survey.firebasestorage.app"
+    "project_number": "335112026607",
+    "project_id": "lit-kirana-ai",
+    "storage_bucket": "lit-kirana-ai.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:474247250950:android:f266df33c1c30c93d1ef87",
+        "mobilesdk_app_id": "1:335112026607:android:ac85f16837d83c051ede1a",
         "android_client_info": {
           "package_name": "com.lohiya.kirana_ai"
         }
@@ -15,45 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyArpdsda9u45qvHnXytUCG3EL3NHcBbbmo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474247250950:android:ed32a7b2ec7f358bd1ef87",
-        "android_client_info": {
-          "package_name": "com.lohiya.kirana_survey"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyArpdsda9u45qvHnXytUCG3EL3NHcBbbmo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474247250950:android:4ef0c246c19f3460d1ef87",
-        "android_client_info": {
-          "package_name": "com.lohiya.pos"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyArpdsda9u45qvHnXytUCG3EL3NHcBbbmo"
+          "current_key": "AIzaSyBvdqBDVB6Wso_dX4cdSiQTuSfhWUrBcl0"
         }
       ],
       "services": {

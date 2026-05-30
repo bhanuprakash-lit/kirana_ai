@@ -149,7 +149,7 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
             fontSize: 13,
           ),
           tabs: const [
-            Tab(icon: Icon(Icons.point_of_sale_rounded), text: 'Billing'),
+            Tab(icon: Icon(Icons.point_of_sale_rounded), text: 'Sales'),
             Tab(icon: Icon(Icons.inventory_2_rounded), text: 'Stock'),
             Tab(icon: Icon(Icons.local_shipping_rounded), text: 'Purchase'),
           ],
