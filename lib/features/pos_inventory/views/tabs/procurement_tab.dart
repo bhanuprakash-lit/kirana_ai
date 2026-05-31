@@ -8,6 +8,7 @@ import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../models/procurement_models.dart';
 import '../../providers/procurement_provider.dart';
 import '../../providers/inventory_provider.dart';
+import '../../providers/reorder_provider.dart';
 import '../widgets/invoice_scan_sheet.dart';
 
 class ProcurementTab extends ConsumerWidget {
@@ -17,6 +18,26 @@ class ProcurementTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(procurementProvider);
 
+    // Arriving from a reorder suggestion / ML reorder screen: open the New
+    // Purchase Order sheet pre-filled, once suppliers are loaded.
+    final prefill = ref.watch(purchasePrefillProvider);
+    if (prefill != null && asyncData.hasValue) {
+      final suppliers = asyncData.value!.suppliers;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        ref.read(purchasePrefillProvider.notifier).clear();
+        if (suppliers.isNotEmpty) {
+          _showAddPurchaseSheet(context, ref, suppliers, prefill: prefill);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Add a supplier first to create a purchase order'),
+            ),
+          );
+        }
+      });
+    }
+
     return asyncData.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(20),
@@ -24,10 +45,19 @@ class ProcurementTab extends ConsumerWidget {
       ),
       error: (err, _) => Center(child: Text('Error: $err')),
       data: (data) => RefreshIndicator(
-        onRefresh: () => ref.read(procurementProvider.notifier).refresh(),
+        onRefresh: () async {
+          await ref.read(procurementProvider.notifier).refresh();
+          await ref.read(reorderProvider.notifier).refresh();
+        },
         child: ListView(
           padding: const EdgeInsets.all(12),
           children: [
+            ..._reorderSection(
+              context,
+              ref,
+              ref.watch(reorderProvider),
+              data.suppliers,
+            ),
             _sectionHeader(
               context,
               'Suppliers',
@@ -144,6 +174,48 @@ class ProcurementTab extends ConsumerWidget {
         child: Text(message, style: const TextStyle(color: BrandColors.muted)),
       ),
     );
+  }
+
+  /// Velocity-based reorder suggestions, shown above Suppliers. Empty list when
+  /// nothing is running low (or while loading/erroring) so the tab stays clean.
+  List<Widget> _reorderSection(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<ReorderSuggestion>> async,
+    List<Supplier> suppliers,
+  ) {
+    final items = async.asData?.value ?? const <ReorderSuggestion>[];
+    if (items.isEmpty) return const [];
+    return [
+      _sectionHeader(context, 'Suggested Reorders'),
+      const Padding(
+        padding: EdgeInsets.only(top: 2, bottom: 8),
+        child: Text(
+          'Running low based on the last 30 days of sales',
+          style: TextStyle(fontSize: 12, color: BrandColors.muted),
+        ),
+      ),
+      ...items.map(
+        (s) => _ReorderCard(
+          s: s,
+          onOrder: suppliers.isEmpty
+              ? null
+              : () => _showAddPurchaseSheet(
+                  context,
+                  ref,
+                  suppliers,
+                  prefill: PurchasePrefill(
+                    productId: s.productId,
+                    productName: s.productName,
+                    qty: s.suggestedQty,
+                    cost: s.costPrice,
+                    supplierId: s.supplierId,
+                  ),
+                ),
+        ),
+      ),
+      const SizedBox(height: 24),
+    ];
   }
 
   void _showAddSupplierSheet(BuildContext context, WidgetRef ref) {
@@ -492,14 +564,30 @@ class ProcurementTab extends ConsumerWidget {
   void _showAddPurchaseSheet(
     BuildContext context,
     WidgetRef ref,
-    List<Supplier> suppliers,
-  ) {
-    Supplier? selectedSupplier = suppliers.first;
+    List<Supplier> suppliers, {
+    PurchasePrefill? prefill,
+  }) {
+    Supplier? selectedSupplier = prefill?.supplierId != null
+        ? suppliers.firstWhere(
+            (s) => s.supplierId == prefill!.supplierId,
+            orElse: () => suppliers.first,
+          )
+        : suppliers.first;
     final products = ref.read(inventoryProvider).value?.items ?? [];
 
     // UI State
     bool saving = false;
-    List<Map<String, dynamic>> selectedItems = [];
+    // Pre-fill the line item when arriving from a reorder suggestion.
+    List<Map<String, dynamic>> selectedItems = prefill != null
+        ? [
+            {
+              'product_id': prefill.productId,
+              'name': prefill.productName,
+              'quantity': prefill.qty,
+              'cost_price': prefill.cost,
+            },
+          ]
+        : [];
     DateTime? dueDate = DateTime.now().add(const Duration(days: 7));
     final notesCtrl = TextEditingController();
 
@@ -994,6 +1082,95 @@ class ProcurementTab extends ConsumerWidget {
             },
             child: const Text('Add'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReorderCard extends StatelessWidget {
+  final ReorderSuggestion s;
+  final VoidCallback? onOrder;
+  const _ReorderCard({required this.s, this.onOrder});
+
+  @override
+  Widget build(BuildContext context) {
+    final cover = s.daysOfCover;
+    final coverLabel = cover == null
+        ? '—'
+        : '${cover.toStringAsFixed(cover < 10 ? 1 : 0)}d cover';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  s.productName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: BrandColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Order ${s.suggestedQty} ${s.unit ?? ''}'.trim(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    color: BrandColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Stock ${s.stock} · ~${s.avgDaily.toStringAsFixed(1)}/day · $coverLabel',
+            style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+          ),
+          if (s.supplierName != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              '${s.supplierName}'
+              '${s.leadTimeDays > 0 ? ' · ${s.leadTimeDays}d lead' : ''}'
+              '${s.reorderCost > 0 ? ' · ~₹${s.reorderCost.toStringAsFixed(0)}' : ''}',
+              style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+            ),
+          ],
+          if (onOrder != null) ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: onOrder,
+                icon: const Icon(Icons.add_shopping_cart_rounded, size: 15),
+                label: const Text(
+                  'Create purchase order',
+                  style: TextStyle(fontSize: 12),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: BrandColors.primary,
+                  side: const BorderSide(color: BrandColors.primary),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

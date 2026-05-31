@@ -448,6 +448,9 @@ class _MetricCard extends ConsumerWidget {
           onTap: () {
             if (metric.id == 'customer') {
               ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
+              ref
+                  .read(financeSubTabProvider.notifier)
+                  .setSubTab(1); // Customer Udhaar
             } else if (metric.id == 'sales') {
               context.push('/pos-history');
             } else {
@@ -1271,15 +1274,38 @@ class _KpiMiniCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          Text(
-            card.value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: BrandColors.ink,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  card.value,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: BrandColors.ink,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              // Profit-confidence dot: margin is based on only part of sales.
+              if (card.coveragePct != null && card.coveragePct! < 90) ...[
+                const SizedBox(width: 4),
+                Tooltip(
+                  message:
+                      'Based on ${card.coveragePct!.toStringAsFixed(0)}% of sales — '
+                      'some items have no cost data',
+                  child: Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE87722),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
           Row(
             children: [

@@ -396,6 +396,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             mrp: v.mrpCtrl.text.isNotEmpty
                 ? double.tryParse(v.mrpCtrl.text)
                 : null,
+            costPrice: v.costCtrl.text.isNotEmpty
+                ? double.tryParse(v.costCtrl.text)
+                : null,
             isPerishable: _isPerishable,
             isLoose: _isLoose,
             expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty
@@ -1123,6 +1126,23 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           ),
           const SizedBox(height: 10),
 
+          // Cost price (what you pay) — feeds profit/margin KPIs.
+          TextFormField(
+            controller: v.costCtrl,
+            enabled: !_saving && !_success,
+            decoration: const InputDecoration(
+              labelText: 'Cost price (what you pay)',
+              hintText: 'optional — improves profit accuracy',
+              prefixText: '₹ ',
+              isDense: true,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+            ],
+          ),
+          const SizedBox(height: 10),
+
           // Stock
           TextFormField(
             controller: v.stockCtrl,
@@ -1185,6 +1205,7 @@ class _VariantData {
   final barcodeCtrl = TextEditingController();
   final priceCtrl = TextEditingController();
   final mrpCtrl = TextEditingController();
+  final costCtrl = TextEditingController();
   final stockCtrl = TextEditingController(text: '0');
   final expiryCtrl = TextEditingController();
   String selectedUnit = 'pcs';
@@ -1194,6 +1215,7 @@ class _VariantData {
     barcodeCtrl.dispose();
     priceCtrl.dispose();
     mrpCtrl.dispose();
+    costCtrl.dispose();
     stockCtrl.dispose();
     expiryCtrl.dispose();
   }

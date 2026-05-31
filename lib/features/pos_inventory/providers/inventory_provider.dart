@@ -194,6 +194,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     double? weight,
     String? barcode,
     double? mrp,
+    double? costPrice,
     bool isPerishable = false,
     bool isLoose = false,
     String? expiryDate,
@@ -210,6 +211,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       'weight': weight,
       'barcode': barcode,
       'mrp': mrp,
+      'costPrice': costPrice,
       'isPerishable': isPerishable,
       'isLoose': isLoose,
       'expiryDate': expiryDate,
@@ -253,6 +255,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     final weight = p['weight'] as double?;
     final barcode = p['barcode'] as String?;
     final mrp = p['mrp'] as double?;
+    final costPrice = p['costPrice'] as double?;
     final isPerishable = p['isPerishable'] as bool;
     final isLoose = p['isLoose'] as bool;
     final expiryDate = p['expiryDate'] as String?;
@@ -323,6 +326,16 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
           'expiry_date': expiryDate,
           'quantity': initialStock,
         });
+      }
+
+      // Capture real purchase cost so profit/margin KPIs have true data.
+      if (costPrice != null && costPrice > 0) {
+        try {
+          await client.post('/kirana/inventory/cost', {
+            'product_id': productId,
+            'cost_price': costPrice,
+          });
+        } catch (_) {}
       }
 
       return null; // success

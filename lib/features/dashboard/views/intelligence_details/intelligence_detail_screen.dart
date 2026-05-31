@@ -4,6 +4,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../providers/intelligence_provider.dart';
 import '../../models/recommendation_model.dart';
+import '../../../pos_inventory/providers/procurement_provider.dart';
 import '../dashboard_screen.dart';
 
 class IntelligenceDetailScreen extends ConsumerStatefulWidget {
@@ -376,7 +377,15 @@ class _RecommendationTile extends ConsumerWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    // Navigate to procurement tab (tab 2, sub-tab 2)
+                    // Pre-fill the purchase order with this product + suggested
+                    // qty, then jump to the procurement tab (tab 2, sub-tab 2).
+                    ref.read(purchasePrefillProvider.notifier).set(
+                          PurchasePrefill(
+                            productId: item.skuId,
+                            productName: item.productName,
+                            qty: reorder.round(),
+                          ),
+                        );
                     Navigator.of(context).pop();
                     ref.read(dashboardTabProvider.notifier).switchTab(2);
                     ref.read(dashboardSubTabProvider.notifier).setSubTab(2);

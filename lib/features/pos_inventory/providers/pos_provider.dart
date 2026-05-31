@@ -231,7 +231,7 @@ class PosNotifier extends Notifier<PosState> {
 
   // ── Cart mutations ─────────────────────────────────────────────────────────
 
-  void addToCart(PosProduct product, {double qty = 1.0}) {
+  void addToCart(PosProduct product, {double qty = 1.0, double? unitPriceOverride}) {
     final existing = state.cart.indexWhere(
       (i) => i.product.productId == product.productId,
     );
@@ -239,13 +239,18 @@ class PosNotifier extends Notifier<PosState> {
       final updated = List<CartItem>.from(state.cart);
       updated[existing] = updated[existing].copyWith(
         quantity: updated[existing].quantity + qty,
+        unitPriceOverride: unitPriceOverride,
       );
       state = state.copyWith(cart: updated);
     } else {
       state = state.copyWith(
         cart: [
           ...state.cart,
-          CartItem(product: product, quantity: qty),
+          CartItem(
+            product: product,
+            quantity: qty,
+            unitPriceOverride: unitPriceOverride,
+          ),
         ],
       );
     }
@@ -353,6 +358,7 @@ class PosNotifier extends Notifier<PosState> {
   Future<Map<String, dynamic>?> placeOrder({
     String paymentMethod = 'cash',
     double? udhaarAmount, // null = full amount is udhaar (or not applicable)
+    int? customerId, // overrides the POS-selected customer (e.g. the udhaar customer)
   }) async {
     if (state.cart.isEmpty) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
@@ -360,8 +366,11 @@ class PosNotifier extends Notifier<PosState> {
     final client = ref.read(apiClientProvider);
     final pending = state.pendingReferral;
 
-    // Resolve customer ID and discount from pending referral (if any)
-    int? customerId = state.selectedCustomerId;
+    // Resolve customer ID and discount from pending referral (if any).
+    // An explicit customerId (e.g. the udhaar customer) takes precedence so the
+    // backend can attribute the order — and auto-create the single khata row —
+    // to the right customer.
+    final int? orderCustomerId = customerId ?? state.selectedCustomerId;
     final discountPct = state.referralDiscountPct ?? 0;
 
     // If a referral QR was scanned, we may already have the new customer's ID
@@ -375,14 +384,14 @@ class PosNotifier extends Notifier<PosState> {
       final body = <String, dynamic>{
         'total_amount': totalAmount,
         'payment_method': paymentMethod,
-        'customer_id': customerId,
+        'customer_id': orderCustomerId,
         'items': state.cart
             .map(
               (i) => {
                 'product_id': i.product.productId,
                 'quantity': i.quantity,
-                'selling_price': i.product.price,
-                'unit_price': i.product.price,
+                'selling_price': i.unitPrice,
+                'unit_price': i.unitPrice,
               },
             )
             .toList(),

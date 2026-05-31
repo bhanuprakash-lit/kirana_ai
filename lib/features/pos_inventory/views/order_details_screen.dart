@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../providers/pos_provider.dart';
 import '../providers/printer_provider.dart';
+import 'widgets/return_sheet.dart';
 import '../../profile/providers/customer_provider.dart';
 import '../../profile/providers/store_settings_provider.dart';
 
@@ -378,6 +379,35 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       ? BrandColors.primary.withValues(alpha: 0.5)
                       : BrandColors.border,
                 ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
+
+          // ── Return / exchange ─────────────────────────────────────────────
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: OutlinedButton.icon(
+              onPressed: () => showReturnSheet(context, ref, widget.order),
+              icon: const Icon(
+                Icons.assignment_return_outlined,
+                size: 18,
+                color: BrandColors.muted,
+              ),
+              label: const Text(
+                'Return / Exchange',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  color: BrandColors.ink,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: BrandColors.border),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

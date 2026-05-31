@@ -52,6 +52,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     ref.listen<OnboardingState>(onboardingProvider, (prev, next) {
       if (next.currentStep != (prev?.currentStep ?? 0)) {
+        // Dismiss the keyboard before transitioning so it doesn't linger
+        // over the next step (which may have no focused field).
+        FocusManager.instance.primaryFocus?.unfocus();
         _pageController.animateToPage(
           next.currentStep,
           duration: const Duration(milliseconds: 420),

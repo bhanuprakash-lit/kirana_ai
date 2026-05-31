@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/pos_provider.dart';
@@ -257,7 +256,6 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   String? _localError;
   int? _udhaarCustomerId;
   String? _udhaarCustomerName;
-  String? _udhaarCustomerPhone;
   // Partial-udhaar slider — how much of the order goes on credit.
   // Initialised to the full order total when Udhaar is chosen.
   double _udhaarAmount = 0;
@@ -294,7 +292,6 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           setState(() {
             _udhaarCustomerId = match.customerId;
             _udhaarCustomerName = match.name;
-            _udhaarCustomerPhone = match.phone;
           });
         }
       }
@@ -315,28 +312,20 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         ? _udhaarAmount.roundToDouble()
         : null;
 
-    final result = await ref
-        .read(posProvider.notifier)
-        .placeOrder(paymentMethod: _paymentMethod, udhaarAmount: udhaarAmt);
+    final result = await ref.read(posProvider.notifier).placeOrder(
+          paymentMethod: _paymentMethod,
+          udhaarAmount: udhaarAmt,
+          // Attribute udhaar orders to the chosen customer so the backend
+          // (pos/crud.create_order) creates the single khata ledger entry,
+          // linked to this order. No separate /finance/udhaar/add call — that
+          // was producing a duplicate, unlinked khata row.
+          customerId: _paymentMethod == 'udhaar' ? _udhaarCustomerId : null,
+        );
     if (!mounted) return;
     if (result != null) {
-      if (_paymentMethod == 'udhaar' && _udhaarCustomerPhone != null) {
-        // Use the slider value — not the full order total — so the finance
-        // ledger records only the credit portion.
-        final creditAmount =
-            udhaarAmt ?? (result['total_amount'] as num?)?.toDouble() ?? 0.0;
-        // Only record udhaar if there's an actual credit amount (slider > 0).
-        if (creditAmount > 0) {
-          try {
-            final client = ref.read(apiClientProvider);
-            await client.post('/kirana/finance/udhaar/add', {
-              'customer_name': _udhaarCustomerName ?? '',
-              'phone': _udhaarCustomerPhone!,
-              'amount': creditAmount,
-            });
-          } catch (_) {}
-          ref.invalidate(financeProvider);
-        }
+      // Refresh the Finance tab so the auto-created udhaar balance shows now.
+      if (_paymentMethod == 'udhaar') {
+        ref.invalidate(financeProvider);
       }
       setState(() {
         _placing = false;
@@ -589,7 +578,6 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
               onSelected: (c) => setState(() {
                 _udhaarCustomerId = c.customerId;
                 _udhaarCustomerName = c.name;
-                _udhaarCustomerPhone = c.phone;
               }),
             ),
             const SizedBox(height: 12),

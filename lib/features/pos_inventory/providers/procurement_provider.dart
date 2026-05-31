@@ -11,6 +11,39 @@ class ProcurementData {
   const ProcurementData({required this.suppliers, required this.purchases});
 }
 
+/// A pending pre-fill for the New Purchase Order sheet — set when the owner taps
+/// "Create purchase order" on a reorder suggestion (procurement) or the ML
+/// reorder detail screen, so the sheet opens with the product + qty already in.
+class PurchasePrefill {
+  final int productId;
+  final String productName;
+  final int qty;
+  final double cost; // 0 if unknown
+  final int? supplierId;
+
+  const PurchasePrefill({
+    required this.productId,
+    required this.productName,
+    required this.qty,
+    this.cost = 0,
+    this.supplierId,
+  });
+}
+
+/// Holds a one-shot purchase prefill across screens (intelligence → procurement).
+class PurchasePrefillNotifier extends Notifier<PurchasePrefill?> {
+  @override
+  PurchasePrefill? build() => null;
+
+  void set(PurchasePrefill prefill) => state = prefill;
+  void clear() => state = null;
+}
+
+final purchasePrefillProvider =
+    NotifierProvider<PurchasePrefillNotifier, PurchasePrefill?>(
+      PurchasePrefillNotifier.new,
+    );
+
 class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   @override
   Future<ProcurementData> build() => _fetch();

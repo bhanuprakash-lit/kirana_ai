@@ -359,10 +359,18 @@ class _PosTabState extends ConsumerState<PosTab> {
   // Adds basket products to cart — only those that are in stock locally.
   // Quantities are clamped to available stock so /pos/orders won't reject
   // the cart with an "insufficient stock" error.
+  //
+  // When the basket has a bundle price, it is distributed across the lines
+  // (proportional to each product's normal price) so the cart total equals the
+  // advertised deal price — not the sum of individual prices. The bundle price
+  // is only honored when the FULL basket is in stock; a deal applies to the
+  // complete set, so a partial basket falls back to regular per-item prices.
   void _addBasketToCart(Basket basket) {
     final notifier = ref.read(posProvider.notifier);
     final products = ref.read(posProvider).products;
-    int added = 0;
+
+    // Resolve in-stock products + clamped quantities first.
+    final resolved = <MapEntry<PosProduct, double>>[];
     int skipped = 0;
     for (final item in basket.items) {
       final product = products
@@ -377,11 +385,11 @@ class _PosTabState extends ConsumerState<PosTab> {
         skipped++;
         continue;
       }
-      notifier.addToCart(product, qty: qty);
-      added++;
+      resolved.add(MapEntry(product, qty));
     }
+
     if (!mounted) return;
-    if (added == 0) {
+    if (resolved.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('All items in "${basket.name}" are out of stock'),
@@ -389,15 +397,40 @@ class _PosTabState extends ConsumerState<PosTab> {
       );
       return;
     }
+
+    // Bundle price applies only to the complete basket.
+    final fullBundle = skipped == 0 && resolved.length == basket.items.length;
+    final bundlePrice = basket.price;
+    double? factor;
+    if (fullBundle && bundlePrice != null && bundlePrice > 0) {
+      final sumNormal = resolved.fold<double>(
+        0,
+        (s, r) => s + r.key.price * r.value,
+      );
+      if (sumNormal > 0) factor = bundlePrice / sumNormal;
+    }
+
+    for (final r in resolved) {
+      notifier.addToCart(
+        r.key,
+        qty: r.value,
+        unitPriceOverride: factor != null ? r.key.price * factor : null,
+      );
+    }
+
+    final added = resolved.length;
+    final String msg;
+    if (factor != null) {
+      msg = 'Bundle "${basket.name}" added at ₹${bundlePrice!.toStringAsFixed(0)}';
+    } else if (skipped == 0) {
+      msg = bundlePrice != null
+          ? '$added items added at regular price (bundle needs all items in stock)'
+          : '$added item${added == 1 ? '' : 's'} from "${basket.name}" added';
+    } else {
+      msg = '$added added · $skipped skipped (out of stock)';
+    }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          skipped == 0
-              ? '$added item${added == 1 ? '' : 's'} from "${basket.name}" added'
-              : '$added added · $skipped skipped (out of stock)',
-        ),
-        duration: const Duration(milliseconds: 1800),
-      ),
+      SnackBar(content: Text(msg), duration: const Duration(milliseconds: 1800)),
     );
   }
 

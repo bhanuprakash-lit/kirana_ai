@@ -30,6 +30,7 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
   final _storeCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _footfallCtrl = TextEditingController(text: '40');
+  final _budgetCtrl = TextEditingController();
   String? _selectedType;
 
   @override
@@ -38,6 +39,7 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
     _storeCtrl.dispose();
     _emailCtrl.dispose();
     _footfallCtrl.dispose();
+    _budgetCtrl.dispose();
     super.dispose();
   }
 
@@ -54,6 +56,7 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
             email: _emailCtrl.text.trim(),
             businessType: _selectedType!,
             footfall: int.tryParse(_footfallCtrl.text) ?? 40,
+            budget: double.tryParse(_budgetCtrl.text.trim()),
           ),
     );
     notifier.goToStep(3);
@@ -153,6 +156,31 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
                   },
                 )
                 .animate(delay: 300.ms)
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: 0.1, end: 0),
+            const SizedBox(height: 16),
+            TextFormField(
+                  controller: _budgetCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: 'Monthly sales target (optional)',
+                    hintText: 'e.g. 150000',
+                    prefixText: '₹ ',
+                    helperText: 'Used to track daily progress. You can change it later.',
+                  ),
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) return null; // optional
+                    final n = double.tryParse(v.trim());
+                    if (n == null || n < 0) return 'Enter a valid amount';
+                    return null;
+                  },
+                )
+                .animate(delay: 325.ms)
                 .fadeIn(duration: 400.ms)
                 .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 36),

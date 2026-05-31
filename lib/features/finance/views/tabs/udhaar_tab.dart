@@ -10,6 +10,8 @@ import '../../../profile/models/customer_model.dart';
 import '../../../profile/providers/customer_provider.dart';
 import '../../models/finance_models.dart';
 import '../../providers/finance_provider.dart';
+import '../../providers/smart_udhaar_provider.dart';
+import '../smart_reminders_screen.dart';
 
 class UdhaarTab extends ConsumerWidget {
   const UdhaarTab({super.key});
@@ -53,7 +55,18 @@ class UdhaarTab extends ConsumerWidget {
           padding: const EdgeInsets.all(20),
           children: [
             _UdhaarStatsCard(stats: data.stats),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            if (data.udhaarList.isNotEmpty) ...[
+              _SmartRemindersBanner(
+                highRisk: ref.watch(highRiskUdhaarCountProvider),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const SmartRemindersScreen(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -662,6 +675,49 @@ class _MiniStat extends StatelessWidget {
           style: const TextStyle(fontSize: 11, color: BrandColors.muted),
         ),
       ],
+    );
+  }
+}
+
+class _SmartRemindersBanner extends StatelessWidget {
+  final int highRisk;
+  final VoidCallback onTap;
+
+  const _SmartRemindersBanner({required this.highRisk, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final urgent = highRisk > 0;
+    final color = urgent ? BrandColors.error : BrandColors.primary;
+    return Material(
+      color: color.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              Icon(Icons.bolt_rounded, color: color, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  urgent
+                      ? '$highRisk high-risk due${highRisk == 1 ? '' : 's'} — chase these first'
+                      : 'Smart Reminders — recovery-ranked dues',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: BrandColors.ink,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: color),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

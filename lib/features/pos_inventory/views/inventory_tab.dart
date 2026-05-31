@@ -8,6 +8,11 @@ import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/inventory_item.dart';
 import '../models/pending_inventory_item.dart';
 import '../providers/inventory_provider.dart';
+import '../providers/near_expiry_provider.dart';
+import '../providers/price_memory_provider.dart';
+import '../providers/ml_flags_provider.dart';
+import 'near_expiry_screen.dart';
+import 'price_memory_screen.dart';
 import 'widgets/add_product_sheet.dart';
 import 'widgets/barcode_scanner_overlay.dart';
 import 'widgets/edit_product_sheet.dart';
@@ -319,6 +324,12 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
             filteredGrouped.putIfAbsent(cat, () => []).add(item);
           }
 
+          final nearExpiryCount = ref.watch(nearExpiryCountProvider);
+          final missingPriceCount = ref.watch(missingPriceCountProvider);
+          final mlFlags =
+              ref.watch(inventoryFlagsProvider).asData?.value ??
+              const <int, List<String>>{};
+
           return RefreshIndicator(
             onRefresh: () => ref.read(inventoryProvider.notifier).refresh(),
             color: BrandColors.primary,
@@ -393,6 +404,36 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                     ),
                   ),
                 ),
+
+                if (nearExpiryCount > 0)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 6, 12, 2),
+                      child: _NearExpiryBanner(
+                        count: nearExpiryCount,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const NearExpiryScreen(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                if (missingPriceCount > 0)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 6, 12, 2),
+                      child: _MissingPriceBanner(
+                        count: missingPriceCount,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PriceMemoryScreen(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
 
                 SliverToBoxAdapter(
                   child: AnimatedContainer(
@@ -514,6 +555,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                         delegate: SliverChildBuilderDelegate(
                           (_, i) => _InventoryTile(
                             item: entry.value[i],
+                            mlFlags: mlFlags[entry.value[i].productId] ?? const [],
                             onTap: () => _showEditProduct(entry.value[i]),
                           ),
                           childCount: entry.value.length,
@@ -528,6 +570,144 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _NearExpiryBanner extends StatelessWidget {
+  final int count;
+  final VoidCallback onTap;
+
+  const _NearExpiryBanner({required this.count, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    const amber = Color(0xFFE87722);
+    return Material(
+      color: amber.withValues(alpha: 0.10),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: amber, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '$count item${count == 1 ? '' : 's'} expiring soon — tap to mark down or clear',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: BrandColors.ink,
+                  ),
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: amber),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Renders every ML flag an item carries (fast moving, reorder, etc.) as chips.
+class _MlFlagChips extends StatelessWidget {
+  final List<String> flags;
+  const _MlFlagChips({required this.flags});
+
+  static const _meta = <String, (String, IconData, Color)>{
+    'fast_moving': ('Fast', Icons.trending_up_rounded, BrandColors.success),
+    'reorder_now': ('Reorder', Icons.refresh_rounded, BrandColors.accent),
+    'stockout_risk': (
+      'Low stock',
+      Icons.warning_amber_rounded,
+      BrandColors.error,
+    ),
+    'dead_stock': ('Dead', Icons.snooze_rounded, Color(0xFFB08D57)),
+    'profit_opportunity': ('Profit', Icons.stars_rounded, BrandColors.primary),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    // De-dup while preserving order; map unknown types out.
+    final seen = <String>{};
+    final chips = <Widget>[];
+    for (final f in flags) {
+      final m = _meta[f];
+      if (m == null || !seen.add(f)) continue;
+      chips.add(
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: m.$3.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(m.$2, size: 10, color: m.$3),
+              const SizedBox(width: 3),
+              Text(
+                m.$1,
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  color: m.$3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (chips.isEmpty) return const SizedBox.shrink();
+    return Wrap(spacing: 4, runSpacing: 4, children: chips);
+  }
+}
+
+class _MissingPriceBanner extends StatelessWidget {
+  final int count;
+  final VoidCallback onTap;
+
+  const _MissingPriceBanner({required this.count, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: BrandColors.primary.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.price_change_outlined,
+                color: BrandColors.primary,
+                size: 22,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '$count product${count == 1 ? '' : 's'} priced ₹0 — tap to set prices',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: BrandColors.ink,
+                  ),
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: BrandColors.primary),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -640,7 +820,12 @@ class _CategoryHeader extends StatelessWidget {
 class _InventoryTile extends StatelessWidget {
   final InventoryItem item;
   final VoidCallback onTap;
-  const _InventoryTile({required this.item, required this.onTap});
+  final List<String> mlFlags;
+  const _InventoryTile({
+    required this.item,
+    required this.onTap,
+    this.mlFlags = const [],
+  });
 
   Color _categoryColor(String? cat) {
     final c = cat?.toLowerCase() ?? '';
@@ -729,31 +914,41 @@ class _InventoryTile extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Row(
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              '₹${item.price.toStringAsFixed(0)} / ${item.isLoose ? (item.unit ?? "unit") : "unit"}',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                color: BrandColors.primary,
-                fontSize: 12,
-              ),
+            Row(
+              children: [
+                Text(
+                  '₹${item.price.toStringAsFixed(0)} / ${item.isLoose ? (item.unit ?? "unit") : "unit"}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: BrandColors.primary,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Stock: ${item.stockLabel}',
+                  style: TextStyle(
+                    color: item.isOutOfStock
+                        ? BrandColors.error
+                        : item.isLowStock
+                        ? BrandColors.accent
+                        : BrandColors.muted,
+                    fontWeight: item.isLowStock || item.isOutOfStock
+                        ? FontWeight.w700
+                        : FontWeight.normal,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            Text(
-              'Stock: ${item.stockLabel}',
-              style: TextStyle(
-                color: item.isOutOfStock
-                    ? BrandColors.error
-                    : item.isLowStock
-                    ? BrandColors.accent
-                    : BrandColors.muted,
-                fontWeight: item.isLowStock || item.isOutOfStock
-                    ? FontWeight.w700
-                    : FontWeight.normal,
-                fontSize: 12,
-              ),
-            ),
+            if (mlFlags.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              _MlFlagChips(flags: mlFlags),
+            ],
           ],
         ),
         trailing: const Icon(

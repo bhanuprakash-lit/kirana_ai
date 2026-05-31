@@ -154,6 +154,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             storeName: state.data.storeName,
             storeType: _mapStoreType(state.data.businessType),
             footfall: state.data.footfall,
+            budget: state.data.budget,
             location: state.data.location.isNotEmpty
                 ? state.data.location
                 : state.data.address,

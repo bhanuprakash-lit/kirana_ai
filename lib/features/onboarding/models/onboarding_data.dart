@@ -8,6 +8,7 @@ class OnboardingData {
   final String storeName;
   final String businessType;
   final int footfall;
+  final double? budget; // owner's monthly sales target (₹); null = not provided
   final String address;
   final String location;
   final String region;
@@ -26,6 +27,7 @@ class OnboardingData {
     this.storeName = '',
     this.businessType = '',
     this.footfall = 40,
+    this.budget,
     this.address = '',
     this.location = '',
     this.region = '',
@@ -45,6 +47,7 @@ class OnboardingData {
     String? storeName,
     String? businessType,
     int? footfall,
+    double? budget,
     String? address,
     String? location,
     String? region,
@@ -62,6 +65,7 @@ class OnboardingData {
     storeName: storeName ?? this.storeName,
     businessType: businessType ?? this.businessType,
     footfall: footfall ?? this.footfall,
+    budget: budget ?? this.budget,
     address: address ?? this.address,
     location: location ?? this.location,
     region: region ?? this.region,

@@ -8,6 +8,9 @@ class KpiCard {
   final String value;
   final String direction; // up / down / stable
   final double? pctChange;
+  // % of billed revenue that has cost data behind it (profit-confidence).
+  // Only meaningful for gross-profit-margin; null elsewhere.
+  final double? coveragePct;
 
   const KpiCard({
     required this.slug,
@@ -15,6 +18,7 @@ class KpiCard {
     required this.value,
     required this.direction,
     this.pctChange,
+    this.coveragePct,
   });
 
   static const _slugMeta = {
@@ -55,6 +59,7 @@ class KpiCard {
       value: fmtVal,
       direction: dir,
       pctChange: pct,
+      coveragePct: (j['cost_coverage_pct'] as num?)?.toDouble(),
     );
   }
 }
