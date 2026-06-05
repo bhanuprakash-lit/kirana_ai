@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/inventory_item.dart';
 import '../models/pending_inventory_item.dart';
@@ -59,217 +60,9 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
     showEditProductSheet(context, ref, item);
   }
 
-  // void _showUpdateStockDialog(InventoryItem item) {
-  //   if (item.isPerishable) {
-  //     _showPerishableOptions(item);
-  //   } else {
-  //     _showSimpleUpdateStock(item);
-  //   }
-  // }
-
-  // void _showPerishableOptions(InventoryItem item) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-  //     ),
-  //     builder: (ctx) => Padding(
-  //       padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-  //       child: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Text(item.name,
-  //               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-  //           Text('Current stock: ${item.stockLabel}',
-  //               style: const TextStyle(color: BrandColors.muted, fontSize: 13)),
-  //           const SizedBox(height: 20),
-  //           SizedBox(
-  //             width: double.infinity,
-  //             child: ElevatedButton.icon(
-  //               onPressed: () {
-  //                 Navigator.pop(ctx);
-  //                 _showReceiveBatchDialog(item);
-  //               },
-  //               icon: const Icon(Icons.add_box_outlined),
-  //               label: const Text('Receive New Batch'),
-  //               style: ElevatedButton.styleFrom(
-  //                 backgroundColor: BrandColors.primary,
-  //                 foregroundColor: Colors.white,
-  //                 padding: const EdgeInsets.symmetric(vertical: 14),
-  //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-  //               ),
-  //             ),
-  //           ),
-  //           const SizedBox(height: 10),
-  //           SizedBox(
-  //             width: double.infinity,
-  //             child: OutlinedButton.icon(
-  //               onPressed: () {
-  //                 Navigator.pop(ctx);
-  //                 _showSimpleUpdateStock(item);
-  //               },
-  //               icon: const Icon(Icons.edit_outlined),
-  //               label: const Text('Correct Stock Count'),
-  //               style: OutlinedButton.styleFrom(
-  //                 padding: const EdgeInsets.symmetric(vertical: 14),
-  //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // void _showReceiveBatchDialog(InventoryItem item) {
-  //   final qtyCtrl = TextEditingController();
-  //   DateTime? selectedExpiry;
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (ctx) => StatefulBuilder(
-  //       builder: (ctx, setDialog) => AlertDialog(
-  //         title: Text('Receive Batch: ${item.name}'),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             Text('Current stock: ${item.stockLabel}',
-  //                 style: const TextStyle(color: BrandColors.muted, fontSize: 12)),
-  //             const SizedBox(height: 16),
-  //             TextField(
-  //               controller: qtyCtrl,
-  //               autofocus: true,
-  //               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  //               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}'))],
-  //               decoration: InputDecoration(
-  //                 labelText: 'Quantity Received',
-  //                 suffixText: item.isLoose ? (item.unit ?? 'units') : 'units',
-  //               ),
-  //             ),
-  //             const SizedBox(height: 16),
-  //             InkWell(
-  //               onTap: () async {
-  //                 final date = await showDatePicker(
-  //                   context: ctx,
-  //                   initialDate: DateTime.now().add(const Duration(days: 3)),
-  //                   firstDate: DateTime.now(),
-  //                   lastDate: DateTime.now().add(const Duration(days: 730)),
-  //                 );
-  //                 if (date != null) setDialog(() => selectedExpiry = date);
-  //               },
-  //               child: Container(
-  //                 padding: const EdgeInsets.all(12),
-  //                 decoration: BoxDecoration(
-  //                   border: Border.all(color: BrandColors.border),
-  //                   borderRadius: BorderRadius.circular(8),
-  //                 ),
-  //                 child: Row(
-  //                   children: [
-  //                     const Icon(Icons.calendar_today_rounded, size: 18, color: BrandColors.primary),
-  //                     const SizedBox(width: 8),
-  //                     Text(
-  //                       selectedExpiry == null
-  //                           ? 'Select Expiry Date *'
-  //                           : '${selectedExpiry!.day}/${selectedExpiry!.month}/${selectedExpiry!.year}',
-  //                       style: TextStyle(
-  //                         color: selectedExpiry == null ? BrandColors.muted : BrandColors.ink,
-  //                         fontWeight: FontWeight.w500,
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-  //           ElevatedButton(
-  //             onPressed: selectedExpiry == null ? null : () async {
-  //               final qty = double.tryParse(qtyCtrl.text);
-  //               if (qty == null || qty <= 0) return;
-  //               final expiryStr =
-  //                   '${selectedExpiry!.year}-${selectedExpiry!.month.toString().padLeft(2,'0')}-${selectedExpiry!.day.toString().padLeft(2,'0')}';
-  //               final success = await ref
-  //                   .read(inventoryProvider.notifier)
-  //                   .receiveBatch(
-  //                     productId: item.productId,
-  //                     quantity: qty,
-  //                     expiryDate: expiryStr,
-  //                     currentStock: item.stockQuantity,
-  //                   );
-  //               if (success && ctx.mounted) {
-  //                 Navigator.pop(ctx);
-  //                 ScaffoldMessenger.of(context).showSnackBar(
-  //                   SnackBar(content: Text('Batch received for ${item.name}')),
-  //                 );
-  //               }
-  //             },
-  //             child: const Text('Receive'),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // void _showSimpleUpdateStock(InventoryItem item) {
-  //   final ctrl = TextEditingController(text: item.stockQuantity.toStringAsFixed(0));
-  //   showDialog(
-  //     context: context,
-  //     builder: (ctx) => AlertDialog(
-  //       title: Text('Correct Stock: ${item.name}'),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Text('Current: ${item.stockLabel}',
-  //               style: const TextStyle(color: BrandColors.muted)),
-  //           const SizedBox(height: 16),
-  //           TextField(
-  //             controller: ctrl,
-  //             autofocus: true,
-  //             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  //             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}'))],
-  //             decoration: InputDecoration(
-  //               labelText: 'Correct Stock Quantity',
-  //               suffixText: item.isLoose ? (item.unit ?? 'units') : 'units',
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(ctx),
-  //           child: const Text('Cancel'),
-  //         ),
-  //         ElevatedButton(
-  //           onPressed: () async {
-  //             final newQty = double.tryParse(ctrl.text);
-  //             if (newQty != null) {
-  //               final success = await ref
-  //                   .read(inventoryProvider.notifier)
-  //                   .updateStock(item.productId, newQty);
-  //               if (success && ctx.mounted) {
-  //                 Navigator.pop(ctx);
-  //                 ScaffoldMessenger.of(context).showSnackBar(
-  //                   SnackBar(content: Text('Stock corrected for ${item.name}')),
-  //                 );
-  //               }
-  //             }
-  //           },
-  //           child: const Text('Save'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final asyncData = ref.watch(inventoryProvider);
 
     return Scaffold(
@@ -320,7 +113,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
 
           final Map<String, List<InventoryItem>> filteredGrouped = {};
           for (final item in filteredItems) {
-            final cat = item.categoryName ?? 'Uncategorised';
+            final cat = item.categoryName ?? l10n.invUncategorised;
             filteredGrouped.putIfAbsent(cat, () => []).add(item);
           }
 
@@ -345,7 +138,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                             controller: _searchCtrl,
                             onChanged: (v) => setState(() => _searchQuery = v),
                             decoration: InputDecoration(
-                              hintText: 'Search items or categories...',
+                              hintText: l10n.invSearchItemsOrCategories,
                               prefixIcon: const Icon(
                                 Icons.search_rounded,
                                 size: 20,
@@ -458,7 +251,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                               children: [
                                 for (final cat in displayCategories)
                                   _CategoryChip(
-                                    label: cat,
+                                    label: cat == 'All' ? l10n.invAll : cat,
                                     isSelected: cat == 'All'
                                         ? _selectedCategory == null
                                         : _selectedCategory == cat,
@@ -472,8 +265,9 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                                 if (!_isExpanded &&
                                     allCategories.length > initialCount)
                                   _ViewMoreChip(
-                                    label:
-                                        '+${allCategories.length - initialCount} more',
+                                    label: l10n.invViewMore(
+                                      allCategories.length - initialCount,
+                                    ),
                                     onTap: () =>
                                         setState(() => _isExpanded = true),
                                   ),
@@ -489,9 +283,9 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                                     Icons.keyboard_arrow_up_rounded,
                                     size: 18,
                                   ),
-                                  label: const Text(
-                                    'Show Less',
-                                    style: TextStyle(
+                                  label: Text(
+                                    l10n.invShowLess,
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -531,12 +325,12 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                   ),
 
                 if (filteredItems.isEmpty)
-                  const SliverFillRemaining(
+                  SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
                       child: Text(
-                        'No matches found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.invNoMatchesFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     ),
                   )
@@ -555,7 +349,8 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                         delegate: SliverChildBuilderDelegate(
                           (_, i) => _InventoryTile(
                             item: entry.value[i],
-                            mlFlags: mlFlags[entry.value[i].productId] ?? const [],
+                            mlFlags:
+                                mlFlags[entry.value[i].productId] ?? const [],
                             onTap: () => _showEditProduct(entry.value[i]),
                           ),
                           childCount: entry.value.length,
@@ -583,6 +378,7 @@ class _NearExpiryBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     const amber = Color(0xFFE87722);
     return Material(
       color: amber.withValues(alpha: 0.10),
@@ -598,7 +394,7 @@ class _NearExpiryBanner extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '$count item${count == 1 ? '' : 's'} expiring soon — tap to mark down or clear',
+                  l10n.invNearExpiryBanner(count),
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
@@ -620,20 +416,34 @@ class _MlFlagChips extends StatelessWidget {
   final List<String> flags;
   const _MlFlagChips({required this.flags});
 
-  static const _meta = <String, (String, IconData, Color)>{
-    'fast_moving': ('Fast', Icons.trending_up_rounded, BrandColors.success),
-    'reorder_now': ('Reorder', Icons.refresh_rounded, BrandColors.accent),
-    'stockout_risk': (
-      'Low stock',
-      Icons.warning_amber_rounded,
-      BrandColors.error,
-    ),
-    'dead_stock': ('Dead', Icons.snooze_rounded, Color(0xFFB08D57)),
-    'profit_opportunity': ('Profit', Icons.stars_rounded, BrandColors.primary),
+  static const _meta = <String, (IconData, Color)>{
+    'fast_moving': (Icons.trending_up_rounded, BrandColors.success),
+    'reorder_now': (Icons.refresh_rounded, BrandColors.accent),
+    'stockout_risk': (Icons.warning_amber_rounded, BrandColors.error),
+    'dead_stock': (Icons.snooze_rounded, Color(0xFFB08D57)),
+    'profit_opportunity': (Icons.stars_rounded, BrandColors.primary),
   };
+
+  String _labelFor(AppLocalizations l10n, String flag) {
+    switch (flag) {
+      case 'fast_moving':
+        return l10n.invFlagFast;
+      case 'reorder_now':
+        return l10n.invFlagReorder;
+      case 'stockout_risk':
+        return l10n.invFlagLowStock;
+      case 'dead_stock':
+        return l10n.invFlagDead;
+      case 'profit_opportunity':
+        return l10n.invFlagProfit;
+      default:
+        return flag;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     // De-dup while preserving order; map unknown types out.
     final seen = <String>{};
     final chips = <Widget>[];
@@ -644,20 +454,20 @@ class _MlFlagChips extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: m.$3.withValues(alpha: 0.12),
+            color: m.$2.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(m.$2, size: 10, color: m.$3),
+              Icon(m.$1, size: 10, color: m.$2),
               const SizedBox(width: 3),
               Text(
-                m.$1,
+                _labelFor(l10n, f),
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
-                  color: m.$3,
+                  color: m.$2,
                 ),
               ),
             ],
@@ -678,6 +488,7 @@ class _MissingPriceBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Material(
       color: BrandColors.primary.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(14),
@@ -696,7 +507,7 @@ class _MissingPriceBanner extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '$count product${count == 1 ? '' : 's'} priced ₹0 — tap to set prices',
+                  l10n.invMissingPriceBanner(count),
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
@@ -704,7 +515,10 @@ class _MissingPriceBanner extends StatelessWidget {
                   ),
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: BrandColors.primary),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: BrandColors.primary,
+              ),
             ],
           ),
         ),
@@ -878,6 +692,7 @@ class _InventoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final catColor = _categoryColor(item.categoryName);
 
     return Container(
@@ -920,27 +735,33 @@ class _InventoryTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  '₹${item.price.toStringAsFixed(0)} / ${item.isLoose ? (item.unit ?? "unit") : "unit"}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    color: BrandColors.primary,
-                    fontSize: 12,
+                Flexible(
+                  child: Text(
+                    '₹${item.price.toStringAsFixed(0)} / ${item.isLoose ? (item.unit ?? l10n.invUnitFallback) : l10n.invUnitFallback}',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: BrandColors.primary,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'Stock: ${item.stockLabel}',
-                  style: TextStyle(
-                    color: item.isOutOfStock
-                        ? BrandColors.error
-                        : item.isLowStock
-                        ? BrandColors.accent
-                        : BrandColors.muted,
-                    fontWeight: item.isLowStock || item.isOutOfStock
-                        ? FontWeight.w700
-                        : FontWeight.normal,
-                    fontSize: 12,
+                Flexible(
+                  child: Text(
+                    l10n.invStockLabel(item.stockLabel),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: item.isOutOfStock
+                          ? BrandColors.error
+                          : item.isLowStock
+                          ? BrandColors.accent
+                          : BrandColors.muted,
+                      fontWeight: item.isLowStock || item.isOutOfStock
+                          ? FontWeight.w700
+                          : FontWeight.normal,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],
@@ -970,6 +791,7 @@ class _PendingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final failed = pending.status == PendingStatus.failed;
     final accent = failed ? BrandColors.error : BrandColors.primary;
 
@@ -1017,7 +839,7 @@ class _PendingTile extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            failed ? 'Sync failed — tap to retry' : 'Syncing to server...',
+            failed ? l10n.invSyncFailedTapRetry : l10n.invSyncingToServer,
             style: TextStyle(
               fontSize: 12,
               color: accent,
@@ -1041,6 +863,7 @@ class _EmptyInventory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -1062,12 +885,12 @@ class _EmptyInventory extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'No inventory yet',
+              l10n.invNoInventoryYet,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Text(
-              'Tap + to add your first product.\nCreate a category first, then add items.',
+              l10n.invNoInventoryHint,
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
@@ -1077,7 +900,7 @@ class _EmptyInventory extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Add First Product'),
+              label: Text(l10n.invAddFirstProduct),
             ),
           ],
         ),
@@ -1093,6 +916,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -1106,7 +930,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Could not load inventory',
+              l10n.invCouldNotLoadInventory,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -1123,7 +947,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
+              label: Text(l10n.invRetry),
             ),
           ],
         ),

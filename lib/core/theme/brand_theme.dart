@@ -24,8 +24,30 @@ class BrandColors {
   static const Color error = Color(0xFFDC2626);
 }
 
-ThemeData buildBrandTheme() {
-  final baseTextTheme = GoogleFonts.dmSansTextTheme();
+/// Picks a base text theme whose font actually has glyphs for the active
+/// script. DM Sans (the brand font) covers Latin only, so for Indic locales we
+/// swap in the matching Noto Sans family — otherwise translated text renders as
+/// empty boxes (tofu).
+TextTheme _baseTextThemeFor(Locale locale) {
+  switch (locale.languageCode) {
+    case 'te':
+      return GoogleFonts.notoSansTeluguTextTheme();
+    case 'hi':
+    case 'mr':
+      return GoogleFonts.notoSansDevanagariTextTheme();
+    case 'ta':
+      return GoogleFonts.notoSansTamilTextTheme();
+    case 'kn':
+      return GoogleFonts.notoSansKannadaTextTheme();
+    case 'ml':
+      return GoogleFonts.notoSansMalayalamTextTheme();
+    default:
+      return GoogleFonts.dmSansTextTheme();
+  }
+}
+
+ThemeData buildBrandTheme(Locale locale) {
+  final baseTextTheme = _baseTextThemeFor(locale);
 
   return ThemeData(
     useMaterial3: true,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/brand_theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 class LoadingButton extends StatelessWidget {
   final String label;
@@ -87,9 +88,9 @@ class ActionStatusOverlay extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
-              'Saving changes...',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context).shrSavingChanges,
+              style: const TextStyle(
                 color: BrandColors.primary,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
@@ -128,9 +129,9 @@ class ActionStatusOverlay extends StatelessWidget {
             if (onRetry != null)
               TextButton(
                 onPressed: onRetry,
-                child: const Text(
-                  'Retry',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context).shrRetry,
+                  style: const TextStyle(
                     color: BrandColors.error,
                     fontWeight: FontWeight.w700,
                   ),
@@ -157,7 +158,8 @@ class ActionStatusOverlay extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Text(
-              successMessage ?? 'Saved successfully!',
+              successMessage ??
+                  AppLocalizations.of(context).shrSavedSuccessfully,
               style: const TextStyle(
                 color: BrandColors.success,
                 fontSize: 13,

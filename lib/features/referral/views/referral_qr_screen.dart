@@ -6,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../profile/models/customer_model.dart';
 import '../../profile/providers/customer_provider.dart';
@@ -54,6 +55,7 @@ class _ReferralQrScreenState extends ConsumerState<ReferralQrScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final customersAsync = ref.watch(customerProvider);
     final customers = customersAsync.customers
         .where(
@@ -80,7 +82,7 @@ class _ReferralQrScreenState extends ConsumerState<ReferralQrScreen> {
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         title: Text(
-          'Generate QR · ${widget.campaign.name}',
+          l10n.mktGenerateQrTitle(widget.campaign.name),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
@@ -91,7 +93,7 @@ class _ReferralQrScreenState extends ConsumerState<ReferralQrScreen> {
             child: TextField(
               controller: _searchCtrl,
               decoration: InputDecoration(
-                hintText: 'Search customer…',
+                hintText: l10n.mktSearchCustomer,
                 prefixIcon: const Icon(Icons.search_rounded),
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
@@ -114,10 +116,10 @@ class _ReferralQrScreenState extends ConsumerState<ReferralQrScreen> {
           else
             Expanded(
               child: customers.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No customers found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.mktNoCustomersFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(
@@ -176,37 +178,37 @@ class _QrView extends StatelessWidget {
   String get _qrData => 'KIRANA_REF:${token.tokenHash}';
 
   Future<void> _sendWhatsApp(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final phone = customer.phone.replaceAll(RegExp(r'\D'), '');
     if (phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No phone number for this customer')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.mktNoPhoneForCustomer)));
       return;
     }
     final message = Uri.encodeComponent(
-      'Hi ${customer.name}! 🎁\n\n'
-      'You\'re invited to share our store with your friends!\n\n'
-      'Your referral code: ${token.tokenHash}\n\n'
-      'When your friend visits our store and shows this code, they get ${campaign.referralDiscountPct.toStringAsFixed(0)}% off — '
-      'and you earn rewards for every ${campaign.milestoneEveryN} friends you bring! 🙌\n\n'
-      '— via LohiyaAI Kirana',
+      l10n.mktReferralWhatsAppMessage(
+        customer.name,
+        token.tokenHash,
+        campaign.referralDiscountPct.toStringAsFixed(0),
+        campaign.milestoneEveryN,
+      ),
     );
     final uri = Uri.parse('whatsapp://send?phone=91$phone&text=$message');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('WhatsApp not installed on this device'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.mktWhatsAppNotInstalled)));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
@@ -214,9 +216,9 @@ class _QrView extends StatelessWidget {
           onPressed: onBack,
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
-        title: const Text(
-          'Referral QR Code',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.mktReferralQrCode,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: SingleChildScrollView(
@@ -325,7 +327,9 @@ class _QrView extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        '${campaign.referralDiscountPct.toStringAsFixed(0)}% off for new customers',
+                        l10n.mktPercentOffForNewCustomers(
+                          campaign.referralDiscountPct.toStringAsFixed(0),
+                        ),
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
@@ -334,7 +338,10 @@ class _QrView extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Milestone reward: ${campaign.milestoneRewardPct.toStringAsFixed(0)}% every ${campaign.milestoneEveryN} referrals',
+                        l10n.mktMilestoneRewardLabel(
+                          campaign.milestoneRewardPct.toStringAsFixed(0),
+                          campaign.milestoneEveryN,
+                        ),
                         style: const TextStyle(
                           fontSize: 12,
                           color: BrandColors.muted,
@@ -358,7 +365,7 @@ class _QrView extends StatelessWidget {
               onTap: () {
                 Clipboard.setData(ClipboardData(text: token.tokenHash));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Referral code copied')),
+                  SnackBar(content: Text(l10n.mktReferralCodeCopied)),
                 );
               },
               child: SingleChildScrollView(
@@ -404,16 +411,16 @@ class _QrView extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () => _sendWhatsApp(context),
                 icon: const Icon(Icons.send_rounded),
-                label: const Text('Send via WhatsApp'),
+                label: Text(l10n.mktSendViaWhatsApp),
               ),
             ).animate(delay: 250.ms).fadeIn(),
 
             const SizedBox(height: 12),
 
-            const Text(
-              'Or show this QR screen directly to the customer for them to screenshot.',
+            Text(
+              l10n.mktQrScreenshotHint,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: BrandColors.muted),
+              style: const TextStyle(fontSize: 12, color: BrandColors.muted),
             ).animate(delay: 280.ms).fadeIn(),
           ],
         ),

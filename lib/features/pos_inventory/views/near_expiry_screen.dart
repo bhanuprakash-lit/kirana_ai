@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/action_widgets.dart';
 import '../providers/near_expiry_provider.dart';
 
@@ -14,6 +16,7 @@ class NearExpiryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(nearExpiryProvider);
     final notifier = ref.read(nearExpiryProvider.notifier);
     final activeDays = notifier.days;
@@ -21,9 +24,9 @@ class NearExpiryScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Expiring Soon',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.invExpiringSoon,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: Column(
@@ -33,19 +36,24 @@ class NearExpiryScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Row(
               children: [
-                const Text(
-                  'Next',
-                  style: TextStyle(color: BrandColors.muted, fontSize: 13),
+                Text(
+                  l10n.invNext,
+                  style: const TextStyle(
+                    color: BrandColors.muted,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 ..._windows.map(
                   (d) => Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
-                      label: Text('$d days'),
+                      label: Text(l10n.invDaysWindow(d)),
                       selected: activeDays == d,
                       onSelected: (_) => notifier.setWindow(d),
-                      selectedColor: BrandColors.primary.withValues(alpha: 0.15),
+                      selectedColor: BrandColors.primary.withValues(
+                        alpha: 0.15,
+                      ),
                       labelStyle: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -62,9 +70,7 @@ class NearExpiryScreen extends ConsumerWidget {
           Expanded(
             child: async.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => _ErrorState(
-                onRetry: () => notifier.refresh(),
-              ),
+              error: (e, _) => _ErrorState(onRetry: () => notifier.refresh()),
               data: (batches) => batches.isEmpty
                   ? const _EmptyState()
                   : RefreshIndicator(
@@ -92,11 +98,11 @@ Color _urgencyColor(int daysLeft) {
   return const Color(0xFFD97706); // amber
 }
 
-String _urgencyLabel(int daysLeft) {
-  if (daysLeft < 0) return 'Expired';
-  if (daysLeft == 0) return 'Expires today';
-  if (daysLeft == 1) return 'Expires tomorrow';
-  return 'Expires in $daysLeft days';
+String _urgencyLabel(AppLocalizations l10n, int daysLeft) {
+  if (daysLeft < 0) return l10n.invExpired;
+  if (daysLeft == 0) return l10n.invExpiresToday;
+  if (daysLeft == 1) return l10n.invExpiresTomorrow;
+  return l10n.invExpiresInDays(daysLeft);
 }
 
 // ── Batch card ────────────────────────────────────────────────────────────────
@@ -107,6 +113,7 @@ class _BatchCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final color = _urgencyColor(batch.daysLeft);
 
     return Container(
@@ -138,8 +145,13 @@ class _BatchCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${batch.qtyInStock} ${batch.unit ?? 'units'} in stock'
-                        '${batch.batchNo != null ? ' · ${batch.batchNo}' : ''}',
+                        l10n.invQtyInStock(
+                              batch.qtyInStock.toString(),
+                              batch.unit ?? l10n.invUnitFallback,
+                            ) +
+                            (batch.batchNo != null
+                                ? ' · ${batch.batchNo}'
+                                : ''),
                         style: const TextStyle(
                           fontSize: 12,
                           color: BrandColors.muted,
@@ -158,7 +170,7 @@ class _BatchCard extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    _urgencyLabel(batch.daysLeft),
+                    _urgencyLabel(l10n, batch.daysLeft),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -172,20 +184,20 @@ class _BatchCard extends ConsumerWidget {
             Row(
               children: [
                 _stat(
-                  'At risk',
+                  l10n.invAtRisk,
                   '₹${batch.valueAtRisk.toStringAsFixed(0)}',
                   BrandColors.error,
                 ),
                 const SizedBox(width: 16),
                 if (batch.hasMarkdown)
                   _stat(
-                    'Marked down',
+                    l10n.invMarkedDown,
                     '₹${batch.markedDownPrice.toStringAsFixed(0)}  (-${batch.markdownPct.toStringAsFixed(0)}%)',
                     BrandColors.success,
                   )
                 else
                   _stat(
-                    'Price',
+                    l10n.invPrice,
                     '₹${batch.price.toStringAsFixed(0)}',
                     BrandColors.ink,
                   ),
@@ -199,7 +211,9 @@ class _BatchCard extends ConsumerWidget {
                     onPressed: () => _openMarkdownSheet(context, ref, batch),
                     icon: const Icon(Icons.sell_outlined, size: 16),
                     label: Text(
-                      batch.hasMarkdown ? 'Change markdown' : 'Mark down',
+                      batch.hasMarkdown
+                          ? l10n.invChangeMarkdown
+                          : l10n.invMarkDown,
                       style: const TextStyle(fontSize: 13),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -214,13 +228,15 @@ class _BatchCard extends ConsumerWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _openWasteSheet(context, ref, batch),
                     icon: const Icon(Icons.delete_sweep_outlined, size: 16),
-                    label: const Text(
-                      'Record waste',
-                      style: TextStyle(fontSize: 13),
+                    label: Text(
+                      l10n.invRecordWaste,
+                      style: const TextStyle(fontSize: 13),
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: BrandColors.error,
-                      side: BorderSide(color: BrandColors.error.withValues(alpha: 0.5)),
+                      side: BorderSide(
+                        color: BrandColors.error.withValues(alpha: 0.5),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
                   ),
@@ -287,6 +303,9 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
   late double _pct;
   bool _saving = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -297,6 +316,7 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final price = widget.batch.price;
     final newPrice = price * (1 - _pct / 100);
     final options = <double>{
@@ -304,8 +324,7 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
       10,
       25,
       40,
-    }.where((v) => v > 0).toList()
-      ..sort();
+    }.where((v) => v > 0).toList()..sort();
 
     return Container(
       decoration: const BoxDecoration(
@@ -323,12 +342,12 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Mark down ${widget.batch.productName}',
+            l10n.invMarkDownTitle(widget.batch.productName),
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 4),
           Text(
-            'Clearance discount to sell before expiry',
+            l10n.invClearanceDiscount,
             style: const TextStyle(fontSize: 13, color: BrandColors.muted),
           ),
           const SizedBox(height: 16),
@@ -339,8 +358,8 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
                 ChoiceChip(
                   label: Text(
                     v == widget.batch.suggestedMarkdownPct
-                        ? '${v.toStringAsFixed(0)}% (suggested)'
-                        : '${v.toStringAsFixed(0)}%',
+                        ? l10n.invPctSuggested(v.toStringAsFixed(0))
+                        : l10n.invPct(v.toStringAsFixed(0)),
                   ),
                   selected: (_pct - v).abs() < 0.01,
                   onSelected: (_) => setState(() => _pct = v),
@@ -350,7 +369,10 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Text('Custom', style: TextStyle(color: BrandColors.muted)),
+              Text(
+                l10n.invCustom,
+                style: const TextStyle(color: BrandColors.muted),
+              ),
               Expanded(
                 child: Slider(
                   value: _pct.clamp(0, 90),
@@ -404,7 +426,7 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
             height: 52,
             width: double.infinity,
             child: LoadingButton(
-              label: 'Apply markdown',
+              label: l10n.invApplyMarkdown,
               isLoading: _saving,
               onPressed: _saving ? null : _apply,
             ),
@@ -423,7 +445,7 @@ class _MarkdownSheetState extends ConsumerState<_MarkdownSheet> {
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(ok ? 'Markdown applied' : 'Could not apply markdown'),
+        content: Text(ok ? _l10n.invMarkdownApplied : _l10n.invMarkdownFailed),
         backgroundColor: ok ? BrandColors.success : BrandColors.error,
       ),
     );
@@ -457,6 +479,9 @@ class _WasteSheetState extends ConsumerState<_WasteSheet> {
   late int _units;
   bool _saving = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -465,6 +490,7 @@ class _WasteSheetState extends ConsumerState<_WasteSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -481,13 +507,13 @@ class _WasteSheetState extends ConsumerState<_WasteSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Write off ${widget.batch.productName}',
+            l10n.invWriteOff(widget.batch.productName),
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Removes spoiled units from stock and records the loss.',
-            style: TextStyle(fontSize: 13, color: BrandColors.muted),
+          Text(
+            l10n.invWriteOffSub,
+            style: const TextStyle(fontSize: 13, color: BrandColors.muted),
           ),
           const SizedBox(height: 18),
           Row(
@@ -514,7 +540,7 @@ class _WasteSheetState extends ConsumerState<_WasteSheet> {
           ),
           Center(
             child: Text(
-              'of ${widget.batch.qtyInStock} in stock',
+              l10n.invOfQtyInStock(widget.batch.qtyInStock),
               style: const TextStyle(fontSize: 12, color: BrandColors.muted),
             ),
           ),
@@ -523,7 +549,7 @@ class _WasteSheetState extends ConsumerState<_WasteSheet> {
             height: 52,
             width: double.infinity,
             child: LoadingButton(
-              label: 'Record waste',
+              label: l10n.invRecordWaste,
               isLoading: _saving,
               onPressed: _saving ? null : _apply,
             ),
@@ -550,7 +576,9 @@ class _WasteSheetState extends ConsumerState<_WasteSheet> {
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(ok ? '$_units units written off' : 'Could not record waste'),
+        content: Text(
+          ok ? _l10n.invUnitsWrittenOff(_units) : _l10n.invWasteFailed,
+        ),
         backgroundColor: ok ? BrandColors.ink : BrandColors.error,
       ),
     );
@@ -564,22 +592,27 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListView(
-      children: const [
-        SizedBox(height: 120),
-        Icon(Icons.check_circle_outline_rounded, size: 64, color: BrandColors.success),
-        SizedBox(height: 16),
+      children: [
+        const SizedBox(height: 120),
+        const Icon(
+          Icons.check_circle_outline_rounded,
+          size: 64,
+          color: BrandColors.success,
+        ),
+        const SizedBox(height: 16),
         Center(
           child: Text(
-            'Nothing expiring soon',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            l10n.invNothingExpiring,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Center(
           child: Text(
-            'Perishable batches nearing expiry will show up here.',
-            style: TextStyle(color: BrandColors.muted, fontSize: 13),
+            l10n.invNothingExpiringSub,
+            style: const TextStyle(color: BrandColors.muted, fontSize: 13),
           ),
         ),
       ],
@@ -593,15 +626,16 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, size: 48, color: BrandColors.error),
           const SizedBox(height: 12),
-          const Text('Could not load expiry data'),
+          Text(l10n.invCouldNotLoadExpiry),
           const SizedBox(height: 12),
-          ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+          ElevatedButton(onPressed: onRetry, child: Text(l10n.invRetry)),
         ],
       ),
     );

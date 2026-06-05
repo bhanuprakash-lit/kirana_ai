@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../core/locale/locale_provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../auth/providers/user_provider.dart';
 import '../../profile/providers/store_settings_provider.dart';
 
@@ -16,6 +18,9 @@ class SupportScreen extends ConsumerStatefulWidget {
 
 class _SupportScreenState extends ConsumerState<SupportScreen> {
   String _version = '...';
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -32,12 +37,13 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Help & Support',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.supSupportTitle,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.white,
         foregroundColor: BrandColors.ink,
@@ -64,44 +70,44 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'How can we help you?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            Text(
+              l10n.supSupportHeading,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Get instant answers to your questions',
-              style: TextStyle(color: BrandColors.muted, fontSize: 14),
+            Text(
+              l10n.supSupportSubheading,
+              style: const TextStyle(color: BrandColors.muted, fontSize: 14),
             ),
             const SizedBox(height: 32),
 
             // Options List
             _SupportOption(
               icon: Icons.help_outline_rounded,
-              title: 'Frequently Asked Questions',
-              subtitle: 'Common questions and answers',
+              title: l10n.supOptionFaqTitle,
+              subtitle: l10n.supOptionFaqSubtitle,
               onTap: () => context.push('/profile/support/faq'),
             ),
             _SupportOption(
               icon: Icons.bug_report_outlined,
-              title: 'Report an Issue',
-              subtitle: 'Encountered a bug? let us know',
+              title: l10n.supOptionReportTitle,
+              subtitle: l10n.supOptionReportSubtitle,
               onTap: () => context.push('/profile/support/report'),
             ),
             _SupportOption(
               icon: Icons.chat_bubble_outline_rounded,
-              title: 'Chat with us',
-              subtitle: 'Connect with our support team',
+              title: l10n.supOptionChatTitle,
+              subtitle: l10n.supOptionChatSubtitle,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Chat support coming soon!')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(l10n.supChatComingSoon)));
               },
             ),
             _SupportOption(
               icon: Icons.email_outlined,
-              title: 'Email Support',
-              subtitle: 'Send us an email directly',
+              title: l10n.supOptionEmailTitle,
+              subtitle: l10n.supOptionEmailSubtitle,
               onTap: _handleEmailSupport,
               isLast: true,
             ),
@@ -195,17 +201,17 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
         debugPrint('Launch result: $launched');
 
         if (!launched && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unable to open email app.')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(_l10n.supEmailUnableToOpen)));
         }
       } else {
         debugPrint('Cannot launch email URI');
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unable to open email app.')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(_l10n.supEmailUnableToOpen)));
         }
       }
     } catch (e, stackTrace) {
@@ -213,11 +219,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
       debugPrintStack(stackTrace: stackTrace);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Something went wrong while opening email app.'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_l10n.supEmailError)));
       }
     }
   }

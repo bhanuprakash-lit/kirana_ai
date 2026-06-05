@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../providers/price_memory_provider.dart';
 
 /// AI Price Memory — products with no selling price, with a one-tap suggested
@@ -12,14 +14,15 @@ class PriceMemoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(priceMemoryProvider);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Missing Prices',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.invMissingPrices,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: async.when(
@@ -34,12 +37,12 @@ class PriceMemoryScreen extends ConsumerWidget {
                 color: BrandColors.error,
               ),
               const SizedBox(height: 12),
-              const Text('Could not load prices'),
+              Text(l10n.invCouldNotLoadPrices),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () =>
                     ref.read(priceMemoryProvider.notifier).refresh(),
-                child: const Text('Retry'),
+                child: Text(l10n.invRetry),
               ),
             ],
           ),
@@ -72,6 +75,9 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
   late final TextEditingController _ctrl;
   bool _saving = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -89,6 +95,7 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final s = widget.item;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -111,7 +118,10 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
           ),
           const SizedBox(height: 2),
           Text(
-            '${s.stock} ${s.unit ?? 'units'} in stock · currently ₹0',
+            l10n.invStockCurrentlyZero(
+              s.stock.toString(),
+              s.unit ?? l10n.invUnitFallback,
+            ),
             style: const TextStyle(fontSize: 12, color: BrandColors.muted),
           ),
           if (s.suggestionSource != null) ...[
@@ -125,7 +135,10 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'Suggested ₹${s.suggestedPrice!.toStringAsFixed(0)} (${s.suggestionSource})',
+                  l10n.invSuggestedPrice(
+                    s.suggestedPrice!.toStringAsFixed(0),
+                    s.suggestionSource!,
+                  ),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -150,10 +163,10 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
                       RegExp(r'^\d+\.?\d{0,2}'),
                     ),
                   ],
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     isDense: true,
                     prefixText: '₹ ',
-                    labelText: 'Selling price',
+                    labelText: l10n.invSellingPrice,
                   ),
                 ),
               ),
@@ -172,7 +185,7 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Set'),
+                      : Text(l10n.invSet),
                 ),
               ),
             ],
@@ -187,7 +200,7 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
     if (price == null || price <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter a valid price')));
+      ).showSnackBar(SnackBar(content: Text(_l10n.invEnterValidPrice)));
       return;
     }
     setState(() => _saving = true);
@@ -200,8 +213,11 @@ class _PriceCardState extends ConsumerState<_PriceCard> {
       SnackBar(
         content: Text(
           ok
-              ? '${widget.item.productName} priced ₹${price.toStringAsFixed(0)}'
-              : 'Could not set price',
+              ? _l10n.invProductPriced(
+                  widget.item.productName,
+                  price.toStringAsFixed(0),
+                )
+              : _l10n.invCouldNotSetPrice,
         ),
         backgroundColor: ok ? BrandColors.success : BrandColors.error,
       ),
@@ -214,22 +230,27 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListView(
-      children: const [
-        SizedBox(height: 120),
-        Icon(Icons.price_check_rounded, size: 64, color: BrandColors.success),
-        SizedBox(height: 16),
+      children: [
+        const SizedBox(height: 120),
+        const Icon(
+          Icons.price_check_rounded,
+          size: 64,
+          color: BrandColors.success,
+        ),
+        const SizedBox(height: 16),
         Center(
           child: Text(
-            'Every product is priced',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            l10n.invEveryProductPriced,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Center(
           child: Text(
-            'Nothing is selling at ₹0. Good going!',
-            style: TextStyle(color: BrandColors.muted, fontSize: 13),
+            l10n.invEveryProductPricedSub,
+            style: const TextStyle(color: BrandColors.muted, fontSize: 13),
           ),
         ),
       ],

@@ -4,6 +4,8 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../models/store_model.dart';
 import '../providers/store_settings_provider.dart';
+import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../core/locale/locale_provider.dart';
 
 class StoreSettingsScreen extends ConsumerStatefulWidget {
   const StoreSettingsScreen({super.key});
@@ -25,6 +27,9 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
   late TextEditingController _regionCtrl;
 
   bool _isSaving = false;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -53,18 +58,19 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncProfile = ref.watch(storeSettingsProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('Store Settings'),
+        title: Text(l10n.profStoreSettings),
         actions: [
           if (!_isSaving)
             TextButton(
               onPressed: _save,
-              child: const Text(
-                'SAVE',
-                style: TextStyle(
+              child: Text(
+                l10n.profSave,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: BrandColors.primary,
                 ),
@@ -86,7 +92,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
           padding: EdgeInsets.all(24),
           child: ListShimmer(itemCount: 5, itemHeight: 60),
         ),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        error: (err, _) => Center(child: Text(l10n.profError(err.toString()))),
         data: (p) {
           _initFields(p);
           final bool isFootfallLocked = p.footfall > 0;
@@ -98,26 +104,26 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionHeader('Basic Information'),
+                  _sectionHeader(l10n.profBasicInformation),
                   const SizedBox(height: 16),
                   _buildTextField(
                     _nameCtrl,
-                    'Store Name',
+                    l10n.profStoreName,
                     Icons.storefront_rounded,
                   ),
                   _buildTextField(
                     _typeCtrl,
-                    'Store Type (e.g. Kirana, Supermarket)',
+                    l10n.profStoreType,
                     Icons.category_rounded,
                   ),
 
                   const SizedBox(height: 32),
-                  _sectionHeader('Business Intelligence'),
+                  _sectionHeader(l10n.profBusinessIntelligence),
                   const SizedBox(height: 8),
                   Text(
                     isFootfallLocked
-                        ? 'Average footfall is automatically computed based on your sales.'
-                        : 'Provide initial values to help our AI optimize your business.',
+                        ? l10n.profFootfallAutoComputed
+                        : l10n.profProvideInitialValues,
                     style: const TextStyle(
                       fontSize: 12,
                       color: BrandColors.muted,
@@ -126,36 +132,38 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                   const SizedBox(height: 16),
                   _buildTextField(
                     _footfallCtrl,
-                    'Avg Daily Footfall',
+                    l10n.profAvgDailyFootfall,
                     Icons.people_rounded,
                     keyboardType: TextInputType.number,
                     readOnly: isFootfallLocked,
-                    helperText: isFootfallLocked ? 'AI Auto-Updating' : null,
+                    helperText: isFootfallLocked
+                        ? l10n.profAiAutoUpdating
+                        : null,
                   ),
                   _buildTextField(
                     _budgetCtrl,
-                    'Monthly Stock Budget',
+                    l10n.profMonthlyStockBudget,
                     Icons.account_balance_wallet_rounded,
                     keyboardType: TextInputType.number,
                   ),
                   _buildTextField(
                     _dailyBudgetCtrl,
-                    'Daily Expense Buffer',
+                    l10n.profDailyExpenseBuffer,
                     Icons.payments_rounded,
                     keyboardType: TextInputType.number,
                   ),
 
                   const SizedBox(height: 32),
-                  _sectionHeader('Location Details'),
+                  _sectionHeader(l10n.profLocationDetails),
                   const SizedBox(height: 16),
                   _buildTextField(
                     _locationCtrl,
-                    'City / Area',
+                    l10n.profCityArea,
                     Icons.location_on_rounded,
                   ),
                   _buildTextField(
                     _regionCtrl,
-                    'State / Region',
+                    l10n.profStateRegion,
                     Icons.map_rounded,
                   ),
 
@@ -209,7 +217,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
             borderSide: const BorderSide(color: BrandColors.border),
           ),
         ),
-        validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+        validator: (v) => (v == null || v.isEmpty) ? _l10n.profRequired : null,
       ),
     );
   }
@@ -234,8 +242,8 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
       await ref.read(storeSettingsProvider.notifier).updateStore(updated);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Settings saved successfully!'),
+          SnackBar(
+            content: Text(_l10n.profSettingsSaved),
             backgroundColor: BrandColors.success,
           ),
         );
@@ -244,7 +252,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save: $e'),
+            content: Text(_l10n.profFailedToSave(e.toString())),
             backgroundColor: BrandColors.error,
           ),
         );

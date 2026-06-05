@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../providers/pos_provider.dart';
 import 'order_details_screen.dart';
 
@@ -82,12 +83,13 @@ class _TransactionHistoryScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Transaction History',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.posTransactionHistory,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.white,
         foregroundColor: BrandColors.ink,
@@ -208,6 +210,7 @@ class _OrderTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = status.toLowerCase() == 'completed'
         ? BrandColors.success
         : BrandColors.warning;
@@ -242,7 +245,7 @@ class _OrderTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Order #$orderId',
+                      l10n.posOrderNumber(orderId),
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 15,
@@ -291,14 +294,15 @@ class _ActiveFiltersBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       color: Colors.white,
       child: Row(
         children: [
-          const Text(
-            'Filters:',
-            style: TextStyle(
+          Text(
+            l10n.posFilters,
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: BrandColors.muted,
@@ -322,9 +326,9 @@ class _ActiveFiltersBar extends StatelessWidget {
           TextButton(
             onPressed: onClear,
             style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
-            child: const Text(
-              'Clear All',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            child: Text(
+              l10n.posClearAllFilters,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -364,20 +368,21 @@ class _EmptyHistory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.history_rounded, size: 64, color: BrandColors.muted),
           const SizedBox(height: 20),
-          const Text(
-            'No transactions found',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+          Text(
+            l10n.posNoTransactions,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Try adjusting your filters',
-            style: TextStyle(color: BrandColors.muted),
+          Text(
+            l10n.posTryAdjustFilters,
+            style: const TextStyle(color: BrandColors.muted),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -389,7 +394,7 @@ class _EmptyHistory extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Reset Filters'),
+            child: Text(l10n.posResetFilters),
           ),
         ],
       ),
@@ -433,6 +438,7 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: const BoxDecoration(
@@ -443,33 +449,33 @@ class _FilterSheetState extends State<_FilterSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Filter Transactions',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+          Text(
+            l10n.posFilterTransactions,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 24),
 
-          const Text(
-            'Payment Status',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          Text(
+            l10n.posPaymentStatus,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
               _ChoiceChip(
-                label: 'All',
+                label: l10n.posFilterAll,
                 selected: _status == null,
                 onSelected: (_) => setState(() => _status = null),
               ),
               const SizedBox(width: 8),
               _ChoiceChip(
-                label: 'Completed',
+                label: l10n.posStatusCompleted,
                 selected: _status == 'completed',
                 onSelected: (_) => setState(() => _status = 'completed'),
               ),
               const SizedBox(width: 8),
               _ChoiceChip(
-                label: 'Pending',
+                label: l10n.posStatusPending,
                 selected: _status == 'pending',
                 onSelected: (_) => setState(() => _status = 'pending'),
               ),
@@ -477,9 +483,9 @@ class _FilterSheetState extends State<_FilterSheet> {
           ),
 
           const SizedBox(height: 24),
-          const Text(
-            'Payment Method',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          Text(
+            l10n.posPaymentMethod,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
           SingleChildScrollView(
@@ -487,19 +493,19 @@ class _FilterSheetState extends State<_FilterSheet> {
             child: Row(
               children: [
                 _ChoiceChip(
-                  label: 'All',
+                  label: l10n.posFilterAll,
                   selected: _payment == null,
                   onSelected: (_) => setState(() => _payment = null),
                 ),
                 const SizedBox(width: 8),
                 _ChoiceChip(
-                  label: 'Cash',
+                  label: l10n.posPayCash,
                   selected: _payment == 'cash',
                   onSelected: (_) => setState(() => _payment = 'cash'),
                 ),
                 const SizedBox(width: 8),
                 _ChoiceChip(
-                  label: 'UPI',
+                  label: l10n.posPayUpi,
                   selected: _payment == 'upi',
                   onSelected: (_) => setState(() => _payment = 'upi'),
                 ),
@@ -508,9 +514,9 @@ class _FilterSheetState extends State<_FilterSheet> {
           ),
 
           const SizedBox(height: 24),
-          const Text(
-            'Date Range',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          Text(
+            l10n.posDateRange,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
           InkWell(
@@ -531,7 +537,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                   const SizedBox(width: 12),
                   Text(
                     _start == null
-                        ? 'Select Date Range'
+                        ? l10n.posSelectDateRange
                         : '${DateFormat('dd MMM').format(_start!)} - ${DateFormat('dd MMM').format(_end!)}',
                     style: TextStyle(
                       color: _start == null
@@ -562,9 +568,12 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Apply Filters',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+              child: Text(
+                l10n.posApplyFilters,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ),

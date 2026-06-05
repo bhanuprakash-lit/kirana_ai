@@ -5,7 +5,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/brand_text_field.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../../../auth/providers/auth_provider.dart';
@@ -47,6 +49,11 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   bool? _usernameAvailable;
   bool _checkingUsername = false;
 
+  /// Locale-resolved strings for use in async callbacks where reaching for
+  /// BuildContext after an await would be unsafe.
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +89,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   Future<void> _sendOtp() async {
     final raw = _phoneCtrl.text.trim();
     if (raw.isEmpty) {
-      setState(() => _error = 'Enter your phone number');
+      setState(() => _error = _l10n.authErrEnterPhone);
       return;
     }
     final phone = raw.startsWith('+') ? raw : '+91$raw';
@@ -117,20 +124,35 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   }
 
   Future<void> _autoVerify(PhoneAuthCredential cred) async {
+    // Auto-retrieved / instant verification (Android). Show a verifying state
+    // and surface failures instead of silently swallowing them.
+    if (mounted) {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+    }
     try {
       final userCred = await FirebaseAuth.instance.signInWithCredential(cred);
       await _handleVerified(userCred);
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _error = _l10n.authErrVerificationFailed;
+        });
+      }
+    }
   }
 
   Future<void> _verifyOtp() async {
     final code = _otpCtrl.text.trim();
     if (code.length != 6) {
-      setState(() => _error = 'Enter the 6-digit OTP');
+      setState(() => _error = _l10n.authErrEnter6Otp);
       return;
     }
     if (_verificationId == null) {
-      setState(() => _error = 'Session expired. Tap Resend.');
+      setState(() => _error = _l10n.authErrSessionExpired);
       return;
     }
     setState(() {
@@ -209,19 +231,19 @@ class _AccountStepState extends ConsumerState<AccountStep> {
     FocusScope.of(context).unfocus();
     final uname = _usernameCtrl.text.trim();
     if (uname.isEmpty) {
-      setState(() => _error = 'Choose a unique username for your store');
+      setState(() => _error = _l10n.accountErrChooseUsername);
       return;
     }
     if (uname.length < 3) {
-      setState(() => _error = 'Username must be at least 3 characters');
+      setState(() => _error = _l10n.accountErrUsernameMin3);
       return;
     }
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(uname)) {
-      setState(() => _error = 'Only letters, numbers, and underscores allowed');
+      setState(() => _error = _l10n.accountErrUsernameChars);
       return;
     }
     if (_usernameAvailable == false) {
-      setState(() => _error = 'That username is taken. Try another.');
+      setState(() => _error = _l10n.accountErrUsernameTakenTry);
       return;
     }
 
@@ -242,15 +264,15 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   String _firebaseError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-phone-number':
-        return 'Invalid phone number format.';
+        return _l10n.authErrInvalidPhone;
       case 'too-many-requests':
-        return 'Too many attempts. Try again later.';
+        return _l10n.authErrTooManyRequests;
       case 'invalid-verification-code':
-        return 'Wrong OTP. Check and try again.';
+        return _l10n.authErrWrongOtp;
       case 'session-expired':
-        return 'OTP expired. Tap Resend.';
+        return _l10n.authErrOtpExpired;
       default:
-        return e.message ?? 'Verification failed.';
+        return e.message ?? _l10n.authErrVerificationFailed;
     }
   }
 
@@ -269,26 +291,27 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   }
 
   Widget _buildEnterPhone(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Verify your\nphone number',
+          l10n.accountVerifyPhoneTitle,
           style: Theme.of(context).textTheme.headlineMedium,
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 8),
         Text(
-          'We\'ll send a one-time password to confirm your number.',
+          l10n.accountVerifyPhoneSubtitle,
           style: Theme.of(context).textTheme.bodyMedium,
         ).animate(delay: 50.ms).fadeIn(),
         const SizedBox(height: 32),
         BrandTextField(
           controller: _phoneCtrl,
-          label: 'Phone number',
+          label: l10n.accountPhoneLabel,
           hint: '9876543210',
           keyboardType: TextInputType.phone,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          autofillHints: const [],
+          autofillHints: const [AutofillHints.telephoneNumber],
           prefix: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 12),
             child: Text(
@@ -306,7 +329,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
         ],
         const SizedBox(height: 32),
         PrimaryButton(
-          label: 'Send OTP',
+          label: l10n.accountSendOtp,
           isLoading: _loading,
           onPressed: _sendOtp,
         ).animate(delay: 150.ms).fadeIn(),
@@ -315,6 +338,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   }
 
   Widget _buildEnterOtp(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -335,7 +359,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'OTP sent to +91 ${_phoneCtrl.text.trim()}',
+                l10n.accountOtpSentTo(_phoneCtrl.text.trim()),
                 style: const TextStyle(
                   fontSize: 13,
                   color: BrandColors.muted,
@@ -347,25 +371,29 @@ class _AccountStepState extends ConsumerState<AccountStep> {
         ),
         const SizedBox(height: 20),
         Text(
-          'Enter OTP',
+          l10n.accountEnterOtpTitle,
           style: Theme.of(context).textTheme.headlineMedium,
         ).animate().fadeIn(duration: 300.ms),
         const SizedBox(height: 8),
         Text(
-          '6-digit code sent to your phone.',
+          l10n.accountEnterOtpSubtitle,
           style: Theme.of(context).textTheme.bodyMedium,
         ).animate(delay: 50.ms).fadeIn(),
         const SizedBox(height: 28),
-        BrandTextField(
-          controller: _otpCtrl,
-          label: '6-digit OTP',
-          hint: '------',
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(6),
-          ],
-          focusNode: _otpFocusNode,
+        AutofillGroup(
+          child: BrandTextField(
+            controller: _otpCtrl,
+            label: l10n.accountOtp6Label,
+            hint: '------',
+            keyboardType: TextInputType.number,
+            // One-tap OS suggestion (iOS) / autofill (Android) for the SMS code.
+            autofillHints: const [AutofillHints.oneTimeCode],
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(6),
+            ],
+            focusNode: _otpFocusNode,
+          ),
         ),
         if (_error != null) ...[
           const SizedBox(height: 10),
@@ -373,7 +401,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
         ],
         const SizedBox(height: 28),
         PrimaryButton(
-          label: 'Verify',
+          label: l10n.accountVerify,
           isLoading: _loading,
           onPressed: _verifyOtp,
         ),
@@ -381,9 +409,9 @@ class _AccountStepState extends ConsumerState<AccountStep> {
         Center(
           child: TextButton(
             onPressed: _loading ? null : _sendOtp,
-            child: const Text(
-              'Resend OTP',
-              style: TextStyle(
+            child: Text(
+              l10n.accountResendOtp,
+              style: const TextStyle(
                 color: BrandColors.primary,
                 fontWeight: FontWeight.w700,
               ),
@@ -395,6 +423,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   }
 
   Widget _buildChooseUsername(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -417,7 +446,7 @@ class _AccountStepState extends ConsumerState<AccountStep> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Phone verified: $_verifiedPhone',
+                  l10n.accountPhoneVerified(_verifiedPhone!),
                   style: const TextStyle(
                     fontSize: 13,
                     color: BrandColors.success,
@@ -429,19 +458,19 @@ class _AccountStepState extends ConsumerState<AccountStep> {
           ).animate().fadeIn(duration: 300.ms),
         const SizedBox(height: 20),
         Text(
-          'Choose a\nstore username',
+          l10n.accountChooseUsernameTitle,
           style: Theme.of(context).textTheme.headlineMedium,
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 8),
         Text(
-          'Your username is unique to your store and used to log in.',
+          l10n.accountChooseUsernameSubtitle,
           style: Theme.of(context).textTheme.bodyMedium,
         ).animate(delay: 50.ms).fadeIn(),
         const SizedBox(height: 28),
         BrandTextField(
           controller: _usernameCtrl,
-          label: 'Username',
-          hint: 'e.g. lohiyastore123',
+          label: l10n.accountUsernameLabel,
+          hint: l10n.accountUsernameHint,
           keyboardType: TextInputType.text,
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]')),
@@ -472,8 +501,8 @@ class _AccountStepState extends ConsumerState<AccountStep> {
           Padding(
             padding: const EdgeInsets.only(top: 6, left: 4),
             child: Text(
-              'Username already taken',
-              style: TextStyle(fontSize: 12, color: BrandColors.error),
+              l10n.accountUsernameTaken,
+              style: const TextStyle(fontSize: 12, color: BrandColors.error),
             ),
           ),
 
@@ -483,14 +512,14 @@ class _AccountStepState extends ConsumerState<AccountStep> {
         ],
         const SizedBox(height: 32),
         PrimaryButton(
-          label: 'Continue',
+          label: l10n.commonContinue,
           isLoading: false,
           onPressed: _submitUsername,
         ).animate(delay: 150.ms).fadeIn(),
         const SizedBox(height: 12),
         Center(
           child: Text(
-            'Letters, numbers, underscores only • min 3 chars',
+            l10n.accountUsernameRules,
             style: const TextStyle(fontSize: 12, color: BrandColors.muted),
             textAlign: TextAlign.center,
           ),

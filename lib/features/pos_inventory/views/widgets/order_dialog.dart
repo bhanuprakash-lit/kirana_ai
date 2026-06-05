@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/pos_provider.dart';
 import '../../providers/printer_provider.dart';
@@ -70,6 +72,7 @@ class _SuccessDialog extends ConsumerWidget {
   const _SuccessDialog({required this.order, required this.parentRef});
 
   Future<void> _printReceipt(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final store = ref.read(storeSettingsProvider).value;
     final products = ref.read(posProvider).products;
     final receipt = PrinterNotifier.buildReceipt(
@@ -81,9 +84,7 @@ class _SuccessDialog extends ConsumerWidget {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          ok ? 'Receipt sent to printer' : 'Print failed — check printer',
-        ),
+        content: Text(ok ? l10n.posReceiptSent : l10n.posPrintFailedCheck),
         backgroundColor: ok ? BrandColors.success : BrandColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -93,6 +94,7 @@ class _SuccessDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final printerState = ref.watch(printerProvider);
 
     return AlertDialog(
@@ -115,9 +117,9 @@ class _SuccessDialog extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Order Placed!',
-            style: TextStyle(
+          Text(
+            l10n.posOrderPlaced,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
@@ -125,7 +127,7 @@ class _SuccessDialog extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Order #${order['order_id']}',
+            l10n.posOrderNumber('${order['order_id']}'),
             style: const TextStyle(
               color: BrandColors.muted,
               fontWeight: FontWeight.w600,
@@ -177,9 +179,12 @@ class _SuccessDialog extends ConsumerWidget {
             OutlinedButton.icon(
               onPressed: () => _printReceipt(context, ref),
               icon: const Icon(Icons.print_rounded, size: 18),
-              label: const Text(
-                'Print Receipt',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+              label: Text(
+                l10n.posPrintReceipt,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
@@ -205,9 +210,12 @@ class _SuccessDialog extends ConsumerWidget {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'New Sale',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+              child: Text(
+                l10n.posNewSale,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 16,
+                ),
               ),
             ),
             const SizedBox(height: 4),
@@ -226,9 +234,12 @@ class _SuccessDialog extends ConsumerWidget {
                 minimumSize: const Size.fromHeight(36),
                 foregroundColor: BrandColors.muted,
               ),
-              child: const Text(
-                'View Order Details',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              child: Text(
+                l10n.posViewOrderDetails,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ),
           ],
@@ -259,6 +270,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   // Partial-udhaar slider — how much of the order goes on credit.
   // Initialised to the full order total when Udhaar is chosen.
   double _udhaarAmount = 0;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   String _fmt(double v) {
     if (v >= 100000) return '₹${(v / 100000).toStringAsFixed(1)}L';
@@ -300,7 +314,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
 
   Future<void> _confirm() async {
     if (_paymentMethod == 'udhaar' && _udhaarCustomerId == null) {
-      setState(() => _localError = 'Please select a customer for Udhaar sale');
+      setState(() => _localError = _l10n.posSelectCustomerForUdhaar);
       return;
     }
     setState(() {
@@ -312,7 +326,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         ? _udhaarAmount.roundToDouble()
         : null;
 
-    final result = await ref.read(posProvider.notifier).placeOrder(
+    final result = await ref
+        .read(posProvider.notifier)
+        .placeOrder(
           paymentMethod: _paymentMethod,
           udhaarAmount: udhaarAmt,
           // Attribute udhaar orders to the chosen customer so the backend
@@ -351,6 +367,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(posProvider);
     final cart = state.cart;
     final printerState = ref.watch(printerProvider);
@@ -381,9 +398,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Confirm Order',
-            style: TextStyle(
+          Text(
+            l10n.posConfirmOrder,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w900,
               color: BrandColors.ink,
@@ -395,7 +412,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             isSaving: _placing,
             error: _localError ?? state.error,
             isSuccess: _success,
-            successMessage: 'Order confirmed!',
+            successMessage: l10n.posOrderConfirmed,
           ),
           if (_placing ||
               _localError != null ||
@@ -451,9 +468,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Subtotal',
-                  style: TextStyle(
+                Text(
+                  l10n.posSubtotal,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: BrandColors.muted,
@@ -473,25 +490,35 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.card_giftcard_rounded,
-                      size: 14,
-                      color: BrandColors.accent,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Referral Discount (${state.referralDiscountPct!.toStringAsFixed(0)}%)'
-                      '${state.referralReferrerName != null ? " · ${state.referralReferrerName}" : ""}',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.card_giftcard_rounded,
+                        size: 14,
                         color: BrandColors.accent,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          l10n.posReferralDiscount(
+                            state.referralDiscountPct!.toStringAsFixed(0),
+                            state.referralReferrerName != null
+                                ? " · ${state.referralReferrerName}"
+                                : "",
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: BrandColors.accent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   '-${_fmt(state.discountAmount)}',
                   style: const TextStyle(
@@ -509,14 +536,18 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Grand Total',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: BrandColors.muted,
+              Expanded(
+                child: Text(
+                  l10n.posGrandTotal,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: BrandColors.muted,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Text(
                 _fmt(state.discountedSubtotal),
                 style: const TextStyle(
@@ -530,9 +561,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           const SizedBox(height: 28),
 
           // ── Payment method ────────────────────────────────────────────────
-          const Text(
-            'Payment Method',
-            style: TextStyle(
+          Text(
+            l10n.posPaymentMethod,
+            style: const TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 14,
               color: BrandColors.ink,
@@ -543,7 +574,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             children: [
               _PaymentOption(
                 icon: Icons.payments_rounded,
-                label: 'Cash',
+                label: l10n.posPayCash,
                 value: 'cash',
                 groupValue: _paymentMethod,
                 enabled: !_placing && !_success,
@@ -552,7 +583,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
               const SizedBox(width: 12),
               _PaymentOption(
                 icon: Icons.account_balance_wallet_outlined,
-                label: 'Udhaar',
+                label: l10n.posPayUdhaar,
                 value: 'udhaar',
                 groupValue: _paymentMethod,
                 enabled: !_placing && !_success,
@@ -561,7 +592,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
               const SizedBox(width: 12),
               _PaymentOption(
                 icon: Icons.qr_code_rounded,
-                label: 'UPI',
+                label: l10n.posPayUpi,
                 value: 'upi',
                 groupValue: _paymentMethod,
                 comingSoon: true,
@@ -612,9 +643,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Print receipt automatically',
-                        style: TextStyle(
+                      Text(
+                        l10n.posPrintAutomatically,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                           color: BrandColors.ink,
@@ -623,9 +654,11 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                       Text(
                         _autoPrint
                             ? (printerState.isConnected
-                                  ? 'Will print after order is placed'
-                                  : 'Printer: ${printerState.statusLabel}')
-                            : 'Disabled — print manually from order details',
+                                  ? l10n.posWillPrintAfter
+                                  : l10n.posPrinterStatus(
+                                      printerState.statusLabel,
+                                    ))
+                            : l10n.posAutoPrintDisabled,
                         style: TextStyle(
                           fontSize: 11,
                           color: _autoPrint
@@ -654,7 +687,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             width: double.infinity,
             height: 56,
             child: LoadingButton(
-              label: 'Place Order · ${_fmt(state.discountedSubtotal)}',
+              label: l10n.posPlaceOrderAmount(_fmt(state.discountedSubtotal)),
               isLoading: _placing,
               onPressed: _success ? null : _confirm,
             ),
@@ -678,6 +711,7 @@ class _UdhaarCustomerPicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final customers = ref.watch(customerProvider).customers;
 
     return GestureDetector(
@@ -731,9 +765,9 @@ class _UdhaarCustomerPicker extends ConsumerWidget {
                         fontSize: 14,
                       ),
                     )
-                  : const Text(
-                      'Select customer (required for Udhaar)',
-                      style: TextStyle(
+                  : Text(
+                      l10n.posSelectCustomerRequired,
+                      style: const TextStyle(
                         fontSize: 13,
                         color: BrandColors.error,
                         fontWeight: FontWeight.w600,
@@ -772,6 +806,7 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final filtered = widget.customers
         .where(
           (c) =>
@@ -807,9 +842,12 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Select Customer for Udhaar',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                  Text(
+                    l10n.posSelectCustomerForUdhaarTitle,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -817,7 +855,7 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
                     autofocus: true,
                     onChanged: (v) => setState(() => _q = v.toLowerCase()),
                     decoration: InputDecoration(
-                      hintText: 'Search by name or phone…',
+                      hintText: l10n.posSearchNameOrPhoneHint,
                       prefixIcon: const Icon(Icons.search_rounded, size: 20),
                       filled: true,
                       fillColor: Colors.white,
@@ -837,10 +875,10 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No customers found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.posNoCustomersFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(
@@ -912,6 +950,7 @@ class _UdhaarSplitSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final cashNow = (total - udhaarAmount).clamp(0.0, total);
     final credit = udhaarAmount.clamp(0.0, total);
     // Step: nearest ₹1; cap divisions so the slider doesn't get sluggish.
@@ -932,9 +971,9 @@ class _UdhaarSplitSlider extends StatelessWidget {
             children: [
               const Icon(Icons.tune_rounded, size: 16, color: _udhaarColor),
               const SizedBox(width: 6),
-              const Text(
-                'How much goes on Udhaar?',
-                style: TextStyle(
+              Text(
+                l10n.posHowMuchUdhaar,
+                style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
                   color: _udhaarColor,
@@ -1008,9 +1047,9 @@ class _UdhaarSplitSlider extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Cash now',
-                        style: TextStyle(
+                      Text(
+                        l10n.posCashNow,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: BrandColors.success,
@@ -1047,9 +1086,9 @@ class _UdhaarSplitSlider extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'On Udhaar',
-                        style: TextStyle(
+                      Text(
+                        l10n.posOnUdhaar,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: _udhaarColor,
@@ -1099,6 +1138,7 @@ class _PaymentOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final selected = value == groupValue && !comingSoon;
     return Expanded(
       child: GestureDetector(
@@ -1145,9 +1185,9 @@ class _PaymentOption extends StatelessWidget {
                       ),
                     ),
                     if (comingSoon)
-                      const Text(
-                        'Coming soon',
-                        style: TextStyle(
+                      Text(
+                        l10n.posComingSoon,
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: BrandColors.muted,

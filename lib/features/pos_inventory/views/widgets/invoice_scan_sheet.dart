@@ -8,8 +8,10 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/providers/usage_limits_provider.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/services/gemini_invoice_service.dart';
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/services/usage_limits_service.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../../subscription/models/subscription_model.dart';
 import '../../../subscription/providers/subscription_provider.dart';
@@ -63,6 +65,9 @@ class _InvoiceScanSheet extends ConsumerStatefulWidget {
 class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
   late final GeminiInvoiceService _svc;
   _ScanState _state = _ScanState.idle;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -224,7 +229,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
   Future<void> _createPO() async {
     if (_selectedSupplier == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a supplier first')),
+        SnackBar(content: Text(_l10n.procPleaseSelectSupplierFirst)),
       );
       return;
     }
@@ -255,7 +260,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                   if (inv?.number != null) 'Invoice: ${inv!.number}',
                   if (inv?.date != null) 'Date: ${inv!.date}',
                 ].join(' · ').isEmpty
-                ? 'From scanned invoice'
+                ? _l10n.procFromScannedInvoice
                 : [
                     if (inv?.number != null) 'Invoice: ${inv!.number}',
                     if (inv?.date != null) 'Date: ${inv!.date}',
@@ -273,8 +278,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
         SnackBar(
           content: Text(
             unmatched > 0
-                ? 'Purchase order created! ($unmatched item${unmatched > 1 ? 's' : ''} not matched)'
-                : 'Purchase order created from invoice!',
+                ? _l10n.procPoCreatedWithUnmatched(unmatched)
+                : _l10n.procPoCreatedFromInvoice,
           ),
           backgroundColor: BrandColors.success,
           duration: const Duration(seconds: 3),
@@ -292,6 +297,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     // ── Pro + usage gating ───────────────────────────────────────────────────
     final subInfo = ref.watch(subInfoProvider);
     final isPro = subInfo.effectiveTier == SubTier.pro;
@@ -340,21 +346,21 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Scan Invoice',
-                          style: TextStyle(
+                          l10n.procScanInvoice,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                             color: BrandColors.ink,
                           ),
                         ),
                         Text(
-                          'Camera · Gallery · PDF',
-                          style: TextStyle(
+                          l10n.procCameraGalleryPdf,
+                          style: const TextStyle(
                             fontSize: 12,
                             color: BrandColors.muted,
                           ),
@@ -366,7 +372,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                     AiUsageBadge(
                       remaining: remaining,
                       total: kDailyLimits[kFeatureInvoice]!,
-                      label: 'scans',
+                      label: l10n.procScansLabel,
                     ),
                   if (_state == _ScanState.review) ...[
                     const SizedBox(width: 4),
@@ -375,7 +381,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                         Icons.refresh_rounded,
                         color: BrandColors.muted,
                       ),
-                      tooltip: 'Scan again',
+                      tooltip: l10n.procScanAgain,
                       onPressed: () => setState(() {
                         _state = _ScanState.idle;
                         _extraction = null;
@@ -395,8 +401,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                 child: AiGateBanner(
                   icon: Icons.workspace_premium_rounded,
                   color: BrandColors.orange,
-                  message: 'Invoice Scan is a Pro feature.',
-                  actionLabel: 'Upgrade to Pro',
+                  message: l10n.procInvoiceScanProFeature,
+                  actionLabel: l10n.procUpgradeToPro,
                   onAction: () => Navigator.pop(context),
                 ),
               )
@@ -406,8 +412,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                 child: AiGateBanner(
                   icon: Icons.bolt_rounded,
                   color: BrandColors.error,
-                  message: 'Daily limit reached. Top up credits to continue.',
-                  actionLabel: 'Buy Credits',
+                  message: l10n.procDailyLimitReached,
+                  actionLabel: l10n.procBuyCredits,
                   onAction: () => showCreditsPurchaseSheet(
                     context,
                     ref,
@@ -441,27 +447,27 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
             children: [
               const CardShimmer(height: 56, radius: 28),
               const SizedBox(height: 16),
-              const Text(
-                'Creating purchase order…',
-                style: TextStyle(color: BrandColors.muted, fontSize: 13),
+              Text(
+                _l10n.procCreatingPurchaseOrder,
+                style: const TextStyle(color: BrandColors.muted, fontSize: 13),
               ),
             ],
           ),
         );
       case _ScanState.done:
-        return const Center(
+        return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.check_circle_rounded,
                 color: BrandColors.success,
                 size: 56,
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
-                'Purchase order created!',
-                style: TextStyle(
+                _l10n.procPurchaseOrderCreated,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: BrandColors.success,
@@ -495,7 +501,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                 ElevatedButton.icon(
                   onPressed: () => setState(() => _state = _ScanState.idle),
                   icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('Try Again'),
+                  label: Text(_l10n.procTryAgain),
                 ),
               ],
             ),
@@ -528,8 +534,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                 const SizedBox(height: 12),
                 Text(
                   canUse
-                      ? 'Capture or upload a supplier invoice'
-                      : 'Upgrade to Pro or top up credits',
+                      ? _l10n.procCaptureOrUploadInvoice
+                      : _l10n.procUpgradeOrTopUp,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 14,
@@ -538,10 +544,13 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Kirana AI reads items, totals & supplier details',
+                Text(
+                  _l10n.procKiranaAiReadsInvoice,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.muted,
+                  ),
                 ),
               ],
             ),
@@ -552,7 +561,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
               Expanded(
                 child: _PickButton(
                   icon: Icons.camera_alt_rounded,
-                  label: 'Camera',
+                  label: _l10n.procCamera,
                   color: BrandColors.primary,
                   onTap: canUse ? _pickCamera : null,
                 ),
@@ -561,7 +570,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
               Expanded(
                 child: _PickButton(
                   icon: Icons.photo_library_rounded,
-                  label: 'Gallery',
+                  label: _l10n.procGallery,
                   color: const Color(0xFF7C3AED),
                   onTap: canUse ? _pickGallery : null,
                 ),
@@ -573,7 +582,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
             width: double.infinity,
             child: _PickButton(
               icon: Icons.picture_as_pdf_rounded,
-              label: 'Upload PDF / Image File',
+              label: _l10n.procUploadPdfImageFile,
               color: BrandColors.muted,
               onTap: canUse ? _pickFile : null,
             ),
@@ -593,18 +602,18 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
             child: CardShimmer(height: 60, radius: 16),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Kirana AI is reading your invoice…',
-            style: TextStyle(
+          Text(
+            _l10n.procKiranaAiReadingInvoice,
+            style: const TextStyle(
               fontSize: 14,
               color: BrandColors.ink,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Extracting items, quantities and totals',
-            style: TextStyle(fontSize: 12, color: BrandColors.muted),
+          Text(
+            _l10n.procExtractingItems,
+            style: const TextStyle(fontSize: 12, color: BrandColors.muted),
           ),
         ],
       ),
@@ -679,9 +688,9 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Grand Total',
-                        style: TextStyle(
+                      Text(
+                        _l10n.procGrandTotal,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                         ),
@@ -703,9 +712,9 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
           const SizedBox(height: 16),
 
           // Supplier picker
-          const Text(
-            'SUPPLIER',
-            style: TextStyle(
+          Text(
+            _l10n.procSupplierUpper,
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w800,
               color: BrandColors.muted,
@@ -726,7 +735,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'ITEMS (${_items.length})',
+                _l10n.procItemsUpperCount(_items.length),
                 style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -735,7 +744,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                 ),
               ),
               Text(
-                '$matched matched',
+                _l10n.procMatchedCount(matched),
                 style: TextStyle(
                   fontSize: 11,
                   color: matched > 0 ? BrandColors.success : BrandColors.muted,
@@ -772,7 +781,9 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '${_items.where((m) => !m.matched).length} unmatched item${_items.where((m) => !m.matched).length > 1 ? 's' : ''} will not be added as line items, but the full invoice total will be recorded.',
+                      _l10n.procUnmatchedItemsWarning(
+                        _items.where((m) => !m.matched).length,
+                      ),
                       style: const TextStyle(
                         fontSize: 11,
                         color: Colors.orange,
@@ -793,8 +804,8 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
               icon: const Icon(Icons.add_task_rounded),
               label: Text(
                 _selectedSupplier == null
-                    ? 'Select a supplier to continue'
-                    : 'Create Purchase Order${grand != null ? ' · ₹${grand.toStringAsFixed(0)}' : ''}',
+                    ? _l10n.procSelectSupplierToContinue
+                    : '${_l10n.procCreatePurchaseOrderTitle}${grand != null ? ' · ₹${grand.toStringAsFixed(0)}' : ''}',
               ),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -869,6 +880,7 @@ class _ConfidenceBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pct = (score * 100).round();
     final color = score >= 0.85
         ? BrandColors.success
@@ -887,7 +899,7 @@ class _ConfidenceBadge extends StatelessWidget {
           Icon(Icons.auto_awesome_rounded, size: 13, color: color),
           const SizedBox(width: 4),
           Text(
-            '$pct% confidence',
+            l10n.procConfidencePercent(pct),
             style: TextStyle(
               fontSize: 12,
               color: color,
@@ -906,16 +918,17 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = status == 'valid'
         ? BrandColors.success
         : status == 'mismatch'
         ? BrandColors.error
         : BrandColors.muted;
     final label = status == 'valid'
-        ? '✓ Totals match'
+        ? l10n.procTotalsMatch
         : status == 'mismatch'
-        ? '⚠ Total mismatch'
-        : 'Unverified';
+        ? l10n.procTotalMismatch
+        : l10n.procUnverified;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -941,6 +954,7 @@ class _InvoiceItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = item.matched ? BrandColors.success : BrandColors.muted;
     final inv = item.invoice;
 
@@ -1011,9 +1025,12 @@ class _InvoiceItemTile extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
-              child: const Text(
-                'Pick',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+              child: Text(
+                l10n.procPick,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
@@ -1040,6 +1057,7 @@ class _SupplierPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () => _showPicker(context),
       child: Container(
@@ -1075,8 +1093,8 @@ class _SupplierPicker extends StatelessWidget {
                     )
                   : Text(
                       vendorName != null
-                          ? 'No match for "$vendorName" — tap to select'
-                          : 'Select supplier',
+                          ? l10n.procNoMatchTapToSelect(vendorName!)
+                          : l10n.procSelectSupplier,
                       style: const TextStyle(
                         fontSize: 13,
                         color: BrandColors.muted,
@@ -1124,6 +1142,7 @@ class _SupplierPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return DraggableScrollableSheet(
       initialChildSize: 0.5,
       maxChildSize: 0.85,
@@ -1145,22 +1164,25 @@ class _SupplierPickerSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Select Supplier',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                l10n.procSelectSupplierTitle,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
             const SizedBox(height: 8),
             const Divider(height: 1),
             Expanded(
               child: suppliers.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No suppliers yet. Add suppliers in the Purchase tab.',
+                        l10n.procNoSuppliersAddInPurchaseTab,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: BrandColors.muted),
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(
@@ -1246,6 +1268,7 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
           (p.brand?.toLowerCase().contains(q) ?? false);
     }).toList();
 
+    final l10n = AppLocalizations.of(context);
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       maxChildSize: 0.9,
@@ -1272,9 +1295,12 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Link to Inventory',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  Text(
+                    l10n.procLinkToInventory,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
@@ -1282,7 +1308,7 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
                     autofocus: true,
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
-                      hintText: 'Search products…',
+                      hintText: l10n.procSearchProducts,
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         size: 18,
@@ -1306,10 +1332,10 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No products found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.procNoProductsFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(
@@ -1330,7 +1356,10 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
                             ),
                           ),
                           subtitle: Text(
-                            '${p.priceLabel} · Stock: ${p.stockLabel}',
+                            l10n.procPriceStockLabel(
+                              p.priceLabel,
+                              p.stockLabel,
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               color: BrandColors.muted,

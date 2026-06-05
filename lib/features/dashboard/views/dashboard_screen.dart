@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
 import '../../finance/views/finance_screen.dart';
@@ -129,7 +130,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
     return subAsync.when(
       loading: () => const Scaffold(
-        body: Padding(padding: EdgeInsets.all(20), child: OverviewShimmer()),
+        // Scrollable so the fixed-height skeleton never overflows a short
+        // screen / large display-size setting (it's a static placeholder).
+        body: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.all(20),
+          child: OverviewShimmer(),
+        ),
       ),
       error: (_, _) => _buildDashboard(currentTab),
       data: (sub) {
@@ -148,6 +155,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   }
 
   Widget _buildDashboard(int currentTab) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: IndexedStack(
         index: currentTab,
@@ -157,21 +165,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         selectedIndex: currentTab,
         onDestinationSelected: (i) =>
             ref.read(dashboardTabProvider.notifier).switchTab(i),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home_rounded),
+            label: l10n.dashNavHome,
           ),
           NavigationDestination(
-            icon: Icon(Icons.menu_book_outlined),
-            selectedIcon: Icon(Icons.menu_book_rounded),
-            label: 'Khata',
+            icon: const Icon(Icons.menu_book_outlined),
+            selectedIcon: const Icon(Icons.menu_book_rounded),
+            label: l10n.dashNavKhata,
           ),
           NavigationDestination(
-            icon: Icon(Icons.storefront_outlined),
-            selectedIcon: Icon(Icons.storefront_rounded),
-            label: 'Billing',
+            icon: const Icon(Icons.storefront_outlined),
+            selectedIcon: const Icon(Icons.storefront_rounded),
+            label: l10n.dashNavBilling,
           ),
         ],
       ),
@@ -207,6 +215,7 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       body: SafeArea(
@@ -231,9 +240,9 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
                 ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Welcome to Kirana AI',
-                style: TextStyle(
+              Text(
+                l10n.dashTrialWelcome,
+                style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w900,
                   color: BrandColors.ink,
@@ -241,9 +250,9 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
                 textAlign: TextAlign.center,
               ).animate().fadeIn(delay: 150.ms),
               const SizedBox(height: 8),
-              const Text(
-                'Choose a plan to trial free. Our team will activate it shortly.',
-                style: TextStyle(
+              Text(
+                l10n.dashTrialChoosePlan,
+                style: const TextStyle(
                   fontSize: 14,
                   color: BrandColors.muted,
                   height: 1.5,
@@ -252,9 +261,9 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
               ).animate().fadeIn(delay: 200.ms),
               const SizedBox(height: 28),
 
-              const Text(
-                'SELECT YOUR TRIAL PLAN',
-                style: TextStyle(
+              Text(
+                l10n.dashTrialSelectPlan,
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.4,
@@ -264,36 +273,36 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
               const SizedBox(height: 12),
 
               _TierCard(
-                tier: 'basic',
+                name: l10n.dashPlanBasicName,
                 selected: _selectedTier == 'basic',
                 onTap: () => setState(() => _selectedTier = 'basic'),
                 color: BrandColors.primary,
                 icon: Icons.star_rounded,
                 price: '₹200/mo',
-                features: const [
-                  'POS & Sales Management',
-                  'Inventory Tracking',
-                  'Finance & Udhaar',
-                  'KPI Insights (3 per category)',
-                  'AI Recommendations',
+                features: [
+                  l10n.dashFeatPos,
+                  l10n.dashFeatInventoryTracking,
+                  l10n.dashFeatFinanceUdhaar,
+                  l10n.dashFeatKpiInsights,
+                  l10n.dashFeatAiReco,
                 ],
               ).animate().fadeIn(delay: 250.ms),
               const SizedBox(height: 10),
 
               _TierCard(
-                tier: 'pro',
+                name: l10n.dashPlanProName,
                 selected: _selectedTier == 'pro',
                 onTap: () => setState(() => _selectedTier = 'pro'),
                 color: const Color(0xFF7C3AED),
                 icon: Icons.workspace_premium_rounded,
                 price: '₹500/mo',
-                badge: 'ALL FEATURES',
-                features: const [
-                  'Everything in Basic',
-                  'All KPI Categories (unlimited)',
-                  'Vendor & Procurement Management',
-                  'Cashflow Support (up to ₹10L)',
-                  'Customer Growth Engine',
+                badge: l10n.dashPlanBadgeAllFeatures,
+                features: [
+                  l10n.dashFeatEverythingBasic,
+                  l10n.dashFeatAllKpi,
+                  l10n.dashFeatVendorProcurement,
+                  l10n.dashFeatCashflowSupport,
+                  l10n.dashFeatCustomerGrowth,
                 ],
               ).animate().fadeIn(delay: 300.ms),
 
@@ -313,7 +322,9 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
                         )
                       : const Icon(Icons.send_rounded, size: 18),
                   label: Text(
-                    'Request ${_selectedTier == 'pro' ? 'Pro' : 'Basic'} Trial',
+                    _selectedTier == 'pro'
+                        ? l10n.dashTrialRequestPro
+                        : l10n.dashTrialRequestBasic,
                   ),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(56),
@@ -331,9 +342,9 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
               Center(
                 child: TextButton(
                   onPressed: () => context.go('/login'),
-                  child: const Text(
-                    'Sign in to a different account',
-                    style: TextStyle(color: BrandColors.muted),
+                  child: Text(
+                    l10n.dashTrialSignInDifferent,
+                    style: const TextStyle(color: BrandColors.muted),
                   ),
                 ),
               ),
@@ -346,7 +357,7 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
 }
 
 class _TierCard extends StatelessWidget {
-  final String tier;
+  final String name;
   final bool selected;
   final VoidCallback onTap;
   final Color color;
@@ -356,7 +367,7 @@ class _TierCard extends StatelessWidget {
   final List<String> features;
 
   const _TierCard({
-    required this.tier,
+    required this.name,
     required this.selected,
     required this.onTap,
     required this.color,
@@ -424,7 +435,7 @@ class _TierCard extends StatelessWidget {
                       Icon(icon, size: 18, color: color),
                       const SizedBox(width: 6),
                       Text(
-                        '${tier[0].toUpperCase()}${tier.substring(1)} Plan',
+                        name,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
@@ -506,6 +517,7 @@ class _PendingActivationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       body: SafeArea(
@@ -528,9 +540,9 @@ class _PendingActivationScreen extends StatelessWidget {
                 ),
               ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
               const SizedBox(height: 28),
-              const Text(
-                'Trial Request Received!',
-                style: TextStyle(
+              Text(
+                l10n.dashPendingTitle,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
                   color: BrandColors.ink,
@@ -538,9 +550,9 @@ class _PendingActivationScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Your trial activation is being reviewed by our team. You\'ll receive a notification on your device as soon as it\'s approved — usually within a few hours.',
-                style: TextStyle(
+              Text(
+                l10n.dashPendingBody,
+                style: const TextStyle(
                   fontSize: 15,
                   color: BrandColors.muted,
                   height: 1.6,
@@ -557,18 +569,18 @@ class _PendingActivationScreen extends StatelessWidget {
                     color: const Color(0xFFFF8C00).withValues(alpha: 0.2),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.notifications_active_rounded,
                       color: Color(0xFFFF8C00),
                       size: 20,
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Make sure notifications are enabled so you don\'t miss the activation alert.',
-                        style: TextStyle(
+                        l10n.dashPendingNotifNote,
+                        style: const TextStyle(
                           fontSize: 13,
                           color: BrandColors.ink,
                           height: 1.4,
@@ -582,7 +594,7 @@ class _PendingActivationScreen extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onRefresh,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Check Status'),
+                label: Text(l10n.dashPendingCheckStatus),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   shape: RoundedRectangleBorder(
@@ -606,6 +618,7 @@ class _UpgradeWall extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       body: SafeArea(
@@ -628,9 +641,9 @@ class _UpgradeWall extends ConsumerWidget {
                 ),
               ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
               const SizedBox(height: 28),
-              const Text(
-                'Free Trial Ended',
-                style: TextStyle(
+              Text(
+                l10n.dashUpgradeTitle,
+                style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w900,
                   color: BrandColors.ink,
@@ -638,9 +651,9 @@ class _UpgradeWall extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Your free trial has ended. Choose a plan to continue using Kirana AI and keep growing your store.',
-                style: TextStyle(
+              Text(
+                l10n.dashUpgradeBody,
+                style: const TextStyle(
                   fontSize: 15,
                   color: BrandColors.muted,
                   height: 1.6,
@@ -649,37 +662,38 @@ class _UpgradeWall extends ConsumerWidget {
               ),
               const SizedBox(height: 36),
               _UpgradeOption(
-                title: 'Basic',
+                title: l10n.dashUpgradeBasic,
                 price: '₹200/mo',
                 dailyPrice: '₹7/day',
                 color: BrandColors.primary,
                 icon: Icons.star_rounded,
-                features: const [
-                  'POS & Inventory',
-                  'Finance & KPIs',
-                  'AI Recommendations',
+                features: [
+                  l10n.dashFeatPosInventory,
+                  l10n.dashFeatFinanceKpis,
+                  l10n.dashFeatAiReco,
                 ],
                 onTap: () => context.push('/profile/subscription'),
               ),
               const SizedBox(height: 12),
               _UpgradeOption(
-                title: 'Pro',
+                title: l10n.dashUpgradePro,
                 price: '₹500/mo',
                 dailyPrice: '₹17/day',
                 color: const Color(0xFF7C3AED),
                 icon: Icons.workspace_premium_rounded,
                 isBest: true,
-                features: const [
-                  'Everything in Basic',
-                  'Vendor Management',
-                  'Cashflow + Referrals',
+                badgeBest: l10n.dashUpgradeBadgeBest,
+                features: [
+                  l10n.dashFeatEverythingBasic,
+                  l10n.dashFeatVendorManagement,
+                  l10n.dashFeatCashflowReferrals,
                 ],
                 onTap: () => context.push('/profile/subscription'),
               ),
               const SizedBox(height: 20),
               TextButton(
                 onPressed: onRefresh,
-                child: const Text('Already subscribed? Refresh'),
+                child: Text(l10n.dashUpgradeAlreadySubscribed),
               ),
             ],
           ),
@@ -695,6 +709,7 @@ class _UpgradeOption extends StatelessWidget {
   final IconData icon;
   final List<String> features;
   final bool isBest;
+  final String? badgeBest;
   final VoidCallback onTap;
 
   const _UpgradeOption({
@@ -706,10 +721,12 @@ class _UpgradeOption extends StatelessWidget {
     required this.features,
     required this.onTap,
     this.isBest = false,
+    this.badgeBest,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -757,9 +774,9 @@ class _UpgradeOption extends StatelessWidget {
                             color: color,
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          child: const Text(
-                            'BEST',
-                            style: TextStyle(
+                          child: Text(
+                            badgeBest ?? '',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 8,
                               fontWeight: FontWeight.w800,
@@ -793,7 +810,7 @@ class _UpgradeOption extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'just $dailyPrice',
+                  l10n.dashUpgradeJustPerDay(dailyPrice),
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,

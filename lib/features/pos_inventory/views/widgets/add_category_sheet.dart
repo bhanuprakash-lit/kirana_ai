@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/inventory_provider.dart';
 
@@ -29,6 +31,9 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
   bool _success = false;
   String? _error;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void dispose() {
     _nameCtrl.dispose();
@@ -38,7 +43,7 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
   Future<void> _save() async {
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      setState(() => _error = 'Category name is required');
+      setState(() => _error = _l10n.invCategoryNameRequired);
       return;
     }
     setState(() {
@@ -58,7 +63,7 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
       } else {
         setState(() {
           _saving = false;
-          _error = 'Failed to create category. Please try again.';
+          _error = _l10n.invCreateCategoryFailed;
         });
       }
     }
@@ -66,6 +71,7 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -92,18 +98,18 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'New Category',
-            style: TextStyle(
+          Text(
+            l10n.invNewCategory,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w900,
               color: BrandColors.ink,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Add a category to organise your products.',
-            style: TextStyle(
+          Text(
+            l10n.invNewCategorySub,
+            style: const TextStyle(
               color: BrandColors.muted,
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -115,7 +121,7 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
             isSaving: _saving,
             error: _error,
             isSuccess: _success,
-            successMessage: 'Category created!',
+            successMessage: l10n.invCategoryCreated,
           ),
           if (_saving || _error != null || _success) const SizedBox(height: 16),
 
@@ -123,9 +129,9 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
             controller: _nameCtrl,
             autofocus: true,
             enabled: !_saving && !_success,
-            decoration: const InputDecoration(
-              labelText: 'Category name',
-              hintText: 'e.g. Staples, Dairy, Snacks…',
+            decoration: InputDecoration(
+              labelText: l10n.invCategoryNameLabel,
+              hintText: l10n.invCategoryNameHint,
             ),
             onSubmitted: (_) => _save(),
           ),
@@ -134,7 +140,7 @@ class _AddCategorySheetState extends ConsumerState<_AddCategorySheet> {
             width: double.infinity,
             height: 56,
             child: LoadingButton(
-              label: 'Create Category',
+              label: l10n.invCreateCategory,
               isLoading: _saving,
               onPressed: _success ? null : _save,
             ),

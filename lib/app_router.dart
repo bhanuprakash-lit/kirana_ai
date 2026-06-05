@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'features/auth/views/login_screen.dart';
 import 'features/dashboard/views/dashboard_screen.dart';
 import 'features/dashboard/views/intelligence_details/intelligence_detail_screen.dart';
+import 'features/onboarding/views/language_select_screen.dart';
 import 'features/onboarding/views/onboarding_screen.dart';
 import 'features/pos_inventory/views/transaction_history_screen.dart';
 import 'features/pos_inventory/views/order_details_screen.dart';
@@ -45,6 +46,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/language',
+        builder: (context, state) => const LanguageSelectScreen(),
       ),
       GoRoute(
         path: '/onboarding',

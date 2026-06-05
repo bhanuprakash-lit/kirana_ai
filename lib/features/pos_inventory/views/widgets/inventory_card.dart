@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../models/inventory_item.dart';
 
 class InventoryCard extends StatelessWidget {
@@ -13,10 +14,12 @@ class InventoryCard extends StatelessWidget {
     return BrandColors.success;
   }
 
-  String get _stockLabel {
-    if (item.isOutOfStock) return 'Out of stock';
-    if (item.isLowStock) return '${item.stockQuantity} — low';
-    return '${item.stockQuantity} in stock';
+  String _stockLabelFor(AppLocalizations l10n) {
+    if (item.isOutOfStock) return l10n.invCardOutOfStock;
+    if (item.isLowStock) {
+      return l10n.invCardStockLow(item.stockQuantity.toString());
+    }
+    return l10n.invCardStockInStock(item.stockQuantity.toString());
   }
 
   IconData _categoryIcon(String? cat) {
@@ -73,6 +76,7 @@ class InventoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final catColor = _categoryColor(item.categoryName);
 
     return Container(
@@ -121,13 +125,13 @@ class InventoryCard extends StatelessWidget {
                         if (item.isFastMoving)
                           _Badge(
                             icon: Icons.diamond_rounded,
-                            label: 'Fast',
+                            label: l10n.invCardFast,
                             color: BrandColors.success,
                           )
                         else if (item.isDeadStock)
                           _Badge(
                             icon: Icons.snooze_rounded,
-                            label: 'Slow',
+                            label: l10n.invCardSlow,
                             color: const Color(0xFFB08D57), // bronze
                           ),
                       ],
@@ -173,7 +177,7 @@ class InventoryCard extends StatelessWidget {
                         const SizedBox(width: 5),
                         Expanded(
                           child: Text(
-                            _stockLabel,
+                            _stockLabelFor(l10n),
                             style: TextStyle(
                               fontSize: 10,
                               color: _stockColor,
@@ -203,24 +207,26 @@ class InventoryCard extends StatelessWidget {
                     if (item.barcode != null)
                       _InfoRow(
                         icon: Icons.qr_code_rounded,
-                        label: 'Barcode',
+                        label: l10n.invCardBarcode,
                         value: item.barcode!,
                       ),
                     _InfoRow(
                       icon: Icons.sell_rounded,
-                      label: 'Sold today',
+                      label: l10n.invCardSoldToday,
                       value: '${item.soldToday}',
                     ),
                     if (item.reorderQty != null)
                       _InfoRow(
                         icon: Icons.refresh_rounded,
-                        label: 'Reorder',
-                        value: '${item.reorderQty} units',
+                        label: l10n.invCardReorder,
+                        value: l10n.invCardReorderUnits(
+                          item.reorderQty.toString(),
+                        ),
                       ),
                     if (item.prob7Day != null)
                       _InfoRow(
                         icon: Icons.warning_amber_rounded,
-                        label: '7d risk',
+                        label: l10n.invCard7dRisk,
                         value: '${(item.prob7Day! * 100).toStringAsFixed(0)}%',
                         valueColor: item.prob7Day! > 0.6
                             ? BrandColors.error
@@ -245,6 +251,7 @@ class _ExpiryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     DateTime? exp;
     try {
       exp = DateTime.parse(expiryDate);
@@ -261,10 +268,10 @@ class _ExpiryBadge extends StatelessWidget {
       color = BrandColors.success;
     }
     final label = days <= 0
-        ? 'Expired'
+        ? l10n.invCardExpired
         : days == 1
-        ? '1d'
-        : '${days}d';
+        ? l10n.invCardDays('1')
+        : l10n.invCardDays(days.toString());
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),

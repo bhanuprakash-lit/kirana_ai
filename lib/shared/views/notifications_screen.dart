@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/brand_theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../models/alert_model.dart';
 import '../providers/alert_provider.dart';
 
@@ -10,12 +11,13 @@ class NotificationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final alerts = ref.watch(alertProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
-      appBar: AppBar(title: const Text('Business Alerts')),
+      appBar: AppBar(title: Text(l10n.shrBusinessAlerts)),
       body: alerts.isEmpty
-          ? _emptyState()
+          ? _emptyState(context)
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: alerts.length,
@@ -27,7 +29,8 @@ class NotificationsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _emptyState() {
+  Widget _emptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -38,17 +41,17 @@ class NotificationsScreen extends ConsumerWidget {
             color: BrandColors.muted.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'All caught up!',
-            style: TextStyle(
+          Text(
+            l10n.shrAllCaughtUp,
+            style: const TextStyle(
               color: BrandColors.muted,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'No urgent alerts at the moment.',
-            style: TextStyle(color: BrandColors.muted, fontSize: 12),
+          Text(
+            l10n.shrNoUrgentAlerts,
+            style: const TextStyle(color: BrandColors.muted, fontSize: 12),
           ),
         ],
       ),

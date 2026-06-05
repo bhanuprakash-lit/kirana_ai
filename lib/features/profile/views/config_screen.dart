@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../core/locale/locale_provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/config_provider.dart';
 
@@ -17,6 +19,9 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
   String? _defaultPayment;
   bool _saving = false;
   bool _dirty = false;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -56,8 +61,8 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
       setState(() => _dirty = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Settings saved'),
+          SnackBar(
+            content: Text(_l10n.psetSettingsSaved),
             backgroundColor: BrandColors.success,
           ),
         );
@@ -66,7 +71,7 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Save failed: $e'),
+            content: Text(_l10n.psetSaveFailed(e.toString())),
             backgroundColor: BrandColors.error,
           ),
         );
@@ -77,27 +82,26 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
   }
 
   Future<void> _reset() async {
+    final l10n = _l10n;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Reset to defaults',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.psetResetToDefaults,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
-        content: const Text(
-          'All settings will be reset to their default values.',
-        ),
+        content: Text(l10n.psetResetConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.psetCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Reset',
-              style: TextStyle(color: BrandColors.error),
+            child: Text(
+              l10n.psetReset,
+              style: const TextStyle(color: BrandColors.error),
             ),
           ),
         ],
@@ -116,7 +120,7 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Reset to defaults')));
+        ).showSnackBar(SnackBar(content: Text(_l10n.psetResetToDefaults)));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -135,7 +139,9 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
           child: ListShimmer(itemCount: 6, itemHeight: 64),
         ),
       ),
-      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+      error: (e, _) => Scaffold(
+        body: Center(child: Text(_l10n.psetErrorWith(e.toString()))),
+      ),
       data: (prefs) {
         return paymentAsync.when(
           loading: () => const Scaffold(
@@ -144,25 +150,28 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
               child: ListShimmer(itemCount: 4, itemHeight: 64),
             ),
           ),
-          error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+          error: (e, _) => Scaffold(
+            body: Center(child: Text(_l10n.psetErrorWith(e.toString()))),
+          ),
           data: (payment) {
             _init(prefs, payment);
             final d = _draft!;
             final pm = _defaultPayment ?? 'cash';
+            final l10n = AppLocalizations.of(context);
 
             return Scaffold(
               backgroundColor: BrandColors.background,
               appBar: AppBar(
-                title: const Text(
-                  'Configuration',
-                  style: TextStyle(fontWeight: FontWeight.w800),
+                title: Text(
+                  l10n.psetConfiguration,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
                 actions: [
                   TextButton(
                     onPressed: _saving ? null : _reset,
-                    child: const Text(
-                      'Reset',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.psetReset,
+                      style: const TextStyle(
                         color: BrandColors.muted,
                         fontWeight: FontWeight.w700,
                       ),
@@ -176,32 +185,35 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                   // ── POS Preferences ────────────────────────────────────────
                   _SectionHeader(
                     icon: Icons.point_of_sale_rounded,
-                    title: 'POS Preferences',
+                    title: l10n.psetPosPreferences,
                     color: BrandColors.primary,
                   ),
                   _Card(
                     children: [
-                      const _SettingLabel(
-                        label: 'Default Payment Method',
-                        hint: 'Pre-selected method when adding a new sale',
+                      _SettingLabel(
+                        label: l10n.psetDefaultPayment,
+                        hint: l10n.psetDefaultPaymentHint,
                       ),
                       const SizedBox(height: 10),
                       SegmentedButton<String>(
-                        segments: const [
+                        segments: [
                           ButtonSegment(
                             value: 'cash',
-                            icon: Icon(Icons.payments_rounded, size: 16),
-                            label: Text('Cash'),
+                            icon: const Icon(Icons.payments_rounded, size: 16),
+                            label: Text(l10n.psetCash),
                           ),
-                          ButtonSegment(
+                          const ButtonSegment(
                             value: 'upi',
                             icon: Icon(Icons.qr_code_rounded, size: 16),
                             label: Text('UPI'),
                           ),
                           ButtonSegment(
                             value: 'card',
-                            icon: Icon(Icons.credit_card_rounded, size: 16),
-                            label: Text('Card'),
+                            icon: const Icon(
+                              Icons.credit_card_rounded,
+                              size: 16,
+                            ),
+                            label: Text(l10n.psetCard),
                           ),
                         ],
                         selected: {pm},
@@ -220,29 +232,32 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                   // ── AI & Forecasting ───────────────────────────────────────
                   _SectionHeader(
                     icon: Icons.auto_awesome_rounded,
-                    title: 'AI & Forecasting',
+                    title: l10n.psetAiForecasting,
                     color: const Color(0xFF7C3AED),
                   ),
                   _Card(
                     children: [
                       _SettingLabel(
-                        label: 'Forecast Horizon',
-                        hint: 'How many days ahead the AI predicts stock needs',
-                        value: '${d.forecastHorizonDays} days',
+                        label: l10n.psetForecastHorizon,
+                        hint: l10n.psetForecastHorizonHint,
+                        value: l10n.psetDaysValue(d.forecastHorizonDays),
                       ),
                       const SizedBox(height: 6),
                       _ChipSelector<int>(
                         options: const [7, 14, 30],
-                        labels: const ['7 days', '14 days', '30 days'],
+                        labels: [
+                          l10n.psetDaysValue(7),
+                          l10n.psetDaysValue(14),
+                          l10n.psetDaysValue(30),
+                        ],
                         selected: d.forecastHorizonDays,
                         onSelected: (v) =>
                             _update(d.copyWith(forecastHorizonDays: v)),
                       ),
                       const _Divider(),
                       _SettingLabel(
-                        label: 'Stockout Risk Threshold',
-                        hint:
-                            'Show stockout alert when 7-day risk exceeds this',
+                        label: l10n.psetStockoutRisk,
+                        hint: l10n.psetStockoutRiskHint,
                         value:
                             '${(d.alertStockoutThreshold * 100).toStringAsFixed(0)}%',
                       ),
@@ -259,9 +274,8 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                       ),
                       const _Divider(),
                       _SettingLabel(
-                        label: 'Min Velocity Threshold',
-                        hint:
-                            'Items selling slower than this are flagged as dead stock',
+                        label: l10n.psetMinVelocity,
+                        hint: l10n.psetMinVelocityHint,
                         value:
                             '${(d.alertMinVelocity * 100).toStringAsFixed(0)}%',
                       ),
@@ -283,16 +297,15 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                   // ── Alert Thresholds ───────────────────────────────────────
                   _SectionHeader(
                     icon: Icons.notifications_active_rounded,
-                    title: 'Alert Thresholds',
+                    title: l10n.psetAlertThresholds,
                     color: BrandColors.accent,
                   ),
                   _Card(
                     children: [
                       _SettingLabel(
-                        label: 'Reorder Alert Days',
-                        hint:
-                            'Alert when projected stock will run out within N days',
-                        value: '${d.alertReorderDays} days',
+                        label: l10n.psetReorderAlertDays,
+                        hint: l10n.psetReorderAlertHint,
+                        value: l10n.psetDaysValue(d.alertReorderDays),
                       ),
                       const SizedBox(height: 6),
                       _ChipSelector<int>(
@@ -304,9 +317,9 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                       ),
                       const _Divider(),
                       _SettingLabel(
-                        label: 'Dead Stock Days',
-                        hint: 'Flag items with no sales for N or more days',
-                        value: '${d.alertDeadStockDays} days',
+                        label: l10n.psetDeadStockDays,
+                        hint: l10n.psetDeadStockHint,
+                        value: l10n.psetDaysValue(d.alertDeadStockDays),
                       ),
                       const SizedBox(height: 6),
                       _ChipSelector<int>(
@@ -318,10 +331,9 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                       ),
                       const _Divider(),
                       _SettingLabel(
-                        label: 'Expiry Alert Days',
-                        hint:
-                            'Alert this many days before a batch/item expires',
-                        value: '${d.alertExpiryDays} days before',
+                        label: l10n.psetExpiryAlertDays,
+                        hint: l10n.psetExpiryAlertHint,
+                        value: l10n.psetDaysBeforeValue(d.alertExpiryDays),
                       ),
                       const SizedBox(height: 6),
                       _ChipSelector<int>(
@@ -338,16 +350,15 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                   // ── Marketing ─────────────────────────────────────────────
                   _SectionHeader(
                     icon: Icons.share_rounded,
-                    title: 'Marketing',
+                    title: l10n.psetMarketing,
                     color: BrandColors.accent,
                   ),
                   _Card(
                     children: [
                       _ToggleRow(
                         icon: Icons.storefront_rounded,
-                        label: 'Allow LohiyaAI to Market My Store',
-                        hint:
-                            'We promote your store on Facebook, Instagram & WhatsApp on your behalf',
+                        label: l10n.psetAllowMarketing,
+                        hint: l10n.psetAllowMarketingHint,
                         value: d.allowSocialMarketing,
                         onChanged: (v) =>
                             _update(d.copyWith(allowSocialMarketing: v)),
@@ -359,32 +370,31 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                   // ── Notifications ──────────────────────────────────────────
                   _SectionHeader(
                     icon: Icons.campaign_rounded,
-                    title: 'Notifications',
+                    title: l10n.psetNotifications,
                     color: BrandColors.success,
                   ),
                   _Card(
                     children: [
                       _ToggleRow(
                         icon: Icons.notifications_rounded,
-                        label: 'In-app Alerts',
-                        hint: 'Show alerts inside the app',
+                        label: l10n.psetInAppAlerts,
+                        hint: l10n.psetInAppAlertsHint,
                         value: d.notifyInApp,
                         onChanged: (v) => _update(d.copyWith(notifyInApp: v)),
                       ),
                       const _Divider(),
                       _ToggleRow(
                         icon: Icons.chat_rounded,
-                        label: 'WhatsApp Notifications',
-                        hint: 'Send restocking and udhaar alerts via WhatsApp',
+                        label: l10n.psetWhatsappNotif,
+                        hint: l10n.psetWhatsappNotifHint,
                         value: d.notifyWhatsapp,
                         onChanged: (v) =>
                             _update(d.copyWith(notifyWhatsapp: v)),
                       ),
                       const _Divider(),
                       _SettingLabel(
-                        label: 'Quiet Hours',
-                        hint:
-                            'No notifications will be sent during this window',
+                        label: l10n.psetQuietHours,
+                        hint: l10n.psetQuietHoursHint,
                         value:
                             '${_fmtHour(d.quietHoursStart)} – ${_fmtHour(d.quietHoursEnd)}',
                       ),
@@ -393,7 +403,7 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                         children: [
                           Expanded(
                             child: _HourDropdown(
-                              label: 'Start',
+                              label: l10n.psetStart,
                               value: d.quietHoursStart,
                               onChanged: (v) =>
                                   _update(d.copyWith(quietHoursStart: v)),
@@ -408,7 +418,7 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _HourDropdown(
-                              label: 'End',
+                              label: l10n.psetEnd,
                               value: d.quietHoursEnd,
                               onChanged: (v) =>
                                   _update(d.copyWith(quietHoursEnd: v)),
@@ -786,9 +796,9 @@ class _SaveBar extends StatelessWidget {
                           strokeWidth: 2.5,
                         ),
                       )
-                    : const Text(
-                        'Save Changes',
-                        style: TextStyle(
+                    : Text(
+                        AppLocalizations.of(context).psetSaveChanges,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                         ),

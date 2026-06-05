@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/services/contact_service.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../models/procurement_models.dart';
 import '../../providers/procurement_provider.dart';
@@ -16,6 +17,7 @@ class ProcurementTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final asyncData = ref.watch(procurementProvider);
 
     // Arriving from a reorder suggestion / ML reorder screen: open the New
@@ -30,9 +32,7 @@ class ProcurementTab extends ConsumerWidget {
           _showAddPurchaseSheet(context, ref, suppliers, prefill: prefill);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Add a supplier first to create a purchase order'),
-            ),
+            SnackBar(content: Text(l10n.procAddSupplierFirstToCreatePo)),
           );
         }
       });
@@ -43,7 +43,7 @@ class ProcurementTab extends ConsumerWidget {
         padding: EdgeInsets.all(20),
         child: ListShimmer(itemCount: 6),
       ),
-      error: (err, _) => Center(child: Text('Error: $err')),
+      error: (err, _) => Center(child: Text(l10n.procErrorWithMessage('$err'))),
       data: (data) => RefreshIndicator(
         onRefresh: () async {
           await ref.read(procurementProvider.notifier).refresh();
@@ -60,12 +60,12 @@ class ProcurementTab extends ConsumerWidget {
             ),
             _sectionHeader(
               context,
-              'Suppliers',
+              l10n.procSuppliers,
               onAdd: () => _showAddSupplierSheet(context, ref),
             ),
             const SizedBox(height: 12),
             if (data.suppliers.isEmpty)
-              _emptyState('No suppliers added yet.')
+              _emptyState(l10n.procNoSuppliersYet)
             else
               ...data.suppliers.map(
                 (s) => _SupplierTile(
@@ -77,7 +77,7 @@ class ProcurementTab extends ConsumerWidget {
             const SizedBox(height: 24),
             _sectionHeader(
               context,
-              'Recent Purchases',
+              l10n.procRecentPurchases,
               onAdd: data.suppliers.isEmpty
                   ? null
                   : () => _showAddPurchaseSheet(context, ref, data.suppliers),
@@ -94,18 +94,18 @@ class ProcurementTab extends ConsumerWidget {
                     color: BrandColors.error.withValues(alpha: 0.2),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.info_outline_rounded,
                       size: 16,
                       color: BrandColors.error,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'If you want to add a purchase, add at least 1 supplier.',
-                        style: TextStyle(
+                        l10n.procAddAtLeastOneSupplier,
+                        style: const TextStyle(
                           color: BrandColors.error,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -118,7 +118,7 @@ class ProcurementTab extends ConsumerWidget {
             ],
             const SizedBox(height: 12),
             if (data.purchases.isEmpty)
-              _emptyState('No purchase orders yet.')
+              _emptyState(l10n.procNoPurchaseOrdersYet)
             else
               ...data.purchases.map((p) => _PurchaseOrderTile(order: p)),
           ],
@@ -133,15 +133,20 @@ class ProcurementTab extends ConsumerWidget {
     VoidCallback? onAdd,
     VoidCallback? onScan,
   }) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        Expanded(
+          child: Text(
+            title,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
         ),
+        const SizedBox(width: 8),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -149,7 +154,7 @@ class ProcurementTab extends ConsumerWidget {
               TextButton.icon(
                 onPressed: onScan,
                 icon: const Icon(Icons.document_scanner_rounded, size: 16),
-                label: const Text('Scan Invoice'),
+                label: Text(l10n.procScanInvoice),
                 style: TextButton.styleFrom(
                   foregroundColor: BrandColors.primary,
                   visualDensity: VisualDensity.compact,
@@ -159,7 +164,7 @@ class ProcurementTab extends ConsumerWidget {
               TextButton.icon(
                 onPressed: onAdd,
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text('Add'),
+                label: Text(l10n.procAdd),
               ),
           ],
         ),
@@ -184,15 +189,16 @@ class ProcurementTab extends ConsumerWidget {
     AsyncValue<List<ReorderSuggestion>> async,
     List<Supplier> suppliers,
   ) {
+    final l10n = AppLocalizations.of(context);
     final items = async.asData?.value ?? const <ReorderSuggestion>[];
     if (items.isEmpty) return const [];
     return [
-      _sectionHeader(context, 'Suggested Reorders'),
-      const Padding(
-        padding: EdgeInsets.only(top: 2, bottom: 8),
+      _sectionHeader(context, l10n.procSuggestedReorders),
+      Padding(
+        padding: const EdgeInsets.only(top: 2, bottom: 8),
         child: Text(
-          'Running low based on the last 30 days of sales',
-          style: TextStyle(fontSize: 12, color: BrandColors.muted),
+          l10n.procRunningLowLast30Days,
+          style: const TextStyle(fontSize: 12, color: BrandColors.muted),
         ),
       ),
       ...items.map(
@@ -219,6 +225,7 @@ class ProcurementTab extends ConsumerWidget {
   }
 
   void _showAddSupplierSheet(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
     final categoryCtrl = TextEditingController();
@@ -247,9 +254,9 @@ class ProcurementTab extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Add New Supplier',
-                        style: TextStyle(
+                      Text(
+                        l10n.procAddNewSupplier,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -274,7 +281,7 @@ class ProcurementTab extends ConsumerWidget {
                                 }
                               },
                         icon: const Icon(Icons.contacts_rounded, size: 18),
-                        label: const Text('Contacts'),
+                        label: Text(l10n.procContacts),
                       ),
                     ],
                   ),
@@ -288,8 +295,8 @@ class ProcurementTab extends ConsumerWidget {
                         RegExp('[<>{}\\\\&;"\']'),
                       ),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Supplier Name',
+                    decoration: InputDecoration(
+                      labelText: l10n.procSupplierName,
                       counterText: '',
                     ),
                   ),
@@ -302,8 +309,8 @@ class ProcurementTab extends ConsumerWidget {
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]')),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Phone Number',
+                    decoration: InputDecoration(
+                      labelText: l10n.procPhoneNumber,
                       counterText: '',
                       hintText: '+91 XXXXX XXXXX',
                     ),
@@ -318,8 +325,8 @@ class ProcurementTab extends ConsumerWidget {
                         RegExp('[<>{}\\\\&;"\']'),
                       ),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Category (e.g. Dairy, FMCG)',
+                    decoration: InputDecoration(
+                      labelText: l10n.procCategoryHint,
                       counterText: '',
                     ),
                   ),
@@ -341,10 +348,8 @@ class ProcurementTab extends ConsumerWidget {
                                 if (digits.length < 7 ||
                                     !RegExp(r'^\+?\d+$').hasMatch(phone)) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Enter a valid phone number',
-                                      ),
+                                    SnackBar(
+                                      content: Text(l10n.procEnterValidPhone),
                                     ),
                                   );
                                   return;
@@ -374,7 +379,7 @@ class ProcurementTab extends ConsumerWidget {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Save Supplier'),
+                          : Text(l10n.procSaveSupplier),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -392,6 +397,7 @@ class ProcurementTab extends ConsumerWidget {
     WidgetRef ref,
     Supplier supplier,
   ) {
+    final l10n = AppLocalizations.of(context);
     final nameCtrl = TextEditingController(text: supplier.name);
     final phoneCtrl = TextEditingController(text: supplier.phone ?? '');
     final categoryCtrl = TextEditingController(text: supplier.category ?? '');
@@ -420,9 +426,9 @@ class ProcurementTab extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Edit Supplier',
-                        style: TextStyle(
+                      Text(
+                        l10n.procEditSupplier,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -447,7 +453,7 @@ class ProcurementTab extends ConsumerWidget {
                                 }
                               },
                         icon: const Icon(Icons.contacts_rounded, size: 18),
-                        label: const Text('Contacts'),
+                        label: Text(l10n.procContacts),
                       ),
                     ],
                   ),
@@ -461,8 +467,8 @@ class ProcurementTab extends ConsumerWidget {
                         RegExp('[<>{}\\\\&;"\']'),
                       ),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Supplier Name',
+                    decoration: InputDecoration(
+                      labelText: l10n.procSupplierName,
                       counterText: '',
                     ),
                   ),
@@ -475,8 +481,8 @@ class ProcurementTab extends ConsumerWidget {
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]')),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Phone Number',
+                    decoration: InputDecoration(
+                      labelText: l10n.procPhoneNumber,
                       counterText: '',
                       hintText: '+91 XXXXX XXXXX',
                     ),
@@ -491,8 +497,8 @@ class ProcurementTab extends ConsumerWidget {
                         RegExp('[<>{}\\\\&;"\']'),
                       ),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Category (e.g. Dairy, FMCG)',
+                    decoration: InputDecoration(
+                      labelText: l10n.procCategoryHint,
                       counterText: '',
                     ),
                   ),
@@ -514,10 +520,8 @@ class ProcurementTab extends ConsumerWidget {
                                 if (digits.length < 7 ||
                                     !RegExp(r'^\+?\d+$').hasMatch(phone)) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Enter a valid phone number',
-                                      ),
+                                    SnackBar(
+                                      content: Text(l10n.procEnterValidPhone),
                                     ),
                                   );
                                   return;
@@ -548,7 +552,7 @@ class ProcurementTab extends ConsumerWidget {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Save Changes'),
+                          : Text(l10n.procSaveChanges),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -567,6 +571,7 @@ class ProcurementTab extends ConsumerWidget {
     List<Supplier> suppliers, {
     PurchasePrefill? prefill,
   }) {
+    final l10n = AppLocalizations.of(context);
     Supplier? selectedSupplier = prefill?.supplierId != null
         ? suppliers.firstWhere(
             (s) => s.supplierId == prefill!.supplierId,
@@ -624,9 +629,9 @@ class ProcurementTab extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'New Purchase Order',
-                      style: TextStyle(
+                    Text(
+                      l10n.procNewPurchaseOrder,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
                       ),
@@ -639,8 +644,11 @@ class ProcurementTab extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Record items purchased from a distributor.',
-                  style: TextStyle(color: BrandColors.muted, fontSize: 14),
+                  l10n.procRecordItemsFromDistributor,
+                  style: const TextStyle(
+                    color: BrandColors.muted,
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 24),
 
@@ -649,9 +657,9 @@ class ProcurementTab extends ConsumerWidget {
                     controller: scrollController,
                     children: [
                       // 1. Supplier & Dates
-                      _formSectionTitle('Order Details'),
+                      _formSectionTitle(l10n.procOrderDetails),
                       const SizedBox(height: 12),
-                      _inputLabel('Distributor'),
+                      _inputLabel(l10n.procDistributor),
                       DropdownButtonFormField<Supplier>(
                         initialValue: selectedSupplier,
                         decoration: InputDecoration(
@@ -682,7 +690,7 @@ class ProcurementTab extends ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _inputLabel('Payment Due Date'),
+                                _inputLabel(l10n.procPaymentDueDate),
                                 InkWell(
                                   onTap: () async {
                                     final d = await showDatePicker(
@@ -711,7 +719,7 @@ class ProcurementTab extends ConsumerWidget {
                                         const SizedBox(width: 8),
                                         Text(
                                           dueDate == null
-                                              ? 'Select Date'
+                                              ? l10n.procSelectDate
                                               : '${dueDate!.day}/${dueDate!.month}/${dueDate!.year}',
                                         ),
                                       ],
@@ -730,7 +738,9 @@ class ProcurementTab extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _formSectionTitle('Items (${selectedItems.length})'),
+                          _formSectionTitle(
+                            l10n.procItemsCount(selectedItems.length),
+                          ),
                           TextButton.icon(
                             onPressed: () => _showInlineProductPicker(
                               ctx,
@@ -758,7 +768,7 @@ class ProcurementTab extends ConsumerWidget {
                               },
                             ),
                             icon: const Icon(Icons.add_rounded, size: 18),
-                            label: const Text('Add Item'),
+                            label: Text(l10n.procAddItem),
                           ),
                         ],
                       ),
@@ -773,10 +783,10 @@ class ProcurementTab extends ConsumerWidget {
                             ),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              'No items added yet',
-                              style: TextStyle(color: BrandColors.muted),
+                              l10n.procNoItemsAddedYet,
+                              style: const TextStyle(color: BrandColors.muted),
                             ),
                           ),
                         )
@@ -836,12 +846,12 @@ class ProcurementTab extends ConsumerWidget {
                         ),
 
                       const SizedBox(height: 32),
-                      _inputLabel('Notes'),
+                      _inputLabel(l10n.procNotes),
                       TextField(
                         controller: notesCtrl,
                         maxLines: 2,
                         decoration: InputDecoration(
-                          hintText: 'Bill number, delivery notes, etc.',
+                          hintText: l10n.procNotesHint,
                           filled: true,
                           fillColor: BrandColors.background,
                           border: OutlineInputBorder(
@@ -869,9 +879,9 @@ class ProcurementTab extends ConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Total Amount',
-                              style: TextStyle(
+                            Text(
+                              l10n.procTotalAmount,
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: BrandColors.muted,
                               ),
@@ -924,7 +934,7 @@ class ProcurementTab extends ConsumerWidget {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text('Save Order'),
+                              : Text(l10n.procSaveOrder),
                         ),
                       ),
                     ],
@@ -968,6 +978,7 @@ class ProcurementTab extends ConsumerWidget {
     List<dynamic> products,
     Function(Map<String, dynamic>) onAdd,
   ) {
+    final l10n = AppLocalizations.of(context);
     List<dynamic> filteredProducts = products;
     final searchCtrl = TextEditingController();
 
@@ -987,7 +998,7 @@ class ProcurementTab extends ConsumerWidget {
                 controller: searchCtrl,
                 autofocus: true,
                 decoration: InputDecoration(
-                  hintText: 'Search product...',
+                  hintText: l10n.procSearchProduct,
                   prefixIcon: const Icon(Icons.search_rounded),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -1032,27 +1043,26 @@ class ProcurementTab extends ConsumerWidget {
     dynamic product,
     Function(Map<String, dynamic>) onAdd,
   ) {
+    final l10n = AppLocalizations.of(context);
     final qtyCtrl = TextEditingController(text: '1');
     final costCtrl = TextEditingController();
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Add ${product.name}'),
+        title: Text(l10n.procAddProduct(product.name)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: qtyCtrl,
-              decoration: const InputDecoration(labelText: 'Quantity'),
+              decoration: InputDecoration(labelText: l10n.procQuantity),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
             TextField(
               controller: costCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Cost Price per unit',
-              ),
+              decoration: InputDecoration(labelText: l10n.procCostPricePerUnit),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),
@@ -1065,7 +1075,7 @@ class ProcurementTab extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(l10n.procCancel),
           ),
           TextButton(
             onPressed: () {
@@ -1080,7 +1090,7 @@ class ProcurementTab extends ConsumerWidget {
               });
               Navigator.pop(ctx);
             },
-            child: const Text('Add'),
+            child: Text(l10n.procAdd),
           ),
         ],
       ),
@@ -1095,10 +1105,11 @@ class _ReorderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final cover = s.daysOfCover;
     final coverLabel = cover == null
         ? '—'
-        : '${cover.toStringAsFixed(cover < 10 ? 1 : 0)}d cover';
+        : l10n.procDaysCover(cover.toStringAsFixed(cover < 10 ? 1 : 0));
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
@@ -1128,7 +1139,7 @@ class _ReorderCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Order ${s.suggestedQty} ${s.unit ?? ''}'.trim(),
+                  l10n.procOrderQty('${s.suggestedQty} ${s.unit ?? ''}'.trim()),
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 12,
@@ -1140,7 +1151,11 @@ class _ReorderCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Stock ${s.stock} · ~${s.avgDaily.toStringAsFixed(1)}/day · $coverLabel',
+            l10n.procStockLine(
+              '${s.stock}',
+              s.avgDaily.toStringAsFixed(1),
+              coverLabel,
+            ),
             style: const TextStyle(fontSize: 12, color: BrandColors.muted),
           ),
           if (s.supplierName != null) ...[
@@ -1159,9 +1174,9 @@ class _ReorderCard extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onOrder,
                 icon: const Icon(Icons.add_shopping_cart_rounded, size: 15),
-                label: const Text(
-                  'Create purchase order',
-                  style: TextStyle(fontSize: 12),
+                label: Text(
+                  l10n.procCreatePurchaseOrder,
+                  style: const TextStyle(fontSize: 12),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: BrandColors.primary,
@@ -1184,6 +1199,7 @@ class _SupplierTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -1210,9 +1226,13 @@ class _SupplierTile extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      supplier.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    Flexible(
+                      child: Text(
+                        supplier.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     if (supplier.category != null &&
                         supplier.category!.isNotEmpty) ...[
@@ -1256,7 +1276,7 @@ class _SupplierTile extends StatelessWidget {
               color: BrandColors.muted,
               size: 20,
             ),
-            tooltip: 'Edit supplier',
+            tooltip: l10n.procEditSupplierTooltip,
           ),
         ],
       ),
@@ -1270,6 +1290,7 @@ class _PurchaseOrderTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final statusColor = _statusColor(order.status);
 
     return Container(
@@ -1345,9 +1366,9 @@ class _PurchaseOrderTile extends ConsumerWidget {
                   foregroundColor: BrandColors.success,
                   padding: EdgeInsets.zero,
                 ),
-                child: const Text(
-                  'Mark as Received',
-                  style: TextStyle(fontSize: 12),
+                child: Text(
+                  l10n.procMarkAsReceived,
+                  style: const TextStyle(fontSize: 12),
                 ),
               ),
             ),

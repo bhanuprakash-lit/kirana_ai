@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../../dashboard/providers/overview_provider.dart';
@@ -18,6 +19,7 @@ class CashflowTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final financeAsync = ref.watch(financeProvider);
     final overviewAsync = ref.watch(overviewProvider);
+    final l10n = AppLocalizations.of(context);
 
     return financeAsync.when(
       loading: () => const Padding(
@@ -44,9 +46,9 @@ class CashflowTab extends ConsumerWidget {
                 color: BrandColors.error,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Failed to load cashflow data',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.finFailedLoadCashflow,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -57,7 +59,7 @@ class CashflowTab extends ConsumerWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.read(financeProvider.notifier).refresh(),
-                child: const Text('Retry'),
+                child: Text(l10n.finRetry),
               ),
             ],
           ),
@@ -88,7 +90,7 @@ class CashflowTab extends ConsumerWidget {
               // ── Income ──────────────────────────────────────────────────
               _SectionHeader(
                 icon: Icons.trending_up_rounded,
-                label: 'Income',
+                label: l10n.finIncome,
                 color: BrandColors.success,
               ),
               const SizedBox(height: 10),
@@ -96,7 +98,7 @@ class CashflowTab extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: _MetricCard(
-                      label: "Today's Sales",
+                      label: l10n.finTodaysSales,
                       value: _fmt(todaySales),
                       icon: Icons.today_rounded,
                       color: BrandColors.success,
@@ -105,7 +107,7 @@ class CashflowTab extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _MetricCard(
-                      label: 'Monthly Sales',
+                      label: l10n.finMonthlySales,
                       value: _fmt(stats.monthlySalesAmount),
                       icon: Icons.calendar_month_rounded,
                       color: BrandColors.primary,
@@ -116,17 +118,17 @@ class CashflowTab extends ConsumerWidget {
               const SizedBox(height: 24),
 
               // ── Credit Exposure ─────────────────────────────────────────
-              const _SectionHeader(
+              _SectionHeader(
                 icon: Icons.account_balance_wallet_outlined,
-                label: 'Credit Exposure (Udhaar)',
-                color: Color(0xFFD97706),
+                label: l10n.finCreditExposureUdhaar,
+                color: const Color(0xFFD97706),
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: _MetricCard(
-                      label: 'Outstanding',
+                      label: l10n.finOutstanding,
                       value: _fmt(stats.totalUdhaarPending),
                       icon: Icons.hourglass_bottom_rounded,
                       color: const Color(0xFFD97706),
@@ -135,7 +137,7 @@ class CashflowTab extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _MetricCard(
-                      label: 'Recovered',
+                      label: l10n.finRecovered,
                       value: _fmt(stats.totalUdhaarRecovered),
                       icon: Icons.check_circle_outline_rounded,
                       color: BrandColors.success,
@@ -145,8 +147,8 @@ class CashflowTab extends ConsumerWidget {
               ),
               const SizedBox(height: 10),
               _MetricCard(
-                label: 'Customers with pending dues',
-                value: '${stats.udhaarCustomerCount} customers',
+                label: l10n.finCustomersWithPendingDues,
+                value: l10n.finCustomersCount(stats.udhaarCustomerCount),
                 icon: Icons.people_outline_rounded,
                 color: BrandColors.error,
                 fullWidth: true,
@@ -156,7 +158,7 @@ class CashflowTab extends ConsumerWidget {
               // ── Credit vs Sales Ratio ───────────────────────────────────
               _SectionHeader(
                 icon: Icons.pie_chart_outline_rounded,
-                label: 'Credit vs Sales Ratio',
+                label: l10n.finCreditVsSalesRatio,
                 color: ratioColor,
               ),
               const SizedBox(height: 10),
@@ -300,11 +302,12 @@ class _CreditRatioCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final label = ratio < 20
-        ? 'Healthy — credit exposure is low'
+        ? l10n.finCreditHealthy
         : ratio < 40
-        ? 'Moderate — consider collecting dues'
-        : 'High — many sales are on credit';
+        ? l10n.finCreditModerate
+        : l10n.finCreditHigh;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -326,17 +329,28 @@ class _CreditRatioCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${ratio.toStringAsFixed(1)}% on credit',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  color: color,
+              Flexible(
+                child: Text(
+                  l10n.finPercentOnCredit(ratio.toStringAsFixed(1)),
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: color,
+                  ),
                 ),
               ),
-              Text(
-                'of ${fmt(monthly)} monthly',
-                style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  l10n.finOfMonthly(fmt(monthly)),
+                  textAlign: TextAlign.end,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.muted,
+                  ),
+                ),
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/services/contact_service.dart';
@@ -19,6 +20,7 @@ class UdhaarTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(financeProvider);
+    final l10n = AppLocalizations.of(context);
 
     return asyncData.when(
       loading: () => const Padding(
@@ -31,20 +33,20 @@ class UdhaarTab extends ConsumerWidget {
           children: [
             const Icon(Icons.error_outline, size: 48, color: BrandColors.error),
             const SizedBox(height: 16),
-            const Text(
-              'Failed to load udhaar data',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              l10n.finFailedLoadUdhaar,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Please check your connection and try again.',
+            Text(
+              l10n.finCheckConnection,
               textAlign: TextAlign.center,
-              style: TextStyle(color: BrandColors.muted),
+              style: const TextStyle(color: BrandColors.muted),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => ref.read(financeProvider.notifier).refresh(),
-              child: const Text('Retry'),
+              child: Text(l10n.finRetry),
             ),
           ],
         ),
@@ -70,16 +72,20 @@ class UdhaarTab extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Customer Dues',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    l10n.finCustomerDues,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 TextButton.icon(
                   onPressed: () => _showAddUdhaarSheet(context, ref),
                   icon: const Icon(Icons.add_rounded, size: 18),
-                  label: const Text('New Udhaar'),
+                  label: Text(l10n.finNewUdhaar),
                 ),
               ],
             ),
@@ -180,6 +186,7 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
   @override
   Widget build(BuildContext context) {
     final customers = ref.watch(customerProvider).customers;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       decoration: const BoxDecoration(
@@ -210,14 +217,18 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Add New Udhaar',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  color: BrandColors.ink,
+              Expanded(
+                child: Text(
+                  l10n.finAddNewUdhaar,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: BrandColors.ink,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               if (!_saving && !_success)
                 TextButton.icon(
                   onPressed: () async {
@@ -238,9 +249,9 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
                     }
                   },
                   icon: const Icon(Icons.contacts_rounded, size: 18),
-                  label: const Text(
-                    'Contacts',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                  label: Text(
+                    l10n.finContacts,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
             ],
@@ -304,9 +315,9 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
                                   ),
                               ],
                             )
-                          : const Text(
-                              'Select existing customer',
-                              style: TextStyle(
+                          : Text(
+                              l10n.finSelectExistingCustomer,
+                              style: const TextStyle(
                                 fontSize: 14,
                                 color: BrandColors.muted,
                                 fontWeight: FontWeight.w500,
@@ -325,17 +336,20 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
               ),
             ),
             const SizedBox(height: 12),
-            const Row(
+            Row(
               children: [
-                Expanded(child: Divider()),
+                const Expanded(child: Divider()),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
-                    'or enter manually',
-                    style: TextStyle(fontSize: 11, color: BrandColors.muted),
+                    l10n.finOrEnterManually,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: BrandColors.muted,
+                    ),
                   ),
                 ),
-                Expanded(child: Divider()),
+                const Expanded(child: Divider()),
               ],
             ),
             const SizedBox(height: 12),
@@ -345,16 +359,16 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
             isSaving: _saving,
             error: _error,
             isSuccess: _success,
-            successMessage: 'Udhaar recorded!',
+            successMessage: l10n.finUdhaarRecorded,
           ),
           if (_saving || _error != null || _success) const SizedBox(height: 16),
 
           TextField(
             controller: widget.nameController,
             enabled: !_saving && !_success,
-            decoration: const InputDecoration(
-              labelText: 'Customer Name',
-              prefixIcon: Icon(Icons.person_outline_rounded),
+            decoration: InputDecoration(
+              labelText: l10n.finCustomerName,
+              prefixIcon: const Icon(Icons.person_outline_rounded),
             ),
           ),
           const SizedBox(height: 16),
@@ -362,9 +376,9 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
             controller: widget.phoneController,
             enabled: !_saving && !_success,
             keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(
-              labelText: 'Phone Number',
-              prefixIcon: Icon(Icons.phone_rounded),
+            decoration: InputDecoration(
+              labelText: l10n.finPhoneNumber,
+              prefixIcon: const Icon(Icons.phone_rounded),
             ),
           ),
           const SizedBox(height: 16),
@@ -372,10 +386,10 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
             controller: widget.amountController,
             enabled: !_saving && !_success,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Amount',
+            decoration: InputDecoration(
+              labelText: l10n.finAmount,
               prefixText: '₹ ',
-              prefixIcon: Icon(Icons.currency_rupee_rounded),
+              prefixIcon: const Icon(Icons.currency_rupee_rounded),
             ),
           ),
           const SizedBox(height: 28),
@@ -383,7 +397,7 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
             width: double.infinity,
             height: 56,
             child: LoadingButton(
-              label: 'Save Udhaar',
+              label: l10n.finSaveUdhaar,
               isLoading: _saving,
               onPressed: _success
                   ? null
@@ -394,7 +408,7 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
                           widget.phoneController.text.isEmpty ||
                           amount <= 0) {
                         setState(
-                          () => _error = 'Enter valid name, phone and amount',
+                          () => _error = l10n.finEnterValidNamePhoneAmount,
                         );
                         return;
                       }
@@ -466,6 +480,7 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final filtered = widget.customers.where((c) {
       if (_query.isEmpty) return true;
       final q = _query.toLowerCase();
@@ -499,9 +514,12 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Select Customer',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                  Text(
+                    l10n.finSelectCustomer,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -509,7 +527,7 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
                     autofocus: true,
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
-                      hintText: 'Search by name or phone...',
+                      hintText: l10n.finSearchByNameOrPhone,
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         size: 20,
@@ -542,10 +560,10 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No customers found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.finNoCustomersFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(
@@ -605,6 +623,7 @@ class _UdhaarStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -622,19 +641,19 @@ class _UdhaarStatsCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _MiniStat(
-            label: 'Total Pending',
+            label: l10n.finTotalPending,
             value: '₹${stats.totalUdhaarPending.toStringAsFixed(0)}',
             color: BrandColors.error,
           ),
 
           _MiniStat(
-            label: 'Recovered',
+            label: l10n.finRecovered,
             value: '₹${stats.totalUdhaarRecovered.toStringAsFixed(0)}',
             color: BrandColors.success,
           ),
 
           _MiniStat(
-            label: 'Customers',
+            label: l10n.finCustomers,
             value: '${stats.udhaarCustomerCount}',
             color: BrandColors.primary,
           ),
@@ -687,6 +706,7 @@ class _SmartRemindersBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final urgent = highRisk > 0;
     final color = urgent ? BrandColors.error : BrandColors.primary;
     return Material(
@@ -704,8 +724,8 @@ class _SmartRemindersBanner extends StatelessWidget {
               Expanded(
                 child: Text(
                   urgent
-                      ? '$highRisk high-risk due${highRisk == 1 ? '' : 's'} — chase these first'
-                      : 'Smart Reminders — recovery-ranked dues',
+                      ? l10n.finHighRiskDues(highRisk)
+                      : l10n.finSmartRemindersSubtitle,
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
@@ -730,6 +750,7 @@ class _UdhaarTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isRecovered = item.isRecovered;
+    final l10n = AppLocalizations.of(context);
 
     return Opacity(
       opacity: isRecovered ? 0.6 : 1.0,
@@ -741,62 +762,69 @@ class _UdhaarTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: BrandColors.border),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              backgroundColor: isRecovered
-                  ? BrandColors.muted
-                  : BrandColors.primary.withValues(alpha: 0.1),
-              child: Text(
-                item.customerName.isNotEmpty
-                    ? item.customerName[0].toUpperCase()
-                    : '?',
-                style: TextStyle(
-                  color: isRecovered ? BrandColors.muted : BrandColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 16),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.customerName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  if (item.phone.isNotEmpty)
-                    Text(
-                      item.phone,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: BrandColors.muted,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  Text(
-                    'Taken: ${_formatDate(item.dateTaken)} (${item.daysPending} days ago)',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: BrandColors.muted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            // Identity + balance.
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                CircleAvatar(
+                  backgroundColor: isRecovered
+                      ? BrandColors.muted
+                      : BrandColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    item.customerName.isNotEmpty
+                        ? item.customerName[0].toUpperCase()
+                        : '?',
+                    style: TextStyle(
+                      color: isRecovered
+                          ? BrandColors.muted
+                          : BrandColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.customerName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (item.phone.isNotEmpty)
+                        Text(
+                          item.phone,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: BrandColors.muted,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      Text(
+                        l10n.finTakenDaysAgo(
+                          _formatDate(item.dateTaken),
+                          item.daysPending,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: BrandColors.muted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Text(
                   '₹${item.balance.toStringAsFixed(0)}',
                   style: TextStyle(
@@ -805,75 +833,86 @@ class _UdhaarTile extends ConsumerWidget {
                     color: isRecovered ? BrandColors.muted : BrandColors.error,
                   ),
                 ),
+              ],
+            ),
 
-                if (!isRecovered)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () async {
-                          try {
-                            await ref
-                                .read(financeProvider.notifier)
-                                .sendReminder(item.khataId);
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('WhatsApp reminder sent!'),
-                                  backgroundColor: BrandColors.success,
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Failed to send reminder: $e'),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.message_outlined,
-                          size: 20,
-                          color: BrandColors.success,
-                        ),
-                        tooltip: 'Send WhatsApp Reminder',
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () => _showRecoveryBottomSheet(context, ref),
-                        style: TextButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        child: const Text('Recover'),
-                      ),
-                      const SizedBox(width: 4),
-                      TextButton(
-                        onPressed: () => _showHistorySheet(context, ref),
-                        style: TextButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                          foregroundColor: BrandColors.muted,
-                        ),
-                        child: const Text('History'),
-                      ),
-                    ],
+            // Actions / settled state on their own full-width row so the
+            // translated labels never squeeze the details above.
+            if (!isRecovered) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      try {
+                        await ref
+                            .read(financeProvider.notifier)
+                            .sendReminder(item.khataId);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.finWhatsappReminderSent),
+                              backgroundColor: BrandColors.success,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                l10n.finFailedSendReminder(e.toString()),
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.message_outlined,
+                      size: 20,
+                      color: BrandColors.success,
+                    ),
+                    tooltip: l10n.finSendWhatsappReminder,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => _showRecoveryBottomSheet(context, ref),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    child: Text(l10n.finRecover),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton(
+                    onPressed: () => _showHistorySheet(context, ref),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      foregroundColor: BrandColors.muted,
+                    ),
+                    child: Text(l10n.finHistory),
+                  ),
+                ],
+              ),
+            ],
 
-                if (isRecovered)
-                  const Text(
-                    'Settled',
-                    style: TextStyle(
+            if (isRecovered)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    l10n.finSettled,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: BrandColors.success,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-              ],
-            ),
+                ),
+              ),
           ],
         ),
       ),
@@ -928,6 +967,7 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -955,7 +995,7 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
           ),
           const SizedBox(height: 24),
           Text(
-            'Recover Udhaar from ${widget.item.customerName}',
+            l10n.finRecoverUdhaarFrom(widget.item.customerName),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
@@ -968,7 +1008,7 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
             isSaving: _saving,
             error: _error,
             isSuccess: _success,
-            successMessage: 'Recovery recorded!',
+            successMessage: l10n.finRecoveryRecorded,
           ),
           if (_saving || _error != null || _success) const SizedBox(height: 16),
 
@@ -977,10 +1017,12 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
             enabled: !_saving && !_success,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              labelText: 'Amount',
+              labelText: l10n.finAmount,
               prefixText: '₹ ',
               prefixIcon: const Icon(Icons.currency_rupee_rounded),
-              helperText: 'Balance: ₹${widget.item.balance.toStringAsFixed(0)}',
+              helperText: l10n.finBalanceLabel(
+                widget.item.balance.toStringAsFixed(0),
+              ),
             ),
           ),
           const SizedBox(height: 28),
@@ -988,20 +1030,21 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
             width: double.infinity,
             height: 56,
             child: LoadingButton(
-              label: 'Confirm Recovery',
+              label: l10n.finConfirmRecovery,
               isLoading: _saving,
               onPressed: _success
                   ? null
                   : () async {
                       final amount = double.tryParse(_controller.text) ?? 0;
                       if (amount <= 0) {
-                        setState(() => _error = 'Please enter a valid amount');
+                        setState(() => _error = l10n.finEnterValidAmount);
                         return;
                       }
                       if (amount > widget.item.balance) {
                         setState(
-                          () => _error =
-                              'Amount cannot exceed balance ₹${widget.item.balance.toStringAsFixed(0)}',
+                          () => _error = l10n.finAmountExceedsBalance(
+                            widget.item.balance.toStringAsFixed(0),
+                          ),
                         );
                         return;
                       }
@@ -1047,6 +1090,7 @@ class _EmptyUdhaar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 40),
@@ -1060,9 +1104,9 @@ class _EmptyUdhaar extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            const Text(
-              'No pending udhaars',
-              style: TextStyle(
+            Text(
+              l10n.finNoPendingUdhaars,
+              style: const TextStyle(
                 color: BrandColors.muted,
                 fontWeight: FontWeight.bold,
               ),
@@ -1120,6 +1164,7 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
       minChildSize: 0.3,
@@ -1150,9 +1195,9 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Recovery History',
-                          style: TextStyle(
+                        Text(
+                          l10n.finRecoveryHistory,
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w900,
                           ),
@@ -1177,7 +1222,9 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      'Balance: ₹${widget.item.balance.toStringAsFixed(0)}',
+                      l10n.finBalanceLabel(
+                        widget.item.balance.toStringAsFixed(0),
+                      ),
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
@@ -1204,10 +1251,10 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
                       ),
                     )
                   : _payments.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No recoveries recorded yet.',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.finNoRecoveriesYet,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.separated(
@@ -1250,7 +1297,9 @@ class _UdhaarHistorySheetState extends State<_UdhaarHistorySheet> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Recovery #${_payments.length - i}',
+                                      l10n.finRecoveryNumber(
+                                        _payments.length - i,
+                                      ),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 14,

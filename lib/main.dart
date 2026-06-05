@@ -3,12 +3,15 @@ import 'dart:ui';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_router.dart';
 import 'core/config/firebase_backend_config.dart';
+import 'core/locale/locale_provider.dart';
 import 'core/services/api_client.dart';
 import 'core/theme/brand_theme.dart';
+import 'l10n/generated/app_localizations.dart';
 import 'features/pos_inventory/providers/printer_provider.dart';
 import 'features/subscription/providers/iap_provider.dart';
 import 'features/support/providers/notification_provider.dart';
@@ -102,11 +105,32 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
   Widget build(BuildContext context) {
     ref.watch(iapProvider); // Initialize IAP stream at app startup
     final router = ref.watch(appRouterProvider);
+    final locale = ref.watch(localeProvider);
     return MaterialApp.router(
       title: 'Kirana AI',
-      theme: buildBrandTheme(),
+      theme: buildBrandTheme(locale),
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+      locale: locale,
+      supportedLocales: kSupportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      builder: (context, child) {
+        // Clamp very large system font / display-size settings so the dense
+        // business layouts (dashboard cards, headers) don't overflow. Moderate
+        // accessibility scaling up to 1.3× is still honoured.
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(
+            textScaler: mq.textScaler.clamp(maxScaleFactor: 1.3),
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }

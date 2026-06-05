@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../shared/widgets/language_selector.dart';
 import '../../providers/onboarding_provider.dart';
 
 class WelcomeStep extends ConsumerStatefulWidget {
@@ -21,29 +23,22 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
   Timer? _timer;
   int _currentSlide = 0;
 
-  static const _slides = [
-    _Slide(
+  // Per-slide visuals; the title/subtitle text is pulled from AppLocalizations
+  // at build time so it follows the chosen language.
+  static const _slideVisuals = [
+    _SlideVisual(
       icon: Icons.storefront_rounded,
       iconColor: Color(0xFFF59E0B),
-      title: 'Welcome to\nKirana AI',
-      subtitle:
-          'Your smart business partner for managing your kirana store — built for South India.',
       gradient: [Color(0xFF243B6B), Color(0xFF1E3A5F)],
     ),
-    _Slide(
+    _SlideVisual(
       icon: Icons.inventory_2_rounded,
       iconColor: Color(0xFF34D399),
-      title: 'Smart Inventory\nManagement',
-      subtitle:
-          'Track stock levels, get low-stock alerts, and never run out of your bestselling products.',
       gradient: [Color(0xFF064E3B), Color(0xFF065F46)],
     ),
-    _Slide(
+    _SlideVisual(
       icon: Icons.trending_up_rounded,
       iconColor: Color(0xFFF59E0B),
-      title: 'Grow Your\nBusiness',
-      subtitle:
-          'Get AI-powered insights, sales analytics, and personalised tips for your store.',
       gradient: [Color(0xFF312E81), Color(0xFF243B6B)],
     ),
   ];
@@ -62,8 +57,8 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
   }
 
   void _startAutoPlay() {
-    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      final next = (_currentSlide + 1) % _slides.length;
+    _timer = Timer.periodic(const Duration(seconds: 8), (_) {
+      final next = (_currentSlide + 1) % _slideVisuals.length;
       _slideController.animateToPage(
         next,
         duration: const Duration(milliseconds: 600),
@@ -74,14 +69,39 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final titles = [
+      l10n.welcomeSlide1Title,
+      l10n.welcomeSlide2Title,
+      l10n.welcomeSlide3Title,
+    ];
+    final subtitles = [
+      l10n.welcomeSlide1Subtitle,
+      l10n.welcomeSlide2Subtitle,
+      l10n.welcomeSlide3Subtitle,
+    ];
+
     return Column(
       children: [
         Expanded(
-          child: PageView.builder(
-            controller: _slideController,
-            onPageChanged: (i) => setState(() => _currentSlide = i),
-            itemCount: _slides.length,
-            itemBuilder: (_, i) => _SlideCard(slide: _slides[i]),
+          child: Stack(
+            children: [
+              PageView.builder(
+                controller: _slideController,
+                onPageChanged: (i) => setState(() => _currentSlide = i),
+                itemCount: _slideVisuals.length,
+                itemBuilder: (_, i) => _SlideCard(
+                  visual: _slideVisuals[i],
+                  title: titles[i],
+                  subtitle: subtitles[i],
+                ),
+              ),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 12,
+                right: 20,
+                child: const LanguageChip(),
+              ),
+            ],
           ),
         ),
         Container(
@@ -96,7 +116,7 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
             children: [
               SmoothPageIndicator(
                 controller: _slideController,
-                count: _slides.length,
+                count: _slideVisuals.length,
                 effect: WormEffect(
                   dotWidth: 8,
                   dotHeight: 8,
@@ -111,7 +131,7 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
                 child: ElevatedButton(
                   onPressed: () =>
                       ref.read(onboardingProvider.notifier).goToStep(1),
-                  child: const Text('Get Started'),
+                  child: Text(l10n.welcomeGetStarted),
                 ),
               ),
               const SizedBox(height: 16),
@@ -119,11 +139,11 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
                 onTap: () => context.go('/login'),
                 child: RichText(
                   text: TextSpan(
-                    text: 'Already have an account? ',
+                    text: l10n.welcomeHaveAccount,
                     style: Theme.of(context).textTheme.bodyMedium,
                     children: [
                       TextSpan(
-                        text: 'Sign In',
+                        text: l10n.welcomeSignIn,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: BrandColors.primary,
                           fontWeight: FontWeight.w700,
@@ -142,8 +162,14 @@ class _WelcomeStepState extends ConsumerState<WelcomeStep> {
 }
 
 class _SlideCard extends StatelessWidget {
-  final _Slide slide;
-  const _SlideCard({required this.slide});
+  final _SlideVisual visual;
+  final String title;
+  final String subtitle;
+  const _SlideCard({
+    required this.visual,
+    required this.title,
+    required this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +178,7 @@ class _SlideCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: slide.gradient,
+          colors: visual.gradient,
         ),
       ),
       child: SafeArea(
@@ -169,7 +195,7 @@ class _SlideCard extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(24),
                     ),
-                    child: Icon(slide.icon, size: 40, color: slide.iconColor),
+                    child: Icon(visual.icon, size: 40, color: visual.iconColor),
                   )
                   .animate()
                   .scale(
@@ -180,7 +206,7 @@ class _SlideCard extends StatelessWidget {
                   .fadeIn(duration: 400.ms),
               const SizedBox(height: 40),
               Text(
-                    slide.title,
+                    title,
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       color: Colors.white,
                       height: 1.1,
@@ -192,7 +218,7 @@ class _SlideCard extends StatelessWidget {
                   .slideX(begin: -0.15, end: 0),
               const SizedBox(height: 16),
               Text(
-                    slide.subtitle,
+                    subtitle,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.white.withValues(alpha: 0.75),
                       height: 1.6,
@@ -209,18 +235,14 @@ class _SlideCard extends StatelessWidget {
   }
 }
 
-class _Slide {
+class _SlideVisual {
   final IconData icon;
   final Color iconColor;
-  final String title;
-  final String subtitle;
   final List<Color> gradient;
 
-  const _Slide({
+  const _SlideVisual({
     required this.icon,
     required this.iconColor,
-    required this.title,
-    required this.subtitle,
     required this.gradient,
   });
 }

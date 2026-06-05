@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/association_model.dart';
 import '../providers/association_provider.dart';
@@ -10,19 +11,20 @@ class AssociationScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         backgroundColor: BrandColors.background,
         appBar: AppBar(
-          title: const Text(
-            'Area Associations',
-            style: TextStyle(fontWeight: FontWeight.w800),
+          title: Text(
+            l10n.mktAreaAssociations,
+            style: const TextStyle(fontWeight: FontWeight.w800),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(text: 'My Areas'),
-              Tab(text: 'Customer Heatmap'),
+              Tab(text: l10n.mktMyAreas),
+              Tab(text: l10n.mktCustomerHeatmap),
             ],
           ),
           actions: [
@@ -54,13 +56,15 @@ class _AssociationsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(associationProvider);
     return async.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(20),
         child: ListShimmer(itemCount: 5),
       ),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) =>
+          Center(child: Text(l10n.mktErrorWithMessage(e.toString()))),
       data: (list) {
         if (list.isEmpty) {
           return Center(
@@ -72,14 +76,14 @@ class _AssociationsTab extends ConsumerWidget {
                   const Text('🏘️', style: TextStyle(fontSize: 48)),
                   const SizedBox(height: 16),
                   Text(
-                    'No areas added yet',
+                    l10n.mktNoAreasAddedYet,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Add nearby apartments, hostels, schools or offices to get targeted campaign suggestions.',
+                  Text(
+                    l10n.mktAreasEmptySubtitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: BrandColors.muted,
                       fontSize: 13,
                       height: 1.5,
@@ -96,7 +100,7 @@ class _AssociationsTab extends ConsumerWidget {
                       );
                     },
                     icon: const Icon(Icons.add_rounded),
-                    label: const Text('Add First Area'),
+                    label: Text(l10n.mktAddFirstArea),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: BrandColors.primary,
                       foregroundColor: Colors.white,
@@ -132,20 +136,21 @@ class _AssociationsTab extends ConsumerWidget {
     WidgetRef ref,
     StoreAssociation assoc,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Remove Area?'),
-        content: Text('Remove "${assoc.name}" from your associations?'),
+        title: Text(l10n.mktRemoveAreaTitle),
+        content: Text(l10n.mktRemoveAreaConfirm(assoc.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.mktCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: BrandColors.error),
-            child: const Text('Remove'),
+            child: Text(l10n.mktRemove),
           ),
         ],
       ),
@@ -168,6 +173,7 @@ class _AssociationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -200,7 +206,7 @@ class _AssociationTile extends StatelessWidget {
             ),
             if (assoc.estimatedHouseholds != null)
               Text(
-                '~${assoc.estimatedHouseholds} households',
+                l10n.mktHouseholdsCount(assoc.estimatedHouseholds!),
                 style: const TextStyle(color: BrandColors.muted, fontSize: 11),
               ),
           ],
@@ -236,32 +242,37 @@ class _HeatmapTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(heatmapProvider);
     return async.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(20),
         child: ListShimmer(itemCount: 5),
       ),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) =>
+          Center(child: Text(l10n.mktErrorWithMessage(e.toString()))),
       data: (rows) {
         if (rows.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.all(40),
+              padding: const EdgeInsets.all(40),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('📊', style: TextStyle(fontSize: 48)),
-                  SizedBox(height: 16),
+                  const Text('📊', style: TextStyle(fontSize: 48)),
+                  const SizedBox(height: 16),
                   Text(
-                    'No heatmap data yet',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    l10n.mktNoHeatmapDataYet,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    'Add areas and tag customers to those areas. Revenue data will appear here over time.',
+                    l10n.mktHeatmapEmptySubtitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: BrandColors.muted,
                       fontSize: 13,
                       height: 1.5,
@@ -283,11 +294,11 @@ class _HeatmapTab extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'Last 90 days · by revenue',
-                  style: TextStyle(
+                  l10n.mktLast90DaysByRevenue,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: BrandColors.muted,
                     fontWeight: FontWeight.w600,
@@ -310,6 +321,7 @@ class _HeatmapRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pct = maxRevenue > 0
         ? (row.totalRevenue / maxRevenue).clamp(0.0, 1.0)
         : 0.0;
@@ -379,21 +391,21 @@ class _HeatmapRow extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                _StatChip('👥 ${row.customerCount}', 'customers'),
+                _StatChip('👥 ${row.customerCount}', l10n.mktCustomers),
                 const SizedBox(width: 12),
-                _StatChip('🛒 ${row.totalOrders}', 'orders'),
+                _StatChip('🛒 ${row.totalOrders}', l10n.mktOrders),
                 const SizedBox(width: 12),
                 _StatChip(
                   '₹${row.avgOrderValue.toStringAsFixed(0)}',
-                  'avg order',
+                  l10n.mktAvgOrder,
                 ),
               ],
             ),
           ] else ...[
             const SizedBox(height: 8),
-            const Text(
-              'No orders yet — tag customers to this area to track',
-              style: TextStyle(fontSize: 11, color: BrandColors.muted),
+            Text(
+              l10n.mktNoOrdersYetTagCustomers,
+              style: const TextStyle(fontSize: 11, color: BrandColors.muted),
             ),
           ],
         ],
@@ -451,6 +463,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) return;
     setState(() => _loading = true);
@@ -470,7 +483,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.mktErrorWithMessage(e.toString())),
             backgroundColor: BrandColors.error,
           ),
         );
@@ -482,6 +495,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -507,16 +521,16 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Add Nearby Area',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            Text(
+              l10n.mktAddNearbyArea,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 20),
 
             // Area type chips
-            const Text(
-              'Area Type',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            Text(
+              l10n.mktAreaType,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -549,12 +563,15 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
                       children: [
                         Text(t.emoji),
                         const SizedBox(width: 6),
-                        Text(
-                          t.label,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                            color: selected ? Colors.white : BrandColors.ink,
+                        Flexible(
+                          child: Text(
+                            t.label,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: selected ? Colors.white : BrandColors.ink,
+                            ),
                           ),
                         ),
                       ],
@@ -568,7 +585,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
             TextField(
               controller: _nameCtrl,
               decoration: InputDecoration(
-                labelText: 'Name (e.g. Prestige Apartments)',
+                labelText: l10n.mktAreaNameLabel,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -579,7 +596,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
               controller: _hhCtrl,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: 'Estimated households (optional)',
+                labelText: l10n.mktEstimatedHouseholdsOptional,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -589,7 +606,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
             TextField(
               controller: _notesCtrl,
               decoration: InputDecoration(
-                labelText: 'Notes (optional)',
+                labelText: l10n.mktNotesOptional,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -618,9 +635,9 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text(
-                        'Add Area',
-                        style: TextStyle(
+                    : Text(
+                        l10n.mktAddArea,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
                         ),

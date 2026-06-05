@@ -231,7 +231,11 @@ class PosNotifier extends Notifier<PosState> {
 
   // ── Cart mutations ─────────────────────────────────────────────────────────
 
-  void addToCart(PosProduct product, {double qty = 1.0, double? unitPriceOverride}) {
+  void addToCart(
+    PosProduct product, {
+    double qty = 1.0,
+    double? unitPriceOverride,
+  }) {
     final existing = state.cart.indexWhere(
       (i) => i.product.productId == product.productId,
     );
@@ -358,7 +362,8 @@ class PosNotifier extends Notifier<PosState> {
   Future<Map<String, dynamic>?> placeOrder({
     String paymentMethod = 'cash',
     double? udhaarAmount, // null = full amount is udhaar (or not applicable)
-    int? customerId, // overrides the POS-selected customer (e.g. the udhaar customer)
+    int?
+    customerId, // overrides the POS-selected customer (e.g. the udhaar customer)
   }) async {
     if (state.cart.isEmpty) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);

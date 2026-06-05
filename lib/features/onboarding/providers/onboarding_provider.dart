@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/locale/locale_provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/repositories/auth_repository.dart'; // ApiException
 import '../models/onboarding_data.dart';
@@ -46,6 +48,11 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   @override
   OnboardingState build() => const OnboardingState();
 
+  /// Localized strings for the current locale. Notifiers have no
+  /// BuildContext, so we resolve AppLocalizations from the locale provider.
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   void updateData(OnboardingData data) => state = state.copyWith(data: data);
 
   void goToStep(int step) =>
@@ -66,8 +73,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
           permission == LocationPermission.deniedForever) {
         state = state.copyWith(
           isLocationLoading: false,
-          errorMessage:
-              'Location permission denied. Please enter address manually.',
+          errorMessage: _l10n.locationPermDenied,
         );
         return;
       }
@@ -94,8 +100,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     } catch (_) {
       state = state.copyWith(
         isLocationLoading: false,
-        errorMessage:
-            'Could not detect location. Please enter address manually.',
+        errorMessage: _l10n.locationDetectFailed,
       );
     }
   }
@@ -196,29 +201,25 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     } catch (_) {
       state = state.copyWith(
         status: OnboardingStatus.error,
-        errorMessage: 'Could not connect to the server. Please try again.',
+        errorMessage: _l10n.commonServerError,
       );
       return false;
     }
   }
 
-  String _mapStoreType(String uiLabel) {
-    switch (uiLabel) {
-      case 'Grocery Store (Kirana)':
-        return 'kirana';
-      case 'General Store':
-        return 'general';
-      case 'Provision Store':
-        return 'provision';
-      case 'Fruits & Vegetables':
-        return 'fruits_vegetables';
-      case 'Medical / Pharmacy':
-        return 'pharmacy';
-      case 'Stationery & Books':
-        return 'stationery';
-      default:
-        return 'other';
-    }
+  /// The business step now stores the stable store-type code directly
+  /// (e.g. `kirana`), decoupled from the localized dropdown label. This just
+  /// guards against unexpected values.
+  String _mapStoreType(String code) {
+    const valid = {
+      'kirana',
+      'general',
+      'provision',
+      'fruits_vegetables',
+      'pharmacy',
+      'stationery',
+    };
+    return valid.contains(code) ? code : 'other';
   }
 
   String _apiError(ApiException e) {
@@ -227,14 +228,14 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         msg.contains('exists') ||
         msg.contains('already')) {
       if (msg.contains('phone')) {
-        return 'This phone number is already registered. Please sign in instead.';
+        return _l10n.regErrPhoneExists;
       }
-      return 'This username is already taken. Please choose another.';
+      return _l10n.regErrUsernameTaken;
     }
     if (e.statusCode == 422) {
-      return 'Invalid details. Please check your entries and try again.';
+      return _l10n.regErrInvalidDetails;
     }
-    return 'Registration failed: ${e.message}';
+    return _l10n.regErrFailed(e.message);
   }
 }
 

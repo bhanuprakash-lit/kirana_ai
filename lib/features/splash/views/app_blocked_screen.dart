@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class AppBlockedScreen extends StatelessWidget {
   final String reason;
@@ -15,15 +16,11 @@ class AppBlockedScreen extends StatelessWidget {
   });
 
   Future<void> _contactUs(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final subject = isStoreBlocked
-        ? 'Store Access Issue — Kirana AI'
-        : 'App Access Issue — Kirana AI';
-    final body =
-        'Hello LohiyaAI Team,\n\n'
-        'I am unable to access the Kirana AI app.\n\n'
-        'Displayed reason: $reason\n\n'
-        'Please help me restore access.\n\n'
-        '— Kirana Owner';
+        ? l10n.supBlockedEmailSubjectStore
+        : l10n.supBlockedEmailSubjectApp;
+    final body = l10n.supBlockedEmailBody(reason);
 
     final uri = Uri(
       scheme: 'mailto',
@@ -34,11 +31,9 @@ class AppBlockedScreen extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please email support@lohiyaai.com directly.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.supBlockedEmailFallback)));
     }
   }
 
@@ -53,6 +48,7 @@ class AppBlockedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       body: SafeArea(
@@ -79,8 +75,8 @@ class AppBlockedScreen extends StatelessWidget {
 
               Text(
                 isStoreBlocked
-                    ? 'Store Temporarily Unavailable'
-                    : 'App Temporarily Unavailable',
+                    ? l10n.supBlockedStoreTitle
+                    : l10n.supBlockedAppTitle,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 22,
@@ -112,11 +108,10 @@ class AppBlockedScreen extends StatelessWidget {
                 const SizedBox(height: 20),
               ],
 
-              const Text(
-                'We are working to resolve this as soon as possible. '
-                'If you need immediate help, tap the button below.',
+              Text(
+                l10n.supBlockedBody,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: BrandColors.muted,
                   height: 1.5,
@@ -127,9 +122,12 @@ class AppBlockedScreen extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () => _contactUs(context),
                 icon: const Icon(Icons.mail_outline_rounded, size: 20),
-                label: const Text(
-                  'Contact Us',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                label: Text(
+                  l10n.supBlockedContactUs,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),

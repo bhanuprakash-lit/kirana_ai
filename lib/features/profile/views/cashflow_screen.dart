@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/cashflow_provider.dart';
 import '../providers/store_settings_provider.dart';
@@ -22,30 +23,32 @@ class _Bank {
   });
 }
 
-const _partners = [
+// Partner banks. Names/rates are proper nouns kept as-is; only the descriptive
+// subtitle is localized, so the list is built per-locale at render time.
+List<_Bank> _partnerBanks(AppLocalizations l10n) => [
   _Bank(
     name: 'SBI Mudra Loan',
-    subtitle: 'Government-backed scheme for small businesses',
+    subtitle: l10n.psetBankSbiDesc,
     rate: 'From 9.75% p.a.',
-    color: Color(0xFF1A3A5C),
+    color: const Color(0xFF1A3A5C),
   ),
   _Bank(
     name: 'HDFC Business Loan',
-    subtitle: 'Quick disbursal for retail growth',
+    subtitle: l10n.psetBankHdfcDesc,
     rate: 'From 11.5% p.a.',
-    color: Color(0xFF00427A),
+    color: const Color(0xFF00427A),
   ),
   _Bank(
     name: 'ICICI SME Credit',
-    subtitle: 'Flexible credit for kirana owners',
+    subtitle: l10n.psetBankIciciDesc,
     rate: 'From 12% p.a.',
-    color: Color(0xFF8B1A1A),
+    color: const Color(0xFF8B1A1A),
   ),
   _Bank(
     name: 'Axis Business Loan',
-    subtitle: 'Tailored finance for retail stores',
+    subtitle: l10n.psetBankAxisDesc,
     rate: 'From 11% p.a.',
-    color: Color(0xFF6B0F0F),
+    color: const Color(0xFF6B0F0F),
   ),
 ];
 
@@ -95,9 +98,9 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Cashflow Support',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          AppLocalizations.of(context).psetCashflowSupport,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: statusAsync.when(
@@ -123,6 +126,7 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
 
   // ignore: strict_top_level_inference
   Widget _buildExistingRequest(cashflowStatus) {
+    final l10n = AppLocalizations.of(context);
     final amount = cashflowStatus.amount as double?;
     final bank = cashflowStatus.selectedBank as String?;
     return Center(
@@ -144,9 +148,9 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
               ),
             ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
             const SizedBox(height: 24),
-            const Text(
-              'Request Under Review',
-              style: TextStyle(
+            Text(
+              l10n.psetRequestUnderReview,
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: BrandColors.ink,
@@ -154,9 +158,9 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Your cashflow request${amount != null ? ' for ₹${_fmt(amount)}' : ''}'
-              '${bank != null ? ' via $bank' : ''} is being processed.\n\n'
-              'Our team will contact you within 2 business days.',
+              (amount != null && bank != null)
+                  ? l10n.psetReqProcessingFull(_fmt(amount), bank)
+                  : l10n.psetReqProcessing,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 14,
@@ -201,6 +205,7 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
   // ── Success screen ────────────────────────────────────────────────────────
 
   Widget _buildSuccess() {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -220,19 +225,19 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
               ),
             ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
             const SizedBox(height: 28),
-            const Text(
-              'Request Submitted!',
-              style: TextStyle(
+            Text(
+              l10n.psetRequestSubmitted,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
                 color: BrandColors.ink,
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'We\'ve received your cashflow request.\nOur team will contact you within\n2 business days.',
+            Text(
+              l10n.psetRequestSubmittedBody,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 15,
                 color: BrandColors.muted,
                 height: 1.65,
@@ -243,7 +248,7 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Back to Profile'),
+                child: Text(l10n.psetBackToProfile),
               ),
             ),
           ],
@@ -256,14 +261,16 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
 
   Widget _buildContent(String storeName, String location, int footfall) {
     final canSubmit = _selectedBank != null && !_submitting;
+    final l10n = AppLocalizations.of(context);
+    final partners = _partnerBanks(l10n);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
       children: [
         // ── Header ──────────────────────────────────────────────────────────
-        const Text(
-          'Apply for\nCashflow Support',
-          style: TextStyle(
+        Text(
+          l10n.psetApplyCashflow,
+          style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w900,
             color: BrandColors.ink,
@@ -271,14 +278,14 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
           ),
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.15, end: 0),
         const SizedBox(height: 6),
-        const Text(
-          'Quick business finance, powered by LohiyaAI partners.',
-          style: TextStyle(fontSize: 14, color: BrandColors.muted),
+        Text(
+          l10n.psetCashflowSubtitle,
+          style: const TextStyle(fontSize: 14, color: BrandColors.muted),
         ).animate(delay: 60.ms).fadeIn(),
         const SizedBox(height: 24),
 
         // ── Business Profile card ────────────────────────────────────────────
-        _SectionLabel(label: 'Your Business Profile'),
+        _SectionLabel(label: l10n.psetYourBusinessProfile),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(20),
@@ -291,20 +298,20 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
             children: [
               _InfoRow(
                 icon: Icons.storefront_rounded,
-                label: 'Store',
+                label: l10n.psetStore,
                 value: storeName.isNotEmpty ? storeName : '—',
               ),
               const Divider(height: 20),
               _InfoRow(
                 icon: Icons.location_on_rounded,
-                label: 'Location',
+                label: l10n.psetLocation,
                 value: location.isNotEmpty ? location : '—',
               ),
               const Divider(height: 20),
               _InfoRow(
                 icon: Icons.people_rounded,
-                label: 'Daily Footfall',
-                value: footfall > 0 ? '$footfall customers/day' : '—',
+                label: l10n.psetDailyFootfall,
+                value: footfall > 0 ? l10n.psetCustomersPerDay(footfall) : '—',
               ),
             ],
           ),
@@ -313,11 +320,11 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
         const SizedBox(height: 28),
 
         // ── Amount selector ──────────────────────────────────────────────────
-        _SectionLabel(label: 'How much do you need?'),
+        _SectionLabel(label: l10n.psetHowMuchNeed),
         const SizedBox(height: 4),
-        const Text(
-          'Drag to select — ₹50,000 to ₹10,00,000',
-          style: TextStyle(fontSize: 12, color: BrandColors.muted),
+        Text(
+          l10n.psetDragToSelect,
+          style: const TextStyle(fontSize: 12, color: BrandColors.muted),
         ),
         const SizedBox(height: 12),
         Container(
@@ -338,9 +345,9 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'loan amount',
-                style: TextStyle(fontSize: 12, color: BrandColors.muted),
+              Text(
+                l10n.psetLoanAmount,
+                style: const TextStyle(fontSize: 12, color: BrandColors.muted),
               ),
               const SizedBox(height: 8),
               SliderTheme(
@@ -393,14 +400,14 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
         // ── Partner banks ────────────────────────────────────────────────────
         ...[
           const SizedBox(height: 32),
-          _SectionLabel(label: 'Choose a Partner Bank'),
+          _SectionLabel(label: l10n.psetChoosePartnerBank),
           const SizedBox(height: 4),
-          const Text(
-            'Select a bank to proceed with your request.',
-            style: TextStyle(fontSize: 12, color: BrandColors.muted),
+          Text(
+            l10n.psetSelectBankHint,
+            style: const TextStyle(fontSize: 12, color: BrandColors.muted),
           ),
           const SizedBox(height: 12),
-          ..._partners.asMap().entries.map((e) {
+          ...partners.asMap().entries.map((e) {
             final idx = e.key;
             final bank = e.value;
             final selected = _selectedBank == bank.name;
@@ -514,14 +521,14 @@ class _CashflowScreenState extends ConsumerState<CashflowScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Submit Request'),
+                  : Text(l10n.psetSubmitRequest),
             ),
           ).animate(delay: 200.ms).fadeIn(),
           const SizedBox(height: 12),
-          const Text(
-            'By submitting, you agree to be contacted by our team regarding this request.',
+          Text(
+            l10n.psetSubmitDisclaimer,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11, color: BrandColors.muted),
+            style: const TextStyle(fontSize: 11, color: BrandColors.muted),
           ),
         ],
       ],

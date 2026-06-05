@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../providers/intelligence_provider.dart';
 import '../../models/recommendation_model.dart';
@@ -20,14 +22,17 @@ class _IntelligenceDetailScreenState
     extends ConsumerState<IntelligenceDetailScreen> {
   String _searchQuery = '';
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   String get _title {
     return {
-          'stockout': 'Stockout Risk',
-          'reorder': 'Reorder Required',
-          'fast_moving': 'Fast Moving Items',
-          'profit': 'High Profit Items',
+          'stockout': _l10n.dashDetailStockout,
+          'reorder': _l10n.dashDetailReorder,
+          'fast_moving': _l10n.dashDetailFastMoving,
+          'profit': _l10n.dashDetailProfit,
         }[widget.type] ??
-        'Intelligence Detail';
+        _l10n.dashDetailDefault;
   }
 
   @override
@@ -109,7 +114,7 @@ class _IntelligenceDetailScreenState
           TextField(
             onChanged: (v) => setState(() => _searchQuery = v),
             decoration: InputDecoration(
-              hintText: 'Search products...',
+              hintText: _l10n.dashSearchProducts,
               prefixIcon: const Icon(Icons.search_rounded),
               contentPadding: const EdgeInsets.symmetric(vertical: 12),
               filled: true,
@@ -123,9 +128,9 @@ class _IntelligenceDetailScreenState
           const SizedBox(height: 12),
           Row(
             children: [
-              const Text(
-                'Sort by:',
-                style: TextStyle(
+              Text(
+                _l10n.dashSortBy,
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: BrandColors.muted,
@@ -133,7 +138,7 @@ class _IntelligenceDetailScreenState
               ),
               const SizedBox(width: 8),
               _FilterChip(
-                label: 'Profit',
+                label: _l10n.dashSortProfit,
                 selected: sortBy == 'expected_profit',
                 onSelected: (s) {
                   ref
@@ -143,7 +148,7 @@ class _IntelligenceDetailScreenState
               ),
               const SizedBox(width: 6),
               _FilterChip(
-                label: 'Demand',
+                label: _l10n.dashSortDemand,
                 selected: sortBy == 'forecast_demand',
                 onSelected: (s) {
                   ref
@@ -154,7 +159,7 @@ class _IntelligenceDetailScreenState
               if (widget.type == 'stockout' || widget.type == 'reorder') ...[
                 const SizedBox(width: 6),
                 _FilterChip(
-                  label: 'Risk',
+                  label: _l10n.dashSortRisk,
                   selected: sortBy == 'stockout_probability',
                   onSelected: (s) {
                     ref
@@ -177,6 +182,7 @@ class _RecommendationTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final color = _getColor(item.type);
     final days = item.daysToStockout;
     final prob = item.stockoutProbability;
@@ -219,7 +225,7 @@ class _RecommendationTile extends ConsumerWidget {
                 const Spacer(),
                 if (item.currentStock != null)
                   Text(
-                    'Stock: ${item.currentStock!.toStringAsFixed(0)}',
+                    l10n.dashStockLabel(item.currentStock!.toStringAsFixed(0)),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -262,7 +268,7 @@ class _RecommendationTile extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Stock runway',
+                              l10n.dashStockRunway,
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -271,8 +277,8 @@ class _RecommendationTile extends ConsumerWidget {
                             ),
                             Text(
                               days <= 0
-                                  ? 'OUT OF STOCK'
-                                  : '~${days.toStringAsFixed(0)} days left',
+                                  ? l10n.dashOutOfStock
+                                  : l10n.dashDaysLeft(days.toStringAsFixed(0)),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
@@ -313,7 +319,7 @@ class _RecommendationTile extends ConsumerWidget {
                 children: [
                   if (prob != null) ...[
                     _StatChip(
-                      label: 'Stockout risk',
+                      label: l10n.dashStatStockoutRisk,
                       value: '${(prob * 100).toStringAsFixed(0)}%',
                       color: prob >= 0.7
                           ? BrandColors.error
@@ -325,8 +331,8 @@ class _RecommendationTile extends ConsumerWidget {
                   ],
                   if (reorder != null && reorder > 0)
                     _StatChip(
-                      label: 'Reorder qty',
-                      value: '${reorder.toStringAsFixed(0)} units',
+                      label: l10n.dashStatReorderQty,
+                      value: l10n.dashUnitsValue(reorder.toStringAsFixed(0)),
                       color: BrandColors.primary,
                     ),
                 ],
@@ -359,7 +365,9 @@ class _RecommendationTile extends ConsumerWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '₹${item.expectedProfitImpact!.toStringAsFixed(0)} estimated weekly profit impact',
+                    l10n.dashWeeklyProfitImpact(
+                      item.expectedProfitImpact!.toStringAsFixed(0),
+                    ),
                     style: const TextStyle(
                       fontSize: 12,
                       color: BrandColors.success,
@@ -379,7 +387,9 @@ class _RecommendationTile extends ConsumerWidget {
                   onPressed: () {
                     // Pre-fill the purchase order with this product + suggested
                     // qty, then jump to the procurement tab (tab 2, sub-tab 2).
-                    ref.read(purchasePrefillProvider.notifier).set(
+                    ref
+                        .read(purchasePrefillProvider.notifier)
+                        .set(
                           PurchasePrefill(
                             productId: item.skuId,
                             productName: item.productName,
@@ -396,7 +406,7 @@ class _RecommendationTile extends ConsumerWidget {
                     color: color,
                   ),
                   label: Text(
-                    'Create Purchase Order · ${reorder.toStringAsFixed(0)} units',
+                    l10n.dashCreatePurchaseOrder(reorder.toStringAsFixed(0)),
                     style: TextStyle(
                       color: color,
                       fontWeight: FontWeight.w700,
@@ -487,6 +497,7 @@ class _EmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -498,14 +509,16 @@ class _EmptyView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            query.isEmpty ? 'No items found' : 'No results for "$query"',
+            query.isEmpty
+                ? l10n.dashNoItemsFound
+                : l10n.dashNoResultsFor(query),
             style: const TextStyle(
               fontWeight: FontWeight.w700,
               color: BrandColors.muted,
             ),
           ),
           if (query.isNotEmpty)
-            TextButton(onPressed: onClear, child: const Text('Clear search')),
+            TextButton(onPressed: onClear, child: Text(l10n.dashClearSearch)),
         ],
       ),
     );
@@ -519,6 +532,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -531,9 +545,9 @@ class _ErrorView extends StatelessWidget {
               color: BrandColors.muted,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Connection Error',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+            Text(
+              l10n.dashConnectionError,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
             ),
             const SizedBox(height: 8),
             Text(
@@ -542,7 +556,7 @@ class _ErrorView extends StatelessWidget {
               style: const TextStyle(color: BrandColors.muted),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+            ElevatedButton(onPressed: onRetry, child: Text(l10n.dashRetry)),
           ],
         ),
       ),

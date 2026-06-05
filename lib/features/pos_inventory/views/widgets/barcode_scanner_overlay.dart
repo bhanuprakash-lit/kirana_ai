@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 /// Scans a barcode and returns it two ways:
 /// 1. Via [onDetected] callback (used by POS tab for async handling)
@@ -37,12 +38,13 @@ class _BarcodeScannerOverlayState extends State<BarcodeScannerOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: const Text('Scan Barcode'),
+        title: Text(l10n.posScanBarcode),
         elevation: 0,
       ),
       body: Stack(
@@ -75,7 +77,7 @@ class _BarcodeScannerOverlayState extends State<BarcodeScannerOverlay> {
             left: 0,
             right: 0,
             child: Text(
-              'Align barcode within the frame',
+              l10n.posAlignBarcode,
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),

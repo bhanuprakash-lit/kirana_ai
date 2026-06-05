@@ -6,9 +6,11 @@ import 'package:kirana_ai/features/pos_inventory/views/widgets/add_product_sheet
 import 'package:kirana_ai/features/referral/views/referral_scan_sheet.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/providers/usage_limits_provider.dart';
 import '../../../core/services/usage_limits_service.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/pos_product.dart';
 import '../providers/pos_provider.dart';
@@ -38,6 +40,9 @@ class _PosTabState extends ConsumerState<PosTab> {
   final _searchCtrl = TextEditingController();
   String _query = '';
   bool _showActions = false;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void dispose() {
@@ -77,71 +82,75 @@ class _PosTabState extends ConsumerState<PosTab> {
     final ctrl = TextEditingController(text: initialValue?.toString() ?? '');
     return showDialog<double>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Enter ${p.unit ?? "Qty"}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(p.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            Text(
-              'Price: ${p.priceLabel}',
-              style: const TextStyle(fontSize: 12, color: BrandColors.muted),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: ctrl,
-              autofocus: true,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
+      builder: (ctx) {
+        final l10n = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(l10n.posEnterQtyTitle(p.unit ?? l10n.posQtyFallback)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(p.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              Text(
+                l10n.posPriceLabel(p.priceLabel),
+                style: const TextStyle(fontSize: 12, color: BrandColors.muted),
               ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}')),
-              ],
-              decoration: InputDecoration(
-                labelText: 'Weight / Measurement',
-                suffixText: p.unit ?? '',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 16),
+              TextField(
+                controller: ctrl,
+                autofocus: true,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,3}')),
+                ],
+                decoration: InputDecoration(
+                  labelText: l10n.posWeightMeasurement,
+                  suffixText: p.unit ?? '',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(l10n.posCommonCancel),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, double.tryParse(ctrl.text)),
+              child: Text(l10n.posCommonAddToCart),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, double.tryParse(ctrl.text)),
-            child: const Text('Add to Cart'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Future<void> _handleUnknownBarcode(String barcode) async {
     final choice = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Unknown Barcode'),
-        content: Text(
-          'Barcode "$barcode" is not in your inventory. What would you like to do?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 'new'),
-            child: const Text('Add as New'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, 'link'),
-            child: const Text('Link to Existing Item'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final l10n = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(l10n.posUnknownBarcodeTitle),
+          content: Text(l10n.posUnknownBarcodeBody(barcode)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'new'),
+              child: Text(l10n.posAddAsNew),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, 'link'),
+              child: Text(l10n.posLinkToExisting),
+            ),
+          ],
+        );
+      },
     );
 
     if (!mounted) return;
@@ -168,6 +177,7 @@ class _PosTabState extends ConsumerState<PosTab> {
         expand: false,
         builder: (context, scrollCtrl) => Consumer(
           builder: (context, ref, _) {
+            final l10n = AppLocalizations.of(context);
             final inventoryAsync = ref.watch(inventoryProvider);
 
             return Column(
@@ -175,7 +185,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'Link Barcode "$barcode"',
+                    l10n.posLinkBarcodeTitle(barcode),
                     style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 16,
@@ -189,17 +199,16 @@ class _PosTabState extends ConsumerState<PosTab> {
                       padding: EdgeInsets.all(16),
                       child: ListShimmer(itemCount: 5, itemHeight: 60),
                     ),
-                    error: (err, _) =>
-                        Center(child: Text('Error loading inventory: $err')),
+                    error: (err, _) => Center(
+                      child: Text(l10n.posErrLoadingInventory('$err')),
+                    ),
                     data: (data) {
                       final unbarcoded = data.items
                           .where((i) => i.barcode == null || i.barcode!.isEmpty)
                           .toList();
 
                       if (unbarcoded.isEmpty) {
-                        return const Center(
-                          child: Text('No items found without barcodes.'),
-                        );
+                        return Center(child: Text(l10n.posNoUnbarcodedItems));
                       }
 
                       return ListView.separated(
@@ -217,7 +226,9 @@ class _PosTabState extends ConsumerState<PosTab> {
                               ),
                             ),
                             subtitle: Text(
-                              'Category: ${item.categoryName ?? "General"}',
+                              l10n.posCategoryLabel(
+                                item.categoryName ?? l10n.posCategoryGeneral,
+                              ),
                             ),
                             trailing: const Icon(
                               Icons.link_rounded,
@@ -238,7 +249,10 @@ class _PosTabState extends ConsumerState<PosTab> {
                                   messenger.showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'Linked $barcode to ${item.name}',
+                                        l10n.posLinkedToItem(
+                                          barcode,
+                                          item.name,
+                                        ),
                                       ),
                                     ),
                                   );
@@ -276,9 +290,9 @@ class _PosTabState extends ConsumerState<PosTab> {
       MaterialPageRoute(
         builder: (_) => Scaffold(
           appBar: AppBar(
-            title: const Text(
-              'Scan Referral QR',
-              style: TextStyle(fontWeight: FontWeight.w800),
+            title: Text(
+              _l10n.posScanReferralQr,
+              style: const TextStyle(fontWeight: FontWeight.w800),
             ),
             backgroundColor: BrandColors.accent,
             foregroundColor: Colors.white,
@@ -333,7 +347,7 @@ class _PosTabState extends ConsumerState<PosTab> {
     if (added == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('All items in "${campaign.name}" are out of stock'),
+          content: Text(_l10n.posCampaignOutOfStock(campaign.name)),
           duration: const Duration(milliseconds: 1800),
         ),
       );
@@ -343,8 +357,8 @@ class _PosTabState extends ConsumerState<PosTab> {
       SnackBar(
         content: Text(
           skipped == 0
-              ? '$added item${added == 1 ? '' : 's'} from "${campaign.name}" added'
-              : '$added added · $skipped skipped (out of stock)',
+              ? _l10n.posCampaignItemsAdded(added, campaign.name)
+              : _l10n.posAddedSkipped(added, skipped),
         ),
         duration: const Duration(milliseconds: 1800),
       ),
@@ -391,9 +405,7 @@ class _PosTabState extends ConsumerState<PosTab> {
     if (!mounted) return;
     if (resolved.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('All items in "${basket.name}" are out of stock'),
-        ),
+        SnackBar(content: Text(_l10n.posCampaignOutOfStock(basket.name))),
       );
       return;
     }
@@ -421,7 +433,8 @@ class _PosTabState extends ConsumerState<PosTab> {
     final added = resolved.length;
     final String msg;
     if (factor != null) {
-      msg = 'Bundle "${basket.name}" added at ₹${bundlePrice!.toStringAsFixed(0)}';
+      msg =
+          'Bundle "${basket.name}" added at ₹${bundlePrice!.toStringAsFixed(0)}';
     } else if (skipped == 0) {
       msg = bundlePrice != null
           ? '$added items added at regular price (bundle needs all items in stock)'
@@ -430,7 +443,10 @@ class _PosTabState extends ConsumerState<PosTab> {
       msg = '$added added · $skipped skipped (out of stock)';
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), duration: const Duration(milliseconds: 1800)),
+      SnackBar(
+        content: Text(msg),
+        duration: const Duration(milliseconds: 1800),
+      ),
     );
   }
 
@@ -491,9 +507,15 @@ class _PosTabState extends ConsumerState<PosTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Select Customer',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Text(
+                      _l10n.posSelectCustomer,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   TextButton.icon(
                     onPressed: () {
@@ -501,16 +523,15 @@ class _PosTabState extends ConsumerState<PosTab> {
                       _showAddCustomerDialog();
                     },
                     icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('New'),
+                    label: Text(_l10n.posNew),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: searchCtrl,
-                autofocus: true,
                 decoration: InputDecoration(
-                  hintText: 'Search by name or phone...',
+                  hintText: _l10n.posSearchNameOrPhone,
                   prefixIcon: const Icon(Icons.search_rounded),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -534,13 +555,14 @@ class _PosTabState extends ConsumerState<PosTab> {
                     final customers = q.isEmpty
                         ? all
                         : all.where((c) {
-                            final name =
-                                (c['name'] ?? '').toString().toLowerCase();
+                            final name = (c['name'] ?? '')
+                                .toString()
+                                .toLowerCase();
                             final phone = (c['phone'] ?? '').toString();
                             return name.contains(q) || phone.contains(q);
                           }).toList();
                     if (customers.isEmpty) {
-                      return const Center(child: Text('No customers found.'));
+                      return Center(child: Text(_l10n.posNoCustomersFound));
                     }
                     return ListView.builder(
                       itemCount: customers.length,
@@ -591,7 +613,12 @@ class _PosTabState extends ConsumerState<PosTab> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Add New Customer'),
+              Expanded(
+                child: Text(
+                  _l10n.posAddNewCustomer,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               IconButton(
                 onPressed: () async {
                   final contact = await ContactService.pickContact();
@@ -610,7 +637,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                   Icons.contacts_rounded,
                   color: BrandColors.primary,
                 ),
-                tooltip: 'Select from Contacts',
+                tooltip: _l10n.posSelectFromContacts,
               ),
             ],
           ),
@@ -619,11 +646,11 @@ class _PosTabState extends ConsumerState<PosTab> {
             children: [
               TextField(
                 controller: nameCtrl,
-                decoration: const InputDecoration(labelText: 'Customer Name'),
+                decoration: InputDecoration(labelText: _l10n.posCustomerName),
               ),
               TextField(
                 controller: phoneCtrl,
-                decoration: const InputDecoration(labelText: 'Phone Number'),
+                decoration: InputDecoration(labelText: _l10n.posPhoneNumber),
                 keyboardType: TextInputType.phone,
               ),
             ],
@@ -631,7 +658,7 @@ class _PosTabState extends ConsumerState<PosTab> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel'),
+              child: Text(_l10n.posCommonCancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -641,7 +668,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                     .createCustomer(nameCtrl.text, phoneCtrl.text);
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              child: const Text('Save & Select'),
+              child: Text(_l10n.posSaveAndSelect),
             ),
           ],
         ),
@@ -688,7 +715,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                         controller: _searchCtrl,
                         onChanged: (v) => setState(() => _query = v),
                         decoration: InputDecoration(
-                          hintText: 'Search products…',
+                          hintText: _l10n.posSearchProducts,
                           prefixIcon: const Icon(
                             Icons.search_rounded,
                             size: 20,
@@ -736,8 +763,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                     const SizedBox(width: 6),
                     // Toggle action chips row
                     GestureDetector(
-                      onTap: () =>
-                          setState(() => _showActions = !_showActions),
+                      onTap: () => setState(() => _showActions = !_showActions),
                       child: Container(
                         width: 36,
                         height: 42,
@@ -833,8 +859,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                               ),
                               const SizedBox(width: 8),
                               GestureDetector(
-                                onTap: () =>
-                                    showTodayOrdersSheet(context, ref),
+                                onTap: () => showTodayOrdersSheet(context, ref),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
@@ -871,13 +896,16 @@ class _PosTabState extends ConsumerState<PosTab> {
                               const Spacer(),
                               GestureDetector(
                                 onTap: () async {
-                                  final messenger =
-                                      ScaffoldMessenger.of(context);
+                                  final messenger = ScaffoldMessenger.of(
+                                    context,
+                                  );
                                   messenger.hideCurrentSnackBar();
                                   messenger.showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Refreshing products...'),
-                                      duration: Duration(seconds: 2),
+                                    SnackBar(
+                                      content: Text(
+                                        _l10n.posRefreshingProducts,
+                                      ),
+                                      duration: const Duration(seconds: 2),
                                     ),
                                   );
                                   await ref
@@ -885,15 +913,17 @@ class _PosTabState extends ConsumerState<PosTab> {
                                       .reloadProducts();
                                   if (!context.mounted) return;
                                   final err = ref.read(posProvider).error;
-                                  final count =
-                                      ref.read(posProvider).products.length;
+                                  final count = ref
+                                      .read(posProvider)
+                                      .products
+                                      .length;
                                   messenger.hideCurrentSnackBar();
                                   messenger.showSnackBar(
                                     SnackBar(
                                       content: Text(
                                         err != null
-                                            ? 'Refresh failed: $err'
-                                            : 'Products refreshed ($count items)',
+                                            ? _l10n.posRefreshFailed(err)
+                                            : _l10n.posProductsRefreshed(count),
                                       ),
                                       backgroundColor: err != null
                                           ? BrandColors.error
@@ -986,15 +1016,13 @@ class _PosTabState extends ConsumerState<PosTab> {
                                 final ok = await showDialog<bool>(
                                   context: context,
                                   builder: (ctx) => AlertDialog(
-                                    title: const Text('Clear Cart?'),
-                                    content: const Text(
-                                      'All items will be removed from the cart.',
-                                    ),
+                                    title: Text(_l10n.posClearCartTitle),
+                                    content: Text(_l10n.posClearCartBody),
                                     actions: [
                                       TextButton(
                                         onPressed: () =>
                                             Navigator.pop(ctx, false),
-                                        child: const Text('Cancel'),
+                                        child: Text(_l10n.posCommonCancel),
                                       ),
                                       TextButton(
                                         onPressed: () =>
@@ -1002,19 +1030,20 @@ class _PosTabState extends ConsumerState<PosTab> {
                                         style: TextButton.styleFrom(
                                           foregroundColor: BrandColors.error,
                                         ),
-                                        child: const Text('Clear'),
+                                        child: Text(_l10n.posCommonClear),
                                       ),
                                     ],
                                   ),
                                 );
-                                if (ok == true)
+                                if (ok == true) {
                                   ref.read(posProvider.notifier).clearCart();
+                                }
                               },
                               icon: const Icon(
                                 Icons.delete_sweep_rounded,
                                 size: 16,
                               ),
-                              label: const Text('Clear'),
+                              label: Text(_l10n.posCommonClear),
                               style: TextButton.styleFrom(
                                 foregroundColor: BrandColors.error,
                                 padding: const EdgeInsets.symmetric(
@@ -1546,8 +1575,9 @@ class _EmptyCartWithCampaigns extends ConsumerWidget {
                 .toList() ??
             [];
 
-        if (campaigns.isEmpty && activeBaskets.isEmpty)
+        if (campaigns.isEmpty && activeBaskets.isEmpty) {
           return const _EmptyCartHint();
+        }
 
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
@@ -1840,7 +1870,9 @@ class _PosBasketCard extends StatelessWidget {
                         Icons.add_shopping_cart_rounded,
                         size: 16,
                       ),
-                      label: const Text('Add to Cart'),
+                      label: Text(
+                        AppLocalizations.of(context).posCommonAddToCart,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _color,
                         foregroundColor: Colors.white,
@@ -2053,7 +2085,9 @@ class _BasketDetailSheet extends StatelessWidget {
                               onAddToCart();
                             },
                       icon: const Icon(Icons.add_shopping_cart_rounded),
-                      label: const Text('Add Available Items to Cart'),
+                      label: Text(
+                        AppLocalizations.of(context).posAddAvailableToCart,
+                      ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(52),
                         backgroundColor: _color,
@@ -2411,7 +2445,11 @@ class _OrderFooter extends StatelessWidget {
                         color: Colors.white,
                       ),
                     )
-                  : Text('Place Order · ${_fmt(subtotal)}'),
+                  : Text(
+                      AppLocalizations.of(
+                        context,
+                      ).posPlaceOrderAmount(_fmt(subtotal)),
+                    ),
             ),
           ),
         ],

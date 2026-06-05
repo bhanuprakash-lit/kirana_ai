@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../models/referral_models.dart';
 import '../providers/referral_provider.dart';
@@ -35,6 +37,9 @@ class _ReferralScanSheet extends ConsumerStatefulWidget {
 }
 
 class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   TokenInfo? _tokenInfo;
   bool _loadingInfo = true;
   String? _infoError;
@@ -63,9 +68,9 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
         setState(() {
           _tokenInfo = info;
           _loadingInfo = false;
-          if (info == null) _infoError = 'Invalid QR code';
+          if (info == null) _infoError = _l10n.mktInvalidQrCode;
           if (info != null && !info.isActive) {
-            _infoError = 'This referral campaign is no longer active';
+            _infoError = _l10n.mktCampaignNoLongerActive;
           }
         });
       }
@@ -73,7 +78,7 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
       if (mounted) {
         setState(() {
           _loadingInfo = false;
-          _infoError = 'Could not load referral info';
+          _infoError = _l10n.mktCouldNotLoadReferralInfo;
         });
       }
     }
@@ -82,7 +87,7 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
   void _apply() {
     final phone = _phoneCtrl.text.trim();
     if (phone.isEmpty || phone.length < 10) {
-      setState(() => _error = 'Enter a valid 10-digit phone number');
+      setState(() => _error = _l10n.mktEnterValidPhone);
       return;
     }
     final e164 = phone.startsWith('+') ? phone : '+91$phone';
@@ -141,7 +146,7 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
         width: double.infinity,
         child: OutlinedButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Close'),
+          child: Text(_l10n.mktClose),
         ),
       ),
     ],
@@ -187,7 +192,7 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Referral from ${info.referrerName}',
+                      _l10n.mktReferralFrom(info.referrerName),
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         color: BrandColors.success,
@@ -195,7 +200,10 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
                       ),
                     ),
                     Text(
-                      '${info.campaignName}  •  ${info.referralDiscountPct.toStringAsFixed(0)}% discount for new customer',
+                      _l10n.mktCampaignDiscountForNewCustomer(
+                        info.campaignName,
+                        info.referralDiscountPct.toStringAsFixed(0),
+                      ),
                       style: const TextStyle(
                         fontSize: 12,
                         color: BrandColors.muted,
@@ -209,18 +217,22 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
         ).animate().fadeIn(duration: 300.ms),
 
         const SizedBox(height: 20),
-        const Text(
-          'New Customer Details',
-          style: TextStyle(
+        Text(
+          _l10n.mktNewCustomerDetails,
+          style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 15,
             color: BrandColors.ink,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
-          'Enter the new customer\'s phone. The discount will be applied when you place the order.',
-          style: TextStyle(fontSize: 12, color: BrandColors.muted, height: 1.5),
+        Text(
+          _l10n.mktNewCustomerPhoneHelper,
+          style: const TextStyle(
+            fontSize: 12,
+            color: BrandColors.muted,
+            height: 1.5,
+          ),
         ),
         const SizedBox(height: 16),
 
@@ -231,8 +243,8 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(10),
           ],
-          decoration: const InputDecoration(
-            labelText: 'Phone Number',
+          decoration: InputDecoration(
+            labelText: _l10n.mktPhoneNumber,
             hintText: '9876543210',
             prefixText: '+91  ',
           ),
@@ -241,9 +253,9 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
         TextField(
           controller: _nameCtrl,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            labelText: 'Customer Name (optional)',
-            hintText: 'e.g. Gnyan Kumar',
+          decoration: InputDecoration(
+            labelText: _l10n.mktCustomerNameOptional,
+            hintText: _l10n.mktCustomerNameHint,
           ),
         ),
 
@@ -261,7 +273,9 @@ class _ReferralScanSheetState extends ConsumerState<_ReferralScanSheet> {
           child: ElevatedButton(
             onPressed: _apply,
             child: Text(
-              'Apply ${info.referralDiscountPct.toStringAsFixed(0)}% Referral Discount',
+              _l10n.mktApplyReferralDiscount(
+                info.referralDiscountPct.toStringAsFixed(0),
+              ),
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),

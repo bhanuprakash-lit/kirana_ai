@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../../../features/dashboard/views/dashboard_screen.dart'
     show financeSubTabProvider;
@@ -49,6 +50,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
   @override
   Widget build(BuildContext context) {
     final asyncData = ref.watch(financeProvider);
+    final l10n = AppLocalizations.of(context);
 
     ref.listen(financeSubTabProvider, (prev, next) {
       if (next != _tabController.index) {
@@ -59,7 +61,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('Finance'),
+        title: Text(l10n.finFinance),
         actions: const [NotificationBell(), SizedBox(width: 8)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(92),
@@ -74,9 +76,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                   ),
                   child: CardShimmer(height: 40, radius: 12),
                 ),
-                error: (_, _) => const SizedBox(
+                error: (_, _) => SizedBox(
                   height: 40,
-                  child: Center(child: Text('Error loading stats')),
+                  child: Center(child: Text(l10n.finErrorLoadingStats)),
                 ),
               ),
               TabBar(
@@ -90,17 +92,17 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                 ),
                 unselectedLabelStyle: const TextStyle(fontSize: 12),
                 labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                tabs: const [
-                  Tab(text: 'Cashflow'),
+                tabs: [
+                  Tab(text: l10n.finTabCashflow),
                   Tab(
                     height: 44,
                     child: Text(
-                      'Customer\nUdhaar',
+                      l10n.finTabCustomerUdhaar,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12, height: 1.2),
+                      style: const TextStyle(fontSize: 12, height: 1.2),
                     ),
                   ),
-                  Tab(text: 'Supplier Udhaar'),
+                  Tab(text: l10n.finTabSupplierUdhaar),
                 ],
               ),
             ],
@@ -121,19 +123,20 @@ class _MonthlySalesOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _StatItem(
-            label: "Monthly Sales",
+            label: l10n.finMonthlySales,
             value: "₹${stats.monthlySalesAmount.toStringAsFixed(0)}",
             icon: Icons.currency_rupee_rounded,
             color: BrandColors.success,
           ),
           _StatItem(
-            label: "Monthly SKUs",
+            label: l10n.finMonthlySkus,
             value: "${stats.monthlySkuCount}",
             icon: Icons.inventory_2_outlined,
             color: BrandColors.primary,
@@ -192,6 +195,7 @@ class _UnderConstruction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -204,9 +208,9 @@ class _UnderConstruction extends StatelessWidget {
           const SizedBox(height: 16),
           Text(label, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
-          const Text(
-            'Will be available in future updates',
-            style: TextStyle(color: BrandColors.muted),
+          Text(
+            l10n.finAvailableInFuture,
+            style: const TextStyle(color: BrandColors.muted),
           ),
         ],
       ),

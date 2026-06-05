@@ -58,11 +58,14 @@ class OverviewShimmer extends StatelessWidget {
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 1.2,
+                // Match the real intelligence grid: taller cells as font scales.
+                childAspectRatio:
+                    1.2 /
+                    MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.4),
               ),
               itemCount: 6,
               itemBuilder: (_, __) => Container(

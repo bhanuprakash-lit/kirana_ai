@@ -77,8 +77,7 @@ final priceMemoryProvider =
 
 /// Count of products missing a price (for the inventory-tab banner).
 final missingPriceCountProvider = Provider<int>((ref) {
-  return ref.watch(priceMemoryProvider).maybeWhen(
-    data: (list) => list.length,
-    orElse: () => 0,
-  );
+  return ref
+      .watch(priceMemoryProvider)
+      .maybeWhen(data: (list) => list.length, orElse: () => 0);
 });

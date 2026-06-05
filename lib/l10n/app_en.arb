@@ -1,0 +1,2807 @@
+{
+  "@@locale": "en",
+  "languageName": "English",
+  "@languageName": {
+    "description": "Native name of this language, shown in the language picker."
+  },
+  "languageChooseTitle": "Choose your language",
+  "languageChooseSubtitle": "You can change this anytime in Settings.",
+  "settingsLanguage": "Language",
+  "commonContinue": "Continue",
+  "commonServerError": "Could not connect to the server. Please try again.",
+  "commonSomethingWrong": "Something went wrong. Please try again.",
+  "authErrEnterPhone": "Enter your phone number",
+  "authErrEnter6Otp": "Enter the 6-digit OTP",
+  "authErrSessionExpired": "Session expired. Tap Resend.",
+  "authErrInvalidPhone": "Invalid phone number. Include country code (e.g. +91...).",
+  "authErrTooManyRequests": "Too many attempts. Please try again later.",
+  "authErrWrongOtp": "Wrong OTP. Please check and try again.",
+  "authErrOtpExpired": "OTP expired. Tap Resend to get a new code.",
+  "authErrVerificationFailed": "Verification failed. Try again.",
+  "welcomeSlide1Title": "Welcome to\nKirana AI",
+  "welcomeSlide1Subtitle": "Your smart business partner for managing your kirana store — built for South India.",
+  "welcomeSlide2Title": "Smart Inventory\nManagement",
+  "welcomeSlide2Subtitle": "Track stock levels, get low-stock alerts, and never run out of your bestselling products.",
+  "welcomeSlide3Title": "Grow Your\nBusiness",
+  "welcomeSlide3Subtitle": "Get AI-powered insights, sales analytics, and personalised tips for your store.",
+  "welcomeGetStarted": "Get Started",
+  "welcomeHaveAccount": "Already have an account? ",
+  "welcomeSignIn": "Sign In",
+  "loginWelcomeBack": "Welcome back",
+  "loginSubtitle": "Sign in to your Kirana AI account.",
+  "loginTabPhone": "Phone OTP",
+  "loginTabUsername": "Username",
+  "loginPhoneLabel": "Phone number",
+  "loginSendOtp": "Send OTP",
+  "loginOtpHelp": "We'll send a one-time password to this number",
+  "loginOtpSentTo": "OTP sent to {phone}",
+  "@loginOtpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "loginOtp6Label": "6-digit OTP",
+  "loginVerifyOtp": "Verify OTP",
+  "loginResendOtp": "Resend OTP",
+  "loginUsernameLabel": "Username",
+  "loginUsernameHint": "e.g. mykiranastore",
+  "loginUsernameRequired": "Username is required",
+  "loginPasswordLabel": "Password",
+  "loginPasswordHint": "Your password",
+  "loginPasswordRequired": "Password is required",
+  "loginSignIn": "Sign In",
+  "loginNoAccount": "Don't have an account? ",
+  "loginCreateOne": "Create one",
+  "loginIncorrect": "Incorrect username or password. Please try again.",
+  "loginFailed": "Login failed: {message}",
+  "@loginFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingStepCount": "{step}/4",
+  "@onboardingStepCount": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "accountVerifyPhoneTitle": "Verify your\nphone number",
+  "accountVerifyPhoneSubtitle": "We'll send a one-time password to confirm your number.",
+  "accountPhoneLabel": "Phone number",
+  "accountSendOtp": "Send OTP",
+  "accountEnterOtpTitle": "Enter OTP",
+  "accountEnterOtpSubtitle": "6-digit code sent to your phone.",
+  "accountOtpSentTo": "OTP sent to +91 {phone}",
+  "@accountOtpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "accountOtp6Label": "6-digit OTP",
+  "accountVerify": "Verify",
+  "accountResendOtp": "Resend OTP",
+  "accountPhoneVerified": "Phone verified: {phone}",
+  "@accountPhoneVerified": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "accountChooseUsernameTitle": "Choose a\nstore username",
+  "accountChooseUsernameSubtitle": "Your username is unique to your store and used to log in.",
+  "accountUsernameLabel": "Username",
+  "accountUsernameHint": "e.g. lohiyastore123",
+  "accountUsernameTaken": "Username already taken",
+  "accountUsernameRules": "Letters, numbers, underscores only • min 3 chars",
+  "accountErrChooseUsername": "Choose a unique username for your store",
+  "accountErrUsernameMin3": "Username must be at least 3 characters",
+  "accountErrUsernameChars": "Only letters, numbers, and underscores allowed",
+  "accountErrUsernameTakenTry": "That username is taken. Try another.",
+  "businessTitle": "Tell us about\nyour store",
+  "businessSubtitle": "Help us personalise your experience.",
+  "businessOwnerLabel": "Owner's full name",
+  "businessOwnerHint": "e.g. Ramesh Kumar",
+  "businessOwnerRequired": "Name is required",
+  "businessStoreLabel": "Store name",
+  "businessStoreHint": "e.g. Sri Lakshmi Stores",
+  "businessStoreRequired": "Store name is required",
+  "businessEmailLabel": "Email address",
+  "businessEmailHint": "you@example.com",
+  "businessEmailRequired": "Email is required",
+  "businessEmailInvalid": "Enter a valid email address",
+  "businessTypeLabel": "Business type",
+  "businessTypeHint": "Select your store type",
+  "businessTypeRequired": "Please select your business type",
+  "businessFootfallLabel": "Estimated daily customers",
+  "businessFootfallHint": "e.g. 40",
+  "businessFootfallSuffix": "customers/day",
+  "businessFootfallInvalid": "Enter a valid number",
+  "businessBudgetLabel": "Monthly sales target (optional)",
+  "businessBudgetHint": "e.g. 150000",
+  "businessBudgetHelper": "Used to track daily progress. You can change it later.",
+  "businessBudgetInvalid": "Enter a valid amount",
+  "businessTypeKirana": "Grocery Store (Kirana)",
+  "businessTypeGeneral": "General Store",
+  "businessTypeProvision": "Provision Store",
+  "businessTypeFruitsVeg": "Fruits & Vegetables",
+  "businessTypePharmacy": "Medical / Pharmacy",
+  "businessTypeStationery": "Stationery & Books",
+  "businessTypeOthers": "Others",
+  "locationTitle": "Where is your\nstore located?",
+  "locationSubtitle": "We use this to show local insights and enable delivery zones.",
+  "locationDetecting": "Detecting location…",
+  "locationDetect": "Detect My Location",
+  "locationOrManual": "or enter manually",
+  "locationAddressLabel": "Store address",
+  "locationAddressHint": "Street, area, landmark…",
+  "locationCityLabel": "City / District",
+  "locationCityHint": "e.g. Hyderabad",
+  "locationGettingCoords": "Getting coordinates…",
+  "locationDetected": "Location detected",
+  "locationErrAddress": "Please detect or enter your store address.",
+  "locationErrCity": "Please enter your city or district.",
+  "locationPermDenied": "Location permission denied. Please enter address manually.",
+  "locationDetectFailed": "Could not detect location. Please enter address manually.",
+  "consentTitle": "Almost there!\nReview & agree",
+  "consentSubtitle": "Please read and accept the following to complete your setup.",
+  "consentTermsTitle": "Terms & Conditions",
+  "consentTermsSummary": "By using Kirana AI, you agree to use the service for legitimate business purposes only. LohiyaAI reserves the right to suspend accounts that violate these terms. Your data is used solely to provide and improve the service.",
+  "consentPrivacyTitle": "Privacy Policy",
+  "consentPrivacySummary": "We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on Firebase infrastructure.",
+  "consentTermsCheckPrefix": "I have read and agree to the ",
+  "consentPrivacyCheckPrefix": "I agree to the ",
+  "consentAcceptBoth": "Please accept both agreements to continue.",
+  "consentCompleteSetup": "Complete Setup",
+  "regErrPhoneExists": "This phone number is already registered. Please sign in instead.",
+  "regErrUsernameTaken": "This username is already taken. Please choose another.",
+  "regErrInvalidDetails": "Invalid details. Please check your entries and try again.",
+  "regErrFailed": "Registration failed: {message}",
+  "@regErrFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "dashNavHome": "Home",
+  "dashNavKhata": "Khata",
+  "dashNavBilling": "Billing",
+  "dashTrialWelcome": "Welcome to Kirana AI",
+  "dashTrialChoosePlan": "Choose a plan to trial free. Our team will activate it shortly.",
+  "dashTrialSelectPlan": "SELECT YOUR TRIAL PLAN",
+  "dashTrialRequestPro": "Request Pro Trial",
+  "dashTrialRequestBasic": "Request Basic Trial",
+  "dashTrialSignInDifferent": "Sign in to a different account",
+  "dashPlanBadgeAllFeatures": "ALL FEATURES",
+  "dashPlanBasicName": "Basic Plan",
+  "dashPlanProName": "Pro Plan",
+  "dashFeatPos": "POS & Sales Management",
+  "dashFeatInventoryTracking": "Inventory Tracking",
+  "dashFeatFinanceUdhaar": "Finance & Udhaar",
+  "dashFeatKpiInsights": "KPI Insights (3 per category)",
+  "dashFeatAiReco": "AI Recommendations",
+  "dashFeatEverythingBasic": "Everything in Basic",
+  "dashFeatAllKpi": "All KPI Categories (unlimited)",
+  "dashFeatVendorProcurement": "Vendor & Procurement Management",
+  "dashFeatCashflowSupport": "Cashflow Support (up to ₹10L)",
+  "dashFeatCustomerGrowth": "Customer Growth Engine",
+  "dashPendingTitle": "Trial Request Received!",
+  "dashPendingBody": "Your trial activation is being reviewed by our team. You'll receive a notification on your device as soon as it's approved — usually within a few hours.",
+  "dashPendingNotifNote": "Make sure notifications are enabled so you don't miss the activation alert.",
+  "dashPendingCheckStatus": "Check Status",
+  "dashUpgradeTitle": "Free Trial Ended",
+  "dashUpgradeBody": "Your free trial has ended. Choose a plan to continue using Kirana AI and keep growing your store.",
+  "dashUpgradeBasic": "Basic",
+  "dashUpgradePro": "Pro",
+  "dashUpgradeBadgeBest": "BEST",
+  "dashUpgradeJustPerDay": "just {price}",
+  "@dashUpgradeJustPerDay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "dashUpgradeAlreadySubscribed": "Already subscribed? Refresh",
+  "dashFeatPosInventory": "POS & Inventory",
+  "dashFeatFinanceKpis": "Finance & KPIs",
+  "dashFeatVendorManagement": "Vendor Management",
+  "dashFeatCashflowReferrals": "Cashflow + Referrals",
+  "dashNewSale": "New Sale",
+  "dashGreetingMorning": "Good morning",
+  "dashGreetingAfternoon": "Good afternoon",
+  "dashGreetingEvening": "Good evening",
+  "dashGreetingWithName": "{greeting}, \n{name}",
+  "@dashGreetingWithName": {
+    "placeholders": {
+      "greeting": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashMorningBriefing": "MORNING BRIEFING",
+  "dashBriefingBody": "You have {risk} SKUs at critical risk and {reorder} items to reorder today. Tap to fix.",
+  "@dashBriefingBody": {
+    "placeholders": {
+      "risk": {
+        "type": "int"
+      },
+      "reorder": {
+        "type": "int"
+      }
+    }
+  },
+  "dashIntelligence": "Intelligence",
+  "dashMetricStockoutLabel": "Stockout Risk",
+  "dashMetricStockoutSub": "SKUs critical",
+  "dashMetricReorderLabel": "Reorder Now",
+  "dashMetricReorderSub": "SKUs low stock",
+  "dashMetricFastLabel": "Fast Moving",
+  "dashMetricFastSub": "Top sellers",
+  "dashMetricProfitLabel": "Profit Picks",
+  "dashMetricProfitSub": "Opportunities",
+  "dashMetricCustomerLabel": "Customer Dues",
+  "dashMetricCustomerSub": "Pending khata",
+  "dashMetricSalesLabel": "Items Sold",
+  "dashMetricSalesSub": "Today so far",
+  "dashTodaysPerformance": "Today's Performance",
+  "dashPosNotAvailable": "POS data not available",
+  "dashStatRevenue": "Revenue",
+  "dashStatOrders": "Orders",
+  "dashStatAvgOrder": "Avg order",
+  "dashStoreOverview": "Store Overview",
+  "dashStoreSkus": "SKUs",
+  "dashStoreFootfall": "Daily footfall",
+  "dashStoreDailyBudget": "Daily budget",
+  "dashCouldNotLoad": "Could not load data",
+  "dashRetry": "Retry",
+  "dashAlerts": "ALERTS",
+  "dashSeeAll": "See all",
+  "dashStoreKpis": "Store KPIs",
+  "dashKpiCoverageTooltip": "Based on {pct}% of sales — some items have no cost data",
+  "@dashKpiCoverageTooltip": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "dashDetailStockout": "Stockout Risk",
+  "dashDetailReorder": "Reorder Required",
+  "dashDetailFastMoving": "Fast Moving Items",
+  "dashDetailProfit": "High Profit Items",
+  "dashDetailDefault": "Intelligence Detail",
+  "dashSearchProducts": "Search products...",
+  "dashSortBy": "Sort by:",
+  "dashSortProfit": "Profit",
+  "dashSortDemand": "Demand",
+  "dashSortRisk": "Risk",
+  "dashStockLabel": "Stock: {qty}",
+  "@dashStockLabel": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStockRunway": "Stock runway",
+  "dashOutOfStock": "OUT OF STOCK",
+  "dashDaysLeft": "~{days} days left",
+  "@dashDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "dashStatStockoutRisk": "Stockout risk",
+  "dashStatReorderQty": "Reorder qty",
+  "dashUnitsValue": "{qty} units",
+  "@dashUnitsValue": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "dashWeeklyProfitImpact": "₹{amount} estimated weekly profit impact",
+  "@dashWeeklyProfitImpact": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "dashCreatePurchaseOrder": "Create Purchase Order · {qty} units",
+  "@dashCreatePurchaseOrder": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "dashNoItemsFound": "No items found",
+  "dashNoResultsFor": "No results for \"{query}\"",
+  "@dashNoResultsFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "dashClearSearch": "Clear search",
+  "dashConnectionError": "Connection Error",
+  "posCommonCancel": "Cancel",
+  "posCommonClear": "Clear",
+  "posCommonRefresh": "Refresh",
+  "posCommonAddToCart": "Add to Cart",
+  "posEnterQtyTitle": "Enter {unit}",
+  "@posEnterQtyTitle": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "posQtyFallback": "Qty",
+  "posPriceLabel": "Price: {price}",
+  "@posPriceLabel": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "posWeightMeasurement": "Weight / Measurement",
+  "posUnknownBarcodeTitle": "Unknown Barcode",
+  "posUnknownBarcodeBody": "Barcode \"{barcode}\" is not in your inventory. What would you like to do?",
+  "@posUnknownBarcodeBody": {
+    "placeholders": {
+      "barcode": {
+        "type": "String"
+      }
+    }
+  },
+  "posAddAsNew": "Add as New",
+  "posLinkToExisting": "Link to Existing Item",
+  "posErrLoadingInventory": "Error loading inventory: {error}",
+  "@posErrLoadingInventory": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "posLinkBarcodeTitle": "Link Barcode \"{barcode}\"",
+  "@posLinkBarcodeTitle": {
+    "placeholders": {
+      "barcode": {
+        "type": "String"
+      }
+    }
+  },
+  "posNoUnbarcodedItems": "No items found without barcodes.",
+  "posCategoryLabel": "Category: {category}",
+  "@posCategoryLabel": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "posCategoryGeneral": "General",
+  "posLinkedToItem": "Linked {barcode} to {name}",
+  "@posLinkedToItem": {
+    "placeholders": {
+      "barcode": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "posScanReferralQr": "Scan Referral QR",
+  "posCampaignOutOfStock": "All items in \"{name}\" are out of stock",
+  "@posCampaignOutOfStock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "posCampaignItemsAdded": "{count} {count, plural, =1{item} other{items}} from \"{name}\" added",
+  "@posCampaignItemsAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "posAddedSkipped": "{added} added · {skipped} skipped (out of stock)",
+  "@posAddedSkipped": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "posBasketAddedAtPrice": "Bundle \"{name}\" added at ₹{price}",
+  "@posBasketAddedAtPrice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "posItemsRegularPrice": "{count} items added at regular price (bundle needs all items in stock)",
+  "@posItemsRegularPrice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posBasketItemsAdded": "{count} {count, plural, =1{item} other{items}} from \"{name}\" added",
+  "@posBasketItemsAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "posItemsAddedToCart": "{count} {count, plural, =1{item} other{items}} added to cart",
+  "@posItemsAddedToCart": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posSelectCustomer": "Select Customer",
+  "posNew": "New",
+  "posSearchNameOrPhone": "Search by name or phone...",
+  "posNoCustomersFound": "No customers found.",
+  "posAddNewCustomer": "Add New Customer",
+  "posSelectFromContacts": "Select from Contacts",
+  "posCustomerName": "Customer Name",
+  "posPhoneNumber": "Phone Number",
+  "posSaveAndSelect": "Save & Select",
+  "posSearchProducts": "Search products…",
+  "posReferralScan": "Referral Scan",
+  "posOrderHistory": "Order History",
+  "posRefreshingProducts": "Refreshing products...",
+  "posRefreshFailed": "Refresh failed: {error}",
+  "@posRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "posProductsRefreshed": "Products refreshed ({count} items)",
+  "@posProductsRefreshed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posItemsInCart": "{count} {count, plural, =1{item} other{items}} in cart",
+  "@posItemsInCart": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posClearCartTitle": "Clear Cart?",
+  "posClearCartBody": "All items will be removed from the cart.",
+  "posFrequentlyBought": "FREQUENTLY BOUGHT TOGETHER",
+  "posNoProductsFound": "No products found",
+  "posStockColon": "Stock: {stock}",
+  "@posStockColon": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "posOffline": "POS Offline",
+  "posCouldNotConnect": "Could not connect to POS.",
+  "posBundlesAndDeals": "Bundles & Deals",
+  "posRefreshAi": "Refresh AI",
+  "posItemsInBundle": "{count} items in bundle",
+  "@posItemsInBundle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posBundlePrice": "bundle price",
+  "posItemFallback": "Item",
+  "posValidUntil": "Valid until {date}",
+  "@posValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "posStockUnitPrice": "Stock: {stock} {unit}  ·  ₹{price}",
+  "@posStockUnitPrice": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "posNotInStock": "Not in stock",
+  "posBundlePriceLabel": "Bundle Price",
+  "posAddAvailableToCart": "Add Available Items to Cart",
+  "posVoiceCount": "Voice ({remaining}/{total})",
+  "@posVoiceCount": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "posVoiceOrder": "Voice Order",
+  "posHandwriteCount": "Handwrite ({remaining}/{total})",
+  "@posHandwriteCount": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "posHandwrite": "Handwrite",
+  "posCartEmpty": "Cart is empty",
+  "posCartEmptyHint": "Search for a product or scan a barcode to start a sale.",
+  "posAddCustomer": "Add Customer",
+  "posItemCount": "{count} items",
+  "@posItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "posPlaceOrderAmount": "Place Order · {amount}",
+  "@posPlaceOrderAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "posPosInventory": "POS / Inventory",
+  "posOnline": "POS Online",
+  "posTabSales": "Sales",
+  "posTabStock": "Stock",
+  "posTabPurchase": "Purchase",
+  "posPurchaseSuppliers": "Purchase & Suppliers",
+  "posPurchaseSuppliersDesc": "Create purchase orders, manage your suppliers, and track what you owe them — all in one place.",
+  "posPaywallPurchaseDesc": "Manage purchase orders and suppliers. Track payments to distributors. Available on the Pro plan.",
+  "posPrinterSetup": "Printer Setup",
+  "posReconnect": "Reconnect",
+  "posForgetPrinter": "Forget this printer",
+  "posPairedDevices": "PAIRED BLUETOOTH DEVICES",
+  "posNoPairedDevices": "No paired devices found",
+  "posPairDeviceHint": "Pair your thermal printer in Android\nBluetooth settings first, then refresh.",
+  "posProOnly": "PRO ONLY",
+  "posUpgradeToProDay": "Upgrade to Pro  ₹500/mo · just ₹17/day",
+  "posReceiptSent": "Receipt sent to printer",
+  "posPrintFailedCheck": "Print failed — check printer",
+  "posOrderPlaced": "Order Placed!",
+  "posOrderNumber": "Order #{id}",
+  "@posOrderNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "posPrintReceipt": "Print Receipt",
+  "posNewSale": "New Sale",
+  "posViewOrderDetails": "View Order Details",
+  "posSelectCustomerForUdhaar": "Please select a customer for Udhaar sale",
+  "posConfirmOrder": "Confirm Order",
+  "posOrderConfirmed": "Order confirmed!",
+  "posSubtotal": "Subtotal",
+  "posReferralDiscount": "Referral Discount ({pct}%){referrer}",
+  "@posReferralDiscount": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      },
+      "referrer": {
+        "type": "String"
+      }
+    }
+  },
+  "posGrandTotal": "Grand Total",
+  "posPaymentMethod": "Payment Method",
+  "posPayCash": "Cash",
+  "posPayUdhaar": "Udhaar",
+  "posPayUpi": "UPI",
+  "posComingSoon": "Coming soon",
+  "posSelectCustomerRequired": "Select customer (required for Udhaar)",
+  "posSelectCustomerForUdhaarTitle": "Select Customer for Udhaar",
+  "posSearchNameOrPhoneHint": "Search by name or phone…",
+  "posPrintAutomatically": "Print receipt automatically",
+  "posWillPrintAfter": "Will print after order is placed",
+  "posPrinterStatus": "Printer: {status}",
+  "@posPrinterStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "posAutoPrintDisabled": "Disabled — print manually from order details",
+  "posHowMuchUdhaar": "How much goes on Udhaar?",
+  "posCashNow": "Cash now",
+  "posOnUdhaar": "On Udhaar",
+  "posPrintFailedCheckConnection": "Print failed — check printer connection",
+  "posTodaysOrders": "Today's Orders",
+  "posTransactionsSoFar": "{count} transactions so far",
+  "@posTransactionsSoFar": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posViewAll": "View All",
+  "posNoOrdersToday": "No orders today yet",
+  "posSalesAppearHere": "Sales transactions will appear here",
+  "posOrderMeta": "{time} · {payment} · {status}",
+  "@posOrderMeta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "payment": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "posPrint": "Print",
+  "posScanBarcode": "Scan Barcode",
+  "posAlignBarcode": "Align barcode within the frame",
+  "posLookingUp": "Looking up…",
+  "posAlreadyInList": "{name} already in list",
+  "@posAlreadyInList": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "posItemQty": "{name} ×{qty}",
+  "@posItemQty": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "qty": {
+        "type": "int"
+      }
+    }
+  },
+  "posItemAdded": "{name} added",
+  "@posItemAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "posNotFoundTapAdd": "Not found — tap to add manually",
+  "posItemsScanned": "{count} {count, plural, =1{item} other{items}} scanned",
+  "@posItemsScanned": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posScanItems": "Scan items",
+  "posClearAll": "Clear all",
+  "posLookingUpItems": "Looking up {count} {count, plural, =1{item} other{items}}…",
+  "@posLookingUpItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "posAddItemsToCart": "Add {count} {count, plural, =1{item} other{items}} to Cart  ·  ₹{total}",
+  "@posAddItemsToCart": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "posPointCamera": "Point camera at a barcode",
+  "posItemsAppearHere": "Items appear here as you scan",
+  "posTransactionHistory": "Transaction History",
+  "posFilters": "Filters:",
+  "posClearAllFilters": "Clear All",
+  "posNoTransactions": "No transactions found",
+  "posTryAdjustFilters": "Try adjusting your filters",
+  "posResetFilters": "Reset Filters",
+  "posFilterTransactions": "Filter Transactions",
+  "posPaymentStatus": "Payment Status",
+  "posFilterAll": "All",
+  "posStatusCompleted": "Completed",
+  "posStatusPending": "Pending",
+  "posDateRange": "Date Range",
+  "posSelectDateRange": "Select Date Range",
+  "posApplyFilters": "Apply Filters",
+  "posOrderDetails": "Order Details",
+  "posPaymentLabel": "Payment",
+  "posTotalAmount": "Total Amount",
+  "posCustomerNumber": "Customer #{id}",
+  "@posCustomerNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "posItemsSummary": "Items Summary",
+  "posProductNumber": "Product #{id}",
+  "@posProductNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "posUnitFallback": "unit",
+  "posPrintReceiptStatus": "Print Receipt ({status})",
+  "@posPrintReceiptStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "posReturnExchange": "Return / Exchange",
+  "posSplitPayment": "SPLIT PAYMENT",
+  "posCashPaidNow": "Cash paid now",
+  "posOnUdhaarCredit": "On Udhaar (credit)",
+  "posUdhaarRecordedNote": "Udhaar portion recorded as credit — check Udhaar tab for balance",
+  "posUdhaarSale": "Udhaar Sale",
+  "posTotalPaid": "Total Paid",
+  "posRecordedAsCredit": "Recorded as credit — check Udhaar tab",
+  "invSearchItemsOrCategories": "Search items or categories...",
+  "invShowLess": "Show Less",
+  "invViewMore": "+{count} more",
+  "@invViewMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invAll": "All",
+  "invUncategorised": "Uncategorised",
+  "invNoMatchesFound": "No matches found",
+  "invNearExpiryBanner": "{count, plural, =1{1 item expiring soon — tap to mark down or clear} other{{count} items expiring soon — tap to mark down or clear}}",
+  "@invNearExpiryBanner": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invMissingPriceBanner": "{count, plural, =1{1 product priced ₹0 — tap to set prices} other{{count} products priced ₹0 — tap to set prices}}",
+  "@invMissingPriceBanner": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invFlagFast": "Fast",
+  "invFlagReorder": "Reorder",
+  "invFlagLowStock": "Low stock",
+  "invFlagDead": "Dead",
+  "invFlagProfit": "Profit",
+  "invStockLabel": "Stock: {stock}",
+  "@invStockLabel": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "invUnitFallback": "unit",
+  "invSyncFailedTapRetry": "Sync failed — tap to retry",
+  "invSyncingToServer": "Syncing to server...",
+  "invNoInventoryYet": "No inventory yet",
+  "invNoInventoryHint": "Tap + to add your first product.\nCreate a category first, then add items.",
+  "invAddFirstProduct": "Add First Product",
+  "invCouldNotLoadInventory": "Could not load inventory",
+  "invRetry": "Retry",
+  "invSelectCategoryError": "Please select a category",
+  "invVariantPriceRequired": "Variant {number}: selling price is required",
+  "@invVariantPriceRequired": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "invProductSavedSyncing": "Product saved — syncing in background",
+  "invVariantsSavedSyncing": "{count} variants saved — syncing in background",
+  "@invVariantsSavedSyncing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invAddProduct": "Add Product",
+  "invAddFromCatalog": "Add from Catalog",
+  "invNewProduct": "New Product",
+  "invSave": "Save",
+  "invSearchProductName": "Search product name...",
+  "invLoadMoreResults": "Load more results",
+  "invNoMoreSearchResults": "No more search results",
+  "invSearchProductCatalog": "Search the product catalog",
+  "invSearchCatalogHint": "Type a name or scan a barcode.\nIf not found, add manually.",
+  "invAddManually": "Add manually",
+  "invAddManuallySub": "Product not in catalog? Enter details yourself.",
+  "invProductAdded": "Product added!",
+  "invVariantsAdded": "{count} variants added!",
+  "@invVariantsAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invLooseItem": "Loose item",
+  "invLooseItemSub": "Sold by weight (e.g. Maida, Pulse)",
+  "invBasicDetails": "Basic Details",
+  "invProductNameLabel": "Product name *",
+  "invRequired": "Required",
+  "invBrandOptional": "Brand (optional)",
+  "invSelectCategoryStar": "Select category *",
+  "invOther": "Other",
+  "invPerishableItem": "Perishable item",
+  "invPerishableItemSub": "Has an expiry date",
+  "invSizePriceStock": "Size, Price & Stock",
+  "invVariantsCount": "Variants ({count})",
+  "@invVariantsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invAddVariant": "Add Variant",
+  "invSaveProduct": "Save Product",
+  "invSaveVariants": "Save {count} Variants",
+  "@invSaveVariants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invProduct": "Product",
+  "invVariantNumber": "Variant {number}",
+  "@invVariantNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "invUnit": "Unit",
+  "invBaseUnit": "Base unit",
+  "invPackSize": "Pack size",
+  "invPackSizeHint": "e.g. 250",
+  "invBarcode": "Barcode",
+  "invFromCatalog": "From catalog",
+  "invOptional": "optional",
+  "invPricePerUnit": "Price / {unit} *",
+  "@invPricePerUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invSellingPriceStar": "Selling price *",
+  "invInvalid": "Invalid",
+  "invMrp": "MRP",
+  "invCostPrice": "Cost price (what you pay)",
+  "invCostPriceHint": "optional — improves profit accuracy",
+  "invOpeningStockUnit": "Opening stock ({unit}) *",
+  "@invOpeningStockUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invOpeningStockUnits": "Opening stock (units) *",
+  "invExpiryDate": "Expiry date",
+  "invExpiryDateHint": "YYYY-MM-DD",
+  "invRequiredForPerishables": "Required for perishables",
+  "invLinkedFromCatalog": "Linked from catalog",
+  "invSelectCategory": "Select Category",
+  "invSearchCategories": "Search categories...",
+  "invNoCategoriesFound": "No categories found",
+  "invEditProduct": "Edit Product",
+  "invProductUpdated": "{name} updated!",
+  "@invProductUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invProductUpdatedSuccess": "Product updated successfully!",
+  "invSellingUnit": "Selling unit",
+  "invPricing": "Pricing",
+  "invPricePerSelected": "Price per {unit} *",
+  "@invPricePerSelected": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invMrpOptional": "MRP (optional)",
+  "invStock": "Stock",
+  "invStockInUnit": "Stock (in {unit}) *",
+  "@invStockInUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invStockQuantityStar": "Stock quantity *",
+  "invPerishableBatchNote": "For perishable batch details, use \"Receive Batch\" from inventory.",
+  "invSaveChanges": "Save Changes",
+  "invCategoryNameRequired": "Category name is required",
+  "invCreateCategoryFailed": "Failed to create category. Please try again.",
+  "invNewCategory": "New Category",
+  "invNewCategorySub": "Add a category to organise your products.",
+  "invCategoryCreated": "Category created!",
+  "invCategoryNameLabel": "Category name",
+  "invCategoryNameHint": "e.g. Staples, Dairy, Snacks…",
+  "invCreateCategory": "Create Category",
+  "invCardOutOfStock": "Out of stock",
+  "invCardStockLow": "{qty} — low",
+  "@invCardStockLow": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "invCardStockInStock": "{qty} in stock",
+  "@invCardStockInStock": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "invCardFast": "Fast",
+  "invCardSlow": "Slow",
+  "invCardExpired": "Expired",
+  "invCardDays": "{days}d",
+  "@invCardDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "invCardBarcode": "Barcode",
+  "invCardSoldToday": "Sold today",
+  "invCardReorder": "Reorder",
+  "invCardReorderUnits": "{qty} units",
+  "@invCardReorderUnits": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "invCard7dRisk": "7d risk",
+  "invExpiringSoon": "Expiring Soon",
+  "invNext": "Next",
+  "invDaysWindow": "{days} days",
+  "@invDaysWindow": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "invExpired": "Expired",
+  "invExpiresToday": "Expires today",
+  "invExpiresTomorrow": "Expires tomorrow",
+  "invExpiresInDays": "Expires in {days} days",
+  "@invExpiresInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "invQtyInStock": "{qty} {unit} in stock",
+  "@invQtyInStock": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invAtRisk": "At risk",
+  "invMarkedDown": "Marked down",
+  "invPrice": "Price",
+  "invChangeMarkdown": "Change markdown",
+  "invMarkDown": "Mark down",
+  "invRecordWaste": "Record waste",
+  "invMarkDownTitle": "Mark down {name}",
+  "@invMarkDownTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invClearanceDiscount": "Clearance discount to sell before expiry",
+  "invPctSuggested": "{pct}% (suggested)",
+  "@invPctSuggested": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "invPct": "{pct}%",
+  "@invPct": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "invCustom": "Custom",
+  "invApplyMarkdown": "Apply markdown",
+  "invMarkdownApplied": "Markdown applied",
+  "invMarkdownFailed": "Could not apply markdown",
+  "invWriteOff": "Write off {name}",
+  "@invWriteOff": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invWriteOffSub": "Removes spoiled units from stock and records the loss.",
+  "invOfQtyInStock": "of {qty} in stock",
+  "@invOfQtyInStock": {
+    "placeholders": {
+      "qty": {
+        "type": "int"
+      }
+    }
+  },
+  "invUnitsWrittenOff": "{units} units written off",
+  "@invUnitsWrittenOff": {
+    "placeholders": {
+      "units": {
+        "type": "int"
+      }
+    }
+  },
+  "invWasteFailed": "Could not record waste",
+  "invNothingExpiring": "Nothing expiring soon",
+  "invNothingExpiringSub": "Perishable batches nearing expiry will show up here.",
+  "invCouldNotLoadExpiry": "Could not load expiry data",
+  "invMissingPrices": "Missing Prices",
+  "invCouldNotLoadPrices": "Could not load prices",
+  "invStockCurrentlyZero": "{qty} {unit} in stock · currently ₹0",
+  "@invStockCurrentlyZero": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "invSuggestedPrice": "Suggested ₹{price} ({source})",
+  "@invSuggestedPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "invSellingPrice": "Selling price",
+  "invSet": "Set",
+  "invEnterValidPrice": "Enter a valid price",
+  "invProductPriced": "{name} priced ₹{price}",
+  "@invProductPriced": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "invCouldNotSetPrice": "Could not set price",
+  "invEveryProductPriced": "Every product is priced",
+  "invEveryProductPricedSub": "Nothing is selling at ₹0. Good going!",
+  "finFinance": "Finance",
+  "finErrorLoadingStats": "Error loading stats",
+  "finTabCashflow": "Cashflow",
+  "finTabCustomerUdhaar": "Customer\nUdhaar",
+  "finTabSupplierUdhaar": "Supplier Udhaar",
+  "finMonthlySales": "Monthly Sales",
+  "finMonthlySkus": "Monthly SKUs",
+  "finAvailableInFuture": "Will be available in future updates",
+  "finFailedLoadUdhaar": "Failed to load udhaar data",
+  "finCheckConnection": "Please check your connection and try again.",
+  "finRetry": "Retry",
+  "finCustomerDues": "Customer Dues",
+  "finNewUdhaar": "New Udhaar",
+  "finAddNewUdhaar": "Add New Udhaar",
+  "finContacts": "Contacts",
+  "finSelectExistingCustomer": "Select existing customer",
+  "finOrEnterManually": "or enter manually",
+  "finUdhaarRecorded": "Udhaar recorded!",
+  "finCustomerName": "Customer Name",
+  "finPhoneNumber": "Phone Number",
+  "finAmount": "Amount",
+  "finSaveUdhaar": "Save Udhaar",
+  "finEnterValidNamePhoneAmount": "Enter valid name, phone and amount",
+  "finSelectCustomer": "Select Customer",
+  "finSearchByNameOrPhone": "Search by name or phone...",
+  "finNoCustomersFound": "No customers found",
+  "finTotalPending": "Total Pending",
+  "finRecovered": "Recovered",
+  "finCustomers": "Customers",
+  "finHighRiskDues": "{count} high-risk due{count, plural, =1{} other{s}} — chase these first",
+  "@finHighRiskDues": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "finSmartRemindersSubtitle": "Smart Reminders — recovery-ranked dues",
+  "finTakenDaysAgo": "Taken: {date} ({days} days ago)",
+  "@finTakenDaysAgo": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "finWhatsappReminderSent": "WhatsApp reminder sent!",
+  "finFailedSendReminder": "Failed to send reminder: {error}",
+  "@finFailedSendReminder": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "finSendWhatsappReminder": "Send WhatsApp Reminder",
+  "finRecover": "Recover",
+  "finHistory": "History",
+  "finSettled": "Settled",
+  "finRecoverUdhaarFrom": "Recover Udhaar from {name}",
+  "@finRecoverUdhaarFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "finRecoveryRecorded": "Recovery recorded!",
+  "finBalanceLabel": "Balance: ₹{value}",
+  "@finBalanceLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "finConfirmRecovery": "Confirm Recovery",
+  "finEnterValidAmount": "Please enter a valid amount",
+  "finAmountExceedsBalance": "Amount cannot exceed balance ₹{value}",
+  "@finAmountExceedsBalance": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "finNoPendingUdhaars": "No pending udhaars",
+  "finRecoveryHistory": "Recovery History",
+  "finNoRecoveriesYet": "No recoveries recorded yet.",
+  "finRecoveryNumber": "Recovery #{number}",
+  "@finRecoveryNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "finErrorWithMessage": "Error: {message}",
+  "@finErrorWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "finOverdue": "Overdue",
+  "finDueToday": "Due Today",
+  "finNext7Days": "Next 7 Days",
+  "finNoPendingPayments7Days": "No pending payments in the next 7 days",
+  "finPaidLast7Days": "Paid Last 7 Days",
+  "finNoPaymentsRecorded7Days": "No payments recorded in the last 7 days",
+  "finSuppliers": "Suppliers",
+  "finAddEditSuppliersHint": "Add or edit suppliers in the Purchase tab",
+  "finNoSuppliersYet": "No suppliers yet.",
+  "finTotalOutstanding": "Total Outstanding",
+  "finToday": "Today",
+  "finPaid7d": "Paid (7d)",
+  "finStockPurchase": "Stock Purchase",
+  "finOverdueSince": "Overdue since {date}",
+  "@finOverdueSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "finDueOn": "Due {day}",
+  "@finDueOn": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "finDueTodayLabel": "Due today",
+  "finToPay": "to pay",
+  "finDetails": "Details",
+  "finMarkPaid": "Mark Paid",
+  "finPurchaseOn": "Purchase on {date}",
+  "@finPurchaseOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "finNoItemsFound": "No items found.",
+  "finTotalBill": "Total Bill",
+  "finTomorrow": "Tomorrow",
+  "finWeekdayMon": "Mon",
+  "finWeekdayTue": "Tue",
+  "finWeekdayWed": "Wed",
+  "finWeekdayThu": "Thu",
+  "finWeekdayFri": "Fri",
+  "finWeekdaySat": "Sat",
+  "finWeekdaySun": "Sun",
+  "finFailedLoadCashflow": "Failed to load cashflow data",
+  "finIncome": "Income",
+  "finTodaysSales": "Today's Sales",
+  "finCreditExposureUdhaar": "Credit Exposure (Udhaar)",
+  "finOutstanding": "Outstanding",
+  "finCustomersWithPendingDues": "Customers with pending dues",
+  "finCustomersCount": "{count} customers",
+  "@finCustomersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "finCreditVsSalesRatio": "Credit vs Sales Ratio",
+  "finPercentOnCredit": "{value}% on credit",
+  "@finPercentOnCredit": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "finOfMonthly": "of {value} monthly",
+  "@finOfMonthly": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "finCreditHealthy": "Healthy — credit exposure is low",
+  "finCreditModerate": "Moderate — consider collecting dues",
+  "finCreditHigh": "High — many sales are on credit",
+  "finSmartReminders": "Smart Reminders",
+  "finCouldNotLoadReminders": "Could not load reminders",
+  "finDaysPending": "{days} days pending",
+  "@finDaysPending": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "finRiskBadge": "{band} RISK",
+  "@finRiskBadge": {
+    "placeholders": {
+      "band": {
+        "type": "String"
+      }
+    }
+  },
+  "finLikelyToRecover": "~{percent}% likely to recover",
+  "@finLikelyToRecover": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "finSendReminder": "Send reminder",
+  "finReminderSentTo": "Reminder sent to {name}",
+  "@finReminderSentTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "finCouldNotSendReminder": "Could not send reminder",
+  "finNoOpenUdhaar": "No open udhaar",
+  "finAllCreditSettled": "All credit is settled. Nice and clean!",
+  "procAddSupplierFirstToCreatePo": "Add a supplier first to create a purchase order",
+  "procErrorWithMessage": "Error: {message}",
+  "@procErrorWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "procSuppliers": "Suppliers",
+  "procNoSuppliersYet": "No suppliers added yet.",
+  "procRecentPurchases": "Recent Purchases",
+  "procAddAtLeastOneSupplier": "If you want to add a purchase, add at least 1 supplier.",
+  "procNoPurchaseOrdersYet": "No purchase orders yet.",
+  "procScanInvoice": "Scan Invoice",
+  "procAdd": "Add",
+  "procSuggestedReorders": "Suggested Reorders",
+  "procRunningLowLast30Days": "Running low based on the last 30 days of sales",
+  "procAddNewSupplier": "Add New Supplier",
+  "procContacts": "Contacts",
+  "procSupplierName": "Supplier Name",
+  "procPhoneNumber": "Phone Number",
+  "procCategoryHint": "Category (e.g. Dairy, FMCG)",
+  "procEnterValidPhone": "Enter a valid phone number",
+  "procSaveSupplier": "Save Supplier",
+  "procEditSupplier": "Edit Supplier",
+  "procSaveChanges": "Save Changes",
+  "procNewPurchaseOrder": "New Purchase Order",
+  "procRecordItemsFromDistributor": "Record items purchased from a distributor.",
+  "procOrderDetails": "Order Details",
+  "procDistributor": "Distributor",
+  "procPaymentDueDate": "Payment Due Date",
+  "procSelectDate": "Select Date",
+  "procItemsCount": "Items ({count})",
+  "@procItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procAddItem": "Add Item",
+  "procNoItemsAddedYet": "No items added yet",
+  "procNotes": "Notes",
+  "procNotesHint": "Bill number, delivery notes, etc.",
+  "procTotalAmount": "Total Amount",
+  "procSaveOrder": "Save Order",
+  "procSearchProduct": "Search product...",
+  "procAddProduct": "Add {name}",
+  "@procAddProduct": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "procQuantity": "Quantity",
+  "procCostPricePerUnit": "Cost Price per unit",
+  "procCancel": "Cancel",
+  "procDaysCover": "{days}d cover",
+  "@procDaysCover": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "procOrderQty": "Order {qty}",
+  "@procOrderQty": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "procStockLine": "Stock {stock} · ~{perDay}/day · {cover}",
+  "@procStockLine": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      },
+      "perDay": {
+        "type": "String"
+      },
+      "cover": {
+        "type": "String"
+      }
+    }
+  },
+  "procCreatePurchaseOrder": "Create purchase order",
+  "procEditSupplierTooltip": "Edit supplier",
+  "procMarkAsReceived": "Mark as Received",
+  "procPleaseSelectSupplierFirst": "Please select a supplier first",
+  "procFromScannedInvoice": "From scanned invoice",
+  "procPoCreatedWithUnmatched": "Purchase order created! ({count} item{count, plural, one{} other{s}} not matched)",
+  "@procPoCreatedWithUnmatched": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procPoCreatedFromInvoice": "Purchase order created from invoice!",
+  "procCameraGalleryPdf": "Camera · Gallery · PDF",
+  "procScansLabel": "scans",
+  "procScanAgain": "Scan again",
+  "procInvoiceScanProFeature": "Invoice Scan is a Pro feature.",
+  "procUpgradeToPro": "Upgrade to Pro",
+  "procDailyLimitReached": "Daily limit reached. Top up credits to continue.",
+  "procBuyCredits": "Buy Credits",
+  "procCreatingPurchaseOrder": "Creating purchase order…",
+  "procPurchaseOrderCreated": "Purchase order created!",
+  "procTryAgain": "Try Again",
+  "procCaptureOrUploadInvoice": "Capture or upload a supplier invoice",
+  "procUpgradeOrTopUp": "Upgrade to Pro or top up credits",
+  "procKiranaAiReadsInvoice": "Kirana AI reads items, totals & supplier details",
+  "procCamera": "Camera",
+  "procGallery": "Gallery",
+  "procUploadPdfImageFile": "Upload PDF / Image File",
+  "procKiranaAiReadingInvoice": "Kirana AI is reading your invoice…",
+  "procExtractingItems": "Extracting items, quantities and totals",
+  "procGrandTotal": "Grand Total",
+  "procSupplierUpper": "SUPPLIER",
+  "procItemsUpperCount": "ITEMS ({count})",
+  "@procItemsUpperCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procMatchedCount": "{count} matched",
+  "@procMatchedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procUnmatchedItemsWarning": "{count} unmatched item{count, plural, one{} other{s}} will not be added as line items, but the full invoice total will be recorded.",
+  "@procUnmatchedItemsWarning": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procSelectSupplierToContinue": "Select a supplier to continue",
+  "procCreatePurchaseOrderTitle": "Create Purchase Order",
+  "procConfidencePercent": "{pct}% confidence",
+  "@procConfidencePercent": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "procTotalsMatch": "✓ Totals match",
+  "procTotalMismatch": "⚠ Total mismatch",
+  "procUnverified": "Unverified",
+  "procPick": "Pick",
+  "procNoMatchTapToSelect": "No match for \"{vendor}\" — tap to select",
+  "@procNoMatchTapToSelect": {
+    "placeholders": {
+      "vendor": {
+        "type": "String"
+      }
+    }
+  },
+  "procSelectSupplier": "Select supplier",
+  "procSelectSupplierTitle": "Select Supplier",
+  "procNoSuppliersAddInPurchaseTab": "No suppliers yet. Add suppliers in the Purchase tab.",
+  "procLinkToInventory": "Link to Inventory",
+  "procSearchProducts": "Search products…",
+  "procNoProductsFound": "No products found",
+  "procPriceStockLabel": "{price} · Stock: {stock}",
+  "@procPriceStockLabel": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "procMicPermissionDenied": "Microphone permission denied. Please enable it in Settings.",
+  "procMicNotAccessible": "Microphone not accessible.",
+  "procAddedToCartFromVoice": "{count} item{count, plural, one{} other{s}} added to cart from voice order",
+  "@procAddedToCartFromVoice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procVoiceOrder": "Voice Order",
+  "procSpeakAnyIndianLanguage": "Speak in any Indian language",
+  "procVoiceOrderProFeature": "Voice Order is a Pro feature. Upgrade to access.",
+  "procUpgrade": "Upgrade",
+  "procNoVoiceOrdersLeft": "No voice orders left today. Get more credits.",
+  "procGetCredits": "Get Credits",
+  "procVoiceLabel": "voice",
+  "procTapMicToStart": "Tap mic to start recording",
+  "procTapToStopAndProcess": "Tap to stop & process",
+  "procKiranaAiProcessing": "Kirana AI is processing…",
+  "procHeard": "Heard",
+  "procNoItemsDetectedTryAgain": "No items detected. Please try again.",
+  "procRecordAgain": "Record Again",
+  "procAddToCartCount": "Add {count} to Cart",
+  "@procAddToCartCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procAutoDetectsLanguages": "Auto-detects: Telugu · Hindi · Urdu · Tamil · Kannada · Malayalam · English",
+  "procInStock": "In stock",
+  "procLowStock": "Low stock",
+  "procNotFound": "Not found",
+  "procPickFromInventory": "Pick from Inventory",
+  "procAddedToCartFromHandwriting": "{count} item{count, plural, one{} other{s}} added to cart from handwriting",
+  "@procAddedToCartFromHandwriting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procCanvasNotReady": "Canvas not ready",
+  "procFailedToCaptureCanvas": "Failed to capture canvas",
+  "procHandwriteOrder": "Handwrite Order",
+  "procWriteItemsAnyScript": "Write items in any script",
+  "procDrawsLabel": "draws",
+  "procUndoLastStroke": "Undo last stroke",
+  "procClear": "Clear",
+  "procHandwriteOrderProFeature": "Handwrite Order is a Pro feature.",
+  "procAutoDetectAfter5s": "Auto-detect after 5s",
+  "procWriteItemsHere": "Write items here",
+  "procUpgradeOrTopUpToWrite": "Upgrade or top up to write",
+  "procHandwriteExample": "e.g. Rice 5kg, Sugar 2kg",
+  "procDetecting": "Detecting…",
+  "procDetectItems": "Detect Items",
+  "procRead": "Read",
+  "procNoItemsDetectedWriteClearly": "No items detected. Try writing more clearly.",
+  "procWriteAgain": "Write Again",
+  "procAnyScriptLanguages": "Any script: English · తెలుగు · हिंदी · Tamil · ಕನ್ನಡ · മലയാളം",
+  "procProductNumber": "Product #{id}",
+  "@procProductNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "procReturnExchange": "Return / Exchange",
+  "procOrderPickItemsToReturn": "Order #{id} · pick items to return",
+  "@procOrderPickItemsToReturn": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "procRecordReturn": "Record return",
+  "procBoughtQty": "bought {qty} ",
+  "@procBoughtQty": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "procBackToShelf": "Back to shelf",
+  "procResaleable": "Resaleable",
+  "procDamagedToVendor": "Damaged → vendor",
+  "procReturnRecordedShelf": "Return recorded — {count} back to shelf",
+  "@procReturnRecordedShelf": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procReturnToVendorSuffix": ", {count} to vendor",
+  "@procReturnToVendorSuffix": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procCouldNotRecordReturn": "Could not record return",
+  "subYourInsights": "Your Insights",
+  "subError": "Error",
+  "subManageKpis": "Manage KPIs",
+  "subManageSubscriptions": "Manage subscriptions",
+  "subDone": "Done",
+  "subKpisSelected": "{n} KPIs selected",
+  "@subKpisSelected": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "subSelectAll": "Select All",
+  "subClear": "Clear",
+  "subUnselect": "Unselect",
+  "subProKpiName": "Pro KPI: {name}",
+  "@subProKpiName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "subConfirmSelections": "Confirm Selections",
+  "subNoActiveKpis": "No active KPIs",
+  "subManageToSeeInsights": "Manage your subscriptions to see insights",
+  "subFailedLoadInsights": "Failed to load live insights",
+  "subManageInventory": "Manage Inventory",
+  "subSendReminders": "Send Reminders",
+  "subReminderMessage": "Hi, this is a reminder regarding your business with us. Please check your latest updates.",
+  "subNewSale": "New Sale",
+  "subAiSummary": "AI Summary",
+  "subPoweredBy": "Powered by {agent}",
+  "@subPoweredBy": {
+    "placeholders": {
+      "agent": {
+        "type": "String"
+      }
+    }
+  },
+  "subTarget": "Target",
+  "subBaseline": "Baseline",
+  "subLiveDataBreakdown": "Live Data Breakdown",
+  "subMlInsights": "MI Insights",
+  "subNoDynamicInsights": "No dynamic insights available for this KPI.",
+  "subPctVsLastPeriod": "{pct}% vs last period",
+  "@subPctVsLastPeriod": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "subCurrent": "current",
+  "subWhyThisValue": "Why this value?",
+  "subSomethingWentWrong": "Oops! Something went wrong",
+  "subRetry": "Retry",
+  "subSubscriptionAndPlans": "Subscription & Plans",
+  "subErrorWithDetail": "Error: {detail}",
+  "@subErrorWithDetail": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "subCancelSubscriptionTitle": "Cancel Subscription?",
+  "subCancelSubscriptionBody": "Your subscription will be cancelled immediately. You can re-subscribe at any time.",
+  "subKeepPlan": "Keep Plan",
+  "subCancelSubscription": "Cancel Subscription",
+  "subSubscriptionCancelled": "Subscription cancelled.",
+  "subCancelFailed": "Cancel failed: {detail}",
+  "@subCancelFailed": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "subChooseYourPlan": "CHOOSE YOUR PLAN",
+  "subFeaturePosSales": "POS & Sales Management",
+  "subFeatureInventoryTracking": "Inventory Tracking",
+  "subFeatureFinanceUdhaar": "Finance & Udhaar",
+  "subFeatureKpiInsights": "KPI Insights (3 per category)",
+  "subFeatureCustomerRelations": "Customer Relations",
+  "subFeatureAiRecommendations": "AI Recommendations",
+  "subFeatureAllKpiCategories": "All KPI Categories (unlimited)",
+  "subFeatureVendorProcurement": "Vendor & Procurement Management",
+  "subFeatureCashflowSupport": "Cashflow Support (up to ₹10L)",
+  "subFeatureCustomerGrowth": "Customer Growth Engine",
+  "subPerMonth": "/month",
+  "subRestorePurchases": "Restore Purchases",
+  "subNeedHelp": "Need help?",
+  "subReachWhatsApp": "Reach us on WhatsApp for plan queries or billing support.",
+  "subWhatsAppSupport": "WhatsApp Support",
+  "subWhatsAppHelpMessage": "Hi! I need help with my Kirana AI subscription.",
+  "subCurrentPlanLabel": "Current: {plan}",
+  "@subCurrentPlanLabel": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "subTimeRemaining": "Time remaining: ",
+  "subBest": "BEST",
+  "subJustPerDay": "just {price}/day",
+  "@subJustPerDay": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "subTrialPlanNotice": "You're on a free trial of this plan. Upgrade to keep access after trial ends.",
+  "subCurrentPlan": "Current Plan",
+  "subUpgradeToKeepAccess": "Upgrade to Keep {name} Access",
+  "@subUpgradeToKeepAccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "subPayAndActivate": "Pay & Activate {name}",
+  "@subPayAndActivate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "subPaywallFeatureEverythingBasic": "Everything in Basic",
+  "subPaywallFeaturePriorityAi": "Priority AI recommendations",
+  "subProFeature": "PRO FEATURE",
+  "subProPlanIncludes": "Pro Plan includes:",
+  "subNotNow": "Not Now",
+  "subUpgradeToProPrice": "Upgrade to Pro  ₹500/mo · just ₹17/day",
+  "subInvoicePack": "Invoice Pack",
+  "subVoicePack": "Voice Pack",
+  "subHandwritingPack": "Handwriting Pack",
+  "subInvoicePackDesc": "Process 10 more supplier bills",
+  "subVoicePackDesc": "Add 10 more audio/voice orders",
+  "subHandwritingPackDesc": "Scan 10 more handwritten notes",
+  "subPrice": "Price",
+  "subCreditsRollOverDaily": "Credits do not expire — they roll over each day.",
+  "subCancel": "Cancel",
+  "subPayAmount": "Pay ₹{amount}",
+  "@subPayAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "subCreditsAdded": "{count} {name} credits added!",
+  "@subCreditsAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "subTopUpCredits": "Top Up Your Credits",
+  "subCreditsNeverExpire": "Credits never expire — they roll over to tomorrow!",
+  "subCreditsCount": "{count} credits",
+  "@subCreditsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "subBuy": "Buy",
+  "subTrialExpiredMessage": "Your free trial has expired. Upgrade to continue.",
+  "subTrialLastDayMessage": "Last day of your free trial! Upgrade now.",
+  "subTrialDaysLeftMessage": "{n} days left in your trial. Upgrade to Basic or Pro.",
+  "@subTrialDaysLeftMessage": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "subTrialExpiringSoon": "Trial Expiring Soon",
+  "mktMyBaskets": "My Baskets",
+  "mktCouldNotLoadBaskets": "Could not load baskets",
+  "mktPullDownToRetry": "Pull down to retry",
+  "mktRetry": "Retry",
+  "mktNewBasket": "New Basket",
+  "mktNoBasketsYet": "No baskets yet",
+  "mktBasketsEmptySubtitle": "Create combo deals and bundle offers.\nAlert all your customers via WhatsApp.",
+  "mktCreateFirstBasket": "Create First Basket",
+  "mktDeleteBasketTitle": "Delete Basket?",
+  "mktDeleteBasketConfirm": "Delete \"{name}\"? This cannot be undone.",
+  "@mktDeleteBasketConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mktCancel": "Cancel",
+  "mktBasketDeleted": "Basket deleted",
+  "mktCouldNotDeleteBasket": "Could not delete basket. Please try again.",
+  "mktDelete": "Delete",
+  "mktSendWhatsAppAlertTitle": "Send WhatsApp Alert?",
+  "mktSendWhatsAppAlertConfirm": "Send basket deal for \"{name}\" to all your customers via WhatsApp?",
+  "@mktSendWhatsAppAlertConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mktSend": "Send",
+  "mktWhatsAppAlertSent": "WhatsApp alert sent to {sent} of {total} customers!",
+  "@mktWhatsAppAlertSent": {
+    "placeholders": {
+      "sent": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mktNoCustomersWithPhone": "No customers with phone numbers found.",
+  "mktWhatsAppNotActiveYet": "WhatsApp not active yet. Alert will auto-send to {total} customers once enabled.",
+  "@mktWhatsAppNotActiveYet": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mktAlertFailed": "Failed: {error}",
+  "@mktAlertFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mktExpired": "Expired",
+  "mktItem": "Item",
+  "mktFromDate": "From {date}",
+  "@mktFromDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "mktToDate": "To {date}",
+  "@mktToDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "mktAlertCustomers": "Alert Customers",
+  "mktNoProductsInInventory": "No products in inventory. Please sync POS first.",
+  "mktAllProductsAdded": "All products already added to this basket",
+  "mktBasketNameRequired": "Basket name is required",
+  "mktAddAtLeastOneProduct": "Add at least one product from inventory",
+  "mktSave": "Save",
+  "mktBasketNameLabel": "Basket Name *",
+  "mktBasketNameHint": "e.g. Breakfast Bundle",
+  "mktDescriptionOptional": "Description (optional)",
+  "mktDescriptionHint": "e.g. Milk + Bread + Eggs",
+  "mktBundlePriceOptional": "Bundle Price (optional)",
+  "mktValidity": "VALIDITY",
+  "mktFromDateLabel": "From date",
+  "mktToDateLabel": "To date",
+  "mktProducts": "PRODUCTS",
+  "mktAddProduct": "Add Product",
+  "mktTapToPickProducts": "Tap to pick products from your inventory",
+  "mktPricePerUnit": "₹{price} / unit",
+  "@mktPricePerUnit": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "mktQty": "Qty",
+  "mktCreateBasket": "Create Basket",
+  "mktSelectProduct": "Select Product",
+  "mktSearchProducts": "Search products...",
+  "mktNoProductsFound": "No products found",
+  "mktAdd": "Add",
+  "mktEstTotal": "est. total",
+  "mktAddAll": "Add All",
+  "mktNotInStock": "Not in stock",
+  "mktCampaignItemStock": "Stock: {qty} {unit}  ·  ₹{price}",
+  "@mktCampaignItemStock": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "mktEstimatedTotal": "Estimated Total",
+  "mktNoItemsInStock": "No items in stock",
+  "mktAddAvailableItemsToCart": "Add {count} Available Items to Cart",
+  "@mktAddAvailableItemsToCart": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mktAreaAssociations": "Area Associations",
+  "mktMyAreas": "My Areas",
+  "mktCustomerHeatmap": "Customer Heatmap",
+  "mktErrorWithMessage": "Error: {error}",
+  "@mktErrorWithMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mktNoAreasAddedYet": "No areas added yet",
+  "mktAreasEmptySubtitle": "Add nearby apartments, hostels, schools or offices to get targeted campaign suggestions.",
+  "mktAddFirstArea": "Add First Area",
+  "mktRemoveAreaTitle": "Remove Area?",
+  "mktRemoveAreaConfirm": "Remove \"{name}\" from your associations?",
+  "@mktRemoveAreaConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mktRemove": "Remove",
+  "mktHouseholdsCount": "~{count} households",
+  "@mktHouseholdsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mktNoHeatmapDataYet": "No heatmap data yet",
+  "mktHeatmapEmptySubtitle": "Add areas and tag customers to those areas. Revenue data will appear here over time.",
+  "mktLast90DaysByRevenue": "Last 90 days · by revenue",
+  "mktCustomers": "customers",
+  "mktOrders": "orders",
+  "mktAvgOrder": "avg order",
+  "mktNoOrdersYetTagCustomers": "No orders yet — tag customers to this area to track",
+  "mktAddNearbyArea": "Add Nearby Area",
+  "mktAreaType": "Area Type",
+  "mktAreaNameLabel": "Name (e.g. Prestige Apartments)",
+  "mktEstimatedHouseholdsOptional": "Estimated households (optional)",
+  "mktNotesOptional": "Notes (optional)",
+  "mktAddArea": "Add Area",
+  "mktCustomerGrowth": "Customer Growth",
+  "mktNewCampaign": "New Campaign",
+  "mktNoCampaignsYet": "No Campaigns Yet",
+  "mktReferralEmptySubtitle": "Create a referral campaign to let your existing customers bring in new ones — and reward them for it.",
+  "mktCreateFirstCampaign": "Create First Campaign",
+  "mktReferralHowItWorks": "Customers share their QR with friends. New visitors scan it in POS to get a discount — and the referrer earns milestone rewards.",
+  "mktCampaignSummary": "{discount}% off for new customers  •  {reward}% reward every {n} refs",
+  "@mktCampaignSummary": {
+    "placeholders": {
+      "discount": {
+        "type": "String"
+      },
+      "reward": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "mktQrCodes": "QR Codes",
+  "mktReferrals": "Referrals",
+  "mktMaxPerPerson": "Max/person",
+  "mktGenerateQr": "Generate QR",
+  "mktGenerateQrTitle": "Generate QR · {name}",
+  "@mktGenerateQrTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mktSearchCustomer": "Search customer…",
+  "mktNoCustomersFound": "No customers found",
+  "mktNoPhoneForCustomer": "No phone number for this customer",
+  "mktReferralWhatsAppMessage": "Hi {name}! 🎁\n\nYou're invited to share our store with your friends!\n\nYour referral code: {code}\n\nWhen your friend visits our store and shows this code, they get {discount}% off — and you earn rewards for every {n} friends you bring! 🙌\n\n— via LohiyaAI Kirana",
+  "@mktReferralWhatsAppMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "discount": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "mktWhatsAppNotInstalled": "WhatsApp not installed on this device",
+  "mktReferralQrCode": "Referral QR Code",
+  "mktPercentOffForNewCustomers": "{discount}% off for new customers",
+  "@mktPercentOffForNewCustomers": {
+    "placeholders": {
+      "discount": {
+        "type": "String"
+      }
+    }
+  },
+  "mktMilestoneRewardLabel": "Milestone reward: {reward}% every {n} referrals",
+  "@mktMilestoneRewardLabel": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "mktReferralCodeCopied": "Referral code copied",
+  "mktSendViaWhatsApp": "Send via WhatsApp",
+  "mktQrScreenshotHint": "Or show this QR screen directly to the customer for them to screenshot.",
+  "mktInvalidQrCode": "Invalid QR code",
+  "mktCampaignNoLongerActive": "This referral campaign is no longer active",
+  "mktCouldNotLoadReferralInfo": "Could not load referral info",
+  "mktEnterValidPhone": "Enter a valid 10-digit phone number",
+  "mktClose": "Close",
+  "mktReferralFrom": "Referral from {name}",
+  "@mktReferralFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mktCampaignDiscountForNewCustomer": "{campaign}  •  {discount}% discount for new customer",
+  "@mktCampaignDiscountForNewCustomer": {
+    "placeholders": {
+      "campaign": {
+        "type": "String"
+      },
+      "discount": {
+        "type": "String"
+      }
+    }
+  },
+  "mktNewCustomerDetails": "New Customer Details",
+  "mktNewCustomerPhoneHelper": "Enter the new customer's phone. The discount will be applied when you place the order.",
+  "mktPhoneNumber": "Phone Number",
+  "mktCustomerNameOptional": "Customer Name (optional)",
+  "mktCustomerNameHint": "e.g. Gnyan Kumar",
+  "mktApplyReferralDiscount": "Apply {discount}% Referral Discount",
+  "@mktApplyReferralDiscount": {
+    "placeholders": {
+      "discount": {
+        "type": "String"
+      }
+    }
+  },
+  "mktCampaignNameRequired": "Campaign name is required",
+  "mktEnterValidDiscount": "Enter a valid discount % (1–100)",
+  "mktMilestoneCountMin": "Milestone count must be at least 1",
+  "mktEnterValidReward": "Enter a valid reward % (1–100)",
+  "mktMaxReferralsMin": "Max referrals must be at least 1",
+  "mktFailedToCreateCampaign": "Failed to create campaign. Please try again.",
+  "mktNewReferralCampaign": "New Referral Campaign",
+  "mktCampaignName": "Campaign Name",
+  "mktCampaignNameHint": "e.g. Summer Referral Drive",
+  "mktNewCustomerDiscountPct": "New Customer Discount %",
+  "mktMilestoneRewardPct": "Milestone Reward %",
+  "mktRewardEveryNReferrals": "Reward Every N Referrals",
+  "mktRewardEveryNHelper": "Referrer earns a milestone reward every N new customers they bring",
+  "mktMaxReferralsPerCustomer": "Max Referrals per Customer",
+  "mktMaxReferralsHelper": "Stop rewarding a customer after this many successful referrals",
+  "mktCreateCampaign": "Create Campaign",
+  "profProfile": "Profile",
+  "profErrorLoadingProfile": "Error loading profile: {error}",
+  "@profErrorLoadingProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profNoUserData": "No user data found.",
+  "profCashflowSupport": "Cashflow Support",
+  "profCashflowSupportDesc": "Apply for ₹50K – ₹10L business finance with tailored repayment plans.",
+  "profCashflowBannerSubtitle": "Apply for ₹50K – ₹10L business finance",
+  "profSectionCustomers": "Customers",
+  "profSectionAnalytics": "Analytics",
+  "profSectionStoreAccount": "Store & Account",
+  "profSectionPlanSupport": "Plan & Support",
+  "profSectionAdmin": "Admin",
+  "profCustomerGrowth": "Customer Growth",
+  "profCustomerGrowthDesc": "Build a referral engine — let your happy customers bring in new ones automatically.",
+  "profCustomerRelations": "Customer Relations",
+  "profAreaAssociations": "Area Associations",
+  "profKpiSubscriptions": "KPI Subscriptions",
+  "profTransactionHistory": "Transaction History",
+  "profMyBaskets": "My Baskets",
+  "profLanguage": "Language",
+  "profStoreSettings": "Store Settings",
+  "profConfiguration": "Configuration",
+  "profPasswordSecurity": "Password & Security",
+  "profSubscriptionPlans": "Subscription & Plans",
+  "profHelpSupport": "Help & Support",
+  "profUserActivity": "User Activity",
+  "profSignOut": "Sign Out",
+  "profTrialExpired": "Trial Expired",
+  "profAwaitingActivation": "Awaiting Activation",
+  "profProTrial": "Pro Trial",
+  "profBasicTrial": "Basic Trial",
+  "profTrialDaysLeft": "{tier} · {days}d left",
+  "@profTrialDaysLeft": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "profTrialActive": "{tier} Active",
+  "@profTrialActive": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "profBasicPlan": "Basic Plan",
+  "profProPlan": "Pro Plan",
+  "profSyncContacts": "Sync Contacts",
+  "profRefreshList": "Refresh List",
+  "profAddCustomer": "Add Customer",
+  "profSearchByNameOrPhone": "Search by name or phone...",
+  "profRetry": "Retry",
+  "profNoSegmentCustomers": "No {segment} customers",
+  "@profNoSegmentCustomers": {
+    "placeholders": {
+      "segment": {
+        "type": "String"
+      }
+    }
+  },
+  "profNoCustomersFound": "No customers found.",
+  "profSegRegular": "Regular",
+  "profSegOccasional": "Occasional",
+  "profSegImpulse": "Impulse",
+  "profSegBulk": "Bulk",
+  "profSegCredit": "Credit",
+  "profSegInactive": "Inactive",
+  "profSyncContactsTitle": "Sync Contacts?",
+  "profSyncContactsBody": "This will import your phone contacts into your customer list. Regular customers will be matched by phone number.",
+  "profCancel": "Cancel",
+  "profSyncNow": "Sync Now",
+  "profSyncedContacts": "Synced {count} contacts successfully!",
+  "@profSyncedContacts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profSyncFailed": "Sync failed: {error}",
+  "@profSyncFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profSendWhatsappReengagement": "Send WhatsApp Re-engagement",
+  "profWhatsappReengagementMessage": "Hi {name}! We miss you at our store. It's been a while since your last visit, and we have fresh stock and great deals waiting for you. Come visit us soon — your favourite items are ready! See you soon!",
+  "@profWhatsappReengagementMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profAddNewCustomer": "Add New Customer",
+  "profEditCustomer": "Edit Customer",
+  "profFullName": "Full Name",
+  "profPhoneNumber": "Phone Number",
+  "profEmailAddressOptional": "Email Address (Optional)",
+  "profHouseholdSize": "Household Size",
+  "profSaveCustomer": "Save Customer",
+  "profFillNameAndPhone": "Please fill name and phone",
+  "profEnterValidPhone": "Enter a valid phone number (digits only)",
+  "profCustomerSaved": "Customer saved successfully",
+  "profLoading": "Loading...",
+  "profCustomerDetails": "Customer Details",
+  "profStatBalance": "Balance",
+  "profStatSpent": "Spent",
+  "profStatOrders": "Orders",
+  "profCustomerInfo": "Customer Info",
+  "profMembersCount": "{count} members",
+  "@profMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profJoinedOn": "Joined On",
+  "profUnknown": "Unknown",
+  "profPurchaseHistory": "Purchase History",
+  "profNoOrdersForCustomer": "No orders found for this customer.",
+  "profErrorLoadingOrders": "Error loading orders: {error}",
+  "@profErrorLoadingOrders": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profDeleteCustomerTitle": "Delete Customer?",
+  "profDeleteCustomerBody": "Are you sure you want to delete {name}? This action cannot be undone.",
+  "@profDeleteCustomerBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profDelete": "Delete",
+  "profFailedToUpdateArea": "Failed to update area: {error}",
+  "@profFailedToUpdateArea": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profAreaAssociation": "Area / Association",
+  "profUnableToLoadAreas": "Unable to load areas",
+  "profNoAreasTapToAdd": "No areas — tap to add one",
+  "profNone": "None",
+  "profOrderNumber": "Order #{id}",
+  "@profOrderNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "profSave": "SAVE",
+  "profError": "Error: {error}",
+  "@profError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profBasicInformation": "Basic Information",
+  "profStoreName": "Store Name",
+  "profStoreType": "Store Type (e.g. Kirana, Supermarket)",
+  "profBusinessIntelligence": "Business Intelligence",
+  "profFootfallAutoComputed": "Average footfall is automatically computed based on your sales.",
+  "profProvideInitialValues": "Provide initial values to help our AI optimize your business.",
+  "profAvgDailyFootfall": "Avg Daily Footfall",
+  "profAiAutoUpdating": "AI Auto-Updating",
+  "profMonthlyStockBudget": "Monthly Stock Budget",
+  "profDailyExpenseBuffer": "Daily Expense Buffer",
+  "profLocationDetails": "Location Details",
+  "profCityArea": "City / Area",
+  "profStateRegion": "State / Region",
+  "profRequired": "Required",
+  "profSettingsSaved": "Settings saved successfully!",
+  "profFailedToSave": "Failed to save: {error}",
+  "@profFailedToSave": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "supSplashTagline": "Smart business, smarter you",
+  "supBlockedAppTitle": "App Temporarily Unavailable",
+  "supBlockedStoreTitle": "Store Temporarily Unavailable",
+  "supBlockedBody": "We are working to resolve this as soon as possible. If you need immediate help, tap the button below.",
+  "supBlockedContactUs": "Contact Us",
+  "supBlockedEmailSubjectApp": "App Access Issue — Kirana AI",
+  "supBlockedEmailSubjectStore": "Store Access Issue — Kirana AI",
+  "supBlockedEmailBody": "Hello LohiyaAI Team,\n\nI am unable to access the Kirana AI app.\n\nDisplayed reason: {reason}\n\nPlease help me restore access.\n\n— Kirana Owner",
+  "@supBlockedEmailBody": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "supBlockedEmailFallback": "Please email support@lohiyaai.com directly.",
+  "supSupportTitle": "Help & Support",
+  "supSupportHeading": "How can we help you?",
+  "supSupportSubheading": "Get instant answers to your questions",
+  "supOptionFaqTitle": "Frequently Asked Questions",
+  "supOptionFaqSubtitle": "Common questions and answers",
+  "supOptionReportTitle": "Report an Issue",
+  "supOptionReportSubtitle": "Encountered a bug? let us know",
+  "supOptionChatTitle": "Chat with us",
+  "supOptionChatSubtitle": "Connect with our support team",
+  "supOptionEmailTitle": "Email Support",
+  "supOptionEmailSubtitle": "Send us an email directly",
+  "supChatComingSoon": "Chat support coming soon!",
+  "supEmailUnableToOpen": "Unable to open email app.",
+  "supEmailError": "Something went wrong while opening email app.",
+  "supFaqTitle": "FAQs",
+  "supFaqQ1": "How do I add a new product?",
+  "supFaqA1": "You can add products from the POS tab by clicking the + button, or from the Inventory tab. You can also scan a barcode to automatically fetch details if available.",
+  "supFaqQ2": "How does the Stockout Risk prediction work?",
+  "supFaqA2": "Our AI analyzes your past sales velocity and current stock levels. If it predicts you will run out of an item within the next 3-7 days, it flags it as a Stockout Risk.",
+  "supFaqQ3": "How do I manage customer credit (Khata)?",
+  "supFaqA3": "When placing an order, select a customer and choose \"Credit\" as the payment method. You can view all pending dues in the Finance -> Udhaar tab or Customer Relations section.",
+  "supFaqQ4": "Can I sync my phone contacts?",
+  "supFaqA4": "Yes! Go to Profile -> Customer Relations and click the Sync icon. This will import your regular shoppers into the app for easy credit tracking.",
+  "supFaqQ5": "What are KPI Subscriptions?",
+  "supFaqA5": "KPIs are key business metrics like Revenue, Margin, and Footfall. You can choose which metrics to monitor from the Profile -> Subscription section.",
+  "supFaqQ6": "How do I generate a daily sales report?",
+  "supFaqA6": "You can view today's performance on the Dashboard. For detailed past reports, visit the Transaction History section in your Profile.",
+  "supReportTitle": "Report an Issue",
+  "supReportHeading": "Describe the problem",
+  "supReportSubheading": "Our team will review your report and fix it as soon as possible.",
+  "supReportCategoryLabel": "ISSUE CATEGORY",
+  "supReportSummaryLabel": "SHORT SUMMARY",
+  "supReportSummaryHint": "e.g. App crashes when scanning barcode",
+  "supReportDescriptionLabel": "DETAILED DESCRIPTION",
+  "supReportDescriptionHint": "Provide details on how to reproduce the issue...",
+  "supReportSubmit": "Submit Report",
+  "supReportFillFields": "Please fill in all fields",
+  "supReportSubmittedTitle": "Report Submitted",
+  "supReportSubmittedBody": "Thank you for your feedback. Our team will look into it immediately.",
+  "supOk": "OK",
+  "supReportSubmitFailed": "Failed to submit report: {error}",
+  "@supReportSubmitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "supCategoryAppBug": "App Bug",
+  "supCategoryPricing": "Pricing Issue",
+  "supCategoryInventory": "Inventory Mismatch",
+  "supCategoryAiFeedback": "AI Recommendation Feedback",
+  "supCategoryPosError": "POS Error",
+  "supCategoryFeatureRequest": "Feature Request",
+  "supCategoryOther": "Other",
+  "shrSavingChanges": "Saving changes...",
+  "shrRetry": "Retry",
+  "shrSavedSuccessfully": "Saved successfully!",
+  "shrBusinessAlerts": "Business Alerts",
+  "shrAllCaughtUp": "All caught up!",
+  "shrNoUrgentAlerts": "No urgent alerts at the moment.",
+  "shrAlertOutOfStock": "Out of Stock",
+  "shrAlertLowStock": "Low Stock",
+  "shrAlertExpiringSoon": "Expiring Soon",
+  "shrAlertOverdueUdhaar": "Long Overdue Udhaar",
+  "shrAlertOverduePayment": "Overdue Payment",
+  "shrAlertUpcomingPayment": "Upcoming Payment",
+  "shrMsgOutOfStock": "{name} is completely out of stock.",
+  "@shrMsgOutOfStock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shrMsgLowStock": "{name} is running low ({stock}).",
+  "@shrMsgLowStock": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "shrMsgExpiringSoon": "{name} expires in {days} days.",
+  "@shrMsgExpiringSoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "shrMsgOverdueUdhaar": "{name} has pending ₹{amount} for {days} days.",
+  "@shrMsgOverdueUdhaar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "shrMsgPaymentOverdue": "₹{amount} to {supplier} is overdue.",
+  "@shrMsgPaymentOverdue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "supplier": {
+        "type": "String"
+      }
+    }
+  },
+  "shrMsgPaymentDue": "₹{amount} to {supplier} due in {days} days.",
+  "@shrMsgPaymentDue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "supplier": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "psetErrorWith": "Error: {error}",
+  "@psetErrorWith": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "psetCancel": "Cancel",
+  "psetReset": "Reset",
+  "psetUserActivity": "User Activity",
+  "psetNoUsersFound": "No users found",
+  "psetNoStore": "No store",
+  "psetNever": "Never",
+  "psetActiveToday": "Active today",
+  "psetInactive": "Inactive",
+  "psetLastSeen": "Last seen",
+  "psetOpensToday": "Opens today",
+  "psetTimeInApp": "Time in app",
+  "psetSalesToday": "Sales today",
+  "psetJustNow": "Just now",
+  "psetMinsAgo": "{m}m ago",
+  "@psetMinsAgo": {
+    "placeholders": {
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "psetHoursAgo": "{h}h ago",
+  "@psetHoursAgo": {
+    "placeholders": {
+      "h": {
+        "type": "int"
+      }
+    }
+  },
+  "psetDaysAgo": "{d}d ago",
+  "@psetDaysAgo": {
+    "placeholders": {
+      "d": {
+        "type": "int"
+      }
+    }
+  },
+  "psetPasswordSecurity": "Password & Security",
+  "psetCouldNotLoadStatus": "Could not load status: {error}",
+  "@psetCouldNotLoadStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "psetEnterNewPassword": "Enter a new password",
+  "psetPasswordMin6": "Password must be at least 6 characters",
+  "psetPasswordsNoMatch": "Passwords do not match",
+  "psetEnterCurrentPassword": "Enter your current password",
+  "psetPasswordUpdated": "Password updated successfully.",
+  "psetPasswordCreated": "Password created successfully.",
+  "psetCouldNotConnect": "Could not connect to server. Please try again.",
+  "psetSomethingWrong": "Something went wrong",
+  "psetPasswordSet": "Password set",
+  "psetNoPasswordYet": "No password yet",
+  "psetLastChanged": "Last changed {date}",
+  "@psetLastChanged": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "psetPasswordActive": "Password is active",
+  "psetCreatePasswordHint": "Create a password to enable username login",
+  "psetPasswordCooldown": "You can change your password again in {days, plural, =1{1 day} other{{days} days}}.",
+  "@psetPasswordCooldown": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "psetChangePassword": "Change Password",
+  "psetCreatePassword": "Create Password",
+  "psetChangeSubtitle": "Enter your current password, then choose a new one.",
+  "psetCreateSubtitle": "Set a password so you can also log in with your username.",
+  "psetCurrentPassword": "Current password",
+  "psetNewPassword": "New password",
+  "psetConfirmNewPassword": "Confirm new password",
+  "psetUpdatePassword": "Update Password",
+  "psetPasswordCooldownNote": "Password can only be changed once every 14 days.",
+  "psetAllHistory": "All History",
+  "psetTabPurchases": "Purchases",
+  "psetTabPosOrders": "POS Orders",
+  "psetNoPurchaseHistory": "No purchase history found.",
+  "psetViewBill": "View Bill",
+  "psetPurchaseDetails": "Purchase Details",
+  "psetFromSupplier": "From {supplier}",
+  "@psetFromSupplier": {
+    "placeholders": {
+      "supplier": {
+        "type": "String"
+      }
+    }
+  },
+  "psetQtyTimes": "Qty: {qty} × ₹{price}",
+  "@psetQtyTimes": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "psetTotalAmount": "Total Amount",
+  "psetSalesTxnHistory": "Sales Transaction History",
+  "psetSalesTxnDesc": "View and filter all your POS orders, payments, and customer transactions.",
+  "psetOpenSalesHistory": "Open Sales History",
+  "psetSettingsSaved": "Settings saved",
+  "psetSaveFailed": "Save failed: {error}",
+  "@psetSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "psetResetToDefaults": "Reset to defaults",
+  "psetResetConfirm": "All settings will be reset to their default values.",
+  "psetConfiguration": "Configuration",
+  "psetPosPreferences": "POS Preferences",
+  "psetAiForecasting": "AI & Forecasting",
+  "psetAlertThresholds": "Alert Thresholds",
+  "psetMarketing": "Marketing",
+  "psetNotifications": "Notifications",
+  "psetDefaultPayment": "Default Payment Method",
+  "psetDefaultPaymentHint": "Pre-selected method when adding a new sale",
+  "psetCash": "Cash",
+  "psetCard": "Card",
+  "psetForecastHorizon": "Forecast Horizon",
+  "psetForecastHorizonHint": "How many days ahead the AI predicts stock needs",
+  "psetDaysValue": "{days} days",
+  "@psetDaysValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "psetStockoutRisk": "Stockout Risk Threshold",
+  "psetStockoutRiskHint": "Show stockout alert when 7-day risk exceeds this",
+  "psetMinVelocity": "Min Velocity Threshold",
+  "psetMinVelocityHint": "Items selling slower than this are flagged as dead stock",
+  "psetReorderAlertDays": "Reorder Alert Days",
+  "psetReorderAlertHint": "Alert when projected stock will run out within N days",
+  "psetDeadStockDays": "Dead Stock Days",
+  "psetDeadStockHint": "Flag items with no sales for N or more days",
+  "psetExpiryAlertDays": "Expiry Alert Days",
+  "psetExpiryAlertHint": "Alert this many days before a batch/item expires",
+  "psetDaysBeforeValue": "{days} days before",
+  "@psetDaysBeforeValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "psetAllowMarketing": "Allow LohiyaAI to Market My Store",
+  "psetAllowMarketingHint": "We promote your store on Facebook, Instagram & WhatsApp on your behalf",
+  "psetInAppAlerts": "In-app Alerts",
+  "psetInAppAlertsHint": "Show alerts inside the app",
+  "psetWhatsappNotif": "WhatsApp Notifications",
+  "psetWhatsappNotifHint": "Send restocking and udhaar alerts via WhatsApp",
+  "psetQuietHours": "Quiet Hours",
+  "psetQuietHoursHint": "No notifications will be sent during this window",
+  "psetStart": "Start",
+  "psetEnd": "End",
+  "psetSaveChanges": "Save Changes",
+  "psetCashflowSupport": "Cashflow Support",
+  "psetRequestUnderReview": "Request Under Review",
+  "psetReqProcessingFull": "Your cashflow request for ₹{amount} via {bank} is being processed.\n\nOur team will contact you within 2 business days.",
+  "@psetReqProcessingFull": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "bank": {
+        "type": "String"
+      }
+    }
+  },
+  "psetReqProcessing": "Your cashflow request is being processed.\n\nOur team will contact you within 2 business days.",
+  "psetRequestSubmitted": "Request Submitted!",
+  "psetRequestSubmittedBody": "We've received your cashflow request.\nOur team will contact you within\n2 business days.",
+  "psetBackToProfile": "Back to Profile",
+  "psetApplyCashflow": "Apply for\nCashflow Support",
+  "psetCashflowSubtitle": "Quick business finance, powered by LohiyaAI partners.",
+  "psetYourBusinessProfile": "Your Business Profile",
+  "psetStore": "Store",
+  "psetLocation": "Location",
+  "psetDailyFootfall": "Daily Footfall",
+  "psetCustomersPerDay": "{count} customers/day",
+  "@psetCustomersPerDay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "psetHowMuchNeed": "How much do you need?",
+  "psetDragToSelect": "Drag to select — ₹50,000 to ₹10,00,000",
+  "psetLoanAmount": "loan amount",
+  "psetChoosePartnerBank": "Choose a Partner Bank",
+  "psetSelectBankHint": "Select a bank to proceed with your request.",
+  "psetSubmitRequest": "Submit Request",
+  "psetSubmitDisclaimer": "By submitting, you agree to be contacted by our team regarding this request.",
+  "psetBankSbiDesc": "Government-backed scheme for small businesses",
+  "psetBankHdfcDesc": "Quick disbursal for retail growth",
+  "psetBankIciciDesc": "Flexible credit for kirana owners",
+  "psetBankAxisDesc": "Tailored finance for retail stores"
+}

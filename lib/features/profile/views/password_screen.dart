@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/config/app_config.dart';
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/brand_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
@@ -60,13 +62,14 @@ class PasswordScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusAsync = ref.watch(_passwordStatusProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Password & Security',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.psetPasswordSecurity,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: statusAsync.when(
@@ -76,7 +79,7 @@ class PasswordScreen extends ConsumerWidget {
         ),
         error: (e, _) => Center(
           child: Text(
-            'Could not load status: $e',
+            l10n.psetCouldNotLoadStatus(e.toString()),
             style: const TextStyle(color: BrandColors.muted),
           ),
         ),
@@ -112,6 +115,9 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
   String? _error;
   String? _success;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void dispose() {
     _oldCtrl.dispose();
@@ -125,19 +131,19 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
     final confirmPass = _confirmCtrl.text.trim();
 
     if (newPass.isEmpty) {
-      setState(() => _error = 'Enter a new password');
+      setState(() => _error = _l10n.psetEnterNewPassword);
       return;
     }
     if (newPass.length < 6) {
-      setState(() => _error = 'Password must be at least 6 characters');
+      setState(() => _error = _l10n.psetPasswordMin6);
       return;
     }
     if (newPass != confirmPass) {
-      setState(() => _error = 'Passwords do not match');
+      setState(() => _error = _l10n.psetPasswordsNoMatch);
       return;
     }
     if (widget.status.hasPassword && _oldCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'Enter your current password');
+      setState(() => _error = _l10n.psetEnterCurrentPassword);
       return;
     }
 
@@ -175,8 +181,8 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
         _confirmCtrl.clear();
         setState(
           () => _success = widget.status.hasPassword
-              ? 'Password updated successfully.'
-              : 'Password created successfully.',
+              ? _l10n.psetPasswordUpdated
+              : _l10n.psetPasswordCreated,
         );
         widget.onSuccess();
       } else {
@@ -184,7 +190,7 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
         setState(() => _error = detail);
       }
     } catch (e) {
-      setState(() => _error = 'Could not connect to server. Please try again.');
+      setState(() => _error = _l10n.psetCouldNotConnect);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -193,15 +199,16 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
   String _extractError(String body) {
     try {
       final json = jsonDecode(body) as Map<String, dynamic>;
-      return json['detail']?.toString() ?? 'Something went wrong';
+      return json['detail']?.toString() ?? _l10n.psetSomethingWrong;
     } catch (_) {
-      return 'Something went wrong';
+      return _l10n.psetSomethingWrong;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final status = widget.status;
+    final l10n = AppLocalizations.of(context);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
@@ -248,7 +255,9 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      status.hasPassword ? 'Password set' : 'No password yet',
+                      status.hasPassword
+                          ? l10n.psetPasswordSet
+                          : l10n.psetNoPasswordYet,
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 15,
@@ -258,10 +267,12 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
                     const SizedBox(height: 2),
                     Text(
                       status.hasPassword && status.lastChangedAt != null
-                          ? 'Last changed ${_formatDate(status.lastChangedAt!)}'
+                          ? l10n.psetLastChanged(
+                              _formatDate(status.lastChangedAt!),
+                            )
                           : status.hasPassword
-                          ? 'Password is active'
-                          : 'Create a password to enable username login',
+                          ? l10n.psetPasswordActive
+                          : l10n.psetCreatePasswordHint,
                       style: const TextStyle(
                         fontSize: 12,
                         color: BrandColors.muted,
@@ -295,7 +306,7 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'You can change your password again in ${status.daysUntilChange} day${status.daysUntilChange == 1 ? '' : 's'}.',
+                    l10n.psetPasswordCooldown(status.daysUntilChange),
                     style: const TextStyle(
                       fontSize: 13,
                       color: Color(0xFF92400E),
@@ -310,7 +321,9 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
 
         const SizedBox(height: 28),
         Text(
-          status.hasPassword ? 'Change Password' : 'Create Password',
+          status.hasPassword
+              ? l10n.psetChangePassword
+              : l10n.psetCreatePassword,
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
@@ -318,8 +331,8 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
         const SizedBox(height: 4),
         Text(
           status.hasPassword
-              ? 'Enter your current password, then choose a new one.'
-              : 'Set a password so you can also log in with your username.',
+              ? l10n.psetChangeSubtitle
+              : l10n.psetCreateSubtitle,
           style: const TextStyle(fontSize: 13, color: BrandColors.muted),
         ),
         const SizedBox(height: 24),
@@ -328,7 +341,7 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
         if (status.hasPassword) ...[
           _PasswordField(
             controller: _oldCtrl,
-            label: 'Current password',
+            label: l10n.psetCurrentPassword,
             show: _showOld,
             onToggle: () => setState(() => _showOld = !_showOld),
             enabled: status.canChange,
@@ -338,7 +351,7 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
 
         _PasswordField(
           controller: _newCtrl,
-          label: 'New password',
+          label: l10n.psetNewPassword,
           show: _showNew,
           onToggle: () => setState(() => _showNew = !_showNew),
           enabled: status.canChange,
@@ -346,7 +359,7 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
         const SizedBox(height: 16),
         _PasswordField(
           controller: _confirmCtrl,
-          label: 'Confirm new password',
+          label: l10n.psetConfirmNewPassword,
           show: _showConfirm,
           onToggle: () => setState(() => _showConfirm = !_showConfirm),
           enabled: status.canChange,
@@ -422,16 +435,18 @@ class _PasswordFormState extends ConsumerState<_PasswordForm> {
 
         const SizedBox(height: 28),
         PrimaryButton(
-          label: status.hasPassword ? 'Update Password' : 'Create Password',
+          label: status.hasPassword
+              ? l10n.psetUpdatePassword
+              : l10n.psetCreatePassword,
           isLoading: _loading,
           onPressed: status.canChange ? _submit : null,
         ),
 
         const SizedBox(height: 16),
-        const Center(
+        Center(
           child: Text(
-            'Password can only be changed once every 14 days.',
-            style: TextStyle(fontSize: 12, color: BrandColors.muted),
+            l10n.psetPasswordCooldownNote,
+            style: const TextStyle(fontSize: 12, color: BrandColors.muted),
             textAlign: TextAlign.center,
           ),
         ),

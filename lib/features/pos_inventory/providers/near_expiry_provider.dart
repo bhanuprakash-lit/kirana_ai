@@ -56,7 +56,8 @@ class NearExpiryBatch {
     wastedUnits: (j['wasted_units'] as num?)?.toInt() ?? 0,
     price: (j['price'] as num?)?.toDouble() ?? 0,
     costPrice: (j['cost_price'] as num?)?.toDouble() ?? 0,
-    suggestedMarkdownPct: (j['suggested_markdown_pct'] as num?)?.toDouble() ?? 0,
+    suggestedMarkdownPct:
+        (j['suggested_markdown_pct'] as num?)?.toDouble() ?? 0,
     valueAtRisk: (j['value_at_risk'] as num?)?.toDouble() ?? 0,
     markedDownPrice: (j['marked_down_price'] as num?)?.toDouble() ?? 0,
   );
@@ -126,8 +127,7 @@ final nearExpiryProvider =
 
 /// Count of near-expiry batches for badges/banners (0 while loading/error).
 final nearExpiryCountProvider = Provider<int>((ref) {
-  return ref.watch(nearExpiryProvider).maybeWhen(
-    data: (b) => b.length,
-    orElse: () => 0,
-  );
+  return ref
+      .watch(nearExpiryProvider)
+      .maybeWhen(data: (b) => b.length, orElse: () => 0);
 });

@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/models/alert_model.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../../../shared/providers/alert_provider.dart';
@@ -46,11 +48,14 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
     }
   }
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   String get _greeting {
     final h = DateTime.now().hour;
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return _l10n.dashGreetingMorning;
+    if (h < 17) return _l10n.dashGreetingAfternoon;
+    return _l10n.dashGreetingEvening;
   }
 
   String get _dateLabel {
@@ -75,6 +80,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
   @override
   Widget build(BuildContext context) {
     final asyncData = ref.watch(overviewProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
@@ -86,9 +92,12 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
         },
         backgroundColor: BrandColors.primary,
         icon: const Icon(Icons.point_of_sale_rounded, color: Colors.white),
-        label: const Text(
-          'New Sale',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        label: Text(
+          l10n.dashNewSale,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
       body: RefreshIndicator(
@@ -143,6 +152,7 @@ class _MorningBriefingRibbon extends ConsumerWidget {
     if (reco.highRiskSkus == 0 && reco.reorderCandidates == 0) {
       return const SizedBox.shrink();
     }
+    final l10n = AppLocalizations.of(context);
 
     return InkWell(
       onTap: () {
@@ -200,9 +210,9 @@ class _MorningBriefingRibbon extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'MORNING BRIEFING',
-                    style: TextStyle(
+                  Text(
+                    l10n.dashMorningBriefing,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
                       color: BrandColors.primary,
@@ -211,7 +221,10 @@ class _MorningBriefingRibbon extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'You have ${reco.highRiskSkus} SKUs at critical risk and ${reco.reorderCandidates} items to reorder today. Tap to fix.',
+                    l10n.dashBriefingBody(
+                      reco.highRiskSkus,
+                      reco.reorderCandidates,
+                    ),
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -244,6 +257,7 @@ class _GreetingHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final firstName = fullName.split(' ').first;
     return Container(
       decoration: const BoxDecoration(
@@ -261,30 +275,36 @@ class _GreetingHeader extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                            '$greeting, \n$firstName',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(color: Colors.white, fontSize: 20),
-                          )
-                          .animate()
-                          .fadeIn(duration: 400.ms)
-                          .slideX(begin: -0.1, end: 0),
-                      const SizedBox(height: 4),
-                      Text(
-                        dateLabel,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.65),
-                          fontSize: 13,
-                        ),
-                      ).animate(delay: 60.ms).fadeIn(duration: 400.ms),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                              l10n.dashGreetingWithName(greeting, firstName),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(color: Colors.white, fontSize: 20),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms)
+                            .slideX(begin: -0.1, end: 0),
+                        const SizedBox(height: 4),
+                        Text(
+                          dateLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.65),
+                                fontSize: 13,
+                              ),
+                        ).animate(delay: 60.ms).fadeIn(duration: 400.ms),
+                      ],
+                    ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 12),
 
                   // Trial countdown (shown only during trial)
                   const TrialCountdownWidget(),
@@ -327,51 +347,52 @@ class _IntelligenceStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final metrics = [
       _Metric(
         id: 'stockout',
-        label: 'Stockout Risk',
-        sublabel: 'SKUs critical',
+        label: l10n.dashMetricStockoutLabel,
+        sublabel: l10n.dashMetricStockoutSub,
         count: reco.highRiskSkus,
         icon: Icons.warning_amber_rounded,
         color: BrandColors.error,
       ),
       _Metric(
         id: 'reorder',
-        label: 'Reorder Now',
-        sublabel: 'SKUs low stock',
+        label: l10n.dashMetricReorderLabel,
+        sublabel: l10n.dashMetricReorderSub,
         count: reco.reorderCandidates,
         icon: Icons.refresh_rounded,
         color: BrandColors.accent,
       ),
       _Metric(
         id: 'fast_moving',
-        label: 'Fast Moving',
-        sublabel: 'Top sellers',
+        label: l10n.dashMetricFastLabel,
+        sublabel: l10n.dashMetricFastSub,
         count: reco.fastMovingSkus,
         icon: Icons.trending_up_rounded,
         color: BrandColors.success,
       ),
       _Metric(
         id: 'profit',
-        label: 'Profit Picks',
-        sublabel: 'Opportunities',
+        label: l10n.dashMetricProfitLabel,
+        sublabel: l10n.dashMetricProfitSub,
         count: reco.profitOpportunities,
         icon: Icons.stars_rounded,
         color: BrandColors.primary,
       ),
       _Metric(
         id: 'customer',
-        label: 'Customer Dues',
-        sublabel: 'Pending khata',
+        label: l10n.dashMetricCustomerLabel,
+        sublabel: l10n.dashMetricCustomerSub,
         count: reco.customerInsights,
         icon: Icons.people_outline_rounded,
         color: Colors.indigo,
       ),
       _Metric(
         id: 'sales',
-        label: 'Items Sold',
-        sublabel: 'Today so far',
+        label: l10n.dashMetricSalesLabel,
+        sublabel: l10n.dashMetricSalesSub,
         count: reco.salesInsights,
         icon: Icons.shopping_bag_outlined,
         color: Colors.teal,
@@ -392,7 +413,7 @@ class _IntelligenceStrip extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Intelligence',
+                l10n.dashIntelligence,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
@@ -404,11 +425,15 @@ class _IntelligenceStrip extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.zero,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
-              childAspectRatio: 1.2,
+              // Give cells proportionally more height as the system font scales
+              // up, so the count + labels never overflow on large display sizes.
+              childAspectRatio:
+                  1.2 /
+                  MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.4),
             ),
             itemCount: metrics.length,
             itemBuilder: (context, i) =>
@@ -480,7 +505,7 @@ class _MetricCard extends ConsumerWidget {
                   Container(height: 3.5, color: metric.color),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -548,6 +573,7 @@ class _TodaySalesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22),
       child: Column(
@@ -561,9 +587,9 @@ class _TodaySalesCard extends StatelessWidget {
                 color: BrandColors.muted,
               ),
               const SizedBox(width: 6),
-              const Text(
-                "Today's Performance",
-                style: TextStyle(
+              Text(
+                l10n.dashTodaysPerformance,
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: BrandColors.ink,
@@ -582,7 +608,7 @@ class _TodaySalesCard extends StatelessWidget {
                 ),
                 child: sales == null
                     ? _NoDataRow(
-                        message: 'POS data not available',
+                        message: l10n.dashPosNotAvailable,
                         icon: Icons.point_of_sale_outlined,
                       )
                     : Padding(
@@ -595,21 +621,21 @@ class _TodaySalesCard extends StatelessWidget {
                           children: [
                             _SalesStat(
                               value: _fmt(sales!.totalSales),
-                              label: 'Revenue',
+                              label: l10n.dashStatRevenue,
                               color: BrandColors.success,
                               icon: Icons.currency_rupee_rounded,
                             ),
                             _VerticalDivider(),
                             _SalesStat(
                               value: sales!.totalOrders.toString(),
-                              label: 'Orders',
+                              label: l10n.dashStatOrders,
                               color: BrandColors.primary,
                               icon: Icons.receipt_long_rounded,
                             ),
                             _VerticalDivider(),
                             _SalesStat(
                               value: _fmt(sales!.avgOrderValue),
-                              label: 'Avg order',
+                              label: l10n.dashStatAvgOrder,
                               color: BrandColors.accent,
                               icon: Icons.shopping_bag_outlined,
                             ),
@@ -688,6 +714,7 @@ class _StoreOverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22),
       child: Column(
@@ -702,7 +729,7 @@ class _StoreOverviewCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Store Overview',
+                l10n.dashStoreOverview,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
@@ -783,13 +810,13 @@ class _StoreOverviewCard extends StatelessWidget {
                         _StoreStat(
                           icon: Icons.inventory_2_outlined,
                           value: store.skuCount.toString(),
-                          label: 'SKUs',
+                          label: l10n.dashStoreSkus,
                         ),
                         _VerticalDivider(),
                         _StoreStat(
                           icon: Icons.people_outline_rounded,
                           value: store.footfall.toString(),
-                          label: 'Daily footfall',
+                          label: l10n.dashStoreFootfall,
                         ),
                         _VerticalDivider(),
                         _StoreStat(
@@ -797,7 +824,7 @@ class _StoreOverviewCard extends StatelessWidget {
                           value: store.dailyBudget > 0
                               ? '₹${(store.dailyBudget / 1000).toStringAsFixed(1)}K'
                               : '—',
-                          label: 'Daily budget',
+                          label: l10n.dashStoreDailyBudget,
                         ),
                       ],
                     ),
@@ -885,6 +912,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -898,7 +926,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Could not load data',
+              l10n.dashCouldNotLoad,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -915,7 +943,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Retry'),
+              label: Text(l10n.dashRetry),
             ),
           ],
         ),
@@ -941,7 +969,9 @@ class _ProAlertsStrip extends ConsumerWidget {
     switch (alert.type) {
       case AlertType.udhaar:
         ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
-        ref.read(financeSubTabProvider.notifier).setSubTab(1); // Customer Udhaar tab
+        ref
+            .read(financeSubTabProvider.notifier)
+            .setSubTab(1); // Customer Udhaar tab
       case AlertType.performance:
         ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
         ref
@@ -973,6 +1003,7 @@ class _ProAlertsStrip extends ConsumerWidget {
         .take(8)
         .toList();
     if (visible.isEmpty) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
@@ -983,9 +1014,9 @@ class _ProAlertsStrip extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(22, 0, 16, 8),
             child: Row(
               children: [
-                const Text(
-                  'ALERTS',
-                  style: TextStyle(
+                Text(
+                  l10n.dashAlerts,
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
@@ -1000,9 +1031,9 @@ class _ProAlertsStrip extends ConsumerWidget {
                       builder: (_) => const NotificationsScreen(),
                     ),
                   ),
-                  child: const Text(
-                    'See all',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.dashSeeAll,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: BrandColors.primary,
                       fontWeight: FontWeight.w600,
@@ -1105,6 +1136,7 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
   @override
   Widget build(BuildContext context) {
     final asyncKpis = ref.watch(kpiCardsProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1120,7 +1152,7 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
               ),
               const SizedBox(width: 6),
               Text(
-                'Store KPIs',
+                l10n.dashStoreKpis,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
@@ -1292,9 +1324,9 @@ class _KpiMiniCard extends StatelessWidget {
               if (card.coveragePct != null && card.coveragePct! < 90) ...[
                 const SizedBox(width: 4),
                 Tooltip(
-                  message:
-                      'Based on ${card.coveragePct!.toStringAsFixed(0)}% of sales — '
-                      'some items have no cost data',
+                  message: AppLocalizations.of(context).dashKpiCoverageTooltip(
+                    card.coveragePct!.toStringAsFixed(0),
+                  ),
                   child: Container(
                     width: 7,
                     height: 7,

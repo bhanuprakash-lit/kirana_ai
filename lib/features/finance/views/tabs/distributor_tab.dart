@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kirana_ai/features/pos_inventory/models/procurement_models.dart';
 import 'package:kirana_ai/features/pos_inventory/providers/procurement_provider.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 
@@ -31,14 +32,22 @@ bool _withinLastDays(DateTime d, int days) {
   return now.difference(d).inDays <= days && now.difference(d).inDays >= 0;
 }
 
-String _dayLabel(DateTime d) {
+String _dayLabel(DateTime d, AppLocalizations l10n) {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   final target = DateTime(d.year, d.month, d.day);
   final diff = target.difference(today).inDays;
-  if (diff == 1) return 'Tomorrow';
-  if (diff == 0) return 'Today';
-  const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  if (diff == 1) return l10n.finTomorrow;
+  if (diff == 0) return l10n.finToday;
+  final weekdays = [
+    l10n.finWeekdayMon,
+    l10n.finWeekdayTue,
+    l10n.finWeekdayWed,
+    l10n.finWeekdayThu,
+    l10n.finWeekdayFri,
+    l10n.finWeekdaySat,
+    l10n.finWeekdaySun,
+  ];
   return '${weekdays[d.weekday - 1]} ${d.day}/${d.month}';
 }
 
@@ -50,13 +59,14 @@ class DistributorTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(procurementProvider);
+    final l10n = AppLocalizations.of(context);
 
     return asyncData.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(20),
         child: ListShimmer(itemCount: 6),
       ),
-      error: (err, _) => Center(child: Text('Error: $err')),
+      error: (err, _) => Center(child: Text(l10n.finErrorWithMessage('$err'))),
       data: (data) {
         final unpaid = data.purchases
             .where((p) => p.paymentStatus != 'paid')
@@ -108,7 +118,7 @@ class DistributorTab extends ConsumerWidget {
               // ── Overdue ───────────────────────────────────────────────────
               if (overdue.isNotEmpty) ...[
                 _SectionHeader(
-                  label: 'Overdue',
+                  label: l10n.finOverdue,
                   count: overdue.length,
                   color: BrandColors.error,
                   icon: Icons.warning_rounded,
@@ -121,7 +131,7 @@ class DistributorTab extends ConsumerWidget {
               // ── Due Today ─────────────────────────────────────────────────
               if (dueToday.isNotEmpty) ...[
                 _SectionHeader(
-                  label: 'Due Today',
+                  label: l10n.finDueToday,
                   count: dueToday.length,
                   color: Colors.orange,
                   icon: Icons.today_rounded,
@@ -134,7 +144,7 @@ class DistributorTab extends ConsumerWidget {
               // ── Next 7 Days ───────────────────────────────────────────────
               if (next7.isNotEmpty) ...[
                 _SectionHeader(
-                  label: 'Next 7 Days',
+                  label: l10n.finNext7Days,
                   count: next7.length,
                   color: BrandColors.primary,
                   icon: Icons.date_range_rounded,
@@ -149,14 +159,14 @@ class DistributorTab extends ConsumerWidget {
                 _EmptyBanner(
                   icon: Icons.check_circle_rounded,
                   color: BrandColors.success,
-                  message: 'No pending payments in the next 7 days',
+                  message: l10n.finNoPendingPayments7Days,
                 ),
                 const SizedBox(height: 20),
               ],
 
               // ── Paid last 7 days ──────────────────────────────────────────
               _SectionHeader(
-                label: 'Paid Last 7 Days',
+                label: l10n.finPaidLast7Days,
                 count: paidLast7.length,
                 color: BrandColors.success,
                 icon: Icons.check_circle_rounded,
@@ -166,7 +176,7 @@ class DistributorTab extends ConsumerWidget {
                 _EmptyBanner(
                   icon: Icons.receipt_long_outlined,
                   color: BrandColors.muted,
-                  message: 'No payments recorded in the last 7 days',
+                  message: l10n.finNoPaymentsRecorded7Days,
                 )
               else
                 ...paidLast7.map((p) => _PaidTile(order: p)),
@@ -175,7 +185,7 @@ class DistributorTab extends ConsumerWidget {
 
               // ── Suppliers (read-only) ─────────────────────────────────────
               _SectionHeader(
-                label: 'Suppliers',
+                label: l10n.finSuppliers,
                 count: data.suppliers.length,
                 color: BrandColors.muted,
                 icon: Icons.business_rounded,
@@ -191,29 +201,34 @@ class DistributorTab extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: BrandColors.border),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.info_outline_rounded,
                       size: 14,
                       color: BrandColors.muted,
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Add or edit suppliers in the Purchase tab',
-                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.finAddEditSuppliersHint,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: BrandColors.muted,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 10),
               if (data.suppliers.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Center(
                     child: Text(
-                      'No suppliers yet.',
-                      style: TextStyle(color: BrandColors.muted),
+                      l10n.finNoSuppliersYet,
+                      style: const TextStyle(color: BrandColors.muted),
                     ),
                   ),
                 )
@@ -244,6 +259,7 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -263,9 +279,9 @@ class _SummaryCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text(
-            'Total Outstanding',
-            style: TextStyle(
+          Text(
+            l10n.finTotalOutstanding,
+            style: const TextStyle(
               color: Colors.white60,
               fontSize: 12,
               letterSpacing: 0.5,
@@ -285,7 +301,7 @@ class _SummaryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _MetricChip(
-                  label: 'Today',
+                  label: l10n.finToday,
                   value: '₹${todayDue.toStringAsFixed(0)}',
                   color: Colors.orange,
                 ),
@@ -293,7 +309,7 @@ class _SummaryCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: _MetricChip(
-                  label: 'Next 7 Days',
+                  label: l10n.finNext7Days,
                   value: '₹${next7Due.toStringAsFixed(0)}',
                   color: const Color(0xFF60A5FA),
                 ),
@@ -301,7 +317,7 @@ class _SummaryCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: _MetricChip(
-                  label: 'Paid (7d)',
+                  label: l10n.finPaid7d,
                   value: '₹${paid7Total.toStringAsFixed(0)}',
                   color: const Color(0xFF4ADE80),
                 ),
@@ -466,6 +482,7 @@ class _PaymentTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -513,7 +530,7 @@ class _PaymentTile extends ConsumerWidget {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              order.notes ?? 'Stock Purchase',
+                              order.notes ?? l10n.finStockPurchase,
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: BrandColors.muted,
@@ -540,10 +557,14 @@ class _PaymentTile extends ConsumerWidget {
                             const SizedBox(width: 4),
                             Text(
                               isOverdue
-                                  ? 'Overdue since ${order.dueDate!.day}/${order.dueDate!.month}'
+                                  ? l10n.finOverdueSince(
+                                      '${order.dueDate!.day}/${order.dueDate!.month}',
+                                    )
                                   : showDayLabel
-                                  ? 'Due ${_dayLabel(order.dueDate!)}'
-                                  : 'Due today',
+                                  ? l10n.finDueOn(
+                                      _dayLabel(order.dueDate!, l10n),
+                                    )
+                                  : l10n.finDueTodayLabel,
                               style: TextStyle(
                                 fontSize: 11,
                                 color: isOverdue
@@ -571,8 +592,11 @@ class _PaymentTile extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      'to pay',
-                      style: TextStyle(fontSize: 10, color: BrandColors.muted),
+                      l10n.finToPay,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ),
@@ -589,7 +613,10 @@ class _PaymentTile extends ConsumerWidget {
                     foregroundColor: BrandColors.muted,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
-                  child: const Text('Details', style: TextStyle(fontSize: 13)),
+                  child: Text(
+                    l10n.finDetails,
+                    style: const TextStyle(fontSize: 13),
+                  ),
                 ),
               ),
               Container(width: 1, height: 28, color: BrandColors.border),
@@ -602,9 +629,12 @@ class _PaymentTile extends ConsumerWidget {
                     foregroundColor: BrandColors.success,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
-                  child: const Text(
-                    'Mark Paid ✓',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  child: Text(
+                    '${l10n.finMarkPaid} ✓',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -616,6 +646,7 @@ class _PaymentTile extends ConsumerWidget {
   }
 
   void _showDetails(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     // Fetch once before showing — prevents future recreation on every builder rebuild
     final itemsFuture = ref
         .read(procurementProvider.notifier)
@@ -667,7 +698,9 @@ class _PaymentTile extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Purchase on ${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}',
+                  l10n.finPurchaseOn(
+                    '${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}',
+                  ),
                   style: const TextStyle(
                     color: BrandColors.muted,
                     fontSize: 13,
@@ -675,11 +708,11 @@ class _PaymentTile extends ConsumerWidget {
                 ),
                 const Divider(height: 28),
                 if (items.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Text(
-                      'No items found.',
-                      style: TextStyle(color: BrandColors.muted),
+                      l10n.finNoItemsFound,
+                      style: const TextStyle(color: BrandColors.muted),
                     ),
                   )
                 else
@@ -722,13 +755,17 @@ class _PaymentTile extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Total Bill',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                    Expanded(
+                      child: Text(
+                        l10n.finTotalBill,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       '₹${order.totalAmount.toStringAsFixed(0)}',
                       style: const TextStyle(
@@ -756,6 +793,7 @@ class _PaidTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -791,7 +829,7 @@ class _PaidTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}  ·  ${order.notes ?? 'Stock Purchase'}',
+                  '${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}  ·  ${order.notes ?? l10n.finStockPurchase}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: BrandColors.muted,

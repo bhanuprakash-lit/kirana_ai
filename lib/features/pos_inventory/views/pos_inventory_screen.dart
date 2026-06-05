@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kirana_ai/shared/widgets/notification_bell.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/pos_provider.dart';
 import '../providers/printer_provider.dart';
@@ -69,6 +70,7 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final posState = ref.watch(posProvider);
     final posOnline = posState.error == null;
     final printerState = ref.watch(printerProvider);
@@ -84,7 +86,12 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('POS / Inventory'),
+            Flexible(
+              child: Text(
+                l10n.posPosInventory,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             const SizedBox(width: 8),
             // POS online/offline pill
             Container(
@@ -110,7 +117,7 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
                   ),
                   const SizedBox(width: 5),
                   Text(
-                    posOnline ? 'POS Online' : 'POS Offline',
+                    posOnline ? l10n.posOnline : l10n.posOffline,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -148,10 +155,19 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
             fontWeight: FontWeight.w700,
             fontSize: 13,
           ),
-          tabs: const [
-            Tab(icon: Icon(Icons.point_of_sale_rounded), text: 'Sales'),
-            Tab(icon: Icon(Icons.inventory_2_rounded), text: 'Stock'),
-            Tab(icon: Icon(Icons.local_shipping_rounded), text: 'Purchase'),
+          tabs: [
+            Tab(
+              icon: const Icon(Icons.point_of_sale_rounded),
+              text: l10n.posTabSales,
+            ),
+            Tab(
+              icon: const Icon(Icons.inventory_2_rounded),
+              text: l10n.posTabStock,
+            ),
+            Tab(
+              icon: const Icon(Icons.local_shipping_rounded),
+              text: l10n.posTabPurchase,
+            ),
           ],
         ),
       ),
@@ -169,19 +185,18 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
                 const InventoryTab(),
                 Consumer(
                   builder: (ctx, ref, _) {
+                    final ctxL10n = AppLocalizations.of(ctx);
                     final sub = ref.watch(subInfoProvider);
                     if (sub.canAccessVendorManagement)
                       return const ProcurementTab();
                     return _ProGateTab(
-                      title: 'Purchase & Suppliers',
-                      description:
-                          'Create purchase orders, manage your suppliers, and track what you owe them — all in one place.',
+                      title: ctxL10n.posPurchaseSuppliers,
+                      description: ctxL10n.posPurchaseSuppliersDesc,
                       icon: Icons.local_shipping_rounded,
                       onUpgrade: () => showPaywallSheet(
                         ctx,
-                        featureName: 'Purchase & Suppliers',
-                        featureDescription:
-                            'Manage purchase orders and suppliers. Track payments to distributors. Available on the Pro plan.',
+                        featureName: ctxL10n.posPurchaseSuppliers,
+                        featureDescription: ctxL10n.posPaywallPurchaseDesc,
                         featureIcon: Icons.local_shipping_rounded,
                       ),
                     );
@@ -254,6 +269,7 @@ class _PrinterPickerSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final printer = ref.watch(printerProvider);
 
     return DraggableScrollableSheet(
@@ -303,9 +319,9 @@ class _PrinterPickerSheet extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Printer Setup',
-                          style: TextStyle(
+                        Text(
+                          l10n.posPrinterSetup,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                           ),
@@ -329,7 +345,7 @@ class _PrinterPickerSheet extends ConsumerWidget {
                       onPressed: () =>
                           ref.read(printerProvider.notifier).reconnect(),
                       icon: const Icon(Icons.refresh_rounded, size: 16),
-                      label: const Text('Reconnect'),
+                      label: Text(l10n.posReconnect),
                       style: TextButton.styleFrom(
                         foregroundColor: BrandColors.primary,
                         visualDensity: VisualDensity.compact,
@@ -416,7 +432,7 @@ class _PrinterPickerSheet extends ConsumerWidget {
                     await onForget();
                   },
                   icon: const Icon(Icons.link_off_rounded, size: 15),
-                  label: const Text('Forget this printer'),
+                  label: Text(l10n.posForgetPrinter),
                   style: TextButton.styleFrom(
                     foregroundColor: BrandColors.error,
                     visualDensity: VisualDensity.compact,
@@ -425,13 +441,13 @@ class _PrinterPickerSheet extends ConsumerWidget {
               ),
             ],
 
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'PAIRED BLUETOOTH DEVICES',
-                  style: TextStyle(
+                  l10n.posPairedDevices,
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     color: BrandColors.muted,
@@ -461,18 +477,18 @@ class _PrinterPickerSheet extends ConsumerWidget {
                               color: BrandColors.muted.withValues(alpha: 0.4),
                             ),
                             const SizedBox(height: 12),
-                            const Text(
-                              'No paired devices found',
-                              style: TextStyle(
+                            Text(
+                              l10n.posNoPairedDevices,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                                 color: BrandColors.ink,
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
-                              'Pair your thermal printer in Android\nBluetooth settings first, then refresh.',
+                            Text(
+                              l10n.posPairDeviceHint,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: BrandColors.muted,
                               ),
@@ -483,7 +499,7 @@ class _PrinterPickerSheet extends ConsumerWidget {
                                   .read(printerProvider.notifier)
                                   .loadPairedDevices(),
                               icon: const Icon(Icons.refresh_rounded, size: 16),
-                              label: const Text('Refresh'),
+                              label: Text(l10n.posCommonRefresh),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: BrandColors.primary,
                                 side: const BorderSide(
@@ -611,6 +627,7 @@ class _ProGateTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -632,9 +649,9 @@ class _ProGateTab extends StatelessWidget {
                 color: const Color(0xFF7C3AED),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
-                'PRO ONLY',
-                style: TextStyle(
+              child: Text(
+                l10n.posProOnly,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -668,7 +685,7 @@ class _ProGateTab extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: onUpgrade,
                 icon: const Icon(Icons.workspace_premium_rounded, size: 18),
-                label: const Text('Upgrade to Pro  ₹500/mo · just ₹17/day'),
+                label: Text(l10n.posUpgradeToProDay),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   backgroundColor: const Color(0xFF7C3AED),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/inventory_provider.dart';
 import '../../providers/pos_provider.dart';
@@ -49,6 +51,9 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
   late final List<_ReturnLine> _lines;
   bool _saving = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -61,7 +66,7 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
       final product = products.where((p) => p.productId == pid).firstOrNull;
       return _ReturnLine(
         productId: pid,
-        name: product?.name ?? 'Product #$pid',
+        name: product?.name ?? _l10n.procProductNumber('$pid'),
         orderedQty: qty,
       );
     }).toList();
@@ -71,6 +76,7 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: const BoxDecoration(
         color: BrandColors.background,
@@ -97,13 +103,21 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Return / Exchange',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                  l10n.procReturnExchange,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Order #${widget.order['order_id']} · pick items to return',
-                  style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+                  l10n.procOrderPickItemsToReturn(
+                    '${widget.order['order_id']}',
+                  ),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: BrandColors.muted,
+                  ),
                 ),
               ],
             ),
@@ -123,7 +137,7 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
               height: 52,
               width: double.infinity,
               child: LoadingButton(
-                label: 'Record return',
+                label: l10n.procRecordReturn,
                 isLoading: _saving,
                 onPressed: (_hasReturns && !_saving) ? _submit : null,
               ),
@@ -177,29 +191,43 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
             ],
           ),
           Text(
-            'bought ${maxQty == line.orderedQty ? maxQty : line.orderedQty} ',
+            _l10n.procBoughtQty(
+              '${maxQty == line.orderedQty ? maxQty : line.orderedQty}',
+            ),
             style: const TextStyle(fontSize: 11, color: BrandColors.muted),
           ),
           if (line.returnQty > 0)
             Row(
               children: [
-                const Text(
-                  'Back to shelf',
-                  style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                Expanded(
+                  child: Text(
+                    _l10n.procBackToShelf,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
+                  ),
                 ),
                 Switch.adaptive(
                   value: line.resaleable,
                   onChanged: (v) => setState(() => line.resaleable = v),
                   activeThumbColor: BrandColors.success,
                 ),
-                Text(
-                  line.resaleable ? 'Resaleable' : 'Damaged → vendor',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: line.resaleable
-                        ? BrandColors.success
-                        : const Color(0xFFE87722),
+                Flexible(
+                  child: Text(
+                    line.resaleable
+                        ? _l10n.procResaleable
+                        : _l10n.procDamagedToVendor,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: line.resaleable
+                          ? BrandColors.success
+                          : const Color(0xFFE87722),
+                    ),
                   ),
                 ),
               ],
@@ -222,11 +250,13 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
     setState(() => _saving = true);
     final items = _lines
         .where((l) => l.returnQty > 0)
-        .map((l) => {
-              'product_id': l.productId,
-              'qty': l.returnQty,
-              'resaleable': l.resaleable,
-            })
+        .map(
+          (l) => {
+            'product_id': l.productId,
+            'qty': l.returnQty,
+            'resaleable': l.resaleable,
+          },
+        )
         .toList();
     try {
       final client = ref.read(apiClientProvider);
@@ -244,8 +274,8 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Return recorded — $restocked back to shelf'
-            '${toVendor > 0 ? ', $toVendor to vendor' : ''}',
+            _l10n.procReturnRecordedShelf(restocked) +
+                (toVendor > 0 ? _l10n.procReturnToVendorSuffix(toVendor) : ''),
           ),
           backgroundColor: BrandColors.success,
         ),
@@ -254,8 +284,8 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
       if (!mounted) return;
       setState(() => _saving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not record return'),
+        SnackBar(
+          content: Text(_l10n.procCouldNotRecordReturn),
           backgroundColor: BrandColors.error,
         ),
       );

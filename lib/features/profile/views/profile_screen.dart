@@ -11,6 +11,8 @@ import '../../subscription/models/subscription_model.dart';
 import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../providers/store_settings_provider.dart';
+import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../shared/widgets/language_selector.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -19,13 +21,14 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(userProvider);
     final storeAsync = ref.watch(storeSettingsProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Profile',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.profProfile,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: userAsync.when(
@@ -33,10 +36,11 @@ class ProfileScreen extends ConsumerWidget {
           padding: EdgeInsets.all(20),
           child: ListShimmer(itemCount: 5),
         ),
-        error: (err, _) => Center(child: Text('Error loading profile: $err')),
+        error: (err, _) =>
+            Center(child: Text(l10n.profErrorLoadingProfile(err.toString()))),
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('No user data found.'));
+            return Center(child: Text(l10n.profNoUserData));
           }
 
           return ListView(
@@ -127,9 +131,8 @@ class ProfileScreen extends ConsumerWidget {
                   if (!sub.canAccessCashflow) {
                     showPaywallSheet(
                       context,
-                      featureName: 'Cashflow Support',
-                      featureDescription:
-                          'Apply for ₹50K – ₹10L business finance with tailored repayment plans.',
+                      featureName: l10n.profCashflowSupport,
+                      featureDescription: l10n.profCashflowSupportDesc,
                       featureIcon: Icons.account_balance_wallet_rounded,
                     );
                     return;
@@ -138,12 +141,12 @@ class ProfileScreen extends ConsumerWidget {
                 },
               ),
 
-              const _SectionLabel('Customers'),
+              _SectionLabel(l10n.profSectionCustomers),
               _GroupCard(
                 rows: [
                   _CompactRow(
                     icon: Icons.share_rounded,
-                    label: 'Customer Growth',
+                    label: l10n.profCustomerGrowth,
                     badge: ref.watch(subInfoProvider).canAccessReferral
                         ? null
                         : 'PRO',
@@ -152,9 +155,8 @@ class ProfileScreen extends ConsumerWidget {
                       if (!sub.canAccessReferral) {
                         showPaywallSheet(
                           context,
-                          featureName: 'Customer Growth',
-                          featureDescription:
-                              'Build a referral engine — let your happy customers bring in new ones automatically.',
+                          featureName: l10n.profCustomerGrowth,
+                          featureDescription: l10n.profCustomerGrowthDesc,
                           featureIcon: Icons.share_rounded,
                         );
                         return;
@@ -164,82 +166,87 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   _CompactRow(
                     icon: Icons.people_outline_rounded,
-                    label: 'Customer Relations',
+                    label: l10n.profCustomerRelations,
                     onTap: () => context.push('/profile/customers'),
                   ),
                   _CompactRow(
                     icon: Icons.location_city_rounded,
-                    label: 'Area Associations',
+                    label: l10n.profAreaAssociations,
                     onTap: () => context.push('/profile/associations'),
                   ),
                 ],
               ),
 
-              const _SectionLabel('Analytics'),
+              _SectionLabel(l10n.profSectionAnalytics),
               _GroupCard(
                 rows: [
                   _CompactRow(
                     icon: Icons.analytics_outlined,
-                    label: 'KPI Subscriptions',
+                    label: l10n.profKpiSubscriptions,
                     onTap: () => context.push('/profile/kpis'),
                   ),
                   _CompactRow(
                     icon: Icons.history_rounded,
-                    label: 'Transaction History',
+                    label: l10n.profTransactionHistory,
                     onTap: () => context.push('/profile/history'),
                   ),
                   _CompactRow(
                     icon: Icons.shopping_basket_rounded,
-                    label: 'My Baskets',
+                    label: l10n.profMyBaskets,
                     onTap: () => context.push('/profile/baskets'),
                   ),
                 ],
               ),
 
-              const _SectionLabel('Store & Account'),
+              _SectionLabel(l10n.profSectionStoreAccount),
               _GroupCard(
                 rows: [
                   _CompactRow(
+                    icon: Icons.language_rounded,
+                    label: l10n.profLanguage,
+                    onTap: () => showLanguagePicker(context, ref),
+                  ),
+                  _CompactRow(
                     icon: Icons.storefront_rounded,
-                    label: 'Store Settings',
+                    label: l10n.profStoreSettings,
                     onTap: () => context.push('/profile/store'),
                   ),
                   _CompactRow(
                     icon: Icons.tune_rounded,
-                    label: 'Configuration',
+                    label: l10n.profConfiguration,
                     onTap: () => context.push('/profile/config'),
                   ),
                   _CompactRow(
                     icon: Icons.lock_outline_rounded,
-                    label: 'Password & Security',
+                    label: l10n.profPasswordSecurity,
                     onTap: () => context.push('/profile/password'),
                   ),
                 ],
               ),
 
-              const _SectionLabel('Plan & Support'),
+              _SectionLabel(l10n.profSectionPlanSupport),
               _GroupCard(
                 rows: [
                   _CompactRow(
                     icon: Icons.workspace_premium_rounded,
-                    label: 'Subscription & Plans',
+                    label: l10n.profSubscriptionPlans,
                     onTap: () => context.push('/profile/subscription'),
                   ),
                   _CompactRow(
                     icon: Icons.help_outline_rounded,
-                    label: 'Help & Support',
+                    label: l10n.profHelpSupport,
                     onTap: () => context.push('/profile/support'),
                   ),
                 ],
               ),
 
               if (user.role == 'admin') ...[
-                const _SectionLabel('Admin'),
+                _SectionLabel(l10n.profSectionAdmin),
                 _GroupCard(
                   rows: [
                     _CompactRow(
                       icon: Icons.people_alt_rounded,
-                      label: 'User Activity',
+                      label: l10n.profUserActivity,
                       onTap: () => context.push('/profile/admin-activity'),
                     ),
                   ],
@@ -268,9 +275,12 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   icon: const Icon(Icons.logout_rounded, size: 20),
-                  label: const Text(
-                    'Sign Out',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                  label: Text(
+                    l10n.profSignOut,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
@@ -289,6 +299,7 @@ class _CashflowBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -317,22 +328,22 @@ class _CashflowBanner extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Cashflow Support',
-                    style: TextStyle(
+                    l10n.profCashflowSupport,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
                       fontSize: 15,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
-                    'Apply for ₹50K – ₹10L business finance',
-                    style: TextStyle(
+                    l10n.profCashflowBannerSubtitle,
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -475,11 +486,14 @@ class _CompactRow extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                  Flexible(
+                    child: Text(
+                      label,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                   if (badge != null) ...[
@@ -528,6 +542,7 @@ class _SubscriptionBadge extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sub = ref.watch(subInfoProvider);
+    final l10n = AppLocalizations.of(context);
 
     final Color color;
     final IconData icon;
@@ -537,29 +552,29 @@ class _SubscriptionBadge extends ConsumerWidget {
       case SubTier.none:
         color = BrandColors.error;
         icon = Icons.warning_amber_rounded;
-        label = 'Trial Expired';
+        label = l10n.profTrialExpired;
       case SubTier.pending:
         color = const Color(0xFFFF8C00);
         icon = Icons.hourglass_top_rounded;
-        label = 'Awaiting Activation';
+        label = l10n.profAwaitingActivation;
       case SubTier.trial:
         final isProTrial = sub.trialTier == 'pro';
         color = isProTrial ? const Color(0xFF7C3AED) : const Color(0xFFFF8C00);
         icon = isProTrial
             ? Icons.workspace_premium_rounded
             : Icons.timer_outlined;
-        final tierLabel = isProTrial ? 'Pro Trial' : 'Basic Trial';
+        final tierLabel = isProTrial ? l10n.profProTrial : l10n.profBasicTrial;
         label = sub.daysRemaining > 0
-            ? '$tierLabel · ${sub.daysRemaining}d left'
-            : '$tierLabel Active';
+            ? l10n.profTrialDaysLeft(tierLabel, sub.daysRemaining)
+            : l10n.profTrialActive(tierLabel);
       case SubTier.basic:
         color = BrandColors.primary;
         icon = Icons.star_rounded;
-        label = 'Basic Plan';
+        label = l10n.profBasicPlan;
       case SubTier.pro:
         color = const Color(0xFF7C3AED);
         icon = Icons.workspace_premium_rounded;
-        label = 'Pro Plan';
+        label = l10n.profProPlan;
     }
 
     return GestureDetector(

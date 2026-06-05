@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../models/campaign_model.dart';
 
 // ── Campaign Card (shown in POS empty state) ──────────────────────────────────
@@ -29,6 +30,7 @@ class CampaignCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final stocked = campaign.stockedItems;
     final allAvailable = campaign.availableCount == campaign.totalItems;
 
@@ -152,9 +154,9 @@ class CampaignCard extends StatelessWidget {
                             color: _color,
                           ),
                         ),
-                        const Text(
-                          'est. total',
-                          style: TextStyle(
+                        Text(
+                          l10n.mktEstTotal,
+                          style: const TextStyle(
                             fontSize: 11,
                             color: BrandColors.muted,
                           ),
@@ -171,7 +173,7 @@ class CampaignCard extends StatelessWidget {
                         Icons.add_shopping_cart_rounded,
                         size: 16,
                       ),
-                      label: const Text('Add All'),
+                      label: Text(l10n.mktAddAll),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _color,
                         foregroundColor: Colors.white,
@@ -248,12 +250,16 @@ class _ItemChip extends StatelessWidget {
             color: inStock ? color : BrandColors.muted,
           ),
           const SizedBox(width: 3),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: inStock ? color : BrandColors.muted,
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: inStock ? color : BrandColors.muted,
+              ),
             ),
           ),
         ],
@@ -286,6 +292,7 @@ class CampaignDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       maxChildSize: 0.92,
@@ -385,11 +392,15 @@ class CampaignDetailSheet extends StatelessWidget {
                     ),
                     subtitle: item.inStock && p != null
                         ? Text(
-                            'Stock: ${p.stockQuantity.toStringAsFixed(0)} ${p.unit ?? 'pcs'}  ·  ₹${p.price.toStringAsFixed(0)}',
+                            l10n.mktCampaignItemStock(
+                              p.stockQuantity.toStringAsFixed(0),
+                              p.unit ?? 'pcs',
+                              p.price.toStringAsFixed(0),
+                            ),
                             style: const TextStyle(fontSize: 12),
                           )
                         : Text(
-                            'Not in stock',
+                            l10n.mktNotInStock,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.red.shade400,
@@ -423,9 +434,9 @@ class CampaignDetailSheet extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Estimated Total',
-                          style: TextStyle(
+                        Text(
+                          l10n.mktEstimatedTotal,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -453,8 +464,10 @@ class CampaignDetailSheet extends StatelessWidget {
                       icon: const Icon(Icons.add_shopping_cart_rounded),
                       label: Text(
                         campaign.stockedItems.isEmpty
-                            ? 'No items in stock'
-                            : 'Add ${campaign.availableCount} Available Items to Cart',
+                            ? l10n.mktNoItemsInStock
+                            : l10n.mktAddAvailableItemsToCart(
+                                campaign.availableCount,
+                              ),
                       ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(52),

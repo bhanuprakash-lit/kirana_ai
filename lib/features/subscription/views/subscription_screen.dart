@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/subscription_model.dart';
 import '../providers/iap_provider.dart';
@@ -14,13 +16,14 @@ class SubscriptionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final subAsync = ref.watch(subscriptionProvider);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Subscription & Plans',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.subSubscriptionAndPlans,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: subAsync.when(
@@ -28,7 +31,8 @@ class SubscriptionScreen extends ConsumerWidget {
           padding: EdgeInsets.all(24),
           child: ListShimmer(itemCount: 4, itemHeight: 80),
         ),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(l10n.subErrorWithDetail(e.toString()))),
         data: (info) => _SubscriptionBody(info: info),
       ),
     );
@@ -47,6 +51,9 @@ class _SubscriptionBody extends ConsumerStatefulWidget {
 
 class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
   bool _isProcessing = false;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -76,19 +83,17 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Cancel Subscription?'),
-        content: const Text(
-          'Your subscription will be cancelled immediately. You can re-subscribe at any time.',
-        ),
+        title: Text(_l10n.subCancelSubscriptionTitle),
+        content: Text(_l10n.subCancelSubscriptionBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Keep Plan'),
+            child: Text(_l10n.subKeepPlan),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: BrandColors.error),
-            child: const Text('Cancel Subscription'),
+            child: Text(_l10n.subCancelSubscription),
           ),
         ],
       ),
@@ -98,15 +103,15 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
     try {
       await ref.read(subscriptionProvider.notifier).cancelSubscription();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Subscription cancelled.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_l10n.subSubscriptionCancelled)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Cancel failed: $e'),
+            content: Text(_l10n.subCancelFailed(e.toString())),
             backgroundColor: BrandColors.error,
           ),
         );
@@ -116,7 +121,22 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final info = widget.info;
+    final basicFeatures = [
+      l10n.subFeaturePosSales,
+      l10n.subFeatureInventoryTracking,
+      l10n.subFeatureFinanceUdhaar,
+      l10n.subFeatureKpiInsights,
+      l10n.subFeatureCustomerRelations,
+      l10n.subFeatureAiRecommendations,
+    ];
+    final proOnlyFeatures = [
+      l10n.subFeatureAllKpiCategories,
+      l10n.subFeatureVendorProcurement,
+      l10n.subFeatureCashflowSupport,
+      l10n.subFeatureCustomerGrowth,
+    ];
     return Stack(
       children: [
         ListView(
@@ -126,9 +146,9 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
             _CurrentPlanCard(info: info),
             const SizedBox(height: 24),
 
-            const Text(
-              'CHOOSE YOUR PLAN',
-              style: TextStyle(
+            Text(
+              l10n.subChooseYourPlan,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.5,
@@ -140,22 +160,22 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
             _PlanCard(
               name: 'Basic',
               price: '₹200',
-              period: '/month',
+              period: l10n.subPerMonth,
               dailyPrice: '₹7',
               color: BrandColors.primary,
               icon: Icons.star_rounded,
               isCurrentPlan: info.tier == SubTier.basic,
               isTrialPlan:
                   info.tier == SubTier.trial && info.trialTier == 'basic',
-              features: _basicFeatures,
-              lockedFeatures: _proOnlyFeatures,
+              features: basicFeatures,
+              lockedFeatures: proOnlyFeatures,
               onUpgrade: _isProcessing ? null : () => _startPayment('basic'),
             ),
             const SizedBox(height: 12),
             _PlanCard(
               name: 'Pro',
               price: '₹500',
-              period: '/month',
+              period: l10n.subPerMonth,
               dailyPrice: '₹17',
               color: const Color(0xFF7C3AED),
               icon: Icons.workspace_premium_rounded,
@@ -163,7 +183,7 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
               isTrialPlan:
                   info.tier == SubTier.trial && info.trialTier == 'pro',
               isBestValue: true,
-              features: [..._basicFeatures, ..._proOnlyFeatures],
+              features: [...basicFeatures, ...proOnlyFeatures],
               onUpgrade: _isProcessing ? null : () => _startPayment('pro'),
             ),
             const SizedBox(height: 20),
@@ -180,7 +200,7 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text('Cancel Subscription'),
+                child: Text(l10n.subCancelSubscription),
               ),
               const SizedBox(height: 16),
             ],
@@ -189,9 +209,9 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
             TextButton(
               onPressed: () =>
                   ref.read(iapProvider.notifier).restorePurchases(),
-              child: const Text(
-                'Restore Purchases',
-                style: TextStyle(color: BrandColors.muted, fontSize: 13),
+              child: Text(
+                l10n.subRestorePurchases,
+                style: const TextStyle(color: BrandColors.muted, fontSize: 13),
               ),
             ),
             const SizedBox(height: 8),
@@ -207,14 +227,17 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Need help?',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                  Text(
+                    l10n.subNeedHelp,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Reach us on WhatsApp for plan queries or billing support.',
-                    style: TextStyle(
+                  Text(
+                    l10n.subReachWhatsApp,
+                    style: const TextStyle(
                       color: BrandColors.muted,
                       fontSize: 13,
                       height: 1.4,
@@ -226,7 +249,7 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
                     child: OutlinedButton.icon(
                       onPressed: _contactWhatsApp,
                       icon: const Icon(Icons.chat_rounded, size: 16),
-                      label: const Text('WhatsApp Support'),
+                      label: Text(l10n.subWhatsAppSupport),
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -250,28 +273,12 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
   }
 
   Future<void> _contactWhatsApp() async {
-    const msg = 'Hi! I need help with my Kirana AI subscription.';
+    final msg = _l10n.subWhatsAppHelpMessage;
     final url = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(msg)}');
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
   }
-
-  static const _basicFeatures = [
-    'POS & Sales Management',
-    'Inventory Tracking',
-    'Finance & Udhaar',
-    'KPI Insights (3 per category)',
-    'Customer Relations',
-    'AI Recommendations',
-  ];
-
-  static const _proOnlyFeatures = [
-    'All KPI Categories (unlimited)',
-    'Vendor & Procurement Management',
-    'Cashflow Support (up to ₹10L)',
-    'Customer Growth Engine',
-  ];
 }
 
 // ── Current plan card ─────────────────────────────────────────────────────────
@@ -282,6 +289,7 @@ class _CurrentPlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = _color(info.tier);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
@@ -309,7 +317,9 @@ class _CurrentPlanCard extends StatelessWidget {
               Icon(_icon(info.tier), color: Colors.white, size: 20),
               const SizedBox(width: 10),
               Text(
-                'Current: ${info.tier.displayName(trialTier: info.trialTier)}',
+                l10n.subCurrentPlanLabel(
+                  info.tier.displayName(trialTier: info.trialTier),
+                ),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
@@ -328,9 +338,9 @@ class _CurrentPlanCard extends StatelessWidget {
                   size: 14,
                 ),
                 const SizedBox(width: 6),
-                const Text(
-                  'Time remaining: ',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                Text(
+                  l10n.subTimeRemaining,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
                 const TrialCountdownWidget(),
               ],
@@ -415,6 +425,7 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -470,9 +481,9 @@ class _PlanCard extends StatelessWidget {
                                 color: color,
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Text(
-                                'BEST',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.subBest,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
                                   fontWeight: FontWeight.w800,
@@ -504,7 +515,7 @@ class _PlanCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'just $dailyPrice/day',
+                        l10n.subJustPerDay(dailyPrice),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -543,7 +554,7 @@ class _PlanCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            'You\'re on a free trial of this plan. Upgrade to keep access after trial ends.',
+                            l10n.subTrialPlanNotice,
                             style: TextStyle(
                               fontSize: 11,
                               color: color,
@@ -566,7 +577,7 @@ class _PlanCard extends StatelessWidget {
                             Icons.check_circle_rounded,
                             size: 16,
                           ),
-                          label: const Text('Current Plan'),
+                          label: Text(l10n.subCurrentPlan),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(48),
                             shape: RoundedRectangleBorder(
@@ -578,7 +589,7 @@ class _PlanCard extends StatelessWidget {
                       ? ElevatedButton.icon(
                           onPressed: onUpgrade,
                           icon: const Icon(Icons.lock_open_rounded, size: 16),
-                          label: Text('Upgrade to Keep $name Access'),
+                          label: Text(l10n.subUpgradeToKeepAccess(name)),
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(48),
                             backgroundColor: color,
@@ -591,7 +602,7 @@ class _PlanCard extends StatelessWidget {
                       : ElevatedButton.icon(
                           onPressed: onUpgrade,
                           icon: const Icon(Icons.payment_rounded, size: 16),
-                          label: Text('Pay & Activate $name'),
+                          label: Text(l10n.subPayAndActivate(name)),
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size.fromHeight(48),
                             backgroundColor: color,

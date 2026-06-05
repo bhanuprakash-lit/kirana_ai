@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../models/pos_product.dart';
 import '../../providers/pos_provider.dart';
 
@@ -57,6 +59,9 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
   String? _flashMessage;
   bool _flashError = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(widget.ref.read(localeProvider));
+
   @override
   void dispose() {
     _scannerCtrl.dispose();
@@ -88,7 +93,7 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
       final existing = _items.indexWhere((i) => i.product.barcode == raw);
       if (existing >= 0) {
         _showFlash(
-          '${_items[existing].product.name} already in list',
+          _l10n.posAlreadyInList(_items[existing].product.name),
           error: false,
         );
       }
@@ -105,7 +110,7 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
     final idx = _items.indexWhere((i) => i.product.barcode == barcode);
     if (idx >= 0) {
       setState(() => _items[idx].qty++);
-      _showFlash('${_items[idx].product.name} ×${_items[idx].qty}');
+      _showFlash(_l10n.posItemQty(_items[idx].product.name, _items[idx].qty));
       return;
     }
 
@@ -114,7 +119,7 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
     final local = notifier.lookupBarcodeLocal(barcode);
     if (local != null) {
       setState(() => _items.insert(0, ScanSessionItem(local)));
-      _showFlash('${local.name} added');
+      _showFlash(_l10n.posItemAdded(local.name));
       return;
     }
 
@@ -122,7 +127,7 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
     final placeholder = ScanSessionItem(
       PosProduct(
         productId: -1,
-        name: 'Looking up…',
+        name: _l10n.posLookingUp,
         price: 0,
         stockQuantity: 0,
         barcode: barcode,
@@ -142,10 +147,10 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
           );
           if (product != null) {
             setState(() => _items[pi] = ScanSessionItem(product));
-            _showFlash('${product.name} added');
+            _showFlash(_l10n.posItemAdded(product.name));
           } else {
             setState(() => _items.removeAt(pi));
-            _showFlash('Not found — tap to add manually', error: true);
+            _showFlash(_l10n.posNotFoundTapAdd, error: true);
             widget.onUnknownBarcode?.call(barcode);
           }
         })
@@ -183,6 +188,7 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final total = _items.fold<double>(0, (s, i) => s + i.product.price * i.qty);
     final hasItems = _items.isNotEmpty;
     final pendingCount = _items.where((i) => i.product.productId == -1).length;
@@ -259,11 +265,12 @@ class _ContinuousScannerSheetState extends State<_ContinuousScannerSheet> {
                               ),
                             ),
                             child: pendingCount > 0
-                                ? Text(
-                                    'Looking up $pendingCount item${pendingCount > 1 ? 's' : ''}…',
-                                  )
+                                ? Text(l10n.posLookingUpItems(pendingCount))
                                 : Text(
-                                    'Add $validCount item${validCount > 1 ? 's' : ''} to Cart  ·  ₹${total.toStringAsFixed(0)}',
+                                    l10n.posAddItemsToCart(
+                                      validCount,
+                                      total.toStringAsFixed(0),
+                                    ),
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w800,
                                       fontSize: 15,
@@ -293,6 +300,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       color: Colors.black,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -306,8 +314,8 @@ class _Header extends StatelessWidget {
           Expanded(
             child: Text(
               itemCount > 0
-                  ? '$itemCount item${itemCount > 1 ? 's' : ''} scanned'
-                  : 'Scan items',
+                  ? l10n.posItemsScanned(itemCount)
+                  : l10n.posScanItems,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -318,9 +326,9 @@ class _Header extends StatelessWidget {
           if (onClear != null)
             TextButton(
               onPressed: onClear,
-              child: const Text(
-                'Clear all',
-                style: TextStyle(color: Colors.white54, fontSize: 13),
+              child: Text(
+                l10n.posClearAll,
+                style: const TextStyle(color: Colors.white54, fontSize: 13),
               ),
             ),
         ],
@@ -526,24 +534,25 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final l10n = AppLocalizations.of(context);
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.qr_code_scanner_rounded,
             size: 40,
             color: BrandColors.muted,
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
-            'Point camera at a barcode',
-            style: TextStyle(color: BrandColors.muted, fontSize: 14),
+            l10n.posPointCamera,
+            style: const TextStyle(color: BrandColors.muted, fontSize: 14),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
-            'Items appear here as you scan',
-            style: TextStyle(color: BrandColors.muted, fontSize: 12),
+            l10n.posItemsAppearHere,
+            style: const TextStyle(color: BrandColors.muted, fontSize: 12),
           ),
         ],
       ),

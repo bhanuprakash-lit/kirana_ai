@@ -1,55 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/providers/usage_limits_provider.dart';
 import '../../../core/services/usage_limits_service.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 // ── Pack definitions ──────────────────────────────────────────────────────────
 
 class _Pack {
   final String feature;
   final String emoji;
-  final String name;
-  final String desc;
   final int count;
   final int priceRs;
 
   const _Pack({
     required this.feature,
     required this.emoji,
-    required this.name,
-    required this.desc,
     required this.count,
     required this.priceRs,
   });
+
+  String name(AppLocalizations l10n) {
+    switch (feature) {
+      case kFeatureInvoice:
+        return l10n.subInvoicePack;
+      case kFeatureVoice:
+        return l10n.subVoicePack;
+      case kFeatureHandwrite:
+        return l10n.subHandwritingPack;
+    }
+    return '';
+  }
+
+  String desc(AppLocalizations l10n) {
+    switch (feature) {
+      case kFeatureInvoice:
+        return l10n.subInvoicePackDesc;
+      case kFeatureVoice:
+        return l10n.subVoicePackDesc;
+      case kFeatureHandwrite:
+        return l10n.subHandwritingPackDesc;
+    }
+    return '';
+  }
 }
 
 const _packs = [
-  _Pack(
-    feature: kFeatureInvoice,
-    emoji: '📄',
-    name: 'Invoice Pack',
-    desc: 'Process 10 more supplier bills',
-    count: 10,
-    priceRs: 5,
-  ),
-  _Pack(
-    feature: kFeatureVoice,
-    emoji: '🎙️',
-    name: 'Voice Pack',
-    desc: 'Add 10 more audio/voice orders',
-    count: 10,
-    priceRs: 2,
-  ),
-  _Pack(
-    feature: kFeatureHandwrite,
-    emoji: '✍️',
-    name: 'Handwriting Pack',
-    desc: 'Scan 10 more handwritten notes',
-    count: 10,
-    priceRs: 3,
-  ),
+  _Pack(feature: kFeatureInvoice, emoji: '📄', count: 10, priceRs: 5),
+  _Pack(feature: kFeatureVoice, emoji: '🎙️', count: 10, priceRs: 2),
+  _Pack(feature: kFeatureHandwrite, emoji: '✍️', count: 10, priceRs: 3),
 ];
 
 // ── Entry point ───────────────────────────────────────────────────────────────
@@ -83,6 +84,7 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
   String? _buying;
 
   Future<void> _purchase(_Pack pack) async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _buying = pack.feature);
 
     // ── Payment confirmation dialog ─────────────────────────────────────────
@@ -91,19 +93,19 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('${pack.emoji} ${pack.name}'),
+        title: Text('${pack.emoji} ${pack.name(l10n)}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(pack.desc),
+            Text(pack.desc(l10n)),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Price',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                Text(
+                  l10n.subPrice,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 Text(
                   '₹${pack.priceRs}',
@@ -116,20 +118,20 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
               ],
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Credits do not expire — they roll over each day.',
-              style: TextStyle(fontSize: 12, color: BrandColors.muted),
+            Text(
+              l10n.subCreditsRollOverDaily,
+              style: const TextStyle(fontSize: 12, color: BrandColors.muted),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.subCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Pay ₹${pack.priceRs}'),
+            child: Text(l10n.subPayAmount(pack.priceRs)),
           ),
         ],
       ),
@@ -139,10 +141,13 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
       await widget.ref
           .read(usageLimitsProvider.notifier)
           .addCredits(pack.feature, pack.count);
+      final l10nAfter = lookupAppLocalizations(widget.ref.read(localeProvider));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${pack.count} ${pack.name} credits added!'),
+            content: Text(
+              l10nAfter.subCreditsAdded(pack.count, pack.name(l10nAfter)),
+            ),
             backgroundColor: BrandColors.success,
           ),
         );
@@ -155,6 +160,7 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -183,18 +189,18 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
           const SizedBox(height: 20),
 
           // Header
-          const Text(
-            'Top Up Your Credits',
-            style: TextStyle(
+          Text(
+            l10n.subTopUpCredits,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w900,
               color: BrandColors.ink,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Credits never expire — they roll over to tomorrow!',
-            style: TextStyle(fontSize: 13, color: BrandColors.muted),
+          Text(
+            l10n.subCreditsNeverExpire,
+            style: const TextStyle(fontSize: 13, color: BrandColors.muted),
           ),
           const SizedBox(height: 20),
 
@@ -231,6 +237,7 @@ class _PackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -254,7 +261,7 @@ class _PackCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  pack.name,
+                  pack.name(l10n),
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 15,
@@ -262,7 +269,7 @@ class _PackCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  pack.desc,
+                  pack.desc(l10n),
                   style: const TextStyle(
                     fontSize: 12,
                     color: BrandColors.muted,
@@ -270,7 +277,7 @@ class _PackCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${pack.count} credits',
+                  l10n.subCreditsCount(pack.count),
                   style: const TextStyle(
                     fontSize: 11,
                     color: BrandColors.success,
@@ -311,9 +318,9 @@ class _PackCard extends StatelessWidget {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Buy',
-                          style: TextStyle(fontWeight: FontWeight.w700),
+                      : Text(
+                          l10n.subBuy,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                 ),
               ),

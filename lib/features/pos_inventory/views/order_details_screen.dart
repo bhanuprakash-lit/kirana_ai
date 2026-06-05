@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../providers/pos_provider.dart';
 import '../providers/printer_provider.dart';
 import 'widgets/return_sheet.dart';
@@ -36,6 +37,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
   }
 
   Future<void> _printReceipt(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final store = ref.read(storeSettingsProvider).value;
     final products = ref.read(posProvider).products;
     final receipt = PrinterNotifier.buildReceipt(
@@ -47,9 +49,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          ok ? 'Receipt sent to printer' : 'Print failed — check printer',
-        ),
+        content: Text(ok ? l10n.posReceiptSent : l10n.posPrintFailedCheck),
         backgroundColor: ok ? BrandColors.success : BrandColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -59,6 +59,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final posState = ref.watch(posProvider);
     final printerState = ref.watch(printerProvider);
     final customerState = ref.watch(customerProvider);
@@ -78,9 +79,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Order Details',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.posOrderDetails,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -90,7 +91,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
           // Quick print from app bar
           IconButton(
             icon: const Icon(Icons.print_rounded),
-            tooltip: 'Print Receipt',
+            tooltip: l10n.posPrintReceipt,
             onPressed: () => _printReceipt(context),
           ),
         ],
@@ -121,7 +122,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Order #${widget.order['order_id']}',
+                          l10n.posOrderNumber('${widget.order['order_id']}'),
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
@@ -150,9 +151,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _InfoTile(
-                      label: 'Payment',
+                      label: l10n.posPaymentLabel,
                       value: paymentMethod.toLowerCase() == 'udhaar'
-                          ? 'Udhaar'
+                          ? l10n.posPayUdhaar
                           : paymentMethod.toUpperCase(),
                       icon: paymentMethod.toLowerCase() == 'udhaar'
                           ? Icons.account_balance_wallet_outlined
@@ -162,7 +163,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           : null,
                     ),
                     _InfoTile(
-                      label: 'Total Amount',
+                      label: l10n.posTotalAmount,
                       value: _fmt(total),
                       icon: Icons.account_balance_wallet_outlined,
                       valueColor: BrandColors.success,
@@ -195,7 +196,8 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              customer?.name ?? 'Customer #$customerId',
+                              customer?.name ??
+                                  l10n.posCustomerNumber('$customerId'),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -222,17 +224,17 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
           ),
 
           const SizedBox(height: 28),
-          const Row(
+          Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.inventory_2_outlined,
                 size: 20,
                 color: BrandColors.primary,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
-                'Items Summary',
-                style: TextStyle(
+                l10n.posItemsSummary,
+                style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
                   color: BrandColors.ink,
@@ -277,8 +279,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   final product = posState.products
                       .where((p) => p.productId == productId)
                       .firstOrNull;
-                  final productName = product?.name ?? 'Product #$productId';
-                  final unit = product?.unit ?? 'unit';
+                  final productName =
+                      product?.name ?? l10n.posProductNumber('$productId');
+                  final unit = product?.unit ?? l10n.posUnitFallback;
 
                   return Padding(
                     padding: const EdgeInsets.all(20),
@@ -345,6 +348,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
             order: widget.order,
             total: total,
             paymentMethod: paymentMethod,
+            l10n: l10n,
           ),
 
           // ── Print receipt button ──────────────────────────────────────────
@@ -363,8 +367,8 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
               ),
               label: Text(
                 printerState.isConnected
-                    ? 'Print Receipt'
-                    : 'Print Receipt (${printerState.statusLabel})',
+                    ? l10n.posPrintReceipt
+                    : l10n.posPrintReceiptStatus(printerState.statusLabel),
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
@@ -398,9 +402,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 size: 18,
                 color: BrandColors.muted,
               ),
-              label: const Text(
-                'Return / Exchange',
-                style: TextStyle(
+              label: Text(
+                l10n.posReturnExchange,
+                style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
                   color: BrandColors.ink,
@@ -504,11 +508,13 @@ class _PaymentSummaryCard extends StatelessWidget {
   final Map<String, dynamic> order;
   final double total;
   final String paymentMethod;
+  final AppLocalizations l10n;
 
   const _PaymentSummaryCard({
     required this.order,
     required this.total,
     required this.paymentMethod,
+    required this.l10n,
   });
 
   String _fmt(double v) => '₹${v.toStringAsFixed(2)}';
@@ -561,9 +567,9 @@ class _PaymentSummaryCard extends StatelessWidget {
                     color: const Color(0xFFD97706).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    'SPLIT PAYMENT',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.posSplitPayment,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFFD97706),
@@ -588,7 +594,7 @@ class _PaymentSummaryCard extends StatelessWidget {
             // Cash row
             _SplitRow(
               icon: Icons.payments_rounded,
-              label: 'Cash paid now',
+              label: l10n.posCashPaidNow,
               amount: _fmt(cashPaid),
               color: BrandColors.success,
             ),
@@ -596,7 +602,7 @@ class _PaymentSummaryCard extends StatelessWidget {
             // Udhaar row
             _SplitRow(
               icon: Icons.account_balance_wallet_outlined,
-              label: 'On Udhaar (credit)',
+              label: l10n.posOnUdhaarCredit,
               amount: _fmt(udhaarAmt),
               color: const Color(0xFFD97706),
             ),
@@ -607,18 +613,18 @@ class _PaymentSummaryCard extends StatelessWidget {
                 color: BrandColors.surfaceTint,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.info_outline_rounded,
                     size: 13,
                     color: BrandColors.muted,
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Udhaar portion recorded as credit — check Udhaar tab for balance',
-                      style: TextStyle(
+                      l10n.posUdhaarRecordedNote,
+                      style: const TextStyle(
                         fontSize: 11,
                         color: BrandColors.muted,
                         fontWeight: FontWeight.w500,
@@ -647,7 +653,7 @@ class _PaymentSummaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isUdhaar ? 'Udhaar Sale' : 'Total Paid',
+                isUdhaar ? l10n.posUdhaarSale : l10n.posTotalPaid,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -655,9 +661,9 @@ class _PaymentSummaryCard extends StatelessWidget {
                 ),
               ),
               if (isUdhaar)
-                const Text(
-                  'Recorded as credit — check Udhaar tab',
-                  style: TextStyle(
+                Text(
+                  l10n.posRecordedAsCredit,
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 11,
                     fontWeight: FontWeight.w500,

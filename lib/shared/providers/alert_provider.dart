@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/alert_model.dart';
+import '../../core/locale/locale_provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../features/pos_inventory/providers/inventory_provider.dart';
 import '../../features/finance/providers/finance_provider.dart';
 import '../../features/pos_inventory/providers/procurement_provider.dart';
@@ -27,6 +29,7 @@ final _pinnedAlertsProvider =
 class AlertNotifier extends Notifier<List<BusinessAlert>> {
   @override
   List<BusinessAlert> build() {
+    final l10n = lookupAppLocalizations(ref.watch(localeProvider));
     final pinned = ref.watch(_pinnedAlertsProvider);
     final inventory = ref.watch(inventoryProvider).asData?.value;
     final finance = ref.watch(financeProvider).asData?.value;
@@ -41,8 +44,8 @@ class AlertNotifier extends Notifier<List<BusinessAlert>> {
           computed.add(
             BusinessAlert(
               id: 'oos_${item.productId}',
-              title: 'Out of Stock',
-              message: '${item.name} is completely out of stock.',
+              title: l10n.shrAlertOutOfStock,
+              message: l10n.shrMsgOutOfStock(item.name),
               type: AlertType.lowStock,
               priority: AlertPriority.high,
               timestamp: DateTime.now(),
@@ -52,8 +55,8 @@ class AlertNotifier extends Notifier<List<BusinessAlert>> {
           computed.add(
             BusinessAlert(
               id: 'low_${item.productId}',
-              title: 'Low Stock',
-              message: '${item.name} is running low (${item.stockLabel}).',
+              title: l10n.shrAlertLowStock,
+              message: l10n.shrMsgLowStock(item.name, item.stockLabel),
               type: AlertType.lowStock,
               priority: AlertPriority.medium,
               timestamp: DateTime.now(),
@@ -69,8 +72,8 @@ class AlertNotifier extends Notifier<List<BusinessAlert>> {
               computed.add(
                 BusinessAlert(
                   id: 'exp_${item.productId}',
-                  title: 'Expiring Soon',
-                  message: '${item.name} expires in $days days.',
+                  title: l10n.shrAlertExpiringSoon,
+                  message: l10n.shrMsgExpiringSoon(item.name, days),
                   type: AlertType.expiry,
                   priority: days <= 3
                       ? AlertPriority.high
@@ -91,9 +94,12 @@ class AlertNotifier extends Notifier<List<BusinessAlert>> {
           computed.add(
             BusinessAlert(
               id: 'udhaar_${item.khataId}',
-              title: 'Long Overdue Udhaar',
-              message:
-                  '${item.customerName} has pending ₹${item.balance.toStringAsFixed(0)} for ${item.daysPending} days.',
+              title: l10n.shrAlertOverdueUdhaar,
+              message: l10n.shrMsgOverdueUdhaar(
+                item.customerName,
+                item.balance.toStringAsFixed(0),
+                item.daysPending,
+              ),
               type: AlertType.udhaar,
               priority: item.daysPending > 60
                   ? AlertPriority.high
@@ -114,9 +120,19 @@ class AlertNotifier extends Notifier<List<BusinessAlert>> {
             computed.add(
               BusinessAlert(
                 id: 'pay_${p.purchaseId}',
-                title: days < 0 ? 'Overdue Payment' : 'Upcoming Payment',
-                message:
-                    '₹${p.totalAmount.toStringAsFixed(0)} to ${p.supplierName} ${days < 0 ? "is overdue" : "due in $days days"}.',
+                title: days < 0
+                    ? l10n.shrAlertOverduePayment
+                    : l10n.shrAlertUpcomingPayment,
+                message: days < 0
+                    ? l10n.shrMsgPaymentOverdue(
+                        p.totalAmount.toStringAsFixed(0),
+                        p.supplierName,
+                      )
+                    : l10n.shrMsgPaymentDue(
+                        p.totalAmount.toStringAsFixed(0),
+                        p.supplierName,
+                        days,
+                      ),
                 type: AlertType.performance,
                 priority: days < 0 ? AlertPriority.high : AlertPriority.medium,
                 timestamp: DateTime.now(),

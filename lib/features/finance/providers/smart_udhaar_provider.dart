@@ -69,8 +69,10 @@ final smartUdhaarProvider =
 
 /// Count of high-risk udhaar entries (for the udhaar-tab banner).
 final highRiskUdhaarCountProvider = Provider<int>((ref) {
-  return ref.watch(smartUdhaarProvider).maybeWhen(
-    data: (list) => list.where((u) => u.riskBand == 'high').length,
-    orElse: () => 0,
-  );
+  return ref
+      .watch(smartUdhaarProvider)
+      .maybeWhen(
+        data: (list) => list.where((u) => u.riskBand == 'high').length,
+        orElse: () => 0,
+      );
 });

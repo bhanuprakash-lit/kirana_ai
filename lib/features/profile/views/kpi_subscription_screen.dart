@@ -4,6 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../core/locale/locale_provider.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/kpi_provider.dart';
 import '../../dashboard/views/dashboard_screen.dart';
@@ -23,13 +25,14 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final asyncData = ref.watch(kpiProvider);
     final notifier = ref.read(kpiProvider.notifier);
 
     return asyncData.when(
       loading: () => Scaffold(
         backgroundColor: BrandColors.background,
-        appBar: AppBar(title: const Text('Your Insights')),
+        appBar: AppBar(title: Text(l10n.subYourInsights)),
         body: const Padding(
           padding: EdgeInsets.all(20),
           child: ListShimmer(itemCount: 6),
@@ -37,7 +40,7 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
       ),
       error: (err, _) => Scaffold(
         backgroundColor: BrandColors.background,
-        appBar: AppBar(title: const Text('Error')),
+        appBar: AppBar(title: Text(l10n.subError)),
         body: _ErrorView(
           message: err.toString(),
           onRetry: () => ref.read(kpiProvider.notifier).refresh(),
@@ -56,13 +59,15 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
         return Scaffold(
           backgroundColor: BrandColors.background,
           appBar: AppBar(
-            title: Text(showEditMode ? 'Manage KPIs' : 'Your Insights'),
+            title: Text(
+              showEditMode ? l10n.subManageKpis : l10n.subYourInsights,
+            ),
             actions: [
               if (!showEditMode)
                 IconButton(
                   icon: const Icon(Icons.settings_suggest_rounded),
                   onPressed: () => setState(() => _isEditing = true),
-                  tooltip: 'Manage subscriptions',
+                  tooltip: l10n.subManageSubscriptions,
                 ),
               if (showEditMode && state.subscribedIds.isNotEmpty)
                 TextButton(
@@ -70,9 +75,9 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
                     await notifier.save();
                     setState(() => _isEditing = false);
                   },
-                  child: const Text(
-                    'Done',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.subDone,
+                    style: const TextStyle(
                       color: BrandColors.primary,
                       fontWeight: FontWeight.w700,
                     ),
@@ -112,6 +117,7 @@ class _KpiSelectionView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final grouped = state.groupedRegistry;
     final tier = ref.watch(subInfoProvider).effectiveTier;
 
@@ -124,7 +130,7 @@ class _KpiSelectionView extends ConsumerWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${state.subscribedIds.length} KPIs selected',
+                  l10n.subKpisSelected(state.subscribedIds.length),
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -134,12 +140,12 @@ class _KpiSelectionView extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: notifier.selectAll,
-                child: const Text('Select All'),
+                child: Text(l10n.subSelectAll),
               ),
               const SizedBox(width: 4),
               TextButton(
                 onPressed: notifier.clearAll,
-                child: const Text('Clear'),
+                child: Text(l10n.subClear),
               ),
             ],
           ),
@@ -190,7 +196,9 @@ class _KpiSelectionView extends ConsumerWidget {
                     style: TextButton.styleFrom(
                       visualDensity: VisualDensity.compact,
                     ),
-                    child: Text(allSelected ? 'Unselect' : 'Select All'),
+                    child: Text(
+                      allSelected ? l10n.subUnselect : l10n.subSelectAll,
+                    ),
                   ),
                   children: items.asMap().entries.map((entry) {
                     final kpi = entry.value;
@@ -202,7 +210,7 @@ class _KpiSelectionView extends ConsumerWidget {
                         if (!accessible) {
                           showPaywallSheet(
                             context,
-                            featureName: 'Pro KPI: ${kpi.name}',
+                            featureName: l10n.subProKpiName(kpi.name),
                             featureDescription: kpi.why,
                             featureIcon: Icons.analytics_rounded,
                           );
@@ -297,7 +305,7 @@ class _KpiSelectionView extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text('Confirm Selections'),
+              child: Text(l10n.subConfirmSelections),
             ),
           ),
       ],
@@ -313,6 +321,7 @@ class _KpiDashboardView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     if (state.subscribedData.isEmpty) {
       return Center(
         child: Column(
@@ -324,14 +333,14 @@ class _KpiDashboardView extends ConsumerWidget {
               color: BrandColors.muted,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No active KPIs',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+            Text(
+              l10n.subNoActiveKpis,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Manage your subscriptions to see insights',
-              style: TextStyle(color: BrandColors.muted),
+            Text(
+              l10n.subManageToSeeInsights,
+              style: const TextStyle(color: BrandColors.muted),
             ),
           ],
         ),
@@ -438,6 +447,9 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
   bool _isLoading = false;
   String? _error;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -460,7 +472,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
       setState(() {
         _detailData = data;
         _isLoading = false;
-        if (data == null) _error = 'Failed to load live insights';
+        if (data == null) _error = _l10n.subFailedLoadInsights;
       });
     }
   }
@@ -475,6 +487,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
   }
 
   Widget? _buildSmartAction(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final endpoint = widget.registry.endpoint ?? '';
     String? label;
     IconData? icon;
@@ -483,7 +496,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
     if (endpoint.contains('stock') ||
         endpoint.contains('inventory') ||
         endpoint.contains('readiness')) {
-      label = 'Manage Inventory';
+      label = l10n.subManageInventory;
       icon = Icons.inventory_2_rounded;
       onTap = () {
         Navigator.pop(context); // Close bottom sheet
@@ -494,13 +507,11 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
     } else if (endpoint.contains('udhar') ||
         endpoint.contains('customer') ||
         endpoint.contains('credit')) {
-      label = 'Send Reminders';
+      label = l10n.subSendReminders;
       icon = Icons.mark_email_unread_rounded;
-      onTap = () => _launchWhatsApp(
-        'Hi, this is a reminder regarding your business with us. Please check your latest updates.',
-      );
+      onTap = () => _launchWhatsApp(l10n.subReminderMessage);
     } else if (endpoint.contains('revenue') || endpoint.contains('sales')) {
-      label = 'New Sale';
+      label = l10n.subNewSale;
       icon = Icons.point_of_sale_rounded;
       onTap = () {
         Navigator.pop(context); // Close bottom sheet
@@ -532,6 +543,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
@@ -608,7 +620,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                         const SizedBox(height: 32),
 
                         _SectionHeader(
-                          title: 'AI Summary',
+                          title: l10n.subAiSummary,
                           icon: Icons.auto_awesome_rounded,
                         ),
                         const SizedBox(height: 12),
@@ -651,7 +663,9 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      'Powered by ${widget.registry.aiAgent}',
+                                      l10n.subPoweredBy(
+                                        widget.registry.aiAgent,
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
@@ -675,7 +689,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _SectionHeader(
-                                    title: 'Target',
+                                    title: l10n.subTarget,
                                     icon: Icons.track_changes_rounded,
                                   ),
                                   const SizedBox(height: 8),
@@ -696,7 +710,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _SectionHeader(
-                                    title: 'Baseline',
+                                    title: l10n.subBaseline,
                                     icon: Icons.flag_rounded,
                                   ),
                                   const SizedBox(height: 8),
@@ -717,7 +731,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                         const SizedBox(height: 32),
 
                         _SectionHeader(
-                          title: 'Live Data Breakdown',
+                          title: l10n.subLiveDataBreakdown,
                           icon: Icons.bar_chart_rounded,
                         ),
                         const SizedBox(height: 12),
@@ -734,7 +748,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                           if (_detailData!['ml_insights'] != null) ...[
                             const SizedBox(height: 24),
                             _SectionHeader(
-                              title: 'MI Insights',
+                              title: l10n.subMlInsights,
                               icon: Icons.psychology_rounded,
                             ),
                             const SizedBox(height: 12),
@@ -743,9 +757,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
                             ),
                           ],
                         ] else
-                          const Text(
-                            'No dynamic insights available for this KPI.',
-                          ),
+                          Text(l10n.subNoDynamicInsights),
 
                         _buildSmartAction(context, ref) ??
                             const SizedBox.shrink(),
@@ -903,14 +915,18 @@ class _MlInsightsView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  e.key.replaceAll('_', ' ').titleCase,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: BrandColors.muted,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    e.key.replaceAll('_', ' ').titleCase,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   e.value.toString(),
                   style: const TextStyle(
@@ -953,6 +969,7 @@ class _CompactKpiTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final trendColor = kpi.trendDirection == 'up'
         ? BrandColors.success
         : kpi.trendDirection == 'down'
@@ -1034,7 +1051,11 @@ class _CompactKpiTile extends StatelessWidget {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          '${kpi.trendPctChange!.abs().toStringAsFixed(1)}% vs last period',
+                                          l10n.subPctVsLastPeriod(
+                                            kpi.trendPctChange!
+                                                .abs()
+                                                .toStringAsFixed(1),
+                                          ),
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w700,
@@ -1058,9 +1079,9 @@ class _CompactKpiTile extends StatelessWidget {
                                   color: BrandColors.ink,
                                 ),
                               ),
-                              const Text(
-                                'current',
-                                style: TextStyle(
+                              Text(
+                                l10n.subCurrent,
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: BrandColors.muted,
                                   fontWeight: FontWeight.w700,
@@ -1075,7 +1096,7 @@ class _CompactKpiTile extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            'Why this value?',
+                            l10n.subWhyThisValue,
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
@@ -1216,6 +1237,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -1228,9 +1250,9 @@ class _ErrorView extends StatelessWidget {
               color: BrandColors.muted,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Oops! Something went wrong',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            Text(
+              l10n.subSomethingWentWrong,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
@@ -1239,7 +1261,7 @@ class _ErrorView extends StatelessWidget {
               style: const TextStyle(color: BrandColors.muted, fontSize: 12),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+            ElevatedButton(onPressed: onRetry, child: Text(l10n.subRetry)),
           ],
         ),
       ),

@@ -10,6 +10,8 @@ import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../finance/providers/finance_provider.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
+import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../core/locale/locale_provider.dart';
 
 // ── Segment metadata ──────────────────────────────────────────────────────────
 
@@ -45,6 +47,25 @@ class _SegmentMeta {
   const _SegmentMeta(this.id, this.label, this.icon, this.color);
 }
 
+String _segmentLabel(AppLocalizations l10n, String id) {
+  switch (id) {
+    case 'regular':
+      return l10n.profSegRegular;
+    case 'occasional':
+      return l10n.profSegOccasional;
+    case 'impulse':
+      return l10n.profSegImpulse;
+    case 'bulk':
+      return l10n.profSegBulk;
+    case 'credit':
+      return l10n.profSegCredit;
+    case 'inactive':
+      return l10n.profSegInactive;
+    default:
+      return id;
+  }
+}
+
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class CustomerManagementScreen extends ConsumerStatefulWidget {
@@ -59,6 +80,9 @@ class _CustomerManagementScreenState
     extends ConsumerState<CustomerManagementScreen> {
   bool _isSyncing = false;
   final _searchCtrl = TextEditingController();
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -82,13 +106,14 @@ class _CustomerManagementScreenState
     final state = ref.watch(customerProvider);
     final notifier = ref.read(customerProvider.notifier);
     final customers = notifier.filteredCustomers;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Customer Relations',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.profCustomerRelations,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         actions: [
           if (_isSyncing)
@@ -102,12 +127,12 @@ class _CustomerManagementScreenState
             )
           else
             IconButton(
-              tooltip: 'Sync Contacts',
+              tooltip: l10n.profSyncContacts,
               icon: const Icon(Icons.sync_rounded),
               onPressed: _handleSyncContacts,
             ),
           IconButton(
-            tooltip: 'Refresh List',
+            tooltip: l10n.profRefreshList,
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () => notifier.fetchCustomers(),
           ),
@@ -117,9 +142,12 @@ class _CustomerManagementScreenState
         onPressed: () => _showAddCustomerSheet(context, ref),
         backgroundColor: BrandColors.primary,
         icon: const Icon(Icons.person_add_rounded, color: Colors.white),
-        label: const Text(
-          'Add Customer',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        label: Text(
+          l10n.profAddCustomer,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
       body: Column(
@@ -135,7 +163,7 @@ class _CustomerManagementScreenState
                   controller: _searchCtrl,
                   onChanged: (v) => notifier.setSearchQuery(v),
                   decoration: InputDecoration(
-                    hintText: 'Search by name or phone...',
+                    hintText: l10n.profSearchByNameOrPhone,
                     prefixIcon: const Icon(
                       Icons.search_rounded,
                       color: BrandColors.muted,
@@ -164,6 +192,7 @@ class _CustomerManagementScreenState
                           .length;
                       return _SegmentChip(
                         meta: seg,
+                        label: _segmentLabel(l10n, seg.id),
                         count: count,
                         isSelected: isSelected,
                         onTap: () =>
@@ -199,7 +228,7 @@ class _CustomerManagementScreenState
                     Text(state.error!, textAlign: TextAlign.center),
                     TextButton(
                       onPressed: () => notifier.fetchCustomers(),
-                      child: const Text('Retry'),
+                      child: Text(l10n.profRetry),
                     ),
                   ],
                 ),
@@ -219,8 +248,10 @@ class _CustomerManagementScreenState
                     const SizedBox(height: 12),
                     Text(
                       state.selectedSegment != null
-                          ? 'No ${state.selectedSegment} customers'
-                          : 'No customers found.',
+                          ? l10n.profNoSegmentCustomers(
+                              _segmentLabel(l10n, state.selectedSegment!),
+                            )
+                          : l10n.profNoCustomersFound,
                       style: const TextStyle(
                         color: BrandColors.muted,
                         fontWeight: FontWeight.w600,
@@ -248,21 +279,20 @@ class _CustomerManagementScreenState
   }
 
   Future<void> _handleSyncContacts() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sync Contacts?'),
-        content: const Text(
-          'This will import your phone contacts into your customer list. Regular customers will be matched by phone number.',
-        ),
+        title: Text(l10n.profSyncContactsTitle),
+        content: Text(l10n.profSyncContactsBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.profCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sync Now'),
+            child: Text(l10n.profSyncNow),
           ),
         ],
       ),
@@ -289,17 +319,15 @@ class _CustomerManagementScreenState
         await ref.read(financeProvider.notifier).syncContacts(syncList);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Synced ${syncList.length} contacts successfully!'),
-            ),
+            SnackBar(content: Text(_l10n.profSyncedContacts(syncList.length))),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Sync failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.profSyncFailed(e.toString()))),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSyncing = false);
@@ -320,12 +348,14 @@ class _CustomerManagementScreenState
 
 class _SegmentChip extends StatelessWidget {
   final _SegmentMeta meta;
+  final String label;
   final int count;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _SegmentChip({
     required this.meta,
+    required this.label,
     required this.count,
     required this.isSelected,
     required this.onTap,
@@ -355,7 +385,7 @@ class _SegmentChip extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              meta.label,
+              label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -390,6 +420,7 @@ class _CustomerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final segs = customer.segments;
     final isInactive = segs.contains('inactive');
     final primarySeg = _primarySegment(segs);
@@ -485,7 +516,7 @@ class _CustomerCard extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  m.label,
+                                  _segmentLabel(l10n, m.id),
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w700,
@@ -511,7 +542,7 @@ class _CustomerCard extends StatelessWidget {
           // WhatsApp re-engagement button for inactive customers
           if (isInactive)
             InkWell(
-              onTap: () => _sendWhatsAppReengagement(customer),
+              onTap: () => _sendWhatsAppReengagement(customer, l10n),
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(20),
               ),
@@ -539,7 +570,7 @@ class _CustomerCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Send WhatsApp Re-engagement',
+                      l10n.profSendWhatsappReengagement,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -569,13 +600,13 @@ class _CustomerCard extends StatelessWidget {
     return null;
   }
 
-  Future<void> _sendWhatsAppReengagement(Customer customer) async {
-    final message =
-        'Hi ${customer.name.split(' ').first}! '
-        'We miss you at our store. It\'s been a while since your last visit, '
-        'and we have fresh stock and great deals waiting for you. '
-        'Come visit us soon — your favourite items are ready! '
-        'See you soon!';
+  Future<void> _sendWhatsAppReengagement(
+    Customer customer,
+    AppLocalizations l10n,
+  ) async {
+    final message = l10n.profWhatsappReengagementMessage(
+      customer.name.split(' ').first,
+    );
 
     final phone = customer.phone.replaceAll(RegExp(r'[^\d+]'), '');
     final url = Uri.parse(
@@ -604,6 +635,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
   final _householdController = TextEditingController(text: '4');
   bool _isSaving = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -626,6 +660,7 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
@@ -646,15 +681,19 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.customer == null
-                      ? 'Add New Customer'
-                      : 'Edit Customer',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
+                Expanded(
+                  child: Text(
+                    widget.customer == null
+                        ? l10n.profAddNewCustomer
+                        : l10n.profEditCustomer,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close_rounded),
@@ -669,9 +708,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
                 // Allow Unicode letters, spaces, dots, hyphens, apostrophes — block HTML/script chars
                 FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
               ],
-              decoration: const InputDecoration(
-                labelText: 'Full Name',
-                prefixIcon: Icon(Icons.person_outline_rounded),
+              decoration: InputDecoration(
+                labelText: l10n.profFullName,
+                prefixIcon: const Icon(Icons.person_outline_rounded),
                 counterText: '',
               ),
             ),
@@ -684,9 +723,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
                 // Allow digits, leading +, spaces, hyphens only
                 FilteringTextInputFormatter.allow(RegExp(r'[-0-9+ ]')),
               ],
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                prefixIcon: Icon(Icons.phone_outlined),
+              decoration: InputDecoration(
+                labelText: l10n.profPhoneNumber,
+                prefixIcon: const Icon(Icons.phone_outlined),
                 counterText: '',
                 hintText: '+91 XXXXX XXXXX',
               ),
@@ -699,9 +738,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
               inputFormatters: [
                 FilteringTextInputFormatter.deny(RegExp('[<>{}\\\\&;"\']')),
               ],
-              decoration: const InputDecoration(
-                labelText: 'Email Address (Optional)',
-                prefixIcon: Icon(Icons.email_outlined),
+              decoration: InputDecoration(
+                labelText: l10n.profEmailAddressOptional,
+                prefixIcon: const Icon(Icons.email_outlined),
                 counterText: '',
               ),
             ),
@@ -710,9 +749,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
               controller: _householdController,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Household Size',
-                prefixIcon: Icon(Icons.group_outlined),
+              decoration: InputDecoration(
+                labelText: l10n.profHouseholdSize,
+                prefixIcon: const Icon(Icons.group_outlined),
               ),
             ),
             const SizedBox(height: 32),
@@ -730,9 +769,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
                 ),
                 child: _isSaving
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                        'Save Customer',
-                        style: TextStyle(
+                    : Text(
+                        l10n.profSaveCustomer,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                         ),
@@ -752,20 +791,18 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
         .replaceAll(' ', '')
         .replaceAll('-', '');
     if (name.isEmpty || phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill name and phone')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_l10n.profFillNameAndPhone)));
       return;
     }
     final digits = phone.replaceAll('+', '');
     if (digits.length < 7 ||
         digits.length > 15 ||
         !RegExp(r'^\+?\d+$').hasMatch(phone)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Enter a valid phone number (digits only)'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_l10n.profEnterValidPhone)));
       return;
     }
 
@@ -791,9 +828,9 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
       setState(() => _isSaving = false);
       if (success) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Customer saved successfully')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_l10n.profCustomerSaved)));
       }
     }
   }

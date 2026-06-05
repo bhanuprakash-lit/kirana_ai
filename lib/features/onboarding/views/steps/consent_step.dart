@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../../providers/onboarding_provider.dart';
 
@@ -21,9 +22,7 @@ class _ConsentStepState extends ConsumerState<ConsentStep> {
   Future<void> _submit() async {
     if (!_termsAccepted || !_privacyAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please accept both agreements to continue.'),
-        ),
+        SnackBar(content: Text(AppLocalizations.of(context).consentAcceptBoth)),
       );
       return;
     }
@@ -42,6 +41,7 @@ class _ConsentStepState extends ConsumerState<ConsentStep> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(onboardingProvider);
     final isLoading = state.status == OnboardingStatus.loading;
     final canSubmit = _termsAccepted && _privacyAccepted;
@@ -52,41 +52,39 @@ class _ConsentStepState extends ConsumerState<ConsentStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Almost there!\nReview & agree',
+            l10n.consentTitle,
             style: Theme.of(context).textTheme.headlineMedium,
           ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
           const SizedBox(height: 8),
           Text(
-            'Please read and accept the following to complete your setup.',
+            l10n.consentSubtitle,
             style: Theme.of(context).textTheme.bodyMedium,
           ).animate(delay: 50.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 28),
           _ConsentCard(
             icon: Icons.gavel_rounded,
-            title: 'Terms & Conditions',
-            summary:
-                'By using Kirana AI, you agree to use the service for legitimate business purposes only. LohiyaAI reserves the right to suspend accounts that violate these terms. Your data is used solely to provide and improve the service.',
+            title: l10n.consentTermsTitle,
+            summary: l10n.consentTermsSummary,
           ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 12),
           _ConsentCard(
             icon: Icons.shield_rounded,
-            title: 'Privacy Policy',
-            summary:
-                'We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on Firebase infrastructure.',
+            title: l10n.consentPrivacyTitle,
+            summary: l10n.consentPrivacySummary,
           ).animate(delay: 150.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 24),
           _ConsentCheckbox(
             value: _termsAccepted,
             onChanged: (v) => setState(() => _termsAccepted = v ?? false),
-            prefix: 'I have read and agree to the ',
-            linkLabel: 'Terms & Conditions',
+            prefix: l10n.consentTermsCheckPrefix,
+            linkLabel: l10n.consentTermsTitle,
           ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 12),
           _ConsentCheckbox(
             value: _privacyAccepted,
             onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
-            prefix: 'I agree to the ',
-            linkLabel: 'Privacy Policy',
+            prefix: l10n.consentPrivacyCheckPrefix,
+            linkLabel: l10n.consentPrivacyTitle,
           ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
           if (state.errorMessage != null) ...[
             const SizedBox(height: 16),
@@ -121,7 +119,7 @@ class _ConsentStepState extends ConsumerState<ConsentStep> {
           ],
           const SizedBox(height: 36),
           PrimaryButton(
-            label: 'Complete Setup',
+            label: l10n.consentCompleteSetup,
             isLoading: isLoading,
             onPressed: canSubmit ? _submit : null,
           ).animate(delay: 300.ms).fadeIn(duration: 400.ms),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kirana_ai/core/theme/brand_theme.dart';
+import 'package:kirana_ai/l10n/generated/app_localizations.dart';
 import 'package:kirana_ai/features/pos_inventory/models/procurement_models.dart';
 import 'package:kirana_ai/features/pos_inventory/providers/procurement_provider.dart';
 import 'package:kirana_ai/shared/widgets/shimmer_widgets.dart';
@@ -27,12 +28,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'All History',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.psetAllHistory,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
         bottom: TabBar(
@@ -41,9 +43,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
           unselectedLabelColor: BrandColors.muted,
           indicatorColor: BrandColors.primary,
           indicatorSize: TabBarIndicatorSize.tab,
-          tabs: const [
-            Tab(text: 'Purchases'),
-            Tab(text: 'POS Orders'),
+          tabs: [
+            Tab(text: l10n.psetTabPurchases),
+            Tab(text: l10n.psetTabPosOrders),
           ],
         ),
       ),
@@ -61,16 +63,18 @@ class _PurchaseHistoryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(procurementProvider);
+    final l10n = AppLocalizations.of(context);
 
     return asyncData.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(16),
         child: ListShimmer(itemCount: 6),
       ),
-      error: (err, _) => Center(child: Text('Error: $err')),
+      error: (err, _) =>
+          Center(child: Text(l10n.psetErrorWith(err.toString()))),
       data: (data) {
         if (data.purchases.isEmpty) {
-          return const Center(child: Text('No purchase history found.'));
+          return Center(child: Text(l10n.psetNoPurchaseHistory));
         }
         return ListView.builder(
           padding: const EdgeInsets.all(16),
@@ -91,6 +95,7 @@ class _PurchaseTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final dateStr = DateFormat(
       'dd MMM yyyy, hh:mm a',
     ).format(order.purchaseDate.toLocal());
@@ -164,7 +169,7 @@ class _PurchaseTile extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => _showPurchaseDetails(context, ref),
-                child: const Text('View Bill'),
+                child: Text(l10n.psetViewBill),
               ),
             ],
           ),
@@ -174,6 +179,7 @@ class _PurchaseTile extends ConsumerWidget {
   }
 
   void _showPurchaseDetails(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final dateStr = DateFormat(
       'dd MMM yyyy, hh:mm a',
     ).format(order.purchaseDate.toLocal());
@@ -204,13 +210,17 @@ class _PurchaseTile extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Purchase Details',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Text(
+                        l10n.psetPurchaseDetails,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       dateStr,
                       style: const TextStyle(
@@ -223,7 +233,7 @@ class _PurchaseTile extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'From ${order.supplierName}',
+                  l10n.psetFromSupplier(order.supplierName),
                   style: const TextStyle(color: BrandColors.muted),
                 ),
                 const Divider(height: 32),
@@ -233,12 +243,19 @@ class _PurchaseTile extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          item.productName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Text(
+                            item.productName,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         Text(
-                          'Qty: ${item.quantity.toStringAsFixed(0)} × ₹${item.costPrice.toStringAsFixed(0)}',
+                          l10n.psetQtyTimes(
+                            item.quantity.toStringAsFixed(0),
+                            item.costPrice.toStringAsFixed(0),
+                          ),
                         ),
                       ],
                     ),
@@ -248,10 +265,14 @@ class _PurchaseTile extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Total Amount',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Expanded(
+                      child: Text(
+                        l10n.psetTotalAmount,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       '₹${order.totalAmount.toStringAsFixed(0)}',
                       style: const TextStyle(
@@ -276,6 +297,7 @@ class _PosOrderHistorySummary extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -293,21 +315,21 @@ class _PosOrderHistorySummary extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Sales Transaction History',
-            style: TextStyle(
+          Text(
+            l10n.psetSalesTxnHistory,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: BrandColors.ink,
             ),
           ),
           const SizedBox(height: 8),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
-              'View and filter all your POS orders, payments, and customer transactions.',
+              l10n.psetSalesTxnDesc,
               textAlign: TextAlign.center,
-              style: TextStyle(color: BrandColors.muted),
+              style: const TextStyle(color: BrandColors.muted),
             ),
           ),
           const SizedBox(height: 32),
@@ -324,15 +346,18 @@ class _PosOrderHistorySummary extends ConsumerWidget {
                 ),
                 elevation: 0,
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Open Sales History',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                    l10n.psetOpenSalesHistory,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded, size: 18),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_forward_rounded, size: 18),
                 ],
               ),
             ),

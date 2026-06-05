@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../providers/referral_provider.dart';
 
 class CreateCampaignSheet extends ConsumerStatefulWidget {
@@ -15,6 +17,9 @@ class CreateCampaignSheet extends ConsumerStatefulWidget {
 }
 
 class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   final _nameCtrl = TextEditingController();
   final _discountCtrl = TextEditingController(text: '10');
   final _milestoneNCtrl = TextEditingController(text: '10');
@@ -36,7 +41,7 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
   Future<void> _save() async {
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
-      setState(() => _error = 'Campaign name is required');
+      setState(() => _error = _l10n.mktCampaignNameRequired);
       return;
     }
     final discount = double.tryParse(_discountCtrl.text);
@@ -44,22 +49,22 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
     final milestoneReward = double.tryParse(_milestoneRewardCtrl.text);
 
     if (discount == null || discount <= 0 || discount > 100) {
-      setState(() => _error = 'Enter a valid discount % (1–100)');
+      setState(() => _error = _l10n.mktEnterValidDiscount);
       return;
     }
     if (milestoneN == null || milestoneN < 1) {
-      setState(() => _error = 'Milestone count must be at least 1');
+      setState(() => _error = _l10n.mktMilestoneCountMin);
       return;
     }
     if (milestoneReward == null ||
         milestoneReward <= 0 ||
         milestoneReward > 100) {
-      setState(() => _error = 'Enter a valid reward % (1–100)');
+      setState(() => _error = _l10n.mktEnterValidReward);
       return;
     }
     final maxRefs = int.tryParse(_maxRefsCtrl.text);
     if (maxRefs == null || maxRefs < 1) {
-      setState(() => _error = 'Max referrals must be at least 1');
+      setState(() => _error = _l10n.mktMaxReferralsMin);
       return;
     }
 
@@ -85,13 +90,14 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
     } else {
       setState(() {
         _saving = false;
-        _error = 'Failed to create campaign. Please try again.';
+        _error = _l10n.mktFailedToCreateCampaign;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         left: 24,
@@ -106,9 +112,9 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'New Referral Campaign',
-                style: TextStyle(
+              Text(
+                l10n.mktNewReferralCampaign,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   color: BrandColors.ink,
@@ -122,12 +128,10 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
           ),
           const SizedBox(height: 20),
 
-          _Label('Campaign Name'),
+          _Label(l10n.mktCampaignName),
           TextField(
             controller: _nameCtrl,
-            decoration: const InputDecoration(
-              hintText: 'e.g. Summer Referral Drive',
-            ),
+            decoration: InputDecoration(hintText: l10n.mktCampaignNameHint),
           ),
           const SizedBox(height: 16),
 
@@ -137,7 +141,7 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _Label('New Customer Discount %'),
+                    _Label(l10n.mktNewCustomerDiscountPct),
                     TextField(
                       controller: _discountCtrl,
                       keyboardType: TextInputType.number,
@@ -155,7 +159,7 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _Label('Milestone Reward %'),
+                    _Label(l10n.mktMilestoneRewardPct),
                     TextField(
                       controller: _milestoneRewardCtrl,
                       keyboardType: TextInputType.number,
@@ -172,27 +176,25 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
           ),
           const SizedBox(height: 16),
 
-          _Label('Reward Every N Referrals'),
+          _Label(l10n.mktRewardEveryNReferrals),
           TextField(
             controller: _milestoneNCtrl,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: '10',
-              helperText:
-                  'Referrer earns a milestone reward every N new customers they bring',
+              helperText: l10n.mktRewardEveryNHelper,
             ),
           ),
           const SizedBox(height: 16),
-          _Label('Max Referrals per Customer'),
+          _Label(l10n.mktMaxReferralsPerCustomer),
           TextField(
             controller: _maxRefsCtrl,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: '50',
-              helperText:
-                  'Stop rewarding a customer after this many successful referrals',
+              helperText: l10n.mktMaxReferralsHelper,
             ),
           ),
 
@@ -218,7 +220,7 @@ class _CreateCampaignSheetState extends ConsumerState<CreateCampaignSheet> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Create Campaign'),
+                  : Text(l10n.mktCreateCampaign),
             ),
           ),
         ],

@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../providers/pos_provider.dart';
 import '../../providers/printer_provider.dart';
@@ -35,6 +37,9 @@ class _TodayOrdersSheet extends ConsumerStatefulWidget {
 class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
   List<Map<String, dynamic>>? _orders;
   bool _loading = true;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -79,7 +84,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Print failed — check printer connection'),
+          content: Text(_l10n.posPrintFailedCheckConnection),
           backgroundColor: BrandColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -92,6 +97,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final printerState = ref.watch(printerProvider);
 
     return DraggableScrollableSheet(
@@ -139,9 +145,9 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Today's Orders",
-                            style: TextStyle(
+                          Text(
+                            l10n.posTodaysOrders,
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
                               color: BrandColors.ink,
@@ -149,7 +155,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                           ),
                           if (_orders != null)
                             Text(
-                              '${_orders!.length} transactions so far',
+                              l10n.posTransactionsSoFar(_orders!.length),
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: BrandColors.muted,
@@ -171,13 +177,13 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                           vertical: 8,
                         ),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Text(
-                            'View All',
-                            style: TextStyle(fontWeight: FontWeight.w700),
+                            l10n.posViewAll,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
-                          Icon(Icons.chevron_right_rounded, size: 18),
+                          const Icon(Icons.chevron_right_rounded, size: 18),
                         ],
                       ),
                     ),
@@ -210,18 +216,18 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            const Text(
-                              'No orders today yet',
-                              style: TextStyle(
+                            Text(
+                              l10n.posNoOrdersToday,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: BrandColors.ink,
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              'Sales transactions will appear here',
-                              style: TextStyle(
+                            Text(
+                              l10n.posSalesAppearHere,
+                              style: const TextStyle(
                                 fontSize: 13,
                                 color: BrandColors.muted,
                               ),
@@ -293,7 +299,9 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Order #${o['order_id']}',
+                                            l10n.posOrderNumber(
+                                              '${o['order_id']}',
+                                            ),
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w800,
                                               fontSize: 15,
@@ -302,7 +310,11 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            '${_timeOf(date)} · $payment · ${status.toUpperCase()}',
+                                            l10n.posOrderMeta(
+                                              _timeOf(date),
+                                              payment,
+                                              status.toUpperCase(),
+                                            ),
                                             style: const TextStyle(
                                               fontSize: 12,
                                               color: BrandColors.muted,
@@ -365,7 +377,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Text(
-                                                  'Print',
+                                                  l10n.posPrint,
                                                   style: TextStyle(
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.w700,

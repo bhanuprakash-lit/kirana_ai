@@ -9,6 +9,8 @@ import '../models/customer_model.dart';
 import 'customer_management_screen.dart';
 import '../../associations/providers/association_provider.dart';
 import '../../associations/models/association_model.dart';
+import '../../../../l10n/generated/app_localizations.dart';
+import '../../../../core/locale/locale_provider.dart';
 
 class CustomerDetailScreen extends ConsumerStatefulWidget {
   final int customerId;
@@ -22,14 +24,18 @@ class CustomerDetailScreen extends ConsumerStatefulWidget {
 class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
   bool _savingAssociation = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(customerProvider);
     final customer = state.customers.firstWhere(
       (c) => c.customerId == widget.customerId,
       orElse: () => Customer(
         customerId: widget.customerId,
-        name: 'Loading...',
+        name: l10n.profLoading,
         phone: '',
       ),
     );
@@ -40,9 +46,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Customer Details',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.profCustomerDetails,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         actions: [
           IconButton(
@@ -129,7 +135,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                 children: [
                   Expanded(
                     child: _StatCard(
-                      label: 'Balance',
+                      label: l10n.profStatBalance,
                       value: khataAsync.when(
                         data: (khata) =>
                             '₹${(khata?['amount'] as num? ?? 0) - (khata?['amount_paid'] as num? ?? 0)}',
@@ -143,7 +149,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _StatCard(
-                      label: 'Spent',
+                      label: l10n.profStatSpent,
                       value: ordersAsync.when(
                         data: (orders) {
                           final total = orders.fold<double>(
@@ -163,7 +169,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _StatCard(
-                      label: 'Orders',
+                      label: l10n.profStatOrders,
                       value: ordersAsync.when(
                         data: (orders) => orders.length.toString(),
                         loading: () => '...',
@@ -180,7 +186,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
             const SizedBox(height: 24),
 
             // Info Section
-            _SectionHeader(title: 'Customer Info'),
+            _SectionHeader(title: l10n.profCustomerInfo),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(20),
@@ -191,18 +197,18 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
               child: Column(
                 children: [
                   _InfoRow(
-                    label: 'Household Size',
-                    value: '${customer.householdSize} members',
+                    label: l10n.profHouseholdSize,
+                    value: l10n.profMembersCount(customer.householdSize),
                     icon: Icons.group_outlined,
                   ),
                   const Divider(height: 32),
                   _InfoRow(
-                    label: 'Joined On',
+                    label: l10n.profJoinedOn,
                     value: customer.createdAt != null
                         ? DateFormat(
                             'MMM dd, yyyy',
                           ).format(customer.createdAt!.toLocal())
-                        : 'Unknown',
+                        : l10n.profUnknown,
                     icon: Icons.calendar_today_outlined,
                   ),
                   const Divider(height: 32),
@@ -218,13 +224,13 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
             const SizedBox(height: 24),
 
             // Purchase History
-            _SectionHeader(title: 'Purchase History'),
+            _SectionHeader(title: l10n.profPurchaseHistory),
             ordersAsync.when(
               data: (orders) {
                 if (orders.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(40),
-                    child: Text('No orders found for this customer.'),
+                  return Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: Text(l10n.profNoOrdersForCustomer),
                   );
                 }
                 return ListView.separated(
@@ -245,7 +251,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
               ),
               error: (err, _) => Padding(
                 padding: const EdgeInsets.all(40),
-                child: Text('Error loading orders: $err'),
+                child: Text(l10n.profErrorLoadingOrders(err.toString())),
               ),
             ),
           ],
@@ -264,17 +270,16 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
   }
 
   void _confirmDelete(BuildContext context, Customer customer) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Customer?'),
-        content: Text(
-          'Are you sure you want to delete ${customer.name}? This action cannot be undone.',
-        ),
+        title: Text(l10n.profDeleteCustomerTitle),
+        content: Text(l10n.profDeleteCustomerBody(customer.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.profCancel),
           ),
           TextButton(
             onPressed: () async {
@@ -295,9 +300,9 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
                 );
               }
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: BrandColors.error),
+            child: Text(
+              l10n.profDelete,
+              style: const TextStyle(color: BrandColors.error),
             ),
           ),
         ],
@@ -316,7 +321,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to update area: $e'),
+            content: Text(_l10n.profFailedToUpdateArea(e.toString())),
             backgroundColor: BrandColors.error,
           ),
         );
@@ -343,6 +348,7 @@ class _AssociationRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final assocAsync = ref.watch(associationProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Row(
       children: [
@@ -356,9 +362,9 @@ class _AssociationRow extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Area / Association',
-                style: TextStyle(
+              Text(
+                l10n.profAreaAssociation,
+                style: const TextStyle(
                   fontSize: 12,
                   color: BrandColors.muted,
                   fontWeight: FontWeight.w500,
@@ -368,9 +374,12 @@ class _AssociationRow extends ConsumerWidget {
               assocAsync.when(
                 loading: () =>
                     const ShimmerBox(width: 80, height: 20, radius: 6),
-                error: (_, _) => const Text(
-                  'Unable to load areas',
-                  style: TextStyle(fontSize: 13, color: BrandColors.muted),
+                error: (_, _) => Text(
+                  l10n.profUnableToLoadAreas,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: BrandColors.muted,
+                  ),
                 ),
                 data: (list) {
                   if (list.isEmpty) {
@@ -378,9 +387,9 @@ class _AssociationRow extends ConsumerWidget {
                       onTap: () => Navigator.of(
                         context,
                       ).pushNamed('/profile/associations'),
-                      child: const Text(
-                        'No areas — tap to add one',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.profNoAreasTapToAdd,
+                        style: const TextStyle(
                           fontSize: 13,
                           color: BrandColors.primary,
                           fontWeight: FontWeight.w600,
@@ -390,11 +399,11 @@ class _AssociationRow extends ConsumerWidget {
                   }
 
                   final items = <DropdownMenuItem<int?>>[
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: null,
                       child: Text(
-                        'None',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.profNone,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     ),
                     ...list.map(
@@ -405,10 +414,13 @@ class _AssociationRow extends ConsumerWidget {
                           children: [
                             Text(a.areaType.emoji),
                             const SizedBox(width: 6),
-                            Text(
-                              a.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                            Flexible(
+                              child: Text(
+                                a.name,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -570,6 +582,7 @@ class _OrderListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final dateStr = order['order_date'] as String;
     final date = DateTime.parse(dateStr).toLocal();
     final amount = (order['total_amount'] as num).toDouble();
@@ -589,7 +602,7 @@ class _OrderListItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Order #${order['order_id']}',
+                  l10n.profOrderNumber(order['order_id'].toString()),
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 14,

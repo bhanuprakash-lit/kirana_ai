@@ -1,12 +1,17 @@
 import 'dart:async' show unawaited;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/services/api_client.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/models/alert_model.dart';
 import '../../../shared/providers/alert_provider.dart';
 import '../models/subscription_model.dart';
 
 class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   Future<SubscriptionInfo> build() => _fetch();
 
@@ -101,10 +106,10 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
     if (daysLeft > 7) return;
 
     final message = daysLeft <= 0
-        ? 'Your free trial has expired. Upgrade to continue.'
+        ? _l10n.subTrialExpiredMessage
         : daysLeft == 1
-        ? 'Last day of your free trial! Upgrade now.'
-        : '$daysLeft days left in your trial. Upgrade to Basic or Pro.';
+        ? _l10n.subTrialLastDayMessage
+        : _l10n.subTrialDaysLeftMessage(daysLeft);
 
     final priority = daysLeft <= 3 ? AlertPriority.high : AlertPriority.medium;
 
@@ -113,7 +118,7 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
         .addCustomAlert(
           BusinessAlert(
             id: 'trial_expiry_$today',
-            title: 'Trial Expiring Soon',
+            title: _l10n.subTrialExpiringSoon,
             message: message,
             type: AlertType.subscription,
             priority: priority,

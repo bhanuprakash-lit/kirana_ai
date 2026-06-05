@@ -1,50 +1,28 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class FaqScreen extends StatelessWidget {
   const FaqScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final faqs = [
-      _Faq(
-        question: 'How do I add a new product?',
-        answer:
-            'You can add products from the POS tab by clicking the + button, or from the Inventory tab. You can also scan a barcode to automatically fetch details if available.',
-      ),
-      _Faq(
-        question: 'How does the Stockout Risk prediction work?',
-        answer:
-            'Our AI analyzes your past sales velocity and current stock levels. If it predicts you will run out of an item within the next 3-7 days, it flags it as a Stockout Risk.',
-      ),
-      _Faq(
-        question: 'How do I manage customer credit (Khata)?',
-        answer:
-            'When placing an order, select a customer and choose "Credit" as the payment method. You can view all pending dues in the Finance -> Udhaar tab or Customer Relations section.',
-      ),
-      _Faq(
-        question: 'Can I sync my phone contacts?',
-        answer:
-            'Yes! Go to Profile -> Customer Relations and click the Sync icon. This will import your regular shoppers into the app for easy credit tracking.',
-      ),
-      _Faq(
-        question: 'What are KPI Subscriptions?',
-        answer:
-            'KPIs are key business metrics like Revenue, Margin, and Footfall. You can choose which metrics to monitor from the Profile -> Subscription section.',
-      ),
-      _Faq(
-        question: 'How do I generate a daily sales report?',
-        answer:
-            'You can view today\'s performance on the Dashboard. For detailed past reports, visit the Transaction History section in your Profile.',
-      ),
+      _Faq(question: l10n.supFaqQ1, answer: l10n.supFaqA1),
+      _Faq(question: l10n.supFaqQ2, answer: l10n.supFaqA2),
+      _Faq(question: l10n.supFaqQ3, answer: l10n.supFaqA3),
+      _Faq(question: l10n.supFaqQ4, answer: l10n.supFaqA4),
+      _Faq(question: l10n.supFaqQ5, answer: l10n.supFaqA5),
+      _Faq(question: l10n.supFaqQ6, answer: l10n.supFaqA6),
     ];
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'FAQs',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.supFaqTitle,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.white,
         foregroundColor: BrandColors.ink,

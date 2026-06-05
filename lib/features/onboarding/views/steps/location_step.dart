@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/brand_text_field.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../../providers/onboarding_provider.dart';
@@ -30,21 +31,20 @@ class _LocationStepState extends ConsumerState<LocationStep> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final address = _addressCtrl.text.trim();
     final city = _cityCtrl.text.trim();
 
     if (address.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please detect or enter your store address.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.locationErrAddress)));
       return;
     }
     if (city.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your city or district.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.locationErrCity)));
       return;
     }
 
@@ -101,6 +101,7 @@ class _LocationStepState extends ConsumerState<LocationStep> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(onboardingProvider);
 
     // Sync auto-detected values into text fields whenever GPS resolves
@@ -123,12 +124,12 @@ class _LocationStepState extends ConsumerState<LocationStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Where is your\nstore located?',
+            l10n.locationTitle,
             style: Theme.of(context).textTheme.headlineMedium,
           ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
           const SizedBox(height: 8),
           Text(
-            'We use this to show local insights and enable delivery zones.',
+            l10n.locationSubtitle,
             style: Theme.of(context).textTheme.bodyMedium,
           ).animate(delay: 50.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 32),
@@ -145,8 +146,8 @@ class _LocationStepState extends ConsumerState<LocationStep> {
                 : const Icon(Icons.my_location_rounded),
             label: Text(
               state.isLocationLoading
-                  ? 'Detecting location…'
-                  : 'Detect My Location',
+                  ? l10n.locationDetecting
+                  : l10n.locationDetect,
             ),
             style: OutlinedButton.styleFrom(
               foregroundColor: BrandColors.primary,
@@ -185,7 +186,7 @@ class _LocationStepState extends ConsumerState<LocationStep> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
-                  'or enter manually',
+                  l10n.locationOrManual,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
@@ -195,20 +196,22 @@ class _LocationStepState extends ConsumerState<LocationStep> {
           const SizedBox(height: 24),
           BrandTextField(
             controller: _addressCtrl,
-            label: 'Store address',
-            hint: 'Street, area, landmark…',
+            label: l10n.locationAddressLabel,
+            hint: l10n.locationAddressHint,
             maxLines: 2,
           ).animate(delay: 150.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 16),
           BrandTextField(
             controller: _cityCtrl,
-            label: 'City / District',
-            hint: 'e.g. Hyderabad',
+            label: l10n.locationCityLabel,
+            hint: l10n.locationCityHint,
             keyboardType: TextInputType.streetAddress,
           ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 36),
           PrimaryButton(
-            label: _geocoding ? 'Getting coordinates…' : 'Continue',
+            label: _geocoding
+                ? l10n.locationGettingCoords
+                : l10n.commonContinue,
             isLoading: _geocoding,
             onPressed: _geocoding ? null : _submit,
           ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
@@ -261,7 +264,9 @@ class _LocationBadge extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  location.isNotEmpty ? location : 'Location detected',
+                  location.isNotEmpty
+                      ? location
+                      : AppLocalizations.of(context).locationDetected,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: BrandColors.success,
                     fontSize: 13,

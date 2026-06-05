@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../core/locale/locale_provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 
 class ReportIssueScreen extends ConsumerStatefulWidget {
@@ -27,14 +29,39 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
     'Other',
   ];
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
+  String _categoryLabel(AppLocalizations l10n, String value) {
+    switch (value) {
+      case 'App Bug':
+        return l10n.supCategoryAppBug;
+      case 'Pricing Issue':
+        return l10n.supCategoryPricing;
+      case 'Inventory Mismatch':
+        return l10n.supCategoryInventory;
+      case 'AI Recommendation Feedback':
+        return l10n.supCategoryAiFeedback;
+      case 'POS Error':
+        return l10n.supCategoryPosError;
+      case 'Feature Request':
+        return l10n.supCategoryFeatureRequest;
+      case 'Other':
+        return l10n.supCategoryOther;
+      default:
+        return value;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Report an Issue',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.supReportTitle,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.white,
         foregroundColor: BrandColors.ink,
@@ -45,21 +72,21 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Describe the problem',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            Text(
+              l10n.supReportHeading,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Our team will review your report and fix it as soon as possible.',
-              style: TextStyle(color: BrandColors.muted, fontSize: 14),
+            Text(
+              l10n.supReportSubheading,
+              style: const TextStyle(color: BrandColors.muted, fontSize: 14),
             ),
             const SizedBox(height: 32),
 
             // Category Dropdown
-            const Text(
-              'ISSUE CATEGORY',
-              style: TextStyle(
+            Text(
+              l10n.supReportCategoryLabel,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
                 color: BrandColors.muted,
@@ -88,7 +115,7 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
                     return DropdownMenuItem<String>(
                       value: category,
                       child: Text(
-                        category,
+                        _categoryLabel(l10n, category),
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     );
@@ -105,9 +132,9 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
             const SizedBox(height: 24),
 
             // Title Field
-            const Text(
-              'SHORT SUMMARY',
-              style: TextStyle(
+            Text(
+              l10n.supReportSummaryLabel,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
                 color: BrandColors.muted,
@@ -118,7 +145,7 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                hintText: 'e.g. App crashes when scanning barcode',
+                hintText: l10n.supReportSummaryHint,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -139,9 +166,9 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
             const SizedBox(height: 24),
 
             // Description Field
-            const Text(
-              'DETAILED DESCRIPTION',
-              style: TextStyle(
+            Text(
+              l10n.supReportDescriptionLabel,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
                 color: BrandColors.muted,
@@ -153,7 +180,7 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
               controller: _descriptionController,
               maxLines: 6,
               decoration: InputDecoration(
-                hintText: 'Provide details on how to reproduce the issue...',
+                hintText: l10n.supReportDescriptionHint,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -175,7 +202,7 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
 
             // Submit Button
             LoadingButton(
-              label: 'Submit Report',
+              label: l10n.supReportSubmit,
               isLoading: _isSending,
               onPressed: _handleSubmit,
             ),
@@ -190,7 +217,9 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
   Future<void> _handleSubmit() async {
     if (_titleController.text.isEmpty || _descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).supReportFillFields),
+        ),
       );
       return;
     }
@@ -214,22 +243,20 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
-            title: const Text(
-              'Report Submitted',
-              style: TextStyle(fontWeight: FontWeight.w900),
+            title: Text(
+              _l10n.supReportSubmittedTitle,
+              style: const TextStyle(fontWeight: FontWeight.w900),
             ),
-            content: const Text(
-              'Thank you for your feedback. Our team will look into it immediately.',
-            ),
+            content: Text(_l10n.supReportSubmittedBody),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context); // pop dialog
                   Navigator.pop(context); // pop screen
                 },
-                child: const Text(
-                  'OK',
-                  style: TextStyle(fontWeight: FontWeight.w800),
+                child: Text(
+                  _l10n.supOk,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
               ),
             ],
@@ -239,9 +266,9 @@ class _ReportIssueScreenState extends ConsumerState<ReportIssueScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSending = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to submit report: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.supReportSubmitFailed(e.toString()))),
+        );
       }
     }
   }

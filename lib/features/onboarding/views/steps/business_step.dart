@@ -3,18 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/brand_text_field.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../../providers/onboarding_provider.dart';
 
-const _businessTypes = [
-  'Grocery Store (Kirana)',
-  'General Store',
-  'Provision Store',
-  'Fruits & Vegetables',
-  'Medical / Pharmacy',
-  'Stationery & Books',
-  'Others',
+/// Stable store-type codes (sent to the backend) paired with their localized
+/// label, resolved at build time. The stored value is always the code, so
+/// translating the label can never break the backend mapping.
+List<({String code, String label})> _businessTypes(AppLocalizations l10n) => [
+  (code: 'kirana', label: l10n.businessTypeKirana),
+  (code: 'general', label: l10n.businessTypeGeneral),
+  (code: 'provision', label: l10n.businessTypeProvision),
+  (code: 'fruits_vegetables', label: l10n.businessTypeFruitsVeg),
+  (code: 'pharmacy', label: l10n.businessTypePharmacy),
+  (code: 'stationery', label: l10n.businessTypeStationery),
+  (code: 'other', label: l10n.businessTypeOthers),
 ];
 
 class BusinessStep extends ConsumerStatefulWidget {
@@ -64,6 +68,7 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(28, 32, 28, 40),
       child: Form(
@@ -72,22 +77,22 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Tell us about\nyour store',
+              l10n.businessTitle,
               style: Theme.of(context).textTheme.headlineMedium,
             ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
             const SizedBox(height: 8),
             Text(
-              'Help us personalise your experience.',
+              l10n.businessSubtitle,
               style: Theme.of(context).textTheme.bodyMedium,
             ).animate(delay: 50.ms).fadeIn(duration: 400.ms),
             const SizedBox(height: 32),
             BrandTextField(
                   controller: _ownerCtrl,
-                  label: "Owner's full name",
-                  hint: 'e.g. Ramesh Kumar',
+                  label: l10n.businessOwnerLabel,
+                  hint: l10n.businessOwnerHint,
                   autofocus: true,
                   validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Name is required'
+                      ? l10n.businessOwnerRequired
                       : null,
                 )
                 .animate(delay: 100.ms)
@@ -96,10 +101,10 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
             const SizedBox(height: 16),
             BrandTextField(
                   controller: _storeCtrl,
-                  label: 'Store name',
-                  hint: 'e.g. Sri Lakshmi Stores',
+                  label: l10n.businessStoreLabel,
+                  hint: l10n.businessStoreHint,
                   validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Store name is required'
+                      ? l10n.businessStoreRequired
                       : null,
                 )
                 .animate(delay: 150.ms)
@@ -108,14 +113,14 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
             const SizedBox(height: 16),
             BrandTextField(
                   controller: _emailCtrl,
-                  label: 'Email address',
-                  hint: 'you@example.com',
+                  label: l10n.businessEmailLabel,
+                  hint: l10n.businessEmailHint,
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty)
-                      return 'Email is required';
+                      return l10n.businessEmailRequired;
                     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
-                      return 'Enter a valid email address';
+                      return l10n.businessEmailInvalid;
                     }
                     return null;
                   },
@@ -125,16 +130,23 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
                 .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-                  value: _selectedType,
-                  decoration: const InputDecoration(labelText: 'Business type'),
-                  hint: const Text('Select your store type'),
+                  initialValue: _selectedType,
+                  decoration: InputDecoration(
+                    labelText: l10n.businessTypeLabel,
+                  ),
+                  hint: Text(l10n.businessTypeHint),
                   isExpanded: true,
-                  items: _businessTypes
-                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                  items: _businessTypes(l10n)
+                      .map(
+                        (t) => DropdownMenuItem(
+                          value: t.code,
+                          child: Text(t.label),
+                        ),
+                      )
                       .toList(),
                   onChanged: (v) => setState(() => _selectedType = v),
                   validator: (v) =>
-                      v == null ? 'Please select your business type' : null,
+                      v == null ? l10n.businessTypeRequired : null,
                 )
                 .animate(delay: 250.ms)
                 .fadeIn(duration: 400.ms)
@@ -144,14 +156,14 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
                   controller: _footfallCtrl,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(
-                    labelText: 'Estimated daily customers',
-                    hintText: 'e.g. 40',
-                    suffixText: 'customers/day',
+                  decoration: InputDecoration(
+                    labelText: l10n.businessFootfallLabel,
+                    hintText: l10n.businessFootfallHint,
+                    suffixText: l10n.businessFootfallSuffix,
                   ),
                   validator: (v) {
                     final n = int.tryParse(v ?? '');
-                    if (n == null || n < 1) return 'Enter a valid number';
+                    if (n == null || n < 1) return l10n.businessFootfallInvalid;
                     return null;
                   },
                 )
@@ -165,18 +177,20 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
                     decimal: true,
                   ),
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d+\.?\d{0,2}'),
+                    ),
                   ],
-                  decoration: const InputDecoration(
-                    labelText: 'Monthly sales target (optional)',
-                    hintText: 'e.g. 150000',
+                  decoration: InputDecoration(
+                    labelText: l10n.businessBudgetLabel,
+                    hintText: l10n.businessBudgetHint,
                     prefixText: '₹ ',
-                    helperText: 'Used to track daily progress. You can change it later.',
+                    helperText: l10n.businessBudgetHelper,
                   ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return null; // optional
                     final n = double.tryParse(v.trim());
-                    if (n == null || n < 0) return 'Enter a valid amount';
+                    if (n == null || n < 0) return l10n.businessBudgetInvalid;
                     return null;
                   },
                 )
@@ -185,7 +199,7 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
                 .slideY(begin: 0.1, end: 0),
             const SizedBox(height: 36),
             PrimaryButton(
-              label: 'Continue',
+              label: l10n.commonContinue,
               onPressed: _submit,
             ).animate(delay: 350.ms).fadeIn(duration: 400.ms),
           ],

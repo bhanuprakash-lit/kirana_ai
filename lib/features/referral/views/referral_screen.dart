@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../models/referral_models.dart';
 import '../providers/referral_provider.dart';
@@ -15,13 +16,14 @@ class ReferralScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final campaignsAsync = ref.watch(referralCampaignsProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Customer Growth',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.mktCustomerGrowth,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -29,9 +31,12 @@ class ReferralScreen extends ConsumerWidget {
         onPressed: () => _showCreateSheet(context, ref),
         backgroundColor: BrandColors.primary,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text(
-          'New Campaign',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        label: Text(
+          l10n.mktNewCampaign,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
       body: campaignsAsync.when(
@@ -39,7 +44,8 @@ class ReferralScreen extends ConsumerWidget {
           padding: EdgeInsets.all(20),
           child: ListShimmer(itemCount: 5),
         ),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) =>
+            Center(child: Text(l10n.mktErrorWithMessage(e.toString()))),
         data: (campaigns) => campaigns.isEmpty
             ? _buildEmpty(context, ref)
             : _buildList(context, ref, campaigns),
@@ -48,6 +54,7 @@ class ReferralScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -67,19 +74,19 @@ class ReferralScreen extends ConsumerWidget {
               ),
             ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
             const SizedBox(height: 24),
-            const Text(
-              'No Campaigns Yet',
-              style: TextStyle(
+            Text(
+              l10n.mktNoCampaignsYet,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
                 color: BrandColors.ink,
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Create a referral campaign to let your existing customers bring in new ones — and reward them for it.',
+            Text(
+              l10n.mktReferralEmptySubtitle,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: BrandColors.muted,
                 height: 1.6,
@@ -89,7 +96,7 @@ class ReferralScreen extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: () => _showCreateSheet(context, ref),
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Create First Campaign'),
+              label: Text(l10n.mktCreateFirstCampaign),
             ),
           ],
         ),
@@ -102,6 +109,7 @@ class ReferralScreen extends ConsumerWidget {
     WidgetRef ref,
     List<ReferralCampaign> campaigns,
   ) {
+    final l10n = AppLocalizations.of(context);
     return RefreshIndicator(
       onRefresh: () => ref.read(referralCampaignsProvider.notifier).refresh(),
       child: ListView(
@@ -126,10 +134,10 @@ class ReferralScreen extends ConsumerWidget {
                   size: 20,
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Customers share their QR with friends. New visitors scan it in POS to get a discount — and the referrer earns milestone rewards.',
-                    style: TextStyle(
+                    l10n.mktReferralHowItWorks,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: BrandColors.primary,
                       fontWeight: FontWeight.w500,
@@ -199,6 +207,7 @@ class _CampaignCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -244,8 +253,11 @@ class _CampaignCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${campaign.referralDiscountPct.toStringAsFixed(0)}% off for new customers  •  '
-                        '${campaign.milestoneRewardPct.toStringAsFixed(0)}% reward every ${campaign.milestoneEveryN} refs',
+                        l10n.mktCampaignSummary(
+                          campaign.referralDiscountPct.toStringAsFixed(0),
+                          campaign.milestoneRewardPct.toStringAsFixed(0),
+                          campaign.milestoneEveryN,
+                        ),
                         style: const TextStyle(
                           fontSize: 11,
                           color: BrandColors.muted,
@@ -275,7 +287,7 @@ class _CampaignCard extends StatelessWidget {
                     Expanded(
                       child: _Stat(
                         icon: Icons.qr_code_rounded,
-                        label: 'QR Codes',
+                        label: l10n.mktQrCodes,
                         value: '${campaign.tokenCount}',
                       ),
                     ),
@@ -284,7 +296,7 @@ class _CampaignCard extends StatelessWidget {
                         alignment: Alignment.centerRight,
                         child: _Stat(
                           icon: Icons.people_rounded,
-                          label: 'Referrals',
+                          label: l10n.mktReferrals,
                           value: '${campaign.totalReferrals}',
                           textAlign: TextAlign.right,
                         ),
@@ -298,7 +310,7 @@ class _CampaignCard extends StatelessWidget {
                     Expanded(
                       child: _Stat(
                         icon: Icons.block_rounded,
-                        label: 'Max/person',
+                        label: l10n.mktMaxPerPerson,
                         value: '${campaign.maxReferralsPerReferrer}',
                       ),
                     ),
@@ -308,9 +320,9 @@ class _CampaignCard extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: campaign.isActive ? onGenerateQr : null,
                           icon: const Icon(Icons.qr_code_2_rounded, size: 16),
-                          label: const Text(
-                            'Generate QR',
-                            style: TextStyle(fontSize: 12),
+                          label: Text(
+                            l10n.mktGenerateQr,
+                            style: const TextStyle(fontSize: 12),
                           ),
                           style: OutlinedButton.styleFrom(
                             minimumSize: Size.zero,

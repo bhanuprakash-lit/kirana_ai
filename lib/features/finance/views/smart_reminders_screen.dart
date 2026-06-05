@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/generated/app_localizations.dart';
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../providers/finance_provider.dart';
 import '../providers/smart_udhaar_provider.dart';
@@ -13,13 +15,14 @@ class SmartRemindersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(smartUdhaarProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Smart Reminders',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.finSmartReminders,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: async.when(
@@ -28,13 +31,18 @@ class SmartRemindersScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: BrandColors.error),
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: BrandColors.error,
+              ),
               const SizedBox(height: 12),
-              const Text('Could not load reminders'),
+              Text(l10n.finCouldNotLoadReminders),
               const SizedBox(height: 12),
               ElevatedButton(
-                onPressed: () => ref.read(smartUdhaarProvider.notifier).refresh(),
-                child: const Text('Retry'),
+                onPressed: () =>
+                    ref.read(smartUdhaarProvider.notifier).refresh(),
+                child: Text(l10n.finRetry),
               ),
             ],
           ),
@@ -77,10 +85,14 @@ class _RiskCard extends ConsumerStatefulWidget {
 class _RiskCardState extends ConsumerState<_RiskCard> {
   bool _reminding = false;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   Widget build(BuildContext context) {
     final s = widget.item;
     final color = _bandColor(s.riskBand);
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -109,7 +121,7 @@ class _RiskCardState extends ConsumerState<_RiskCard> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '₹${s.balance.toStringAsFixed(0)} · ${s.daysPending} days pending',
+                      '₹${s.balance.toStringAsFixed(0)} · ${l10n.finDaysPending(s.daysPending)}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: BrandColors.muted,
@@ -125,7 +137,7 @@ class _RiskCardState extends ConsumerState<_RiskCard> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${s.riskBand.toUpperCase()} RISK',
+                  l10n.finRiskBadge(s.riskBand.toUpperCase()),
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
@@ -154,7 +166,7 @@ class _RiskCardState extends ConsumerState<_RiskCard> {
           ),
           const SizedBox(height: 4),
           Text(
-            '~${s.recoveryLikelihood}% likely to recover',
+            l10n.finLikelyToRecover(s.recoveryLikelihood),
             style: const TextStyle(fontSize: 11, color: BrandColors.muted),
           ),
           const SizedBox(height: 10),
@@ -169,7 +181,10 @@ class _RiskCardState extends ConsumerState<_RiskCard> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.message_rounded, size: 15),
-              label: const Text('Send reminder', style: TextStyle(fontSize: 13)),
+              label: Text(
+                l10n.finSendReminder,
+                style: const TextStyle(fontSize: 13),
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: const Color(0xFF25D366),
                 side: const BorderSide(color: Color(0xFF25D366)),
@@ -185,19 +200,21 @@ class _RiskCardState extends ConsumerState<_RiskCard> {
   Future<void> _remind() async {
     setState(() => _reminding = true);
     try {
-      await ref.read(financeProvider.notifier).sendReminder(widget.item.khataId);
+      await ref
+          .read(financeProvider.notifier)
+          .sendReminder(widget.item.khataId);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Reminder sent to ${widget.item.customerName}'),
+          content: Text(_l10n.finReminderSentTo(widget.item.customerName)),
           backgroundColor: BrandColors.success,
         ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not send reminder'),
+        SnackBar(
+          content: Text(_l10n.finCouldNotSendReminder),
           backgroundColor: BrandColors.error,
         ),
       );
@@ -212,22 +229,27 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListView(
-      children: const [
-        SizedBox(height: 120),
-        Icon(Icons.verified_outlined, size: 64, color: BrandColors.success),
-        SizedBox(height: 16),
+      children: [
+        const SizedBox(height: 120),
+        const Icon(
+          Icons.verified_outlined,
+          size: 64,
+          color: BrandColors.success,
+        ),
+        const SizedBox(height: 16),
         Center(
           child: Text(
-            'No open udhaar',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            l10n.finNoOpenUdhaar,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Center(
           child: Text(
-            'All credit is settled. Nice and clean!',
-            style: TextStyle(color: BrandColors.muted, fontSize: 13),
+            l10n.finAllCreditSettled,
+            style: const TextStyle(color: BrandColors.muted, fontSize: 13),
           ),
         ),
       ],

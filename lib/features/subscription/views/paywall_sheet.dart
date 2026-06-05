@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 /// Shows a Pro-feature paywall bottom sheet and returns true if the user
 /// chose to go to the subscription screen, false otherwise.
@@ -37,6 +38,14 @@ class _PaywallSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final proFeatures = [
+      l10n.subPaywallFeatureEverythingBasic,
+      l10n.subFeatureVendorProcurement,
+      l10n.subFeatureCashflowSupport,
+      l10n.subFeatureCustomerGrowth,
+      l10n.subPaywallFeaturePriorityAi,
+    ];
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -68,18 +77,18 @@ class _PaywallSheet extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.workspace_premium_rounded,
                   size: 14,
                   color: Colors.white,
                 ),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Text(
-                  'PRO FEATURE',
-                  style: TextStyle(
+                  l10n.subProFeature,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
@@ -140,16 +149,16 @@ class _PaywallSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Pro Plan includes:',
-                  style: TextStyle(
+                Text(
+                  l10n.subProPlanIncludes,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
                     color: Color(0xFF7C3AED),
                   ),
                 ),
                 const SizedBox(height: 10),
-                ..._proFeatures.map(
+                ...proFeatures.map(
                   (f) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
                     child: Row(
@@ -192,7 +201,7 @@ class _PaywallSheet extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text('Not Now'),
+                  child: Text(l10n.subNotNow),
                 ),
               ),
               const SizedBox(width: 12),
@@ -211,9 +220,9 @@ class _PaywallSheet extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    'Upgrade to Pro  ₹500/mo · just ₹17/day',
-                    style: TextStyle(fontWeight: FontWeight.w800),
+                  child: Text(
+                    l10n.subUpgradeToProPrice,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
               ),
@@ -223,12 +232,4 @@ class _PaywallSheet extends StatelessWidget {
       ),
     );
   }
-
-  static const _proFeatures = [
-    'Everything in Basic',
-    'Vendor & Procurement Management',
-    'Cashflow Support (up to ₹10L)',
-    'Customer Growth Engine',
-    'Priority AI recommendations',
-  ];
 }

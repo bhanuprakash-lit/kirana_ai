@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../providers/onboarding_provider.dart';
 import '../../support/providers/notification_provider.dart';
 import 'steps/account_step.dart';
@@ -155,7 +156,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           SizedBox(
             width: 40,
             child: Text(
-              '${state.currentStep}/4',
+              AppLocalizations.of(
+                context,
+              ).onboardingStepCount(state.currentStep),
               textAlign: TextAlign.end,
               style: Theme.of(
                 context,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/providers/usage_limits_provider.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/services/gemini_item.dart';
@@ -12,6 +13,7 @@ import '../../../../core/services/gemini_vision_service.dart';
 import '../../../../core/utils/product_matcher.dart';
 import '../../../../core/services/usage_limits_service.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../subscription/models/subscription_model.dart';
 import '../../../subscription/providers/subscription_provider.dart';
 import '../../../subscription/views/credits_purchase_sheet.dart';
@@ -70,6 +72,9 @@ class _HandwritingOrderSheetState
   bool _autoDetectEnabled = true; // toggle in sheet
   String _errorMsg = '';
   bool _hasDrawn = false;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   // Auto-detect timer (fires 2s after user stops drawing, first time only)
   Timer? _autoDetectTimer;
@@ -154,12 +159,12 @@ class _HandwritingOrderSheetState
       final boundary =
           _repaintKey.currentContext?.findRenderObject()
               as RenderRepaintBoundary?;
-      if (boundary == null) throw Exception('Canvas not ready');
+      if (boundary == null) throw Exception(_l10n.procCanvasNotReady);
 
       final image = await boundary.toImage(pixelRatio: 2.0);
       final data = await image.toByteData(format: ui.ImageByteFormat.png);
       final pngBytes = data?.buffer.asUint8List();
-      if (pngBytes == null) throw Exception('Failed to capture canvas');
+      if (pngBytes == null) throw Exception(_l10n.procFailedToCaptureCanvas);
 
       final result = await _visionSvc.processHandwriting(pngBytes);
       final products = ref.read(posProvider).products;
@@ -225,9 +230,7 @@ class _HandwritingOrderSheetState
     if (mounted) Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          '$added item${added != 1 ? 's' : ''} added to cart from handwriting',
-        ),
+        content: Text(_l10n.procAddedToCartFromHandwriting(added)),
         backgroundColor: BrandColors.success,
         duration: const Duration(milliseconds: 1800),
       ),
@@ -244,6 +247,7 @@ class _HandwritingOrderSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final matched = _matches.where((m) => m.inStock).length;
 
     // ── Pro + usage gating ─────────────────────────────────────────────────────
@@ -316,21 +320,21 @@ class _HandwritingOrderSheetState
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Handwrite Order',
-                          style: TextStyle(
+                          l10n.procHandwriteOrder,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                             color: BrandColors.ink,
                           ),
                         ),
                         Text(
-                          'Write items in any script',
-                          style: TextStyle(
+                          l10n.procWriteItemsAnyScript,
+                          style: const TextStyle(
                             fontSize: 12,
                             color: BrandColors.muted,
                           ),
@@ -343,14 +347,14 @@ class _HandwritingOrderSheetState
                     AiUsageBadge(
                       remaining: remaining,
                       total: kDailyLimits[kFeatureHandwrite]!,
-                      label: 'draws',
+                      label: l10n.procDrawsLabel,
                     ),
                   if (_strokes.isNotEmpty) ...[
                     const SizedBox(width: 4),
                     IconButton(
                       onPressed: _undoStroke,
                       icon: const Icon(Icons.undo_rounded, size: 20),
-                      tooltip: 'Undo last stroke',
+                      tooltip: l10n.procUndoLastStroke,
                       color: BrandColors.muted,
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
@@ -360,7 +364,7 @@ class _HandwritingOrderSheetState
                     TextButton.icon(
                       onPressed: _clear,
                       icon: const Icon(Icons.clear_all_rounded, size: 16),
-                      label: const Text('Clear'),
+                      label: Text(l10n.procClear),
                       style: TextButton.styleFrom(
                         foregroundColor: BrandColors.error,
                         visualDensity: VisualDensity.compact,
@@ -379,8 +383,8 @@ class _HandwritingOrderSheetState
                 child: AiGateBanner(
                   icon: Icons.workspace_premium_rounded,
                   color: BrandColors.orange,
-                  message: 'Handwrite Order is a Pro feature.',
-                  actionLabel: 'Upgrade to Pro',
+                  message: l10n.procHandwriteOrderProFeature,
+                  actionLabel: l10n.procUpgradeToPro,
                   onAction: () => Navigator.pop(context),
                 ),
               )
@@ -390,8 +394,8 @@ class _HandwritingOrderSheetState
                 child: AiGateBanner(
                   icon: Icons.bolt_rounded,
                   color: BrandColors.error,
-                  message: 'Daily limit reached. Top up credits to continue.',
-                  actionLabel: 'Buy Credits',
+                  message: l10n.procDailyLimitReached,
+                  actionLabel: l10n.procBuyCredits,
                   onAction: () => showCreditsPurchaseSheet(
                     context,
                     ref,
@@ -419,10 +423,13 @@ class _HandwritingOrderSheetState
                     color: BrandColors.muted,
                   ),
                   const SizedBox(width: 6),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Auto-detect after 5s',
-                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                      l10n.procAutoDetectAfter5s,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ),
                   Transform.scale(
@@ -498,8 +505,8 @@ class _HandwritingOrderSheetState
                               const SizedBox(height: 8),
                               Text(
                                 canUse
-                                    ? 'Write items here'
-                                    : 'Upgrade or top up to write',
+                                    ? l10n.procWriteItemsHere
+                                    : l10n.procUpgradeOrTopUpToWrite,
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: canUse
@@ -509,9 +516,9 @@ class _HandwritingOrderSheetState
                                 ),
                               ),
                               if (canUse)
-                                const Text(
-                                  'e.g. Rice 5kg, Sugar 2kg',
-                                  style: TextStyle(
+                                Text(
+                                  l10n.procHandwriteExample,
+                                  style: const TextStyle(
                                     fontSize: 11,
                                     color: BrandColors.border,
                                   ),
@@ -551,8 +558,8 @@ class _HandwritingOrderSheetState
                       : const Icon(Icons.auto_awesome_rounded, size: 16),
                   label: Text(
                     _detectState == _DetectState.processing
-                        ? 'Detecting…'
-                        : 'Detect Items',
+                        ? l10n.procDetecting
+                        : l10n.procDetectItems,
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -618,9 +625,9 @@ class _HandwritingOrderSheetState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Read',
-                                style: TextStyle(
+                              Text(
+                                l10n.procRead,
+                                style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                   color: BrandColors.muted,
@@ -644,9 +651,9 @@ class _HandwritingOrderSheetState
 
                       // Items
                       if (_matches.isEmpty)
-                        const Text(
-                          'No items detected. Try writing more clearly.',
-                          style: TextStyle(
+                        Text(
+                          l10n.procNoItemsDetectedWriteClearly,
+                          style: const TextStyle(
                             color: BrandColors.muted,
                             fontSize: 13,
                           ),
@@ -676,7 +683,7 @@ class _HandwritingOrderSheetState
                             child: OutlinedButton.icon(
                               onPressed: _clear,
                               icon: const Icon(Icons.draw_rounded, size: 16),
-                              label: const Text('Write Again'),
+                              label: Text(l10n.procWriteAgain),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -692,7 +699,7 @@ class _HandwritingOrderSheetState
                                 Icons.add_shopping_cart_rounded,
                                 size: 16,
                               ),
-                              label: Text('Add $matched to Cart'),
+                              label: Text(l10n.procAddToCartCount(matched)),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -756,6 +763,7 @@ class _StrokePainter extends CustomPainter {
 class _ScriptBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
@@ -779,7 +787,7 @@ class _ScriptBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Any script: English · తెలుగు · हिंदी · Tamil · ಕನ್ನಡ · മലയാളം',
+              l10n.procAnyScriptLanguages,
               style: TextStyle(
                 fontSize: 11,
                 color: BrandColors.purple.withValues(alpha: 0.9),
@@ -802,6 +810,7 @@ class _MatchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = match.inStock
         ? BrandColors.success
         : match.found
@@ -815,10 +824,10 @@ class _MatchTile extends StatelessWidget {
         : Icons.cancel_rounded;
 
     final statusLabel = match.inStock
-        ? 'In stock'
+        ? l10n.procInStock
         : match.found
-        ? 'Low stock'
-        : 'Not found';
+        ? l10n.procLowStock
+        : l10n.procNotFound;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
@@ -860,9 +869,12 @@ class _MatchTile extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
-              child: const Text(
-                'Pick',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              child: Text(
+                l10n.procPick,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             )
           else ...[
@@ -937,6 +949,7 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
           (p.brand?.toLowerCase().contains(q) ?? false);
     }).toList();
 
+    final l10n = AppLocalizations.of(context);
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       maxChildSize: 0.9,
@@ -963,9 +976,12 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Pick from Inventory',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  Text(
+                    l10n.procPickFromInventory,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
@@ -973,7 +989,7 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                     autofocus: true,
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
-                      hintText: 'Search products…',
+                      hintText: l10n.procSearchProducts,
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         size: 18,
@@ -1006,10 +1022,10 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No products found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.procNoProductsFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(
@@ -1030,7 +1046,10 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                             ),
                           ),
                           subtitle: Text(
-                            '${p.priceLabel} · Stock: ${p.stockLabel}',
+                            l10n.procPriceStockLabel(
+                              p.priceLabel,
+                              p.stockLabel,
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               color: BrandColors.muted,

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/providers/usage_limits_provider.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/services/gemini_audio_service.dart';
@@ -13,6 +14,7 @@ import '../../../../core/utils/product_matcher.dart';
 import '../../../../core/services/gemini_item.dart';
 import '../../../../core/services/usage_limits_service.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../subscription/models/subscription_model.dart';
 import '../../../subscription/providers/subscription_provider.dart';
 import '../../../subscription/views/credits_purchase_sheet.dart';
@@ -62,6 +64,9 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
   List<_MatchedItem> _matches = [];
   String _errorMsg = '';
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   // Timer
   Timer? _timer;
   int _seconds = 0;
@@ -100,8 +105,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
     if (!granted.isGranted) {
       setState(() {
         _status = _VoiceState.error;
-        _errorMsg =
-            'Microphone permission denied. Please enable it in Settings.';
+        _errorMsg = _l10n.procMicPermissionDenied;
       });
       return;
     }
@@ -110,7 +114,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
     if (!hasPermission) {
       setState(() {
         _status = _VoiceState.error;
-        _errorMsg = 'Microphone not accessible.';
+        _errorMsg = _l10n.procMicNotAccessible;
       });
       return;
     }
@@ -204,9 +208,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
     if (mounted) Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          '$added item${added != 1 ? 's' : ''} added to cart from voice order',
-        ),
+        content: Text(_l10n.procAddedToCartFromVoice(added)),
         backgroundColor: BrandColors.success,
         duration: const Duration(milliseconds: 1800),
       ),
@@ -223,6 +225,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final matched = _matches.where((m) => m.inStock).length;
     final subInfo = ref.watch(subInfoProvider);
     final isPro = subInfo.effectiveTier == SubTier.pro;
@@ -274,21 +277,24 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                 ),
               ),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Voice Order',
-                      style: TextStyle(
+                      l10n.procVoiceOrder,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
                         color: BrandColors.ink,
                       ),
                     ),
                     Text(
-                      'Speak in any Indian language',
-                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                      l10n.procSpeakAnyIndianLanguage,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ),
@@ -306,8 +312,8 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
             AiGateBanner(
               icon: Icons.workspace_premium_rounded,
               color: BrandColors.orange,
-              message: 'Voice Order is a Pro feature. Upgrade to access.',
-              actionLabel: 'Upgrade',
+              message: l10n.procVoiceOrderProFeature,
+              actionLabel: l10n.procUpgrade,
               onAction: () {
                 Navigator.pop(context);
               },
@@ -316,8 +322,8 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
             AiGateBanner(
               icon: Icons.bolt_rounded,
               color: BrandColors.error,
-              message: 'No voice orders left today. Get more credits.',
-              actionLabel: 'Get Credits',
+              message: l10n.procNoVoiceOrdersLeft,
+              actionLabel: l10n.procGetCredits,
               onAction: () => showCreditsPurchaseSheet(
                 context,
                 ref,
@@ -328,7 +334,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
             AiUsageBadge(
               remaining: remaining,
               total: kDailyLimits[kFeatureVoice]!,
-              label: 'voice',
+              label: l10n.procVoiceLabel,
             ),
 
           const SizedBox(height: 20),
@@ -350,25 +356,28 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
             const SizedBox(height: 8),
             Text(
               _status == _VoiceState.idle
-                  ? 'Tap mic to start recording'
-                  : 'Tap to stop & process',
+                  ? l10n.procTapMicToStart
+                  : l10n.procTapToStopAndProcess,
               style: const TextStyle(fontSize: 12, color: BrandColors.muted),
             ),
           ],
 
           if (_status == _VoiceState.processing)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: Column(
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40),
                     child: CardShimmer(height: 48, radius: 12),
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   Text(
-                    'Kirana AI is processing…',
-                    style: TextStyle(color: BrandColors.muted, fontSize: 13),
+                    l10n.procKiranaAiProcessing,
+                    style: const TextStyle(
+                      color: BrandColors.muted,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -409,7 +418,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                 _seconds = 0;
               }),
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Try Again'),
+              label: Text(l10n.procTryAgain),
             ),
           ],
 
@@ -428,9 +437,9 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Heard',
-                      style: TextStyle(
+                    Text(
+                      l10n.procHeard,
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: BrandColors.muted,
@@ -454,11 +463,11 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
 
             // Matched items list
             if (_matches.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Text(
-                  'No items detected. Please try again.',
-                  style: TextStyle(color: BrandColors.muted),
+                  l10n.procNoItemsDetectedTryAgain,
+                  style: const TextStyle(color: BrandColors.muted),
                 ),
               )
             else
@@ -492,7 +501,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                       _matches = [];
                     }),
                     icon: const Icon(Icons.mic_rounded, size: 16),
-                    label: const Text('Record Again'),
+                    label: Text(l10n.procRecordAgain),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -503,7 +512,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
                   child: ElevatedButton.icon(
                     onPressed: matched > 0 ? _addToCart : null,
                     icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
-                    label: Text('Add $matched to Cart'),
+                    label: Text(l10n.procAddToCartCount(matched)),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -523,6 +532,7 @@ class _VoiceOrderSheetState extends ConsumerState<_VoiceOrderSheet>
 class _LanguageBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -546,7 +556,7 @@ class _LanguageBanner extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Auto-detects: Telugu · Hindi · Urdu · Tamil · Kannada · Malayalam · English',
+              l10n.procAutoDetectsLanguages,
               style: TextStyle(
                 fontSize: 11,
                 color: BrandColors.primary.withValues(alpha: 0.85),
@@ -666,6 +676,7 @@ class _MatchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final color = match.inStock
         ? BrandColors.success
         : match.found
@@ -679,10 +690,10 @@ class _MatchTile extends StatelessWidget {
         : Icons.cancel_rounded;
 
     final statusLabel = match.inStock
-        ? 'In stock'
+        ? l10n.procInStock
         : match.found
-        ? 'Low stock'
-        : 'Not found';
+        ? l10n.procLowStock
+        : l10n.procNotFound;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -724,9 +735,12 @@ class _MatchTile extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
-              child: const Text(
-                'Pick',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              child: Text(
+                l10n.procPick,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             )
           else ...[
@@ -801,6 +815,7 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
           (p.brand?.toLowerCase().contains(q) ?? false);
     }).toList();
 
+    final l10n = AppLocalizations.of(context);
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       maxChildSize: 0.9,
@@ -827,9 +842,12 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Pick from Inventory',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                  Text(
+                    l10n.procPickFromInventory,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
@@ -837,7 +855,7 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                     autofocus: true,
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
-                      hintText: 'Search products…',
+                      hintText: l10n.procSearchProducts,
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         size: 18,
@@ -870,10 +888,10 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
             const SizedBox(height: 8),
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No products found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.procNoProductsFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(
@@ -894,7 +912,10 @@ class _InlinePickerSheetState extends State<_InlinePickerSheet> {
                             ),
                           ),
                           subtitle: Text(
-                            '${p.priceLabel} · Stock: ${p.stockLabel}',
+                            l10n.procPriceStockLabel(
+                              p.priceLabel,
+                              p.stockLabel,
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               color: BrandColors.muted,

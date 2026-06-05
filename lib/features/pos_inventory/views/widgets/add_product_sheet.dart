@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/inventory_provider.dart';
 import '../../providers/pos_provider.dart';
@@ -136,6 +138,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 
   // Variants — first variant is always present (the "main" product)
   final List<_VariantData> _variants = [_VariantData()];
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void initState() {
@@ -349,13 +354,13 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategoryId == null) {
-      setState(() => _error = 'Please select a category');
+      setState(() => _error = _l10n.invSelectCategoryError);
       return;
     }
     // Validate all variants have a price
     for (int i = 0; i < _variants.length; i++) {
       if (_variants[i].priceCtrl.text.trim().isEmpty) {
-        setState(() => _error = 'Variant ${i + 1}: selling price is required');
+        setState(() => _error = _l10n.invVariantPriceRequired(i + 1));
         return;
       }
     }
@@ -428,8 +433,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           SnackBar(
             content: Text(
               count == 1
-                  ? 'Product saved — syncing in background'
-                  : '$count variants saved — syncing in background',
+                  ? _l10n.invProductSavedSyncing
+                  : _l10n.invVariantsSavedSyncing(count),
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -447,6 +452,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
@@ -455,8 +461,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         elevation: 0,
         title: Text(
           _stage == _Stage.search
-              ? 'Add Product'
-              : (_linked != null ? 'Add from Catalog' : 'New Product'),
+              ? l10n.invAddProduct
+              : (_linked != null ? l10n.invAddFromCatalog : l10n.invNewProduct),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         leading: IconButton(
@@ -487,9 +493,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                           color: BrandColors.primary,
                         ),
                       )
-                    : const Text(
-                        'Save',
-                        style: TextStyle(
+                    : Text(
+                        l10n.invSave,
+                        style: const TextStyle(
                           color: BrandColors.primary,
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
@@ -506,6 +512,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   // ── Search stage ──────────────────────────────────────────────────────────
 
   Widget _buildSearch() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         // Search bar
@@ -519,7 +526,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   controller: _searchCtrl,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: 'Search product name...',
+                    hintText: l10n.invSearchProductName,
                     prefixIcon: const Icon(
                       Icons.search_rounded,
                       color: BrandColors.muted,
@@ -610,7 +617,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                                   ),
                                 )
                               : const Icon(Icons.expand_more_rounded),
-                          label: const Text('Load more results'),
+                          label: Text(l10n.invLoadMoreResults),
                         ),
                       );
                     }
@@ -621,8 +628,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Center(
                           child: Text(
-                            'No more search results',
-                            style: TextStyle(
+                            l10n.invNoMoreSearchResults,
+                            style: const TextStyle(
                               color: BrandColors.muted,
                               fontSize: 12,
                             ),
@@ -639,24 +646,29 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   }
 
   Widget _buildSearchEmpty() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Icon(Icons.search_rounded, size: 56, color: BrandColors.border),
         const SizedBox(height: 14),
-        const Text(
-          'Search the product catalog',
-          style: TextStyle(
+        Text(
+          l10n.invSearchProductCatalog,
+          style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 16,
             color: BrandColors.ink,
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Type a name or scan a barcode.\nIf not found, add manually.',
+        Text(
+          l10n.invSearchCatalogHint,
           textAlign: TextAlign.center,
-          style: TextStyle(color: BrandColors.muted, fontSize: 13, height: 1.5),
+          style: const TextStyle(
+            color: BrandColors.muted,
+            fontSize: 13,
+            height: 1.5,
+          ),
         ),
         const SizedBox(height: 28),
         _buildManualEntry(),
@@ -665,6 +677,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   }
 
   Widget _buildManualEntry() {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: GestureDetector(
@@ -694,21 +707,24 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add manually',
-                      style: TextStyle(
+                      l10n.invAddManually,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 14,
                         color: BrandColors.ink,
                       ),
                     ),
                     Text(
-                      'Product not in catalog? Enter details yourself.',
-                      style: TextStyle(fontSize: 12, color: BrandColors.muted),
+                      l10n.invAddManuallySub,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ),
@@ -724,6 +740,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   // ── Form stage ────────────────────────────────────────────────────────────
 
   Widget _buildForm() {
+    final l10n = AppLocalizations.of(context);
     return Form(
       key: _formKey,
       child: ListView(
@@ -734,8 +751,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             error: _error,
             isSuccess: _success,
             successMessage: _variants.length == 1
-                ? 'Product added!'
-                : '${_variants.length} variants added!',
+                ? l10n.invProductAdded
+                : l10n.invVariantsAdded(_variants.length),
           ),
           if (_saving || _error != null || _success) const SizedBox(height: 16),
 
@@ -747,8 +764,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 
           // Loose toggle
           _ToggleRow(
-            label: 'Loose item',
-            sublabel: 'Sold by weight (e.g. Maida, Pulse)',
+            label: l10n.invLooseItem,
+            sublabel: l10n.invLooseItemSub,
             value: _isLoose,
             enabled: !_saving && !_success,
             onChanged: (v) => setState(() {
@@ -762,22 +779,22 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           ),
           const SizedBox(height: 20),
 
-          _SectionHeader('Basic Details'),
+          _SectionHeader(l10n.invBasicDetails),
           const SizedBox(height: 12),
 
           TextFormField(
             controller: _nameCtrl,
             enabled: _linked == null && !_saving && !_success,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Product name *'),
+            decoration: InputDecoration(labelText: l10n.invProductNameLabel),
             validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
+                (v == null || v.trim().isEmpty) ? l10n.invRequired : null,
           ),
           const SizedBox(height: 14),
           TextFormField(
             controller: _brandCtrl,
             enabled: _linked == null && !_saving && !_success,
-            decoration: const InputDecoration(labelText: 'Brand (optional)'),
+            decoration: InputDecoration(labelText: l10n.invBrandOptional),
           ),
           const SizedBox(height: 14),
 
@@ -805,7 +822,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            _selectedCategoryName ?? 'Select category *',
+                            _selectedCategoryName ?? l10n.invSelectCategoryStar,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -845,21 +862,21 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             ],
           ),
           if (_error != null && _selectedCategoryId == null)
-            const Padding(
-              padding: EdgeInsets.only(top: 4, left: 4),
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 4),
               child: Text(
-                'Please select a category',
-                style: TextStyle(fontSize: 12, color: BrandColors.error),
+                l10n.invSelectCategoryError,
+                style: const TextStyle(fontSize: 12, color: BrandColors.error),
               ),
             ),
           const SizedBox(height: 24),
 
           // ── Perishable toggle ──────────────────────────────────────────
-          _SectionHeader('Other'),
+          _SectionHeader(l10n.invOther),
           const SizedBox(height: 12),
           _ToggleRow(
-            label: 'Perishable item',
-            sublabel: 'Has an expiry date',
+            label: l10n.invPerishableItem,
+            sublabel: l10n.invPerishableItemSub,
             value: _isPerishable,
             enabled: !_saving && !_success,
             onChanged: (v) => setState(() => _isPerishable = v),
@@ -872,8 +889,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             children: [
               _SectionHeader(
                 _variants.length == 1
-                    ? 'Size, Price & Stock'
-                    : 'Variants (${_variants.length})',
+                    ? l10n.invSizePriceStock
+                    : l10n.invVariantsCount(_variants.length),
               ),
               if (!_saving && !_success)
                 TextButton.icon(
@@ -885,9 +902,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                     _variants.add(v);
                   }),
                   icon: const Icon(Icons.add_rounded, size: 16),
-                  label: const Text(
-                    'Add Variant',
-                    style: TextStyle(fontSize: 13),
+                  label: Text(
+                    l10n.invAddVariant,
+                    style: const TextStyle(fontSize: 13),
                   ),
                   style: TextButton.styleFrom(
                     foregroundColor: BrandColors.primary,
@@ -912,8 +929,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             height: 56,
             child: LoadingButton(
               label: _variants.length == 1
-                  ? 'Save Product'
-                  : 'Save ${_variants.length} Variants',
+                  ? l10n.invSaveProduct
+                  : l10n.invSaveVariants(_variants.length),
               isLoading: _saving,
               onPressed: _success ? null : _save,
             ),
@@ -925,6 +942,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   }
 
   Widget _buildVariantRow(int idx) {
+    final l10n = AppLocalizations.of(context);
     final v = _variants[idx];
     final isFirst = idx == 0;
     final canRemove = _variants.length > 1 && !_saving && !_success;
@@ -949,7 +967,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  _variants.length == 1 ? 'Product' : 'Variant ${idx + 1}',
+                  _variants.length == 1
+                      ? l10n.invProduct
+                      : l10n.invVariantNumber(idx + 1),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -980,8 +1000,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   value: v.selectedUnit,
-                  decoration: const InputDecoration(
-                    labelText: 'Unit',
+                  decoration: InputDecoration(
+                    labelText: l10n.invUnit,
                     isDense: true,
                   ),
                   isExpanded: true,
@@ -1001,8 +1021,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   controller: v.weightCtrl,
                   enabled: !_isLoose && !_saving && !_success,
                   decoration: InputDecoration(
-                    labelText: _isLoose ? 'Base unit' : 'Pack size',
-                    hintText: 'e.g. 250',
+                    labelText: _isLoose ? l10n.invBaseUnit : l10n.invPackSize,
+                    hintText: l10n.invPackSizeHint,
                     isDense: true,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(
@@ -1036,10 +1056,10 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                         controller: v.barcodeCtrl,
                         enabled: barcodeEditable,
                         decoration: InputDecoration(
-                          labelText: 'Barcode',
+                          labelText: l10n.invBarcode,
                           hintText: catalogHasBarcode
-                              ? 'From catalog'
-                              : 'optional',
+                              ? l10n.invFromCatalog
+                              : l10n.invOptional,
                           isDense: true,
                         ),
                         keyboardType: TextInputType.number,
@@ -1082,8 +1102,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   enabled: !_saving && !_success,
                   decoration: InputDecoration(
                     labelText: _isLoose
-                        ? 'Price / ${v.selectedUnit} *'
-                        : 'Selling price *',
+                        ? l10n.invPricePerUnit(v.selectedUnit)
+                        : l10n.invSellingPriceStar,
                     prefixText: '₹ ',
                     isDense: true,
                   ),
@@ -1096,8 +1116,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                     ),
                   ],
                   validator: (val) {
-                    if (val == null || val.isEmpty) return 'Required';
-                    if (double.tryParse(val) == null) return 'Invalid';
+                    if (val == null || val.isEmpty) return l10n.invRequired;
+                    if (double.tryParse(val) == null) return l10n.invInvalid;
                     return null;
                   },
                 ),
@@ -1107,8 +1127,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                 child: TextFormField(
                   controller: v.mrpCtrl,
                   enabled: !_saving && !_success,
-                  decoration: const InputDecoration(
-                    labelText: 'MRP',
+                  decoration: InputDecoration(
+                    labelText: l10n.invMrp,
                     prefixText: '₹ ',
                     isDense: true,
                   ),
@@ -1130,9 +1150,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           TextFormField(
             controller: v.costCtrl,
             enabled: !_saving && !_success,
-            decoration: const InputDecoration(
-              labelText: 'Cost price (what you pay)',
-              hintText: 'optional — improves profit accuracy',
+            decoration: InputDecoration(
+              labelText: l10n.invCostPrice,
+              hintText: l10n.invCostPriceHint,
               prefixText: '₹ ',
               isDense: true,
             ),
@@ -1149,8 +1169,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             enabled: !_saving && !_success,
             decoration: InputDecoration(
               labelText: _isLoose
-                  ? 'Opening stock (${v.selectedUnit}) *'
-                  : 'Opening stock (units) *',
+                  ? l10n.invOpeningStockUnit(v.selectedUnit)
+                  : l10n.invOpeningStockUnits,
               isDense: true,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -1165,16 +1185,16 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             TextFormField(
               controller: v.expiryCtrl,
               enabled: !_saving && !_success,
-              decoration: const InputDecoration(
-                labelText: 'Expiry date',
-                hintText: 'YYYY-MM-DD',
-                prefixIcon: Icon(Icons.event_rounded, size: 18),
+              decoration: InputDecoration(
+                labelText: l10n.invExpiryDate,
+                hintText: l10n.invExpiryDateHint,
+                prefixIcon: const Icon(Icons.event_rounded, size: 18),
                 isDense: true,
               ),
               readOnly: true,
               validator: (val) =>
                   (_isPerishable && (val == null || val.isEmpty))
-                  ? 'Required for perishables'
+                  ? l10n.invRequiredForPerishables
                   : null,
               onTap: () async {
                 if (_saving || _success) return;
@@ -1323,6 +1343,7 @@ class _LinkedChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -1356,9 +1377,9 @@ class _LinkedChip extends StatelessWidget {
                       color: BrandColors.primary,
                     ),
                     const SizedBox(width: 4),
-                    const Text(
-                      'Linked from catalog',
-                      style: TextStyle(
+                    Text(
+                      l10n.invLinkedFromCatalog,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: BrandColors.primary,
@@ -1425,6 +1446,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final filtered =
         widget.categories.where((c) {
           if (_query.isEmpty) return true;
@@ -1463,9 +1485,12 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Select Category',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                  Text(
+                    l10n.invSelectCategory,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -1473,7 +1498,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                     autofocus: true,
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
-                      hintText: 'Search categories...',
+                      hintText: l10n.invSearchCategories,
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         size: 20,
@@ -1507,10 +1532,10 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
             // List
             Expanded(
               child: filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No categories found',
-                        style: TextStyle(color: BrandColors.muted),
+                        l10n.invNoCategoriesFound,
+                        style: const TextStyle(color: BrandColors.muted),
                       ),
                     )
                   : ListView.builder(

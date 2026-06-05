@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../models/inventory_item.dart';
 import '../../providers/inventory_provider.dart';
@@ -77,6 +79,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
   bool _saving = false;
   bool _success = false;
   String? _error;
+
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
 
   @override
   void dispose() {
@@ -160,9 +165,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
       await Future.delayed(const Duration(milliseconds: 700));
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${widget.item.name} updated!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_l10n.invProductUpdated(widget.item.name))),
+        );
       }
     } else {
       setState(() {
@@ -174,15 +179,16 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: BrandColors.ink,
         elevation: 0,
-        title: const Text(
-          'Edit Product',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.invEditProduct,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
@@ -203,9 +209,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                           color: BrandColors.primary,
                         ),
                       )
-                    : const Text(
-                        'Save',
-                        style: TextStyle(
+                    : Text(
+                        l10n.invSave,
+                        style: const TextStyle(
                           color: BrandColors.primary,
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
@@ -224,7 +230,7 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               isSaving: _saving,
               error: _error,
               isSuccess: _success,
-              successMessage: 'Product updated successfully!',
+              successMessage: l10n.invProductUpdatedSuccess,
             ),
             if (_saving || _error != null || _success)
               const SizedBox(height: 16),
@@ -257,8 +263,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               ),
 
             _ToggleRow(
-              label: 'Loose item',
-              sublabel: 'Sold by weight (e.g. Maida, Pulse)',
+              label: l10n.invLooseItem,
+              sublabel: l10n.invLooseItemSub,
               value: _isLoose,
               enabled: !_saving && !_success,
               onChanged: (v) => setState(() {
@@ -268,22 +274,22 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
             ),
             const SizedBox(height: 20),
 
-            _SectionHeader('Basic Details'),
+            _SectionHeader(l10n.invBasicDetails),
             const SizedBox(height: 12),
 
             TextFormField(
               controller: _nameCtrl,
               enabled: !_saving && !_success,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Product name *'),
+              decoration: InputDecoration(labelText: l10n.invProductNameLabel),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.invRequired : null,
             ),
             const SizedBox(height: 14),
             TextFormField(
               controller: _brandCtrl,
               enabled: !_saving && !_success,
-              decoration: const InputDecoration(labelText: 'Brand (optional)'),
+              decoration: InputDecoration(labelText: l10n.invBrandOptional),
             ),
             const SizedBox(height: 14),
 
@@ -309,7 +315,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              _selectedCategoryName ?? 'Select category *',
+                              _selectedCategoryName ??
+                                  l10n.invSelectCategoryStar,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -356,9 +363,7 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedUnit,
-                    decoration: const InputDecoration(
-                      labelText: 'Selling unit',
-                    ),
+                    decoration: InputDecoration(labelText: l10n.invSellingUnit),
                     isExpanded: true,
                     items: _editUnits
                         .map((u) => DropdownMenuItem(value: u, child: Text(u)))
@@ -374,8 +379,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     controller: _weightCtrl,
                     enabled: !_isLoose && !_saving && !_success,
                     decoration: InputDecoration(
-                      labelText: _isLoose ? 'Base unit' : 'Pack size',
-                      hintText: 'e.g. 250',
+                      labelText: _isLoose ? l10n.invBaseUnit : l10n.invPackSize,
+                      hintText: l10n.invPackSizeHint,
                     ),
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
@@ -399,9 +404,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     child: TextFormField(
                       controller: _barcodeCtrl,
                       enabled: !_saving && !_success,
-                      decoration: const InputDecoration(
-                        labelText: 'Barcode',
-                        hintText: 'optional',
+                      decoration: InputDecoration(
+                        labelText: l10n.invBarcode,
+                        hintText: l10n.invOptional,
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -429,7 +434,7 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               ),
             const SizedBox(height: 24),
 
-            _SectionHeader('Pricing'),
+            _SectionHeader(l10n.invPricing),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -439,8 +444,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     enabled: !_saving && !_success,
                     decoration: InputDecoration(
                       labelText: _isLoose
-                          ? 'Price per $_selectedUnit *'
-                          : 'Selling price *',
+                          ? l10n.invPricePerSelected(_selectedUnit ?? '')
+                          : l10n.invSellingPriceStar,
                       prefixText: '₹ ',
                     ),
                     keyboardType: const TextInputType.numberWithOptions(
@@ -452,8 +457,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                       ),
                     ],
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Required';
-                      if (double.tryParse(v) == null) return 'Invalid';
+                      if (v == null || v.isEmpty) return l10n.invRequired;
+                      if (double.tryParse(v) == null) return l10n.invInvalid;
                       return null;
                     },
                   ),
@@ -463,8 +468,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                   child: TextFormField(
                     controller: _mrpCtrl,
                     enabled: !_saving && !_success,
-                    decoration: const InputDecoration(
-                      labelText: 'MRP (optional)',
+                    decoration: InputDecoration(
+                      labelText: l10n.invMrpOptional,
                       prefixText: '₹ ',
                     ),
                     keyboardType: const TextInputType.numberWithOptions(
@@ -481,15 +486,15 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
             ),
             const SizedBox(height: 24),
 
-            _SectionHeader('Stock'),
+            _SectionHeader(l10n.invStock),
             const SizedBox(height: 12),
             TextFormField(
               controller: _stockCtrl,
               enabled: !_saving && !_success,
               decoration: InputDecoration(
                 labelText: _isLoose
-                    ? 'Stock (in $_selectedUnit) *'
-                    : 'Stock quantity *',
+                    ? l10n.invStockInUnit(_selectedUnit ?? '')
+                    : l10n.invStockQuantityStar,
               ),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -497,13 +502,14 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
-              validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+              validator: (v) =>
+                  (v == null || v.isEmpty) ? l10n.invRequired : null,
             ),
             if (widget.item.isPerishable)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  'For perishable batch details, use "Receive Batch" from inventory.',
+                  l10n.invPerishableBatchNote,
                   style: TextStyle(
                     fontSize: 12,
                     color: BrandColors.muted.withValues(alpha: 0.8),
@@ -512,11 +518,11 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               ),
             const SizedBox(height: 24),
 
-            _SectionHeader('Other'),
+            _SectionHeader(l10n.invOther),
             const SizedBox(height: 12),
             _ToggleRow(
-              label: 'Perishable item',
-              sublabel: 'Has an expiry date',
+              label: l10n.invPerishableItem,
+              sublabel: l10n.invPerishableItemSub,
               value: _isPerishable,
               enabled: !_saving && !_success,
               onChanged: (v) => setState(() => _isPerishable = v),
@@ -543,9 +549,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text(
-                        'Save Changes',
-                        style: TextStyle(
+                    : Text(
+                        l10n.invSaveChanges,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
                         ),

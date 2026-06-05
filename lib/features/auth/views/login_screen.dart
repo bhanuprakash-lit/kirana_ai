@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kirana_ai/features/support/providers/notification_provider.dart';
 
+import '../../../core/locale/locale_provider.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../repositories/auth_repository.dart';
 import '../../../shared/widgets/brand_text_field.dart';
@@ -38,6 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       body: SafeArea(
@@ -67,12 +70,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               ),
               const SizedBox(height: 28),
               Text(
-                'Welcome back',
+                l10n.loginWelcomeBack,
                 style: Theme.of(context).textTheme.headlineMedium,
               ).animate(delay: 50.ms).fadeIn().slideY(begin: 0.2, end: 0),
               const SizedBox(height: 6),
               Text(
-                'Sign in to your Kirana AI account.',
+                l10n.loginSubtitle,
                 style: Theme.of(context).textTheme.bodyMedium,
               ).animate(delay: 100.ms).fadeIn(),
               const SizedBox(height: 28),
@@ -108,14 +111,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   dividerColor: Colors.transparent,
-                  tabs: const [
+                  tabs: [
                     Tab(
-                      icon: Icon(Icons.phone_rounded, size: 18),
-                      text: 'Phone OTP',
+                      icon: const Icon(Icons.phone_rounded, size: 18),
+                      text: l10n.loginTabPhone,
                     ),
                     Tab(
-                      icon: Icon(Icons.lock_outline_rounded, size: 18),
-                      text: 'Username',
+                      icon: const Icon(Icons.lock_outline_rounded, size: 18),
+                      text: l10n.loginTabUsername,
                     ),
                   ],
                 ),
@@ -136,11 +139,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   onTap: () => context.go('/onboarding'),
                   child: RichText(
                     text: TextSpan(
-                      text: "Don't have an account? ",
+                      text: l10n.loginNoAccount,
                       style: Theme.of(context).textTheme.bodyMedium,
                       children: [
                         TextSpan(
-                          text: 'Create one',
+                          text: l10n.loginCreateOne,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: BrandColors.primary,
@@ -181,6 +184,9 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
   String? _verificationId;
   int? _resendToken;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void initState() {
     super.initState();
@@ -217,7 +223,7 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
   Future<void> _sendOtp() async {
     final raw = _phoneCtrl.text.trim();
     if (raw.isEmpty) {
-      setState(() => _error = 'Enter your phone number');
+      setState(() => _error = _l10n.authErrEnterPhone);
       return;
     }
     if (_loading) return;
@@ -234,7 +240,15 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
       phoneNumber: phone,
       timeout: const Duration(seconds: 60),
       verificationCompleted: (cred) async {
-        // Auto-retrieved OTP (Android only)
+        // Auto-retrieved / instant verification (Android). Surface a verifying
+        // state so the hands-free sign-in doesn't look like a frozen pause.
+        if (mounted) {
+          setState(() {
+            _loading = true;
+            _error = null;
+            _step = _PhoneStep.enterOtp;
+          });
+        }
         await _signInWithCredential(cred);
       },
       verificationFailed: (e) {
@@ -262,11 +276,11 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
   Future<void> _verifyOtp() async {
     final code = _otpCtrl.text.trim();
     if (code.length != 6) {
-      setState(() => _error = 'Enter the 6-digit OTP');
+      setState(() => _error = _l10n.authErrEnter6Otp);
       return;
     }
     if (_verificationId == null) {
-      setState(() => _error = 'Session expired. Tap Resend.');
+      setState(() => _error = _l10n.authErrSessionExpired);
       return;
     }
     setState(() {
@@ -315,7 +329,7 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
     } catch (_) {
       setState(() {
         _loading = false;
-        _error = 'Something went wrong. Please try again.';
+        _error = _l10n.commonSomethingWrong;
       });
     }
   }
@@ -323,30 +337,31 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
   String _firebaseError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-phone-number':
-        return 'Invalid phone number. Include country code (e.g. +91...).';
+        return _l10n.authErrInvalidPhone;
       case 'too-many-requests':
-        return 'Too many attempts. Please try again later.';
+        return _l10n.authErrTooManyRequests;
       case 'invalid-verification-code':
-        return 'Wrong OTP. Please check and try again.';
+        return _l10n.authErrWrongOtp;
       case 'session-expired':
-        return 'OTP expired. Tap Resend to get a new code.';
+        return _l10n.authErrOtpExpired;
       default:
-        return e.message ?? 'Verification failed. Try again.';
+        return e.message ?? _l10n.authErrVerificationFailed;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_step == _PhoneStep.enterPhone) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           BrandTextField(
             controller: _phoneCtrl,
-            label: 'Phone number',
+            label: l10n.loginPhoneLabel,
             hint: '9876543210',
             keyboardType: TextInputType.phone,
-            autofillHints: const [],
+            autofillHints: const [AutofillHints.telephoneNumber],
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(10),
@@ -368,14 +383,14 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
           ],
           const SizedBox(height: 24),
           PrimaryButton(
-            label: 'Send OTP',
+            label: l10n.loginSendOtp,
             isLoading: _loading,
             onPressed: _sendOtp,
           ),
           const SizedBox(height: 16),
           Center(
             child: Text(
-              'We\'ll send a one-time password to this number',
+              l10n.loginOtpHelp,
               style: const TextStyle(fontSize: 12, color: BrandColors.muted),
               textAlign: TextAlign.center,
             ),
@@ -404,7 +419,7 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
             ),
             const SizedBox(width: 8),
             Text(
-              'OTP sent to ${_phoneCtrl.text.trim()}',
+              l10n.loginOtpSentTo(_phoneCtrl.text.trim()),
               style: const TextStyle(
                 fontSize: 13,
                 color: BrandColors.muted,
@@ -414,16 +429,22 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
           ],
         ),
         const SizedBox(height: 16),
-        BrandTextField(
-          controller: _otpCtrl,
-          label: '6-digit OTP',
-          hint: '------',
-          keyboardType: TextInputType.number,
-          focusNode: _otpFocusNode,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(6),
-          ],
+        AutofillGroup(
+          child: BrandTextField(
+            controller: _otpCtrl,
+            label: l10n.loginOtp6Label,
+            hint: '------',
+            keyboardType: TextInputType.number,
+            focusNode: _otpFocusNode,
+            // Lets the OS surface the incoming SMS code as a one-tap keyboard
+            // suggestion (iOS) / autofill (Android). On Android, Firebase's
+            // verificationCompleted also auto-verifies hands-free.
+            autofillHints: const [AutofillHints.oneTimeCode],
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(6),
+            ],
+          ),
         ),
         if (_error != null) ...[
           const SizedBox(height: 10),
@@ -431,7 +452,7 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
         ],
         const SizedBox(height: 24),
         PrimaryButton(
-          label: 'Verify OTP',
+          label: l10n.loginVerifyOtp,
           isLoading: _loading,
           onPressed: _verifyOtp,
         ),
@@ -439,9 +460,9 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
         Center(
           child: TextButton(
             onPressed: _loading ? null : _sendOtp,
-            child: const Text(
-              'Resend OTP',
-              style: TextStyle(
+            child: Text(
+              l10n.loginResendOtp,
+              style: const TextStyle(
                 color: BrandColors.primary,
                 fontWeight: FontWeight.w700,
               ),
@@ -470,6 +491,9 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
   bool _isLoading = false;
   String? _error;
 
+  AppLocalizations get _l10n =>
+      lookupAppLocalizations(ref.read(localeProvider));
+
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -496,12 +520,12 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
     } on ApiException catch (e) {
       setState(() {
         _error = e.statusCode == 401
-            ? 'Incorrect username or password. Please try again.'
-            : 'Login failed: ${e.message}';
+            ? _l10n.loginIncorrect
+            : _l10n.loginFailed(e.message);
       });
     } catch (_) {
       setState(() {
-        _error = 'Could not connect to the server. Please try again.';
+        _error = _l10n.commonServerError;
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -510,6 +534,7 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Form(
       key: _formKey,
       child: Column(
@@ -517,17 +542,18 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
         children: [
           BrandTextField(
             controller: _emailCtrl,
-            label: 'Username',
-            hint: 'e.g. mykiranastore',
+            label: l10n.loginUsernameLabel,
+            hint: l10n.loginUsernameHint,
             keyboardType: TextInputType.text,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Username is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? l10n.loginUsernameRequired
+                : null,
           ),
           const SizedBox(height: 14),
           BrandTextField(
             controller: _passwordCtrl,
-            label: 'Password',
-            hint: 'Your password',
+            label: l10n.loginPasswordLabel,
+            hint: l10n.loginPasswordHint,
             obscureText: !_showPassword,
             suffix: IconButton(
               icon: Icon(
@@ -540,7 +566,7 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
               onPressed: () => setState(() => _showPassword = !_showPassword),
             ),
             validator: (v) =>
-                (v == null || v.isEmpty) ? 'Password is required' : null,
+                (v == null || v.isEmpty) ? l10n.loginPasswordRequired : null,
           ),
           if (_error != null) ...[
             const SizedBox(height: 10),
@@ -548,7 +574,7 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
           ],
           const SizedBox(height: 24),
           PrimaryButton(
-            label: 'Sign In',
+            label: l10n.loginSignIn,
             isLoading: _isLoading,
             onPressed: _signIn,
           ),
