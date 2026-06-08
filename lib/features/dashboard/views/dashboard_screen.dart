@@ -129,15 +129,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final currentTab = ref.watch(dashboardTabProvider);
 
     return subAsync.when(
-      loading: () => const Scaffold(
-        // Scrollable so the fixed-height skeleton never overflows a short
-        // screen / large display-size setting (it's a static placeholder).
-        body: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.all(20),
-          child: OverviewShimmer(),
-        ),
-      ),
+      loading: () => _buildDashboard(currentTab),
       error: (_, _) => _buildDashboard(currentTab),
       data: (sub) {
         if (sub.isPending)

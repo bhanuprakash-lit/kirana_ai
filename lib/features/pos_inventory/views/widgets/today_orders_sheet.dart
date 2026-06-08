@@ -72,7 +72,7 @@ class _TodayOrdersSheetState extends ConsumerState<_TodayOrdersSheet> {
   }
 
   Future<void> _printOrder(Map<String, dynamic> order) async {
-    final store = ref.read(storeSettingsProvider).value;
+    final store = await ref.read(storeSettingsProvider.future);
     final products = ref.read(posProvider).products;
     final receipt = PrinterNotifier.buildReceipt(
       order: order,

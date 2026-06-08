@@ -1202,7 +1202,12 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    child: IgnorePointer(
+                    child: GestureDetector(
+                      onTap: () => _sc.animateTo(
+                        _sc.offset - 200,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
                       child: Container(
                         width: 48,
                         decoration: BoxDecoration(
@@ -1228,7 +1233,12 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
                     right: 0,
                     top: 0,
                     bottom: 0,
-                    child: IgnorePointer(
+                    child: GestureDetector(
+                      onTap: () => _sc.animateTo(
+                        _sc.offset + 200,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      ),
                       child: Container(
                         width: 48,
                         decoration: BoxDecoration(

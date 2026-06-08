@@ -10,10 +10,35 @@ import '../../features/auth/repositories/auth_repository.dart';
 class ApiClient {
   static const _storage = FlutterSecureStorage();
 
+  // In-memory token cache to prevent slow, concurrent Keystore reads on Android.
+  static String? _cachedAuthToken;
+  static String? _cachedPosToken;
+
+  static Future<String?> _getAuthToken() async {
+    _cachedAuthToken ??= await _storage.read(key: 'auth_token');
+    return _cachedAuthToken;
+  }
+
+  static Future<String?> _getPosToken() async {
+    _cachedPosToken ??= await _storage.read(key: 'pos_token');
+    return _cachedPosToken;
+  }
+
+  /// Optional: Provide a way to clear or update the cache when logging in/out
+  static void clearTokenCache() {
+    _cachedAuthToken = null;
+    _cachedPosToken = null;
+  }
+
+  static void updateTokenCache({String? authToken, String? posToken}) {
+    if (authToken != null) _cachedAuthToken = authToken;
+    if (posToken != null) _cachedPosToken = posToken;
+  }
+
   // ── Kirana AI endpoints (Bearer kirana token) ──────────────────────────────
 
   Future<dynamic> get(String path) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     final res = await http.get(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
@@ -28,7 +53,7 @@ class ApiClient {
   }
 
   Future<dynamic> post(String path, dynamic body) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
@@ -44,7 +69,7 @@ class ApiClient {
   }
 
   Future<dynamic> patch(String path, dynamic body) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     final res = await http.patch(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
@@ -61,7 +86,7 @@ class ApiClient {
   }
 
   Future<dynamic> delete(String path) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     final res = await http.delete(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
@@ -79,7 +104,7 @@ class ApiClient {
   // ── POS endpoints (Bearer pos token) ──────────────────────────────────────
 
   Future<Map<String, dynamic>?> posGet(String path) async {
-    final token = await _storage.read(key: 'pos_token');
+    final token = await _getPosToken();
     if (token == null) return null;
     final res = await http.get(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
@@ -96,7 +121,7 @@ class ApiClient {
 
   // POS endpoints that return a bare JSON array (e.g. /pos/products, /pos/categories)
   Future<List<dynamic>?> posGetList(String path) async {
-    final token = await _storage.read(key: 'pos_token');
+    final token = await _getPosToken();
     if (token == null) return null;
     final res = await http.get(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
@@ -115,7 +140,7 @@ class ApiClient {
     String path,
     Map<String, dynamic> body,
   ) async {
-    final token = await _storage.read(key: 'pos_token');
+    final token = await _getPosToken();
     if (token == null) return null;
     try {
       final res = await http.post(
@@ -140,7 +165,7 @@ class ApiClient {
     String table, {
     Map<String, String>? filters,
   }) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     var path = '/oltp/$table';
     if (filters != null && filters.isNotEmpty) {
       final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
@@ -163,7 +188,7 @@ class ApiClient {
     String table,
     Map<String, dynamic> body,
   ) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}/oltp/$table'),
       headers: {
@@ -183,7 +208,7 @@ class ApiClient {
     Map<String, dynamic> body, {
     Map<String, String>? filters,
   }) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     var path = '/oltp/$table';
     if (filters != null && filters.isNotEmpty) {
       final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
@@ -208,7 +233,7 @@ class ApiClient {
     String table, {
     required Map<String, String> filters,
   }) async {
-    final token = await _storage.read(key: 'auth_token');
+    final token = await _getAuthToken();
     final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
     final path = '/oltp/$table?$q';
 

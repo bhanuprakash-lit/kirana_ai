@@ -226,6 +226,8 @@
   "posCommonClear": "அழி",
   "posCommonRefresh": "புதுப்பி",
   "posCommonAddToCart": "கார்ட்டில் சேர்",
+  "posCameraPermissionRequired": "பார்கோடுகளை ஸ்கேன் செய்ய கேமரா அனுமதி தேவை.",
+  "posCommonSettings": "அமைப்புகள்",
   "posEnterQtyTitle": "{unit} உள்ளிடவும்",
   "posQtyFallback": "அளவு",
   "posPriceLabel": "விலை: {price}",

@@ -1464,6 +1464,18 @@ abstract class AppLocalizations {
   /// **'Add to Cart'**
   String get posCommonAddToCart;
 
+  /// No description provided for @posCameraPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required to scan barcodes.'**
+  String get posCameraPermissionRequired;
+
+  /// No description provided for @posCommonSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get posCommonSettings;
+
   /// No description provided for @posEnterQtyTitle.
   ///
   /// In en, this message translates to:

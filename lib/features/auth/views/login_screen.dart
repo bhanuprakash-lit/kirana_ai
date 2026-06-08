@@ -313,9 +313,9 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
         return;
       }
 
-      ref.read(notificationServiceProvider).uploadToken();
+      await ref.read(notificationServiceProvider).requestPermission();
       ref.invalidate(subscriptionProvider);
-      context.go('/home');
+      if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
         _loading = false;
@@ -514,7 +514,7 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
             username: _emailCtrl.text.trim(),
             password: _passwordCtrl.text,
           );
-      ref.read(notificationServiceProvider).uploadToken();
+      await ref.read(notificationServiceProvider).requestPermission();
       ref.invalidate(subscriptionProvider);
       if (mounted) context.go('/home');
     } on ApiException catch (e) {

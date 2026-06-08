@@ -7,6 +7,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../../providers/onboarding_provider.dart';
+import '../../../support/providers/notification_provider.dart';
 
 class ConsentStep extends ConsumerStatefulWidget {
   const ConsentStep({super.key});
@@ -26,6 +27,10 @@ class _ConsentStepState extends ConsumerState<ConsentStep> {
       );
       return;
     }
+
+    // Request notification permissions contextually here at the end of onboarding
+    await ref.read(notificationServiceProvider).requestPermission();
+
     final notifier = ref.read(onboardingProvider.notifier);
     notifier.updateData(
       ref

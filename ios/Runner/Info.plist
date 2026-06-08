@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Kirana Ai</string>
+	<string>Kirana AI</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -53,6 +53,18 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Bluetooth is required to connect and print receipts to your thermal printer.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth is required to connect and print receipts to your thermal printer.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera is required to scan barcodes and invoices.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone is required for voice commands and recording notes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access is required to upload invoice images.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location is used to verify store transactions and delivery tracking.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>We need access to your contacts to add udhaar entries</string>
 	<key>UISupportedInterfaceOrientations</key>

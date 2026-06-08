@@ -226,6 +226,8 @@
   "posCommonClear": "साफ करा",
   "posCommonRefresh": "रिफ्रेश करा",
   "posCommonAddToCart": "कार्टमध्ये जोडा",
+  "posCameraPermissionRequired": "बारकोड स्कॅन करण्यासाठी कॅमेरा परवानगी आवश्यक आहे.",
+  "posCommonSettings": "सेटिंग्ज",
   "posEnterQtyTitle": "{unit} टाका",
   "posQtyFallback": "प्रमाण",
   "posPriceLabel": "किंमत: {price}",

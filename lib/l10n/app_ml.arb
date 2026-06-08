@@ -226,6 +226,8 @@
   "posCommonClear": "മായ്ക്കുക",
   "posCommonRefresh": "പുതുക്കുക",
   "posCommonAddToCart": "കാർട്ടിൽ ചേർക്കുക",
+  "posCameraPermissionRequired": "ബാർകോഡുകൾ സ്കാൻ ചെയ്യാൻ ക്യാമറ അനുമതി ആവശ്യമാണ്.",
+  "posCommonSettings": "സെറ്റിങ്സ്",
   "posEnterQtyTitle": "{unit} നൽകുക",
   "posQtyFallback": "അളവ്",
   "posPriceLabel": "വില: {price}",

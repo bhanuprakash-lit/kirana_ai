@@ -50,7 +50,7 @@ void _showSuccessDialog(
 /// Fire-and-forget receipt print (called after order confirmation).
 Future<void> _triggerPrint(WidgetRef ref, Map<String, dynamic> order) async {
   try {
-    final store = ref.read(storeSettingsProvider).value;
+    final store = await ref.read(storeSettingsProvider.future);
     final products = ref.read(posProvider).products;
     final receipt = PrinterNotifier.buildReceipt(
       order: order,
@@ -73,7 +73,7 @@ class _SuccessDialog extends ConsumerWidget {
 
   Future<void> _printReceipt(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
-    final store = ref.read(storeSettingsProvider).value;
+    final store = await ref.read(storeSettingsProvider.future);
     final products = ref.read(posProvider).products;
     final receipt = PrinterNotifier.buildReceipt(
       order: order,

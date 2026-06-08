@@ -5,6 +5,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,25 +86,39 @@ class PrinterService {
 
   // ── BT state ────────────────────────────────────────────────────────────────
 
-  Future<bool> get isBluetoothEnabled => PrintBluetoothThermal.bluetoothEnabled;
+  Future<bool> get isBluetoothEnabled async {
+    // On iOS, the plugin might return false if checked too quickly after app start.
+    // We don't loop here to avoid blocking, but the notifier handles retries.
+    return await PrintBluetoothThermal.bluetoothEnabled;
+  }
+
   Future<bool> get isConnected => PrintBluetoothThermal.connectionStatus;
 
   // ── Permissions ─────────────────────────────────────────────────────────────
 
   /// Requests BLUETOOTH_CONNECT + BLUETOOTH_SCAN on Android 12+.
+  /// On iOS, requests the general Bluetooth permission.
   Future<bool> requestPermissions() async {
-    if (!Platform.isAndroid) return true;
-    final result = await [
-      Permission.bluetoothConnect,
-      Permission.bluetoothScan,
-    ].request();
-    return result.values.every((s) => s.isGranted || s.isLimited);
+    if (Platform.isAndroid) {
+      final result = await [
+        Permission.bluetoothConnect,
+        Permission.bluetoothScan,
+      ].request();
+      return result.values.every((s) => s.isGranted || s.isLimited);
+    } else if (Platform.isIOS) {
+      final status = await Permission.bluetooth.request();
+      // On iOS 13+, we also need to ensure Bluetooth is allowed for the app.
+      return status.isGranted || status.isLimited;
+    }
+    return true;
   }
 
   // ── Device discovery ────────────────────────────────────────────────────────
 
   Future<List<PrinterDevice>> getPairedDevices() async {
     await requestPermissions();
+    // On iOS, this plugin's pairedBluetooths method actually triggers/returns 
+    // discovered BLE peripherals.
     final list = await PrintBluetoothThermal.pairedBluetooths;
     return list
         .map(
@@ -119,17 +134,59 @@ class PrinterService {
 
   /// Always closes any open socket first, then re-connects.
   /// This fixes hot-restart ("Printer Not Found") and stale-socket reconnect
-  /// failures — the RFCOMM socket stays alive on the Android native side after
-  /// a Flutter hot-restart, so a blind connect() call returns false.
+  /// failures.
   Future<bool> connect({String? mac}) async {
     final targetMac = mac ?? (await getSelectedPrinter())?.address;
     if (targetMac == null) return false;
     await requestPermissions();
+
+    if (Platform.isIOS) {
+      // ── iOS Stability Logic ──────────────────────────────────────────────
+      
+      // 1. Wait for Bluetooth to be ready.
+      bool ready = false;
+      for (int i = 0; i < 5; i++) {
+        if (await PrintBluetoothThermal.bluetoothEnabled) {
+          ready = true;
+          break;
+        }
+        await Future.delayed(const Duration(milliseconds: 600));
+      }
+      if (!ready) return false;
+
+      // 2. Ensure the device is in the plugin's internal map.
+      // The plugin crashes (force-unwraps nil) if we connect to a UUID it hasn't 
+      // "discovered" in the current session.
+      bool found = false;
+      for (int i = 0; i < 8; i++) {
+        final devices = await getPairedDevices();
+        if (devices.any((d) => d.address.toUpperCase() == targetMac.toUpperCase())) {
+          found = true;
+          break;
+        }
+        // Scanning...
+        await Future.delayed(const Duration(milliseconds: 1200));
+      }
+      
+      if (!found) return false;
+
+      // 3. DO NOT call disconnect on iOS before connect.
+      // In this specific plugin, disconnect can clear the peripheral map, 
+      // causing the subsequent connect() to crash.
+    } else {
+      // ── Android Logic ────────────────────────────────────────────────────
+      try {
+        await PrintBluetoothThermal.disconnect;
+      } catch (_) {}
+      await Future.delayed(const Duration(milliseconds: 700));
+    }
+
     try {
-      await PrintBluetoothThermal.disconnect;
-    } catch (_) {}
-    await Future.delayed(const Duration(milliseconds: 700));
-    return PrintBluetoothThermal.connect(macPrinterAddress: targetMac);
+      return await PrintBluetoothThermal.connect(macPrinterAddress: targetMac);
+    } catch (e) {
+      debugPrint('Printer connection error: $e');
+      return false;
+    }
   }
 
   Future<bool> disconnect() => PrintBluetoothThermal.disconnect;

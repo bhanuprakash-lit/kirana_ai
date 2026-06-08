@@ -226,6 +226,8 @@
   "posCommonClear": "క్లియర్",
   "posCommonRefresh": "రిఫ్రెష్",
   "posCommonAddToCart": "కార్ట్‌కి జోడించు",
+  "posCameraPermissionRequired": "బార్‌కోడ్‌లను స్కాన్ చేయడానికి కెమెరా అనుమతి అవసరం.",
+  "posCommonSettings": "సెట్టింగ్స్",
   "posEnterQtyTitle": "{unit} నమోదు చేయండి",
   "posQtyFallback": "క్వాంటిటీ",
   "posPriceLabel": "ధర: {price}",

@@ -755,6 +755,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get posCommonAddToCart => 'कार्ट में जोड़ें';
 
   @override
+  String get posCameraPermissionRequired =>
+      'बारकोड स्कैन करने के लिए कैमरा अनुमति आवश्यक है।';
+
+  @override
+  String get posCommonSettings => 'सेटिंग्स';
+
+  @override
   String posEnterQtyTitle(String unit) {
     return '$unit दर्ज करें';
   }

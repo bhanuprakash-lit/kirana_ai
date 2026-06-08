@@ -758,6 +758,13 @@ class AppLocalizationsTe extends AppLocalizations {
   String get posCommonAddToCart => 'కార్ట్‌కి జోడించు';
 
   @override
+  String get posCameraPermissionRequired =>
+      'బార్‌కోడ్‌లను స్కాన్ చేయడానికి కెమెరా అనుమతి అవసరం.';
+
+  @override
+  String get posCommonSettings => 'సెట్టింగ్స్';
+
+  @override
   String posEnterQtyTitle(String unit) {
     return '$unit నమోదు చేయండి';
   }

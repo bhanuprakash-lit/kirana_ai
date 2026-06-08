@@ -763,6 +763,13 @@ class AppLocalizationsTa extends AppLocalizations {
   String get posCommonAddToCart => 'கார்ட்டில் சேர்';
 
   @override
+  String get posCameraPermissionRequired =>
+      'பார்கோடுகளை ஸ்கேன் செய்ய கேமரா அனுமதி தேவை.';
+
+  @override
+  String get posCommonSettings => 'அமைப்புகள்';
+
+  @override
   String posEnterQtyTitle(String unit) {
     return '$unit உள்ளிடவும்';
   }

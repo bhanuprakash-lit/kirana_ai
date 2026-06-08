@@ -755,6 +755,13 @@ class AppLocalizationsKn extends AppLocalizations {
   String get posCommonAddToCart => 'ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ';
 
   @override
+  String get posCameraPermissionRequired =>
+      'ಬಾರ್‌ಕೋಡ್‌ಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಲು ಕ್ಯಾಮರಾ ಅನುಮತಿ ಅಗತ್ಯವಿದೆ.';
+
+  @override
+  String get posCommonSettings => 'ಸೆಟ್ಟಿಂಗ್ಸ್';
+
+  @override
   String posEnterQtyTitle(String unit) {
     return '$unit ನಮೂದಿಸಿ';
   }

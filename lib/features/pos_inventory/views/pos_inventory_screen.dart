@@ -42,6 +42,11 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
             .setSubTab(_tabController.index);
       }
     });
+
+    // Initialize Bluetooth contextually when opening POS
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(printerProvider.notifier).init();
+    });
   }
 
   @override

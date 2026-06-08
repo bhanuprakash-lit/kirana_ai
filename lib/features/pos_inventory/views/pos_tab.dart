@@ -761,35 +761,6 @@ class _PosTabState extends ConsumerState<PosTab> {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    // Toggle action chips row
-                    GestureDetector(
-                      onTap: () => setState(() => _showActions = !_showActions),
-                      child: Container(
-                        width: 36,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          color: _showActions
-                              ? BrandColors.primary.withValues(alpha: 0.1)
-                              : BrandColors.surfaceTint,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: _showActions
-                                ? BrandColors.primary.withValues(alpha: 0.3)
-                                : BrandColors.border,
-                          ),
-                        ),
-                        child: Icon(
-                          _showActions
-                              ? Icons.keyboard_arrow_up_rounded
-                              : Icons.keyboard_arrow_down_rounded,
-                          size: 18,
-                          color: _showActions
-                              ? BrandColors.primary
-                              : BrandColors.ink,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
                     // Barcode scan — icon only (widely understood)
                     GestureDetector(
                       onTap: _openScanner,
@@ -809,152 +780,81 @@ class _PosTabState extends ConsumerState<PosTab> {
                     ),
                   ],
                 ),
-                // Row 2: labelled action chips (collapsible)
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
-                  child: _showActions
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: _openReferralScanner,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: BrandColors.accent.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: BrandColors.accent.withValues(
-                                        alpha: 0.35,
-                                      ),
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.card_giftcard_rounded,
-                                        size: 13,
-                                        color: BrandColors.accent,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'Referral Scan',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: BrandColors.accent,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              GestureDetector(
-                                onTap: () => showTodayOrdersSheet(context, ref),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: BrandColors.surfaceTint,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: BrandColors.border,
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.receipt_long_rounded,
-                                        size: 13,
-                                        color: BrandColors.ink,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        'Order History',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: BrandColors.ink,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                              GestureDetector(
-                                onTap: () async {
-                                  final messenger = ScaffoldMessenger.of(
-                                    context,
-                                  );
-                                  messenger.hideCurrentSnackBar();
-                                  messenger.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        _l10n.posRefreshingProducts,
-                                      ),
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
-                                  await ref
-                                      .read(posProvider.notifier)
-                                      .reloadProducts();
-                                  if (!context.mounted) return;
-                                  final err = ref.read(posProvider).error;
-                                  final count = ref
-                                      .read(posProvider)
-                                      .products
-                                      .length;
-                                  messenger.hideCurrentSnackBar();
-                                  messenger.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        err != null
-                                            ? _l10n.posRefreshFailed(err)
-                                            : _l10n.posProductsRefreshed(count),
-                                      ),
-                                      backgroundColor: err != null
-                                          ? BrandColors.error
-                                          : BrandColors.success,
-                                      duration: const Duration(
-                                        milliseconds: 1500,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: BrandColors.surfaceTint,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: BrandColors.border,
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.refresh_rounded,
-                                    size: 16,
-                                    color: BrandColors.ink,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: _openReferralScanner,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: BrandColors.accent.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: BrandColors.accent.withValues(alpha: 0.35)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.card_giftcard_rounded, size: 13, color: BrandColors.accent),
+                        SizedBox(width: 4),
+                        Text('Referral Scan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: BrandColors.accent)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => showTodayOrdersSheet(context, ref),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: BrandColors.surfaceTint,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: BrandColors.border),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.receipt_long_rounded, size: 13, color: BrandColors.ink),
+                        SizedBox(width: 4),
+                        Text('Order History', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: BrandColors.ink)),
+                      ],
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    messenger.hideCurrentSnackBar();
+                    messenger.showSnackBar(SnackBar(content: Text(_l10n.posRefreshingProducts), duration: const Duration(seconds: 2)));
+                    await ref.read(posProvider.notifier).reloadProducts();
+                    if (!context.mounted) return;
+                    final err = ref.read(posProvider).error;
+                    final count = ref.read(posProvider).products.length;
+                    messenger.hideCurrentSnackBar();
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(err != null ? _l10n.posRefreshFailed(err) : _l10n.posProductsRefreshed(count)),
+                        backgroundColor: err != null ? BrandColors.error : BrandColors.success,
+                        duration: const Duration(milliseconds: 1500),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: BrandColors.surfaceTint,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: BrandColors.border),
+                    ),
+                    child: const Icon(Icons.refresh_rounded, size: 16, color: BrandColors.ink),
+                  ),
                 ),
               ],
             ),

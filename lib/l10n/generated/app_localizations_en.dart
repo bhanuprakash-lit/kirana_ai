@@ -747,6 +747,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posCommonAddToCart => 'Add to Cart';
 
   @override
+  String get posCameraPermissionRequired =>
+      'Camera permission is required to scan barcodes.';
+
+  @override
+  String get posCommonSettings => 'Settings';
+
+  @override
   String posEnterQtyTitle(String unit) {
     return 'Enter $unit';
   }

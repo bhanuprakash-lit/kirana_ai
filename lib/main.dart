@@ -58,13 +58,8 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
     // App launched = first foreground event
     _foregroundStart = DateTime.now();
     _trackEvent('foreground');
-    // Request Bluetooth first, then notification permissions — Android can only
-    // show one system dialog at a time; concurrent requests cause one to be
-    // silently dismissed.
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref.read(printerProvider.notifier).init();
-      ref.read(notificationServiceProvider).init();
-    });
+    // Permissions are now handled contextually or via a dedicated onboarding flow
+    // to enhance the user's first-time experience.
   }
 
   @override

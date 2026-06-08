@@ -226,6 +226,8 @@
   "posCommonClear": "ತೆರವುಗೊಳಿಸಿ",
   "posCommonRefresh": "ರಿಫ್ರೆಶ್",
   "posCommonAddToCart": "ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ",
+  "posCameraPermissionRequired": "ಬಾರ್‌ಕೋಡ್‌ಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಲು ಕ್ಯಾಮರಾ ಅನುಮತಿ ಅಗತ್ಯವಿದೆ.",
+  "posCommonSettings": "ಸೆಟ್ಟಿಂಗ್ಸ್",
   "posEnterQtyTitle": "{unit} ನಮೂದಿಸಿ",
   "posQtyFallback": "ಪ್ರಮಾಣ",
   "posPriceLabel": "ಬೆಲೆ: {price}",

@@ -77,7 +77,20 @@ class NotificationService {
     // Register background handler first (required before any other FCM call)
     FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
-    // Request permissions
+    // Note: Permission is no longer requested here. Call requestPermission() when appropriate.
+    
+    // Check if permission is already granted (e.g. from previous runs)
+    final settings = await _fcm.getNotificationSettings();
+    final granted =
+        settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional;
+
+    if (!granted) return; // Don't setup foreground styling/local notifs if not allowed
+
+    _setupForegroundHandling();
+  }
+
+  Future<bool> requestPermission() async {
     final settings = await _fcm.requestPermission(
       alert: true,
       badge: true,
@@ -88,8 +101,13 @@ class NotificationService {
         settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
 
-    if (!granted) return;
+    if (granted) {
+      await _setupForegroundHandling();
+    }
+    return granted;
+  }
 
+  Future<void> _setupForegroundHandling() async {
     // Keep notifications visible while app is in foreground on Android
     await _fcm.setForegroundNotificationPresentationOptions(
       alert: true,

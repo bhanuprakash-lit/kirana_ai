@@ -226,6 +226,8 @@
   "posCommonClear": "क्लियर",
   "posCommonRefresh": "रिफ्रेश",
   "posCommonAddToCart": "कार्ट में जोड़ें",
+  "posCameraPermissionRequired": "बारकोड स्कैन करने के लिए कैमरा अनुमति आवश्यक है।",
+  "posCommonSettings": "सेटिंग्स",
   "posEnterQtyTitle": "{unit} दर्ज करें",
   "posQtyFallback": "मात्रा",
   "posPriceLabel": "कीमत: {price}",

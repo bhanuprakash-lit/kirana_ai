@@ -347,6 +347,8 @@
   "posCommonClear": "Clear",
   "posCommonRefresh": "Refresh",
   "posCommonAddToCart": "Add to Cart",
+  "posCameraPermissionRequired": "Camera permission is required to scan barcodes.",
+  "posCommonSettings": "Settings",
   "posEnterQtyTitle": "Enter {unit}",
   "@posEnterQtyTitle": {
     "placeholders": {

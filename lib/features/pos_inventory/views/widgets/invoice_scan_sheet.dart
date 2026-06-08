@@ -389,6 +389,14 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
                       }),
                     ),
                   ],
+                  const SizedBox(width: 4),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: BrandColors.muted,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ],
               ),
             ),

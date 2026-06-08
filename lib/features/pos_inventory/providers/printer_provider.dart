@@ -1,11 +1,12 @@
 // Riverpod state management for the Bluetooth thermal printer.
 //
 // Lifecycle:
-//   1. build() calls init() via Future.microtask — requests BT permissions
-//      on first load and auto-connects to the saved printer if BT is on.
-//   2. onAppResumed() — re-checks BT state when app returns to foreground.
-//   3. selectPrinter() — user picks a device; saves it and connects.
-//   4. printOrder() — verifies connection, reconnects if needed, prints.
+//   1. build() returns initial state.
+//   2. init() is called when the user opens the POS screen, requesting
+//      BT permissions contextually instead of at app launch.
+//   3. onAppResumed() — re-checks BT state when app returns to foreground.
+//   4. selectPrinter() — user picks a device; saves it and connects.
+//   5. printOrder() — verifies connection, reconnects if needed, prints.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -88,6 +89,7 @@ class PrinterStateData {
   final PrinterDevice? selectedPrinter;
   final List<PrinterDevice> pairedDevices;
   final bool loadingDevices;
+  final bool isInitialized; // Track if we've requested permissions
 
   const PrinterStateData({
     this.status = PrinterStatus.noPrinterSaved,
@@ -95,6 +97,7 @@ class PrinterStateData {
     this.selectedPrinter,
     this.pairedDevices = const [],
     this.loadingDevices = false,
+    this.isInitialized = false,
   });
 
   String get statusLabel => status.label;
@@ -109,6 +112,7 @@ class PrinterStateData {
     bool clearPrinter = false,
     List<PrinterDevice>? pairedDevices,
     bool? loadingDevices,
+    bool? isInitialized,
   }) => PrinterStateData(
     status: status ?? this.status,
     btEnabled: btEnabled ?? this.btEnabled,
@@ -117,6 +121,7 @@ class PrinterStateData {
         : (selectedPrinter ?? this.selectedPrinter),
     pairedDevices: pairedDevices ?? this.pairedDevices,
     loadingDevices: loadingDevices ?? this.loadingDevices,
+    isInitialized: isInitialized ?? this.isInitialized,
   );
 }
 
@@ -129,19 +134,27 @@ class PrinterNotifier extends Notifier<PrinterStateData> {
 
   @override
   PrinterStateData build() {
-    // Do NOT call init() here — main.dart calls it explicitly via
-    // addPostFrameCallback so BT permissions are requested after the first
-    // frame. A second microtask-based call would race and both fail.
     return const PrinterStateData();
   }
 
   // ── Init ───────────────────────────────────────────────────────────────────
 
   Future<void> init() async {
+    if (state.isInitialized) return;
+    state = state.copyWith(isInitialized: true);
+
     await _svc.requestPermissions();
 
     final saved = await _svc.getSelectedPrinter();
-    final btEnabled = await _svc.isBluetoothEnabled;
+    
+    // On iOS, the Bluetooth manager (CBCentralManager) might take a moment 
+    // to reach the .poweredOn state after the app starts.
+    bool btEnabled = false;
+    for (int i = 0; i < 5; i++) {
+      btEnabled = await _svc.isBluetoothEnabled;
+      if (btEnabled) break;
+      await Future.delayed(const Duration(milliseconds: 600));
+    }
 
     if (!btEnabled) {
       state = state.copyWith(
@@ -163,6 +176,8 @@ class PrinterNotifier extends Notifier<PrinterStateData> {
   }
 
   Future<void> onAppResumed() async {
+    if (!state.isInitialized) return;
+
     final btEnabled = await _svc.isBluetoothEnabled;
     state = state.copyWith(btEnabled: btEnabled);
 
