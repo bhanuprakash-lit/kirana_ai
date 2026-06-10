@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QR / scan frame: four corner brackets + a center scan line -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3,3h7v2.2H5.2V10H3V3zM21,3v7h-2.2V5.2H14V3H21zM3,21v-7h2.2v4.8H10V21H3zM21,21h-7v-2.2h4.8V14H21V21z" />
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M6.5,11h11v2h-11z" />
+</vector>

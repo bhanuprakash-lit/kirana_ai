@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +11,7 @@ import 'app_router.dart';
 import 'core/config/firebase_backend_config.dart';
 import 'core/locale/locale_provider.dart';
 import 'core/services/api_client.dart';
+import 'core/services/home_widget_service.dart';
 import 'core/theme/brand_theme.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'features/pos_inventory/providers/printer_provider.dart';
@@ -18,6 +20,11 @@ import 'features/support/providers/notification_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Lock orientation to portrait up
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
   // Firebase init (Remote Config, Crashlytics, Performance)
   await FirebaseBackendConfig.initialize();
@@ -58,6 +65,11 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
     // App launched = first foreground event
     _foregroundStart = DateTime.now();
     _trackEvent('foreground');
+    // Home-screen widget: register tap routing + refresh from last-known data.
+    HomeWidgetService.init();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => HomeWidgetService.update(ref),
+    );
     // Permissions are now handled contextually or via a dedicated onboarding flow
     // to enhance the user's first-time experience.
   }
@@ -75,12 +87,15 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
       _trackEvent('foreground');
       // Re-check Bluetooth state (user may have toggled it in system settings)
       ref.read(printerProvider.notifier).onAppResumed();
+      HomeWidgetService.update(ref);
     } else if (state == AppLifecycleState.paused) {
       final durationSec = _foregroundStart != null
           ? DateTime.now().difference(_foregroundStart!).inSeconds
           : null;
       _foregroundStart = null;
       _trackEvent('background', durationSec: durationSec);
+      // Leaving the app — push a complete, freshly-fetched snapshot to the widget.
+      HomeWidgetService.update(ref, fetch: true);
     }
   }
 

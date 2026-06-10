@@ -123,7 +123,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
               ref.watch(inventoryFlagsProvider).asData?.value ??
               const <int, List<String>>{};
 
-          return RefreshIndicator(
+          return RefreshIndicator.adaptive(
             onRefresh: () => ref.read(inventoryProvider.notifier).refresh(),
             color: BrandColors.primary,
             child: CustomScrollView(

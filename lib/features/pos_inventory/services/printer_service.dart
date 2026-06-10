@@ -117,7 +117,7 @@ class PrinterService {
 
   Future<List<PrinterDevice>> getPairedDevices() async {
     await requestPermissions();
-    // On iOS, this plugin's pairedBluetooths method actually triggers/returns 
+    // On iOS, this plugin's pairedBluetooths method actually triggers/returns
     // discovered BLE peripherals.
     final list = await PrintBluetoothThermal.pairedBluetooths;
     return list
@@ -142,7 +142,7 @@ class PrinterService {
 
     if (Platform.isIOS) {
       // ── iOS Stability Logic ──────────────────────────────────────────────
-      
+
       // 1. Wait for Bluetooth to be ready.
       bool ready = false;
       for (int i = 0; i < 5; i++) {
@@ -155,23 +155,25 @@ class PrinterService {
       if (!ready) return false;
 
       // 2. Ensure the device is in the plugin's internal map.
-      // The plugin crashes (force-unwraps nil) if we connect to a UUID it hasn't 
+      // The plugin crashes (force-unwraps nil) if we connect to a UUID it hasn't
       // "discovered" in the current session.
       bool found = false;
       for (int i = 0; i < 8; i++) {
         final devices = await getPairedDevices();
-        if (devices.any((d) => d.address.toUpperCase() == targetMac.toUpperCase())) {
+        if (devices.any(
+          (d) => d.address.toUpperCase() == targetMac.toUpperCase(),
+        )) {
           found = true;
           break;
         }
         // Scanning...
         await Future.delayed(const Duration(milliseconds: 1200));
       }
-      
+
       if (!found) return false;
 
       // 3. DO NOT call disconnect on iOS before connect.
-      // In this specific plugin, disconnect can clear the peripheral map, 
+      // In this specific plugin, disconnect can clear the peripheral map,
       // causing the subsequent connect() to crash.
     } else {
       // ── Android Logic ────────────────────────────────────────────────────
@@ -329,17 +331,6 @@ class PrinterService {
 
   static String _pad(int n) => n.toString().padLeft(2, '0');
 
-  String _center(String s, [int width = 32]) {
-    if (s.length >= width) return s.substring(0, width);
-    final pad = (width - s.length) ~/ 2;
-    return ' ' * pad + s;
-  }
-
-  String _wrapCenter(String text, [int width = 32]) {
-    final lines = _wordWrap(text, width);
-    return lines.map((l) => _center(l, width)).join('\n');
-  }
-
   /// Key-value pair: "Key:       Value" (key=10, value=22)
   String _kv(String key, String val) {
     final k = '$key:'.padRight(10);
@@ -395,7 +386,4 @@ class PrinterService {
   static const List<int> _alignCenter = [0x1B, 0x61, 0x01]; // ESC a 1
   static const List<int> _boldOn = [0x1B, 0x45, 0x01]; // ESC E 1
   static const List<int> _boldOff = [0x1B, 0x45, 0x00]; // ESC E 0
-  static const List<int> _dblSize = [0x1B, 0x21, 0x30]; // double width+height
-  static const List<int> _normalSize = [0x1B, 0x21, 0x00]; // normal size
-  static const List<int> _cut = [0x1D, 0x56, 0x42, 0x03]; // GS V 66 3 — cut
 }

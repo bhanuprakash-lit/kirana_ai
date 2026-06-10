@@ -110,7 +110,7 @@ class ReferralScreen extends ConsumerWidget {
     List<ReferralCampaign> campaigns,
   ) {
     final l10n = AppLocalizations.of(context);
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () => ref.read(referralCampaignsProvider.notifier).refresh(),
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),

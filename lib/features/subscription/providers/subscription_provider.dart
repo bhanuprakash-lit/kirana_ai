@@ -111,6 +111,10 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
         ? _l10n.subTrialLastDayMessage
         : _l10n.subTrialDaysLeftMessage(daysLeft);
 
+    final title = daysLeft <= 0
+        ? _l10n.subTrialExpiredTitle
+        : _l10n.subTrialExpiringSoon;
+
     final priority = daysLeft <= 3 ? AlertPriority.high : AlertPriority.medium;
 
     ref
@@ -118,7 +122,7 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
         .addCustomAlert(
           BusinessAlert(
             id: 'trial_expiry_$today',
-            title: _l10n.subTrialExpiringSoon,
+            title: title,
             message: message,
             type: AlertType.subscription,
             priority: priority,
@@ -128,15 +132,20 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
         );
 
     // Fire-and-forget FCM push
-    unawaited(_sendPushNotification(daysLeft, message));
+    unawaited(_sendPushNotification(daysLeft, title, message));
     await prefs.setString('sub_alert_day', today);
   }
 
-  Future<void> _sendPushNotification(int daysLeft, String body) async {
+  Future<void> _sendPushNotification(
+    int daysLeft,
+    String title,
+    String body,
+  ) async {
     try {
       final client = ref.read(apiClientProvider);
       await client.post('/kirana/subscription/send-reminder', {
         'days_left': daysLeft,
+        'title': title,
         'message': body,
       });
     } catch (_) {}

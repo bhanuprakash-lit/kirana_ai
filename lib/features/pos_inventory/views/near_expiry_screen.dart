@@ -73,7 +73,7 @@ class NearExpiryScreen extends ConsumerWidget {
               error: (e, _) => _ErrorState(onRetry: () => notifier.refresh()),
               data: (batches) => batches.isEmpty
                   ? const _EmptyState()
-                  : RefreshIndicator(
+                  : RefreshIndicator.adaptive(
                       onRefresh: () => notifier.refresh(),
                       child: ListView.builder(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),

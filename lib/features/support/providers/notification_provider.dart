@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -15,17 +17,80 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
   debugPrint('FCM background message: ${message.messageId}');
 }
 
+@pragma('vm:entry-point')
+void _onNotificationTapBackground(NotificationResponse response) {
+  // Action-button taps on a notification shown while the app is terminated land
+  // here in a separate isolate. We can't touch the main-isolate navigation from
+  // here, so the app simply opens; deep-linking applies to foreground/resumed
+  // taps. Kept registered so the plugin doesn't warn.
+}
+
+// ── Notification channels ─────────────────────────────────────────────────────
+// Splitting into categories lets users mute one kind (e.g. tips) without
+// silencing payments or stock alerts. Channel IDs MUST match what the backend
+// sets in AndroidNotification.channel_id (via the `channel` data field).
+
+const String kDefaultChannelId = 'kirana_ai_high';
+
+class _Channel {
+  final String id;
+  final String name;
+  final String description;
+  final Importance importance;
+  const _Channel(this.id, this.name, this.description, this.importance);
+}
+
+const List<_Channel> _channels = <_Channel>[
+  _Channel(
+    'kirana_payments',
+    'Payments & Udhaar',
+    'Customer dues and supplier payment reminders',
+    Importance.high,
+  ),
+  _Channel(
+    'kirana_stock',
+    'Stock Alerts',
+    'Low-stock and expiry warnings',
+    Importance.high,
+  ),
+  _Channel(
+    'kirana_sales',
+    'Sales & Billing',
+    'Cart and billing reminders',
+    Importance.high,
+  ),
+  _Channel(
+    'kirana_summary',
+    'Daily Summary',
+    'Daily and weekly business summaries',
+    Importance.defaultImportance, // informational — no heads-up intrusion
+  ),
+  _Channel(
+    'kirana_growth',
+    'Tips & Offers',
+    'Growth tips and feature suggestions',
+    Importance.low,
+  ),
+  _Channel(
+    'kirana_account',
+    'Account & Subscription',
+    'Subscription and account updates',
+    Importance.high,
+  ),
+  // Legacy / fallback channel — also the manifest default_notification_channel_id.
+  _Channel(
+    kDefaultChannelId,
+    'Kirana AI Alerts',
+    'Important alerts from Kirana AI',
+    Importance.high,
+  ),
+];
+
+final Map<String, _Channel> _channelById = {for (final c in _channels) c.id: c};
+
 // ── Local notifications setup ─────────────────────────────────────────────────
 
 final _localNotifications = FlutterLocalNotificationsPlugin();
-
-const _androidChannel = AndroidNotificationChannel(
-  'kirana_ai_high', // must match what FCM uses or what you send
-  'Kirana AI Alerts',
-  description: 'Important alerts from Kirana AI',
-  importance: Importance.high,
-  playSound: true,
-);
 
 Future<void> initLocalNotifications() async {
   const android = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -37,29 +102,76 @@ Future<void> initLocalNotifications() async {
   await _localNotifications.initialize(
     const InitializationSettings(android: android, iOS: iOS),
     onDidReceiveNotificationResponse: _onNotificationTap,
+    onDidReceiveBackgroundNotificationResponse: _onNotificationTapBackground,
   );
 
-  // Create the Android notification channel
-  await _localNotifications
+  // Create every Android notification channel up front.
+  final androidImpl = _localNotifications
       .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
-      >()
-      ?.createNotificationChannel(_androidChannel);
+      >();
+  if (androidImpl != null) {
+    for (final c in _channels) {
+      await androidImpl.createNotificationChannel(
+        AndroidNotificationChannel(
+          c.id,
+          c.name,
+          description: c.description,
+          importance: c.importance,
+          playSound: true,
+        ),
+      );
+    }
+  }
+}
+
+// ── Pending navigation (deep-link from a tapped notification) ─────────────────
+// Stores the full nav intent (route + tab + subtab) rather than a bare route,
+// so tab/subtab targeting from the backend actually takes effect.
+
+Map<String, String>? _pendingNav;
+void Function()? _onPendingNav;
+
+/// Dashboard registers a callback so taps that arrive while it's already alive
+/// (foreground tap, or resume from background) navigate immediately.
+void registerPendingNavListener(void Function() cb) => _onPendingNav = cb;
+void clearPendingNavListener() => _onPendingNav = null;
+
+/// Returns and clears the pending navigation intent, if any.
+Map<String, String>? consumePendingNavigation() {
+  final nav = _pendingNav;
+  _pendingNav = null;
+  return nav;
+}
+
+/// Sets a pending navigation intent from outside the FCM flow (e.g. a home-screen
+/// widget tap) and pings the listener so it's applied immediately when the app
+/// is already running.
+void setPendingNavigation(Map<String, String> nav) {
+  _pendingNav = nav;
+  _onPendingNav?.call();
+}
+
+Map<String, String> _navFromData(Map<String, dynamic> data) {
+  final out = <String, String>{};
+  for (final key in const ['route', 'tab', 'subtab', 'action']) {
+    final v = data[key];
+    if (v != null && '$v'.isNotEmpty) out[key] = '$v';
+  }
+  return out;
 }
 
 void _onNotificationTap(NotificationResponse response) {
-  // payload carries the FCM 'action' value; handled by NotificationService
-  debugPrint('Notification tapped: ${response.payload}');
-  _pendingAction = response.payload;
-}
-
-// Pending deep-link action set when the user taps a notification.
-String? _pendingAction;
-
-String? consumePendingAction() {
-  final action = _pendingAction;
-  _pendingAction = null;
-  return action;
+  final payload = response.payload;
+  if (payload == null || payload.isEmpty) return;
+  try {
+    final decoded = jsonDecode(payload) as Map;
+    _pendingNav = decoded.map((k, v) => MapEntry('$k', '$v'));
+  } catch (_) {
+    // Legacy plain-string payloads were a bare route.
+    _pendingNav = {'route': payload};
+  }
+  _onPendingNav?.call();
 }
 
 // ── NotificationService ───────────────────────────────────────────────────────
@@ -78,7 +190,7 @@ class NotificationService {
     FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
     // Note: Permission is no longer requested here. Call requestPermission() when appropriate.
-    
+
     // Check if permission is already granted (e.g. from previous runs)
     final settings = await _fcm.getNotificationSettings();
     final granted =
@@ -87,7 +199,7 @@ class NotificationService {
 
     if (!granted) return; // Don't setup foreground styling/local notifs if not allowed
 
-    _setupForegroundHandling();
+    await _setupForegroundHandling();
   }
 
   Future<bool> requestPermission() async {
@@ -140,12 +252,10 @@ class NotificationService {
     if (n == null) return;
 
     final data = message.data;
-    final route = data['route'] as String?;
-    final action = data['action'] as String?;
-    final logId = data['log_id'] as String?;
-
-    // Use route as payload so tapping the local notification deep-links correctly
-    final payload = route ?? action;
+    final channelId = data['channel'] ?? kDefaultChannelId;
+    final channel = _channelById[channelId] ?? _channelById[kDefaultChannelId]!;
+    final nav = _navFromData(data);
+    final cta = data['cta'];
 
     _localNotifications.show(
       message.hashCode,
@@ -153,34 +263,45 @@ class NotificationService {
       n.body,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          _androidChannel.id,
-          _androidChannel.name,
-          channelDescription: _androidChannel.description,
-          importance: Importance.high,
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          importance: channel.importance,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
+          // Expandable long text so summaries/reports aren't truncated.
+          styleInformation: BigTextStyleInformation(
+            n.body ?? '',
+            contentTitle: n.title,
+          ),
+          actions: (cta != null && cta.isNotEmpty)
+              ? <AndroidNotificationAction>[
+                  AndroidNotificationAction(
+                    'cta',
+                    cta,
+                    showsUserInterface: true,
+                  ),
+                ]
+              : null,
         ),
         iOS: const DarwinNotificationDetails(),
       ),
-      payload: payload,
+      // Tapping the local notification deep-links via the full nav intent.
+      payload: nav.isEmpty ? null : jsonEncode(nav),
     );
 
-    _handleAction(action, route: route);
-    _markOpened(logId);
+    _handleAction(data['action'], route: data['route']);
+    _markOpened(data['log_id']);
   }
 
   // ── Tap handler (background resume or terminated launch) ──────────────────
 
   void _handleMessageTap(RemoteMessage message) {
     final data = message.data;
-    // New intelligence notifications use 'route'; legacy ones use 'action'
-    final route = data['route'] as String?;
-    final action = data['action'] as String?;
-    final logId = data['log_id'] as String?;
-
-    _pendingAction = route ?? action;
-    _markOpened(logId);
-    _handleAction(action, route: route);
+    _pendingNav = _navFromData(data);
+    _markOpened(data['log_id']);
+    _handleAction(data['action'], route: data['route']);
+    _onPendingNav?.call();
   }
 
   // ── Mark a notification as opened (best-effort) ────────────────────────────

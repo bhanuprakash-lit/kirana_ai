@@ -86,7 +86,7 @@ class _IntelligenceDetailScreenState
                   );
                 }
 
-                return RefreshIndicator(
+                return RefreshIndicator.adaptive(
                   onRefresh: () async =>
                       ref.invalidate(intelligenceProvider(widget.type)),
                   child: ListView.separated(

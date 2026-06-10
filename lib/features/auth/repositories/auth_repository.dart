@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/services/device_info.dart';
 import '../models/app_user.dart';
 
 class ApiException implements Exception {
@@ -65,9 +66,10 @@ class AuthRepository {
 
   Future<void> _obtainPosToken(String username, String password) async {
     try {
+      final telemetry = await DeviceTelemetry.headers();
       final res = await http.post(
         Uri.parse('${AppConfig.apiBaseUrl}/pos/token'),
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {...telemetry, 'Content-Type': 'application/x-www-form-urlencoded'},
         body:
             'username=${Uri.encodeComponent(username)}&password=${Uri.encodeComponent(password)}',
       );
@@ -83,9 +85,10 @@ class AuthRepository {
 
   Future<void> _obtainPosTokenFromKirana(String kiranaToken) async {
     try {
+      final telemetry = await DeviceTelemetry.headers();
       final res = await http.post(
         Uri.parse('${AppConfig.apiBaseUrl}/pos/token-from-kirana'),
-        headers: {'Authorization': 'Bearer $kiranaToken'},
+        headers: {...telemetry, 'Authorization': 'Bearer $kiranaToken'},
       );
       if (res.statusCode == 200) {
         final json = jsonDecode(res.body) as Map<String, dynamic>;
@@ -178,9 +181,10 @@ class AuthRepository {
     required String username,
     required String password,
   }) async {
+    final telemetry = await DeviceTelemetry.headers();
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/login'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {...telemetry, 'Content-Type': 'application/json'},
       body: jsonEncode({'username': username, 'password': password}),
     );
     if (res.statusCode == 200) {
@@ -199,9 +203,10 @@ class AuthRepository {
     required String phoneNumber,
     required String firebaseUid,
   }) async {
+    final telemetry = await DeviceTelemetry.headers();
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/phone-login'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {...telemetry, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'phone_number': phoneNumber,
         'firebase_uid': firebaseUid,
@@ -252,9 +257,10 @@ class AuthRepository {
     double? latitude,
     double? longitude,
   }) async {
+    final telemetry = await DeviceTelemetry.headers();
     final res = await http.post(
       Uri.parse('${AppConfig.apiBaseUrl}/kirana/auth/register'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {...telemetry, 'Content-Type': 'application/json'},
       body: jsonEncode({
         'username': username,
         'password': password,

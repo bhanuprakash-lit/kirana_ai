@@ -349,7 +349,7 @@ class _KpiDashboardView extends ConsumerWidget {
 
     final grouped = state.groupedSubscribedData;
 
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: onRefresh,
       child: ListView.builder(
         padding: const EdgeInsets.all(16),

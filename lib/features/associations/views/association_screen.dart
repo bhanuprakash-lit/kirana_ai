@@ -114,7 +114,7 @@ class _AssociationsTab extends ConsumerWidget {
             ),
           );
         }
-        return RefreshIndicator(
+        return RefreshIndicator.adaptive(
           onRefresh: () => ref.read(associationProvider.notifier).refresh(),
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -289,7 +289,7 @@ class _HeatmapTab extends ConsumerWidget {
           (m, r) => r.totalRevenue > m ? r.totalRevenue : m,
         );
 
-        return RefreshIndicator(
+        return RefreshIndicator.adaptive(
           onRefresh: () => ref.read(heatmapProvider.notifier).refresh(),
           child: ListView(
             padding: const EdgeInsets.all(16),

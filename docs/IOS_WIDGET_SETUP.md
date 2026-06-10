@@ -1,0 +1,107 @@
+# iOS Home-Screen Widgets — Mac/Xcode Setup
+
+The Dart wiring and the SwiftUI source (`ios/KiranaWidget/KiranaWidget.swift`) are
+already committed. The steps below create the Widget Extension target, the shared
+App Group, and the deep-link wiring — these must be done **in Xcode on a Mac**
+(they can't be done from the Windows dev box).
+
+Three widgets are defined: **KiranaMediumWidget** (4-stat glance, data-driven),
+**KiranaNewSaleWidget** (small — opens scanner), **KiranaVisionWidget** (small —
+"coming soon" toast).
+
+## Prerequisites
+- macOS + Xcode.
+- An Apple Developer account (the App Group capability needs it).
+- `cd ios && pod install` after pulling (the `home_widget` pod must be installed).
+
+## 1. Create the Widget Extension target
+1. Open `ios/Runner.xcworkspace` in Xcode.
+2. **File → New → Target… → Widget Extension**. Name it **`KiranaWidget`**.
+   - Uncheck **Include Configuration App Intent** and **Include Live Activity**
+     (we use a plain `StaticConfiguration`).
+   - Team = your team. Activate the scheme when prompted.
+3. Xcode generates a placeholder `KiranaWidget.swift` + assets in a new group.
+   **Delete the placeholder `.swift`** and instead add our committed file
+   `ios/KiranaWidget/KiranaWidget.swift` to the project, with **Target Membership =
+   KiranaWidgetExtension only** (not Runner). (Keep the Xcode-generated
+   `Info.plist` and `Assets.xcassets` for the extension.)
+4. Set the extension's **Minimum Deployments** to match Runner (iOS 14+ is fine;
+   the code guards iOS-17 APIs).
+
+## 2. Shared App Group (data bridge)
+The app writes widget data into `group.com.lohiya.kiranaAi`; the widget reads it.
+Add the **same** App Group to **both** targets:
+1. Select the **Runner** target → **Signing & Capabilities → + Capability → App Groups**
+   → add `group.com.lohiya.kiranaAi`.
+2. Select the **KiranaWidgetExtension** target → add the **same** App Group.
+3. With "Automatically manage signing" on, Xcode registers the group in the portal.
+   This creates `Runner.entitlements` and `KiranaWidgetExtension.entitlements`,
+   each listing the group.
+
+> The id must exactly match `_appGroupId` in
+> `lib/core/services/home_widget_service.dart` (`group.com.lohiya.kiranaAi`).
+
+## 3. Deep links (widget tap → app screen)
+Widget taps open `kiranaai://w?...` URLs. The app already parses these in
+`HomeWidgetService._handleUri` (→ `setPendingNavigation` → dashboard). We just need
+the URL delivered to the `home_widget` plugin. This app uses a **SceneDelegate**,
+so forward URL contexts:
+
+```swift
+// ios/Runner/SceneDelegate.swift
+import home_widget   // module name may be `home_widget` (underscored)
+
+func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
+           options connectionOptions: UIScene.ConnectionOptions) {
+    // ... existing setup ...
+    if let url = connectionOptions.urlContexts.first?.url {
+        HomeWidgetPlugin.shared?.handleWidgetClicked(url)  // see note below
+    }
+}
+
+func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    if let url = URLContexts.first?.url {
+        HomeWidgetPlugin.shared?.handleWidgetClicked(url)
+    }
+}
+```
+
+> **Validate this against the `home_widget` 0.7 iOS API.** The exact forwarding
+> entry point varies by version — some versions hook `application(_:open:)` in
+> AppDelegate automatically (non-scene apps), others need the scene forwarding
+> above. If `HomeWidget.widgetClicked` / `initiallyLaunchedFromHomeWidget()` don't
+> fire on tap, this is the place to fix. As a fallback, register the URL scheme so
+> the app receives the URL at all:
+
+Optionally register the scheme in `ios/Runner/Info.plist`:
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array><string>kiranaai</string></array>
+  </dict>
+</array>
+```
+
+## 4. Build & run
+1. `cd ios && pod install`
+2. Select the **Runner** scheme → run on a simulator/device once (so the app writes
+   a first snapshot into the App Group; open the app while logged in).
+3. Long-press the home screen → **+** → **Kirana AI** → add the medium and the two
+   small widgets.
+4. Tap each: medium cells deep-link (per-cell taps need **iOS 17+**; on older iOS
+   the whole medium widget opens the overview), New Sale opens the scanner, Vision
+   AI shows the "coming soon" toast.
+
+## Notes
+- The medium widget refreshes when the app foregrounds/backgrounds (the app calls
+  `updateWidget(iOSName: "KiranaMediumWidget")`) plus a 30-min safety timeline.
+  WidgetKit throttles refreshes — "fresh after app use or push" is the realistic
+  promise, same as Android.
+- Small widgets are static (no data) — pure action launchers, English labels.
+- Icons use SF Symbols (`qrcode.viewfinder`, `sparkles`); no asset import needed.
+- Snapshot keys are shared with Android — see
+  `lib/core/services/home_widget_service.dart` and the `KiranaSnapshot.load()`
+  reader in the Swift file. Keep them in sync.

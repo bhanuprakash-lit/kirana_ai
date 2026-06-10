@@ -68,7 +68,7 @@ class BasketsScreen extends ConsumerWidget {
         ),
         data: (baskets) => baskets.isEmpty
             ? _buildEmpty(context, ref)
-            : RefreshIndicator(
+            : RefreshIndicator.adaptive(
                 onRefresh: () => ref.read(basketProvider.notifier).refresh(),
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),

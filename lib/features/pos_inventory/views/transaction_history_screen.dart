@@ -128,7 +128,7 @@ class _TransactionHistoryScreenState
                   )
                 : _orders == null || _orders!.isEmpty
                 ? _EmptyHistory(onReset: _resetFilters)
-                : RefreshIndicator(
+                : RefreshIndicator.adaptive(
                     onRefresh: _load,
                     child: ListView.separated(
                       padding: const EdgeInsets.all(20),

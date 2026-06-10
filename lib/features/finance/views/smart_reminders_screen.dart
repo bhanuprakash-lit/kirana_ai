@@ -49,7 +49,7 @@ class SmartRemindersScreen extends ConsumerWidget {
         ),
         data: (list) => list.isEmpty
             ? const _Empty()
-            : RefreshIndicator(
+            : RefreshIndicator.adaptive(
                 onRefresh: () =>
                     ref.read(smartUdhaarProvider.notifier).refresh(),
                 child: ListView.builder(

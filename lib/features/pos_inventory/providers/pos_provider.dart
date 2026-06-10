@@ -525,3 +525,14 @@ class PosNotifier extends Notifier<PosState> {
 final posProvider = NotifierProvider.autoDispose<PosNotifier, PosState>(
   PosNotifier.new,
 );
+
+/// Bumped to ask the POS tab to open the continuous scanner (e.g. from the
+/// home-screen widget's "New Bill" action). POS tab listens and opens the sheet.
+class PosScanRequestNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+  void request() => state++;
+}
+
+final posScanRequestProvider =
+    NotifierProvider<PosScanRequestNotifier, int>(PosScanRequestNotifier.new);

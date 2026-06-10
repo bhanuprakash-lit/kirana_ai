@@ -44,7 +44,7 @@ class ProcurementTab extends ConsumerWidget {
         child: ListShimmer(itemCount: 6),
       ),
       error: (err, _) => Center(child: Text(l10n.procErrorWithMessage('$err'))),
-      data: (data) => RefreshIndicator(
+      data: (data) => RefreshIndicator.adaptive(
         onRefresh: () async {
           await ref.read(procurementProvider.notifier).refresh();
           await ref.read(reorderProvider.notifier).refresh();

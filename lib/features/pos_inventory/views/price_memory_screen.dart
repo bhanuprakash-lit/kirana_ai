@@ -49,7 +49,7 @@ class PriceMemoryScreen extends ConsumerWidget {
         ),
         data: (list) => list.isEmpty
             ? const _Empty()
-            : RefreshIndicator(
+            : RefreshIndicator.adaptive(
                 onRefresh: () =>
                     ref.read(priceMemoryProvider.notifier).refresh(),
                 child: ListView.builder(

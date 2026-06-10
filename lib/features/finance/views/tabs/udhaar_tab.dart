@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -51,8 +53,9 @@ class UdhaarTab extends ConsumerWidget {
           ],
         ),
       ),
-      data: (data) => RefreshIndicator(
+      data: (data) => RefreshIndicator.adaptive(
         onRefresh: () => ref.read(financeProvider.notifier).refresh(),
+        color: BrandColors.primary,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [

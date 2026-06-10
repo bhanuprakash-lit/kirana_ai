@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../../../l10n/generated/app_localizations.dart';
-import '../../../shared/widgets/shimmer_widgets.dart';
+import '../../pos_inventory/providers/pos_provider.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
 import '../../finance/views/finance_screen.dart';
 import '../../auth/providers/user_provider.dart';
@@ -58,6 +58,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Navigate immediately when a notification is tapped while this screen is
+    // already alive (foreground tap, or resume from background).
+    registerPendingNavListener(_handlePendingNotification);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notificationServiceProvider).init();
       ref.read(userProvider.notifier).refresh();
@@ -71,6 +74,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   @override
   void dispose() {
+    clearPendingNavListener();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -107,11 +111,62 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   }
 
   void _handlePendingNotification() {
-    final route = consumePendingAction();
-    if (route != null && mounted) {
-      // Small delay so the dashboard finishes building before navigating
-      Future.delayed(const Duration(milliseconds: 500), () {
+    final nav = consumePendingNavigation();
+    if (nav == null || !mounted) return;
+
+    final tab = nav['tab'];
+    final subtab = nav['subtab'];
+    final route = nav['route'];
+    final action = nav['action'];
+
+    // 1) Switch the bottom-nav tab (0=Overview, 1=Finance, 2=POS/Inventory).
+    final tabIndex = switch (tab) {
+      'finance' => 1,
+      'pos' => 2,
+      'home' || 'overview' => 0,
+      _ => null,
+    };
+    if (tabIndex != null) {
+      ref.read(dashboardTabProvider.notifier).switchTab(tabIndex);
+    }
+
+    // 2) Switch the sub-tab within that tab, if provided.
+    final subIndex = subtab != null ? int.tryParse(subtab) : null;
+    if (subIndex != null) {
+      if (tab == 'finance') {
+        ref.read(financeSubTabProvider.notifier).setSubTab(subIndex);
+      } else {
+        ref.read(dashboardSubTabProvider.notifier).setSubTab(subIndex);
+      }
+    }
+
+    // 3) Push a deeper screen route if one is targeted (anything but the home
+    //    dashboard, which the tab switch above already handles).
+    if (route != null && route.isNotEmpty && route != '/home') {
+      // Small delay so the dashboard finishes building before navigating.
+      Future.delayed(const Duration(milliseconds: 300), () {
         if (mounted) context.push(route);
+      });
+    }
+
+    // 4) Run a requested action — e.g. "New Bill" / "Sales QR" on the widget
+    //    open the item scanner directly. Delay so POS is settled and listening.
+    if (action == 'scan') {
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) ref.read(posScanRequestProvider.notifier).request();
+      });
+    }
+
+    // 5) Vision AI widget — feature not built yet; land on the dashboard and
+    //    show a "coming soon" toast.
+    if (action == 'vision') {
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context).visionComingSoon),
+          ),
+        );
       });
     }
   }
@@ -132,14 +187,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       loading: () => _buildDashboard(currentTab),
       error: (_, _) => _buildDashboard(currentTab),
       data: (sub) {
-        if (sub.isPending)
+        if (sub.isPending) {
           return _PendingActivationScreen(
             onRefresh: () => ref.read(subscriptionProvider.notifier).refresh(),
           );
-        if (sub.isExpired)
+        }
+        if (sub.isExpired) {
           return _UpgradeWall(
             onRefresh: () => ref.read(subscriptionProvider.notifier).refresh(),
           );
+        }
         if (!sub.hasAppAccess) return const _RequestTrialScreen();
         return _buildDashboard(currentTab);
       },

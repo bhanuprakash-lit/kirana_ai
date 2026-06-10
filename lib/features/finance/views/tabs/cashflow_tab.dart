@@ -82,7 +82,7 @@ class CashflowTab extends ConsumerWidget {
             ? const Color(0xFFD97706)
             : BrandColors.error;
 
-        return RefreshIndicator(
+        return RefreshIndicator.adaptive(
           onRefresh: () => ref.read(financeProvider.notifier).refresh(),
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),

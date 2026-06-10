@@ -101,7 +101,7 @@ class DistributorTab extends ConsumerWidget {
         final next7Due = next7.fold(0.0, (s, p) => s + p.totalAmount);
         final paid7Total = paidLast7.fold(0.0, (s, p) => s + p.totalAmount);
 
-        return RefreshIndicator(
+        return RefreshIndicator.adaptive(
           onRefresh: () => ref.read(procurementProvider.notifier).refresh(),
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),

@@ -39,7 +39,6 @@ class PosTab extends ConsumerStatefulWidget {
 class _PosTabState extends ConsumerState<PosTab> {
   final _searchCtrl = TextEditingController();
   String _query = '';
-  bool _showActions = false;
 
   AppLocalizations get _l10n =>
       lookupAppLocalizations(ref.read(localeProvider));
@@ -678,6 +677,12 @@ class _PosTabState extends ConsumerState<PosTab> {
 
   @override
   Widget build(BuildContext context) {
+    // Open the scanner when something requests it (e.g. the home-screen widget's
+    // "New Bill" action deep-link). Guard against re-entrancy if already open.
+    ref.listen<int>(posScanRequestProvider, (_, _) {
+      if (mounted) _openScanner();
+    });
+
     final state = ref.watch(posProvider);
     final cart = state.cart;
     final isSearching = _query.isNotEmpty;

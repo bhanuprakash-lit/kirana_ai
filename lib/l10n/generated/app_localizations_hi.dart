@@ -2992,6 +2992,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get subTrialExpiringSoon => 'ट्रायल जल्द खत्म हो रहा है';
 
   @override
+  String get subTrialExpiredTitle => 'Trial Expired';
+
+  @override
   String get mktMyBaskets => 'मेरे बास्केट';
 
   @override
@@ -4461,4 +4464,43 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get psetBankAxisDesc => 'रिटेल स्टोर्स के लिए अनुकूल फाइनेंस';
+
+  @override
+  String get widgetTitleSales => 'Today\'s Sales';
+
+  @override
+  String get widgetTitleUdhaar => 'Udhaar Due';
+
+  @override
+  String get widgetTitleLowStock => 'Low Stock';
+
+  @override
+  String get widgetTitlePayToday => 'Pay Today';
+
+  @override
+  String get widgetNewBill => '+ New Bill';
+
+  @override
+  String get widgetUnitOrders => 'orders';
+
+  @override
+  String get widgetUnitItems => 'items';
+
+  @override
+  String get widgetUnitOverdue => 'overdue';
+
+  @override
+  String get widgetUnitPending => 'pending';
+
+  @override
+  String get widgetUnitToPay => 'to pay';
+
+  @override
+  String get widgetSignIn => 'Open Kirana AI to sign in';
+
+  @override
+  String get widgetNoData => 'Open the app to load today\'s numbers';
+
+  @override
+  String get visionComingSoon => 'Vision AI is coming soon!';
 }

@@ -1,4 +1,7 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -84,6 +87,18 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
 
     return Scaffold(
       backgroundColor: BrandColors.background,
+      appBar: AppBar(
+        toolbarHeight: 90,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        flexibleSpace: _GreetingHeader(
+          greeting: _greeting,
+          fullName: _fullName,
+          storeName: _storeName,
+          dateLabel: _dateLabel,
+        ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'overview_pos_fab',
         onPressed: () {
@@ -100,45 +115,71 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () => ref.read(overviewProvider.notifier).refresh(),
-        color: BrandColors.primary,
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: _GreetingHeader(
-                greeting: _greeting,
-                fullName: _fullName,
-                storeName: _storeName,
-                dateLabel: _dateLabel,
-              ),
-            ),
-            asyncData.when(
-              loading: () => const SliverToBoxAdapter(child: OverviewShimmer()),
-              error: (err, _) => SliverFillRemaining(
-                child: _ErrorView(
-                  message: err.toString(),
-                  onRetry: () => ref.read(overviewProvider.notifier).refresh(),
+      body: Platform.isIOS
+          ? CustomScrollView(
+              slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: () => ref.read(overviewProvider.notifier).refresh(),
                 ),
-              ),
-              data: (data) => SliverList(
-                delegate: SliverChildListDelegate([
-                  _MorningBriefingRibbon(reco: data.recommendations),
-                  const _ProAlertsStrip(),
-                  _IntelligenceStrip(reco: data.recommendations),
-                  const SizedBox(height: 24),
-                  _TodaySalesCard(sales: data.dailySales),
-                  const SizedBox(height: 16),
-                  const _KpiSummaryRow(),
-                  const SizedBox(height: 16),
-                  _StoreOverviewCard(store: data.store),
-                  const SizedBox(height: 100),
-                ]),
+                asyncData.when(
+                  loading: () => const SliverToBoxAdapter(child: OverviewShimmer()),
+                  error: (err, _) => SliverFillRemaining(
+                    child: _ErrorView(
+                      message: err.toString(),
+                      onRetry: () =>
+                          ref.read(overviewProvider.notifier).refresh(),
+                    ),
+                  ),
+                  data: (data) => SliverList(
+                    delegate: SliverChildListDelegate([
+                      _MorningBriefingRibbon(reco: data.recommendations),
+                      const _ProAlertsStrip(),
+                      _IntelligenceStrip(reco: data.recommendations),
+                      const SizedBox(height: 24),
+                      _TodaySalesCard(sales: data.dailySales),
+                      const SizedBox(height: 16),
+                      const _KpiSummaryRow(),
+                      const SizedBox(height: 16),
+                      _StoreOverviewCard(store: data.store),
+                      const SizedBox(height: 100),
+                    ]),
+                  ),
+                ),
+              ],
+            )
+          : RefreshIndicator.adaptive(
+              onRefresh: () => ref.read(overviewProvider.notifier).refresh(),
+              color: BrandColors.primary,
+              child: CustomScrollView(
+                slivers: [
+                  asyncData.when(
+                    loading: () =>
+                        const SliverToBoxAdapter(child: OverviewShimmer()),
+                    error: (err, _) => SliverFillRemaining(
+                      child: _ErrorView(
+                        message: err.toString(),
+                        onRetry: () =>
+                            ref.read(overviewProvider.notifier).refresh(),
+                      ),
+                    ),
+                    data: (data) => SliverList(
+                      delegate: SliverChildListDelegate([
+                        _MorningBriefingRibbon(reco: data.recommendations),
+                        const _ProAlertsStrip(),
+                        _IntelligenceStrip(reco: data.recommendations),
+                        const SizedBox(height: 24),
+                        _TodaySalesCard(sales: data.dailySales),
+                        const SizedBox(height: 16),
+                        const _KpiSummaryRow(),
+                        const SizedBox(height: 16),
+                        _StoreOverviewCard(store: data.store),
+                        const SizedBox(height: 100),
+                      ]),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -267,15 +308,14 @@ class _GreetingHeader extends ConsumerWidget {
           colors: [BrandColors.primary, Color(0xFF1E3A5F)],
         ),
       ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(22, 20, 22, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 50), // Spacer for status bar area
+            Row(
+              children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,8 +376,7 @@ class _GreetingHeader extends ConsumerWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

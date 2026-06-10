@@ -3096,6 +3096,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get subTrialExpiringSoon => 'சோதனை விரைவில் காலாவதியாகிறது';
 
   @override
+  String get subTrialExpiredTitle => 'Trial Expired';
+
+  @override
   String get mktMyBaskets => 'எனது கூடைகள்';
 
   @override
@@ -4581,4 +4584,43 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get psetBankAxisDesc => 'சில்லறை கடைகளுக்கான தனிப்பயன் நிதி';
+
+  @override
+  String get widgetTitleSales => 'Today\'s Sales';
+
+  @override
+  String get widgetTitleUdhaar => 'Udhaar Due';
+
+  @override
+  String get widgetTitleLowStock => 'Low Stock';
+
+  @override
+  String get widgetTitlePayToday => 'Pay Today';
+
+  @override
+  String get widgetNewBill => '+ New Bill';
+
+  @override
+  String get widgetUnitOrders => 'orders';
+
+  @override
+  String get widgetUnitItems => 'items';
+
+  @override
+  String get widgetUnitOverdue => 'overdue';
+
+  @override
+  String get widgetUnitPending => 'pending';
+
+  @override
+  String get widgetUnitToPay => 'to pay';
+
+  @override
+  String get widgetSignIn => 'Open Kirana AI to sign in';
+
+  @override
+  String get widgetNoData => 'Open the app to load today\'s numbers';
+
+  @override
+  String get visionComingSoon => 'Vision AI is coming soon!';
 }

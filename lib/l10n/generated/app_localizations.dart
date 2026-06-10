@@ -5310,6 +5310,12 @@ abstract class AppLocalizations {
   /// **'Trial Expiring Soon'**
   String get subTrialExpiringSoon;
 
+  /// No description provided for @subTrialExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial Expired'**
+  String get subTrialExpiredTitle;
+
   /// No description provided for @mktMyBaskets.
   ///
   /// In en, this message translates to:
@@ -7888,6 +7894,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tailored finance for retail stores'**
   String get psetBankAxisDesc;
+
+  /// No description provided for @widgetTitleSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Sales'**
+  String get widgetTitleSales;
+
+  /// No description provided for @widgetTitleUdhaar.
+  ///
+  /// In en, this message translates to:
+  /// **'Udhaar Due'**
+  String get widgetTitleUdhaar;
+
+  /// No description provided for @widgetTitleLowStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Stock'**
+  String get widgetTitleLowStock;
+
+  /// No description provided for @widgetTitlePayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay Today'**
+  String get widgetTitlePayToday;
+
+  /// No description provided for @widgetNewBill.
+  ///
+  /// In en, this message translates to:
+  /// **'+ New Bill'**
+  String get widgetNewBill;
+
+  /// No description provided for @widgetUnitOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'orders'**
+  String get widgetUnitOrders;
+
+  /// No description provided for @widgetUnitItems.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get widgetUnitItems;
+
+  /// No description provided for @widgetUnitOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'overdue'**
+  String get widgetUnitOverdue;
+
+  /// No description provided for @widgetUnitPending.
+  ///
+  /// In en, this message translates to:
+  /// **'pending'**
+  String get widgetUnitPending;
+
+  /// No description provided for @widgetUnitToPay.
+  ///
+  /// In en, this message translates to:
+  /// **'to pay'**
+  String get widgetUnitToPay;
+
+  /// No description provided for @widgetSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Kirana AI to sign in'**
+  String get widgetSignIn;
+
+  /// No description provided for @widgetNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the app to load today\'s numbers'**
+  String get widgetNoData;
+
+  /// No description provided for @visionComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision AI is coming soon!'**
+  String get visionComingSoon;
 }
 
 class _AppLocalizationsDelegate

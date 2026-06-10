@@ -1918,6 +1918,7 @@
     }
   },
   "subTrialExpiringSoon": "Trial Expiring Soon",
+  "subTrialExpiredTitle": "Trial Expired",
   "mktMyBaskets": "My Baskets",
   "mktCouldNotLoadBaskets": "Could not load baskets",
   "mktPullDownToRetry": "Pull down to retry",
@@ -2805,5 +2806,18 @@
   "psetBankSbiDesc": "Government-backed scheme for small businesses",
   "psetBankHdfcDesc": "Quick disbursal for retail growth",
   "psetBankIciciDesc": "Flexible credit for kirana owners",
-  "psetBankAxisDesc": "Tailored finance for retail stores"
+  "psetBankAxisDesc": "Tailored finance for retail stores",
+  "widgetTitleSales": "Today's Sales",
+  "widgetTitleUdhaar": "Udhaar Due",
+  "widgetTitleLowStock": "Low Stock",
+  "widgetTitlePayToday": "Pay Today",
+  "widgetNewBill": "+ New Bill",
+  "widgetUnitOrders": "orders",
+  "widgetUnitItems": "items",
+  "widgetUnitOverdue": "overdue",
+  "widgetUnitPending": "pending",
+  "widgetUnitToPay": "to pay",
+  "widgetSignIn": "Open Kirana AI to sign in",
+  "widgetNoData": "Open the app to load today's numbers",
+  "visionComingSoon": "Vision AI is coming soon!"
 }
