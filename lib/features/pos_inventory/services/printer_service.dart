@@ -115,8 +115,18 @@ class PrinterService {
 
   // ── Device discovery ────────────────────────────────────────────────────────
 
+  DateTime _lastScan = DateTime(0);
+
   Future<List<PrinterDevice>> getPairedDevices() async {
     await requestPermissions();
+
+    // Throttle: Ensure at least 3 seconds between scan requests
+    final now = DateTime.now();
+    if (now.difference(_lastScan) < const Duration(seconds: 3)) {
+      await Future.delayed(const Duration(seconds: 3));
+    }
+    _lastScan = DateTime.now();
+
     // On iOS, this plugin's pairedBluetooths method actually triggers/returns
     // discovered BLE peripherals.
     final list = await PrintBluetoothThermal.pairedBluetooths;
