@@ -1297,5 +1297,19 @@
   "psetBankSbiDesc": "చిన్న వ్యాపారాల కోసం ప్రభుత్వ మద్దతు గల పథకం",
   "psetBankHdfcDesc": "రిటైల్ వృద్ధికి త్వరిత డిస్‌బర్సల్",
   "psetBankIciciDesc": "కిరాణా యజమానుల కోసం ఫ్లెక్సిబుల్ క్రెడిట్",
-  "psetBankAxisDesc": "రిటైల్ స్టోర్‌ల కోసం తగిన ఫైనాన్స్"
+  "psetBankAxisDesc": "రిటైల్ స్టోర్‌ల కోసం తగిన ఫైనాన్స్",
+  "subTrialExpiredTitle": "ట్రయల్ ముగిసింది",
+  "visionComingSoon": "విజన్ AI త్వరలో వస్తుంది!",
+  "widgetNewBill": "+ కొత్త బిల్లు",
+  "widgetNoData": "నేటి గణాంకాల కోసం యాప్ తెరవండి",
+  "widgetSignIn": "సైన్ ఇన్ చేయడానికి Kirana AI తెరవండి",
+  "widgetTitleLowStock": "తక్కువ స్టాక్",
+  "widgetTitlePayToday": "ఈరోజు చెల్లించండి",
+  "widgetTitleSales": "నేటి అమ్మకాలు",
+  "widgetTitleUdhaar": "ఉధార్ బకాయి",
+  "widgetUnitItems": "వస్తువులు",
+  "widgetUnitOrders": "ఆర్డర్లు",
+  "widgetUnitOverdue": "గడువు మించింది",
+  "widgetUnitPending": "పెండింగ్‌లో",
+  "widgetUnitToPay": "చెల్లించాలి"
 }

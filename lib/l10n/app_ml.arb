@@ -1297,5 +1297,19 @@
   "psetBankSbiDesc": "ചെറുകിട ബിസിനസുകൾക്കുള്ള സർക്കാർ പിന്തുണയുള്ള പദ്ധതി",
   "psetBankHdfcDesc": "റീട്ടെയിൽ വളർച്ചയ്ക്കായി വേഗത്തിലുള്ള വിതരണം",
   "psetBankIciciDesc": "കിരാന ഉടമകൾക്കുള്ള ഫ്ലെക്സിബിൾ ക്രെഡിറ്റ്",
-  "psetBankAxisDesc": "റീട്ടെയിൽ സ്റ്റോറുകൾക്കായി ഇഷ്ടാനുസൃത ഫിനാൻസ്"
+  "psetBankAxisDesc": "റീട്ടെയിൽ സ്റ്റോറുകൾക്കായി ഇഷ്ടാനുസൃത ഫിനാൻസ്",
+  "subTrialExpiredTitle": "ട്രയൽ കാലഹരണപ്പെട്ടു",
+  "visionComingSoon": "വിഷൻ AI ഉടൻ വരുന്നു!",
+  "widgetNewBill": "+ പുതിയ ബിൽ",
+  "widgetNoData": "ഇന്നത്തെ കണക്കുകൾ ലോഡ് ചെയ്യാൻ ആപ്പ് തുറക്കുക",
+  "widgetSignIn": "സൈൻ ഇൻ ചെയ്യാൻ Kirana AI തുറക്കുക",
+  "widgetTitleLowStock": "കുറഞ്ഞ സ്റ്റോക്ക്",
+  "widgetTitlePayToday": "ഇന്ന് അടയ്ക്കുക",
+  "widgetTitleSales": "ഇന്നത്തെ വിൽപ്പന",
+  "widgetTitleUdhaar": "ഉധാർ കുടിശ്ശിക",
+  "widgetUnitItems": "ഇനങ്ങൾ",
+  "widgetUnitOrders": "ഓർഡറുകൾ",
+  "widgetUnitOverdue": "കാലാവധി കഴിഞ്ഞു",
+  "widgetUnitPending": "തീർപ്പാക്കാത്തത്",
+  "widgetUnitToPay": "അടയ്ക്കാൻ"
 }

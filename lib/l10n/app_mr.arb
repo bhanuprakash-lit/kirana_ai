@@ -1297,5 +1297,19 @@
   "psetBankSbiDesc": "लहान व्यवसायांसाठी सरकार-समर्थित योजना",
   "psetBankHdfcDesc": "किरकोळ वाढीसाठी जलद वितरण",
   "psetBankIciciDesc": "किराणा मालकांसाठी लवचिक क्रेडिट",
-  "psetBankAxisDesc": "किरकोळ दुकानांसाठी अनुकूल वित्त"
+  "psetBankAxisDesc": "किरकोळ दुकानांसाठी अनुकूल वित्त",
+  "subTrialExpiredTitle": "चाचणी संपली",
+  "visionComingSoon": "व्हिजन AI लवकरच येत आहे!",
+  "widgetNewBill": "+ नवीन बिल",
+  "widgetNoData": "आजचे आकडे लोड करण्यासाठी अॅप उघडा",
+  "widgetSignIn": "साइन इन करण्यासाठी Kirana AI उघडा",
+  "widgetTitleLowStock": "कमी स्टॉक",
+  "widgetTitlePayToday": "आज पैसे द्या",
+  "widgetTitleSales": "आजची विक्री",
+  "widgetTitleUdhaar": "उधार येणे",
+  "widgetUnitItems": "वस्तू",
+  "widgetUnitOrders": "ऑर्डर",
+  "widgetUnitOverdue": "मुदत संपलेले",
+  "widgetUnitPending": "प्रलंबित",
+  "widgetUnitToPay": "द्यायचे"
 }

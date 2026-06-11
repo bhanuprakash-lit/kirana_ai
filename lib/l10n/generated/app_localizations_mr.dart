@@ -3072,7 +3072,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get subTrialExpiringSoon => 'चाचणी लवकरच संपत आहे';
 
   @override
-  String get subTrialExpiredTitle => 'Trial Expired';
+  String get subTrialExpiredTitle => 'चाचणी संपली';
 
   @override
   String get mktMyBaskets => 'माझ्या बास्केट';
@@ -4546,41 +4546,41 @@ class AppLocalizationsMr extends AppLocalizations {
   String get psetBankAxisDesc => 'किरकोळ दुकानांसाठी अनुकूल वित्त';
 
   @override
-  String get widgetTitleSales => 'Today\'s Sales';
+  String get widgetTitleSales => 'आजची विक्री';
 
   @override
-  String get widgetTitleUdhaar => 'Udhaar Due';
+  String get widgetTitleUdhaar => 'उधार येणे';
 
   @override
-  String get widgetTitleLowStock => 'Low Stock';
+  String get widgetTitleLowStock => 'कमी स्टॉक';
 
   @override
-  String get widgetTitlePayToday => 'Pay Today';
+  String get widgetTitlePayToday => 'आज पैसे द्या';
 
   @override
-  String get widgetNewBill => '+ New Bill';
+  String get widgetNewBill => '+ नवीन बिल';
 
   @override
-  String get widgetUnitOrders => 'orders';
+  String get widgetUnitOrders => 'ऑर्डर';
 
   @override
-  String get widgetUnitItems => 'items';
+  String get widgetUnitItems => 'वस्तू';
 
   @override
-  String get widgetUnitOverdue => 'overdue';
+  String get widgetUnitOverdue => 'मुदत संपलेले';
 
   @override
-  String get widgetUnitPending => 'pending';
+  String get widgetUnitPending => 'प्रलंबित';
 
   @override
-  String get widgetUnitToPay => 'to pay';
+  String get widgetUnitToPay => 'द्यायचे';
 
   @override
-  String get widgetSignIn => 'Open Kirana AI to sign in';
+  String get widgetSignIn => 'साइन इन करण्यासाठी Kirana AI उघडा';
 
   @override
-  String get widgetNoData => 'Open the app to load today\'s numbers';
+  String get widgetNoData => 'आजचे आकडे लोड करण्यासाठी अॅप उघडा';
 
   @override
-  String get visionComingSoon => 'Vision AI is coming soon!';
+  String get visionComingSoon => 'व्हिजन AI लवकरच येत आहे!';
 }

@@ -1297,5 +1297,19 @@
   "psetBankSbiDesc": "ಸಣ್ಣ ವ್ಯಾಪಾರಗಳಿಗೆ ಸರ್ಕಾರಿ ಬೆಂಬಲಿತ ಯೋಜನೆ",
   "psetBankHdfcDesc": "ಚಿಲ್ಲರೆ ಬೆಳವಣಿಗೆಗೆ ತ್ವರಿತ ವಿತರಣೆ",
   "psetBankIciciDesc": "ಕಿರಾಣಾ ಮಾಲೀಕರಿಗೆ ಹೊಂದಿಕೊಳ್ಳುವ ಸಾಲ",
-  "psetBankAxisDesc": "ಚಿಲ್ಲರೆ ಅಂಗಡಿಗಳಿಗೆ ಸೂಕ್ತ ಹಣಕಾಸು"
+  "psetBankAxisDesc": "ಚಿಲ್ಲರೆ ಅಂಗಡಿಗಳಿಗೆ ಸೂಕ್ತ ಹಣಕಾಸು",
+  "subTrialExpiredTitle": "ಟ್ರಯಲ್ ಮುಗಿದಿದೆ",
+  "visionComingSoon": "ವಿಷನ್ AI ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!",
+  "widgetNewBill": "+ ಹೊಸ ಬಿಲ್",
+  "widgetNoData": "ಇಂದಿನ ಅಂಕಿಅಂಶಗಳಿಗಾಗಿ ಆಪ್ ತೆರೆಯಿರಿ",
+  "widgetSignIn": "ಸೈನ್ ಇನ್ ಮಾಡಲು Kirana AI ತೆರೆಯಿರಿ",
+  "widgetTitleLowStock": "ಕಡಿಮೆ ಸ್ಟಾಕ್",
+  "widgetTitlePayToday": "ಇಂದು ಪಾವತಿಸಿ",
+  "widgetTitleSales": "ಇಂದಿನ ಮಾರಾಟ",
+  "widgetTitleUdhaar": "ಉಧಾರ್ ಬಾಕಿ",
+  "widgetUnitItems": "ವಸ್ತುಗಳು",
+  "widgetUnitOrders": "ಆರ್ಡರ್‌ಗಳು",
+  "widgetUnitOverdue": "ಅವಧಿ ಮೀರಿದೆ",
+  "widgetUnitPending": "ಬಾಕಿ",
+  "widgetUnitToPay": "ಪಾವತಿಸಬೇಕು"
 }

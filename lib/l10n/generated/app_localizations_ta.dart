@@ -3102,7 +3102,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get subTrialExpiringSoon => 'சோதனை விரைவில் காலாவதியாகிறது';
 
   @override
-  String get subTrialExpiredTitle => 'Trial Expired';
+  String get subTrialExpiredTitle => 'சோதனை காலாவதியானது';
 
   @override
   String get mktMyBaskets => 'எனது கூடைகள்';
@@ -4592,41 +4592,41 @@ class AppLocalizationsTa extends AppLocalizations {
   String get psetBankAxisDesc => 'சில்லறை கடைகளுக்கான தனிப்பயன் நிதி';
 
   @override
-  String get widgetTitleSales => 'Today\'s Sales';
+  String get widgetTitleSales => 'இன்றைய விற்பனை';
 
   @override
-  String get widgetTitleUdhaar => 'Udhaar Due';
+  String get widgetTitleUdhaar => 'உதார் நிலுவை';
 
   @override
-  String get widgetTitleLowStock => 'Low Stock';
+  String get widgetTitleLowStock => 'குறைந்த இருப்பு';
 
   @override
-  String get widgetTitlePayToday => 'Pay Today';
+  String get widgetTitlePayToday => 'இன்று செலுத்துங்கள்';
 
   @override
-  String get widgetNewBill => '+ New Bill';
+  String get widgetNewBill => '+ புதிய பில்';
 
   @override
-  String get widgetUnitOrders => 'orders';
+  String get widgetUnitOrders => 'ஆர்டர்கள்';
 
   @override
-  String get widgetUnitItems => 'items';
+  String get widgetUnitItems => 'பொருட்கள்';
 
   @override
-  String get widgetUnitOverdue => 'overdue';
+  String get widgetUnitOverdue => 'தாமதம்';
 
   @override
-  String get widgetUnitPending => 'pending';
+  String get widgetUnitPending => 'நிலுவையில்';
 
   @override
-  String get widgetUnitToPay => 'to pay';
+  String get widgetUnitToPay => 'செலுத்த வேண்டும்';
 
   @override
-  String get widgetSignIn => 'Open Kirana AI to sign in';
+  String get widgetSignIn => 'உள்நுழைய Kirana AI ஐத் திறக்கவும்';
 
   @override
-  String get widgetNoData => 'Open the app to load today\'s numbers';
+  String get widgetNoData => 'இன்றைய எண்களை ஏற்ற ஆப்பைத் திறக்கவும்';
 
   @override
-  String get visionComingSoon => 'Vision AI is coming soon!';
+  String get visionComingSoon => 'விஷன் AI விரைவில் வருகிறது!';
 }

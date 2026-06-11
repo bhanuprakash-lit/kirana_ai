@@ -1297,5 +1297,19 @@
   "psetBankSbiDesc": "छोटे व्यवसायों के लिए सरकार-समर्थित योजना",
   "psetBankHdfcDesc": "रिटेल ग्रोथ के लिए तेज़ डिस्बर्सल",
   "psetBankIciciDesc": "किराना मालिकों के लिए फ्लेक्सिबल क्रेडिट",
-  "psetBankAxisDesc": "रिटेल स्टोर्स के लिए अनुकूल फाइनेंस"
+  "psetBankAxisDesc": "रिटेल स्टोर्स के लिए अनुकूल फाइनेंस",
+  "subTrialExpiredTitle": "ट्रायल समाप्त",
+  "visionComingSoon": "विज़न AI जल्द आ रहा है!",
+  "widgetNewBill": "+ नया बिल",
+  "widgetNoData": "आज के आंकड़े लोड करने के लिए ऐप खोलें",
+  "widgetSignIn": "साइन इन करने के लिए Kirana AI खोलें",
+  "widgetTitleLowStock": "कम स्टॉक",
+  "widgetTitlePayToday": "आज भुगतान करें",
+  "widgetTitleSales": "आज की बिक्री",
+  "widgetTitleUdhaar": "उधार बकाया",
+  "widgetUnitItems": "आइटम",
+  "widgetUnitOrders": "ऑर्डर",
+  "widgetUnitOverdue": "अतिदेय",
+  "widgetUnitPending": "लंबित",
+  "widgetUnitToPay": "भुगतान करना है"
 }

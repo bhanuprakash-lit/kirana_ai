@@ -1297,5 +1297,19 @@
   "psetBankSbiDesc": "சிறு வணிகங்களுக்கான அரசு ஆதரவு திட்டம்",
   "psetBankHdfcDesc": "சில்லறை வளர்ச்சிக்கான விரைவான வழங்கல்",
   "psetBankIciciDesc": "மளிகைக் கடை உரிமையாளர்களுக்கான நெகிழ்வான கடன்",
-  "psetBankAxisDesc": "சில்லறை கடைகளுக்கான தனிப்பயன் நிதி"
+  "psetBankAxisDesc": "சில்லறை கடைகளுக்கான தனிப்பயன் நிதி",
+  "subTrialExpiredTitle": "சோதனை காலாவதியானது",
+  "visionComingSoon": "விஷன் AI விரைவில் வருகிறது!",
+  "widgetNewBill": "+ புதிய பில்",
+  "widgetNoData": "இன்றைய எண்களை ஏற்ற ஆப்பைத் திறக்கவும்",
+  "widgetSignIn": "உள்நுழைய Kirana AI ஐத் திறக்கவும்",
+  "widgetTitleLowStock": "குறைந்த இருப்பு",
+  "widgetTitlePayToday": "இன்று செலுத்துங்கள்",
+  "widgetTitleSales": "இன்றைய விற்பனை",
+  "widgetTitleUdhaar": "உதார் நிலுவை",
+  "widgetUnitItems": "பொருட்கள்",
+  "widgetUnitOrders": "ஆர்டர்கள்",
+  "widgetUnitOverdue": "தாமதம்",
+  "widgetUnitPending": "நிலுவையில்",
+  "widgetUnitToPay": "செலுத்த வேண்டும்"
 }
