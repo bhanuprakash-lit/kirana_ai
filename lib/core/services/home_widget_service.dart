@@ -28,7 +28,9 @@ class HomeWidgetService {
 
   /// Register tap handling (call once at startup, before runApp's first frame).
   static Future<void> init() async {
-    await HomeWidget.setAppGroupId(_appGroupId); // iOS shared storage; no-op on Android
+    await HomeWidget.setAppGroupId(
+      _appGroupId,
+    ); // iOS shared storage; no-op on Android
     HomeWidget.widgetClicked.listen(_handleUri);
     _handleUri(await HomeWidget.initiallyLaunchedFromHomeWidget());
   }
@@ -93,12 +95,14 @@ class HomeWidgetService {
       // ── Today's Sales ─────────────────────────────────────────────────────
       final ds = overview?.dailySales;
       final salesValue = ds != null ? _inr(ds.totalSales, hide) : '—';
-      final salesSub =
-          ds != null ? '${ds.totalOrders} ${l10n.widgetUnitOrders}' : '';
+      final salesSub = ds != null
+          ? '${ds.totalOrders} ${l10n.widgetUnitOrders}'
+          : '';
 
       // ── Udhaar Due ────────────────────────────────────────────────────────
-      final pending =
-          (finance?.udhaarList ?? const []).where((u) => !u.isRecovered);
+      final pending = (finance?.udhaarList ?? const []).where(
+        (u) => !u.isRecovered,
+      );
       final overdueCount = pending.where((u) => u.daysPending > 30).length;
       final udhaarValue = finance != null
           ? _inr(finance.stats.totalUdhaarPending, hide)
@@ -106,36 +110,40 @@ class HomeWidgetService {
       final udhaarSub = finance == null
           ? ''
           : overdueCount > 0
-              ? '$overdueCount ${l10n.widgetUnitOverdue}'
-              : '${pending.length} ${l10n.widgetUnitPending}';
+          ? '$overdueCount ${l10n.widgetUnitOverdue}'
+          : '${pending.length} ${l10n.widgetUnitPending}';
 
       // ── Low Stock ─────────────────────────────────────────────────────────
       final items = inventory?.items ?? const [];
-      final lowCount =
-          items.where((i) => i.isLowStock || i.isOutOfStock).length;
+      final lowCount = items
+          .where((i) => i.isLowStock || i.isOutOfStock)
+          .length;
       final stockValue = inventory != null ? '$lowCount' : '—';
       final stockCritical = items.any((i) => i.isOutOfStock);
 
       // ── Pay Today (supplier dues) ─────────────────────────────────────────
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final unpaid = (procurement?.purchases ?? const [])
-          .where((p) => p.paymentStatus != 'paid' && p.dueDate != null);
-      final dueToday =
-          unpaid.where((p) => _sameDay(p.dueDate!, now)).toList();
-      final overdue =
-          unpaid.where((p) => p.dueDate!.isBefore(today)).toList();
+      final unpaid = (procurement?.purchases ?? const []).where(
+        (p) => p.paymentStatus != 'paid' && p.dueDate != null,
+      );
+      final dueToday = unpaid.where((p) => _sameDay(p.dueDate!, now)).toList();
+      final overdue = unpaid.where((p) => p.dueDate!.isBefore(today)).toList();
       String supplierValue;
       String supplierSub;
       bool supplierAlert;
       if (dueToday.isNotEmpty) {
         supplierValue = _inr(
-            dueToday.fold<double>(0, (s, p) => s + p.totalAmount), hide);
+          dueToday.fold<double>(0, (s, p) => s + p.totalAmount),
+          hide,
+        );
         supplierSub = '${dueToday.length} ${l10n.widgetUnitToPay}';
         supplierAlert = false;
       } else if (overdue.isNotEmpty) {
-        supplierValue =
-            _inr(overdue.fold<double>(0, (s, p) => s + p.totalAmount), hide);
+        supplierValue = _inr(
+          overdue.fold<double>(0, (s, p) => s + p.totalAmount),
+          hide,
+        );
         supplierSub = '${overdue.length} ${l10n.widgetUnitOverdue}';
         supplierAlert = true;
       } else {
@@ -180,9 +188,9 @@ class HomeWidgetService {
       HomeWidget.saveWidgetData<String>(key, value);
 
   static Future<bool?> _push() => HomeWidget.updateWidget(
-        qualifiedAndroidName: _qualifiedAndroidName,
-        iOSName: _iosWidgetName,
-      );
+    qualifiedAndroidName: _qualifiedAndroidName,
+    iOSName: _iosWidgetName,
+  );
 
   static String _inr(num v, bool hide) {
     if (hide) return '••••';

@@ -119,10 +119,12 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
           ? CustomScrollView(
               slivers: [
                 CupertinoSliverRefreshControl(
-                  onRefresh: () => ref.read(overviewProvider.notifier).refresh(),
+                  onRefresh: () =>
+                      ref.read(overviewProvider.notifier).refresh(),
                 ),
                 asyncData.when(
-                  loading: () => const SliverToBoxAdapter(child: OverviewShimmer()),
+                  loading: () =>
+                      const SliverToBoxAdapter(child: OverviewShimmer()),
                   error: (err, _) => SliverFillRemaining(
                     child: _ErrorView(
                       message: err.toString(),
@@ -316,67 +318,66 @@ class _GreetingHeader extends ConsumerWidget {
             const SizedBox(height: 50), // Spacer for status bar area
             Row(
               children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                              l10n.dashGreetingWithName(greeting, firstName),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleLarge
-                                  ?.copyWith(color: Colors.white, fontSize: 20),
-                            )
-                            .animate()
-                            .fadeIn(duration: 400.ms)
-                            .slideX(begin: -0.1, end: 0),
-                        const SizedBox(height: 4),
-                        Text(
-                          dateLabel,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Colors.white.withValues(alpha: 0.65),
-                                fontSize: 13,
-                              ),
-                        ).animate(delay: 60.ms).fadeIn(duration: 400.ms),
-                      ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                            l10n.dashGreetingWithName(greeting, firstName),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(color: Colors.white, fontSize: 20),
+                          )
+                          .animate()
+                          .fadeIn(duration: 400.ms)
+                          .slideX(begin: -0.1, end: 0),
+                      const SizedBox(height: 4),
+                      Text(
+                        dateLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.65),
+                          fontSize: 13,
+                        ),
+                      ).animate(delay: 60.ms).fadeIn(duration: 400.ms),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // Trial countdown (shown only during trial)
+                const TrialCountdownWidget(),
+                const SizedBox(width: 8),
+
+                // 1️⃣ Notifications first
+                const NotificationBell(color: Colors.white),
+                const SizedBox(width: 8),
+
+                // 2️⃣ Profile circular button
+                GestureDetector(
+                  onTap: () => context.push('/profile'),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.person_rounded,
+                      size: 18,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 12),
-
-                  // Trial countdown (shown only during trial)
-                  const TrialCountdownWidget(),
-                  const SizedBox(width: 8),
-
-                  // 1️⃣ Notifications first
-                  const NotificationBell(color: Colors.white),
-                  const SizedBox(width: 8),
-
-                  // 2️⃣ Profile circular button
-                  GestureDetector(
-                    onTap: () => context.push('/profile'),
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
-                ],
-              ),
-            ],
-          ),
+                ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
+              ],
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }
 

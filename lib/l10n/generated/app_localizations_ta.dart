@@ -2050,6 +2050,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get finSendWhatsappReminder => 'WhatsApp நினைவூட்டலை அனுப்பு';
 
   @override
+  String get finRemind => 'நினைவூட்டு';
+
+  @override
+  String get finRemindedToday => 'இன்று நினைவூட்டப்பட்டது';
+
+  @override
   String get finRecover => 'மீட்டெடு';
 
   @override

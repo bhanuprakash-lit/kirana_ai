@@ -2052,6 +2052,12 @@ class AppLocalizationsMl extends AppLocalizations {
   String get finSendWhatsappReminder => 'WhatsApp റിമൈൻഡർ അയയ്ക്കുക';
 
   @override
+  String get finRemind => 'ഓർമ്മിപ്പിക്കുക';
+
+  @override
+  String get finRemindedToday => 'ഇന്ന് ഓർമ്മിപ്പിച്ചു';
+
+  @override
   String get finRecover => 'വീണ്ടെടുക്കുക';
 
   @override

@@ -574,6 +574,8 @@
   "finWhatsappReminderSent": "WhatsApp रिमाइंडर भेज दिया!",
   "finFailedSendReminder": "रिमाइंडर भेजने में विफल: {error}",
   "finSendWhatsappReminder": "WhatsApp रिमाइंडर भेजें",
+  "finRemind": "याद दिलाएं",
+  "finRemindedToday": "आज याद दिला दिया",
   "finRecover": "वसूल करें",
   "finHistory": "हिस्ट्री",
   "finSettled": "सेटल हो गया",

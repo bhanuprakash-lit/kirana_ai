@@ -574,6 +574,8 @@
   "finWhatsappReminderSent": "WhatsApp റിമൈൻഡർ അയച്ചു!",
   "finFailedSendReminder": "റിമൈൻഡർ അയയ്ക്കാനായില്ല: {error}",
   "finSendWhatsappReminder": "WhatsApp റിമൈൻഡർ അയയ്ക്കുക",
+  "finRemind": "ഓർമ്മിപ്പിക്കുക",
+  "finRemindedToday": "ഇന്ന് ഓർമ്മിപ്പിച്ചു",
   "finRecover": "വീണ്ടെടുക്കുക",
   "finHistory": "ചരിത്രം",
   "finSettled": "തീർപ്പാക്കി",

@@ -30,10 +30,6 @@ class PlatformRefreshIndicator extends StatelessWidget {
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: onRefresh,
-      color: color,
-      child: child,
-    );
+    return RefreshIndicator(onRefresh: onRefresh, color: color, child: child);
   }
 }

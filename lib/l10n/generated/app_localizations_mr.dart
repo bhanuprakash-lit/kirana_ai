@@ -2026,6 +2026,12 @@ class AppLocalizationsMr extends AppLocalizations {
   String get finSendWhatsappReminder => 'WhatsApp स्मरणपत्र पाठवा';
 
   @override
+  String get finRemind => 'आठवण करा';
+
+  @override
+  String get finRemindedToday => 'आज आठवण दिली';
+
+  @override
   String get finRecover => 'वसूल करा';
 
   @override

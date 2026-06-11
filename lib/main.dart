@@ -22,9 +22,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Lock orientation to portrait up
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   // Firebase init (Remote Config, Crashlytics, Performance)
   await FirebaseBackendConfig.initialize();

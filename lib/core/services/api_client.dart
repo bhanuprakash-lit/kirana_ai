@@ -10,6 +10,18 @@ import '../../features/auth/repositories/auth_repository.dart';
 class ApiClient {
   static const _storage = FlutterSecureStorage();
 
+  /// Single shared client so connections are pooled/kept-alive across the many
+  /// concurrent requests fired at app start (overview, subscription, inventory,
+  /// finance, etc.). The top-level `http.get`/`http.post` helpers open and tear
+  /// down a fresh TCP+TLS connection per call — a costly handshake storm on a
+  /// cold launch over mobile data. Reusing one client removes that overhead.
+  static final http.Client _client = http.Client();
+
+  /// Network calls that hang shouldn't keep the UI on a shimmer forever. A
+  /// stalled request now fails after this window so providers can surface an
+  /// error (and retry) instead of blocking indefinitely.
+  static const Duration _timeout = Duration(seconds: 20);
+
   // In-memory token cache to prevent slow, concurrent Keystore reads on Android.
   static String? _cachedAuthToken;
   static String? _cachedPosToken;
@@ -39,13 +51,15 @@ class ApiClient {
 
   Future<dynamic> get(String path) async {
     final token = await _getAuthToken();
-    final res = await http.get(
-      Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+    final res = await _client
+        .get(
+          Uri.parse('${AppConfig.apiBaseUrl}$path'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        )
+        .timeout(_timeout);
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
     }
@@ -54,7 +68,7 @@ class ApiClient {
 
   Future<dynamic> post(String path, dynamic body) async {
     final token = await _getAuthToken();
-    final res = await http.post(
+    final res = await _client.post(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
         'Authorization': 'Bearer $token',
@@ -70,7 +84,7 @@ class ApiClient {
 
   Future<dynamic> patch(String path, dynamic body) async {
     final token = await _getAuthToken();
-    final res = await http.patch(
+    final res = await _client.patch(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
         'Authorization': 'Bearer $token',
@@ -87,7 +101,7 @@ class ApiClient {
 
   Future<dynamic> delete(String path) async {
     final token = await _getAuthToken();
-    final res = await http.delete(
+    final res = await _client.delete(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
         'Authorization': 'Bearer $token',
@@ -106,10 +120,12 @@ class ApiClient {
   Future<Map<String, dynamic>?> posGet(String path) async {
     final token = await _getPosToken();
     if (token == null) return null;
-    final res = await http.get(
-      Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    final res = await _client
+        .get(
+          Uri.parse('${AppConfig.apiBaseUrl}$path'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(_timeout);
     if (res.statusCode == 200) {
       return jsonDecode(res.body) as Map<String, dynamic>;
     }
@@ -123,10 +139,12 @@ class ApiClient {
   Future<List<dynamic>?> posGetList(String path) async {
     final token = await _getPosToken();
     if (token == null) return null;
-    final res = await http.get(
-      Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    final res = await _client
+        .get(
+          Uri.parse('${AppConfig.apiBaseUrl}$path'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(_timeout);
     if (res.statusCode == 200) {
       return jsonDecode(res.body) as List<dynamic>;
     }
@@ -143,7 +161,7 @@ class ApiClient {
     final token = await _getPosToken();
     if (token == null) return null;
     try {
-      final res = await http.post(
+      final res = await _client.post(
         Uri.parse('${AppConfig.apiBaseUrl}$path'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -171,13 +189,15 @@ class ApiClient {
       final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
       path = '$path?$q';
     }
-    final res = await http.get(
-      Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+    final res = await _client
+        .get(
+          Uri.parse('${AppConfig.apiBaseUrl}$path'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        )
+        .timeout(_timeout);
     if (res.statusCode == 200) {
       return jsonDecode(res.body) as Map<String, dynamic>;
     }
@@ -189,7 +209,7 @@ class ApiClient {
     Map<String, dynamic> body,
   ) async {
     final token = await _getAuthToken();
-    final res = await http.post(
+    final res = await _client.post(
       Uri.parse('${AppConfig.apiBaseUrl}/oltp/$table'),
       headers: {
         'Authorization': 'Bearer $token',
@@ -214,7 +234,7 @@ class ApiClient {
       final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
       path = '$path?$q';
     }
-    final res = await http.patch(
+    final res = await _client.patch(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
         'Authorization': 'Bearer $token',
@@ -237,7 +257,7 @@ class ApiClient {
     final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
     final path = '/oltp/$table?$q';
 
-    final res = await http.delete(
+    final res = await _client.delete(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
       headers: {
         'Authorization': 'Bearer $token',

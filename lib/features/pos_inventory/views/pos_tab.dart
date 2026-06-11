@@ -795,18 +795,34 @@ class _PosTabState extends ConsumerState<PosTab> {
                 GestureDetector(
                   onTap: _openReferralScanner,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: BrandColors.accent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: BrandColors.accent.withValues(alpha: 0.35)),
+                      border: Border.all(
+                        color: BrandColors.accent.withValues(alpha: 0.35),
+                      ),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.card_giftcard_rounded, size: 13, color: BrandColors.accent),
+                        Icon(
+                          Icons.card_giftcard_rounded,
+                          size: 13,
+                          color: BrandColors.accent,
+                        ),
                         SizedBox(width: 4),
-                        Text('Referral Scan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: BrandColors.accent)),
+                        Text(
+                          'Referral Scan',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: BrandColors.accent,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -815,7 +831,10 @@ class _PosTabState extends ConsumerState<PosTab> {
                 GestureDetector(
                   onTap: () => showTodayOrdersSheet(context, ref),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: BrandColors.surfaceTint,
                       borderRadius: BorderRadius.circular(20),
@@ -824,9 +843,20 @@ class _PosTabState extends ConsumerState<PosTab> {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.receipt_long_rounded, size: 13, color: BrandColors.ink),
+                        Icon(
+                          Icons.receipt_long_rounded,
+                          size: 13,
+                          color: BrandColors.ink,
+                        ),
                         SizedBox(width: 4),
-                        Text('Order History', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: BrandColors.ink)),
+                        Text(
+                          'Order History',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: BrandColors.ink,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -836,7 +866,12 @@ class _PosTabState extends ConsumerState<PosTab> {
                   onTap: () async {
                     final messenger = ScaffoldMessenger.of(context);
                     messenger.hideCurrentSnackBar();
-                    messenger.showSnackBar(SnackBar(content: Text(_l10n.posRefreshingProducts), duration: const Duration(seconds: 2)));
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(_l10n.posRefreshingProducts),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                     await ref.read(posProvider.notifier).reloadProducts();
                     if (!context.mounted) return;
                     final err = ref.read(posProvider).error;
@@ -844,8 +879,14 @@ class _PosTabState extends ConsumerState<PosTab> {
                     messenger.hideCurrentSnackBar();
                     messenger.showSnackBar(
                       SnackBar(
-                        content: Text(err != null ? _l10n.posRefreshFailed(err) : _l10n.posProductsRefreshed(count)),
-                        backgroundColor: err != null ? BrandColors.error : BrandColors.success,
+                        content: Text(
+                          err != null
+                              ? _l10n.posRefreshFailed(err)
+                              : _l10n.posProductsRefreshed(count),
+                        ),
+                        backgroundColor: err != null
+                            ? BrandColors.error
+                            : BrandColors.success,
                         duration: const Duration(milliseconds: 1500),
                       ),
                     );
@@ -858,7 +899,11 @@ class _PosTabState extends ConsumerState<PosTab> {
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: BrandColors.border),
                     ),
-                    child: const Icon(Icons.refresh_rounded, size: 16, color: BrandColors.ink),
+                    child: const Icon(
+                      Icons.refresh_rounded,
+                      size: 16,
+                      color: BrandColors.ink,
+                    ),
                   ),
                 ),
               ],

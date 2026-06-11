@@ -845,23 +845,37 @@ class _UdhaarTile extends ConsumerWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  IconButton(
-                    onPressed: () async {
-                      try {
-                        await ref
-                            .read(financeProvider.notifier)
-                            .sendReminder(item.khataId);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
+                  // One WhatsApp reminder per customer per day (server-enforced).
+                  // When already reminded today the button is disabled and shows
+                  // a "Reminded today" state instead of an icon-only tap target.
+                  if (item.remindedToday)
+                    TextButton.icon(
+                      onPressed: null,
+                      icon: const Icon(Icons.check_circle_rounded, size: 18),
+                      label: Text(l10n.finRemindedToday),
+                      style: TextButton.styleFrom(
+                        foregroundColor: BrandColors.muted,
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    )
+                  else
+                    TextButton.icon(
+                      onPressed: () async {
+                        final notifier = ref.read(financeProvider.notifier);
+                        final messenger = ScaffoldMessenger.of(context);
+                        try {
+                          await notifier.sendReminder(item.khataId);
+                          messenger.showSnackBar(
                             SnackBar(
                               content: Text(l10n.finWhatsappReminderSent),
                               backgroundColor: BrandColors.success,
                             ),
                           );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          // Refresh so the button flips to "Reminded today".
+                          await notifier.refresh();
+                        } catch (e) {
+                          messenger.showSnackBar(
                             SnackBar(
                               content: Text(
                                 l10n.finFailedSendReminder(e.toString()),
@@ -869,17 +883,15 @@ class _UdhaarTile extends ConsumerWidget {
                             ),
                           );
                         }
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.message_outlined,
-                      size: 20,
-                      color: BrandColors.success,
+                      },
+                      icon: const Icon(Icons.message_rounded, size: 18),
+                      label: Text(l10n.finRemind),
+                      style: TextButton.styleFrom(
+                        foregroundColor: BrandColors.success,
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
                     ),
-                    tooltip: l10n.finSendWhatsappReminder,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
                   const Spacer(),
                   TextButton(
                     onPressed: () => _showRecoveryBottomSheet(context, ref),

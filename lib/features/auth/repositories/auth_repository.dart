@@ -69,7 +69,10 @@ class AuthRepository {
       final telemetry = await DeviceTelemetry.headers();
       final res = await http.post(
         Uri.parse('${AppConfig.apiBaseUrl}/pos/token'),
-        headers: {...telemetry, 'Content-Type': 'application/x-www-form-urlencoded'},
+        headers: {
+          ...telemetry,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
         body:
             'username=${Uri.encodeComponent(username)}&password=${Uri.encodeComponent(password)}',
       );

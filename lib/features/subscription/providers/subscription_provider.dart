@@ -92,7 +92,11 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
   /// Respects quiet hours. Runs at most once per day.
   Future<void> checkTrialAlerts() async {
     final info = state.asData?.value;
-    if (info == null || !info.isTrial || info.trialEndsAt == null) return;
+    if (info == null || !info.isTrial) return;
+
+    // Use the server-authoritative countdown, not a locally-parsed timestamp.
+    final remaining = info.trialRemaining;
+    if (remaining == null) return;
 
     final prefs = await SharedPreferences.getInstance();
     final today = DateTime.now().toIso8601String().substring(0, 10);
@@ -102,20 +106,24 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
     final now = DateTime.now();
     if (now.hour < quietEnd + 1) return;
 
-    final daysLeft = info.trialEndsAt!.difference(now).inDays;
-    if (daysLeft > 7) return;
+    final expired = info.serverExpired || remaining.inSeconds <= 0;
+    final daysLeft = remaining.inDays;
+    // Only nudge within the final week of the trial.
+    if (!expired && daysLeft > 7) return;
 
-    final message = daysLeft <= 0
+    final message = expired
         ? _l10n.subTrialExpiredMessage
-        : daysLeft == 1
+        : daysLeft <= 1
         ? _l10n.subTrialLastDayMessage
         : _l10n.subTrialDaysLeftMessage(daysLeft);
 
-    final title = daysLeft <= 0
+    final title = expired
         ? _l10n.subTrialExpiredTitle
         : _l10n.subTrialExpiringSoon;
 
-    final priority = daysLeft <= 3 ? AlertPriority.high : AlertPriority.medium;
+    final priority = (expired || daysLeft <= 3)
+        ? AlertPriority.high
+        : AlertPriority.medium;
 
     ref
         .read(alertProvider.notifier)

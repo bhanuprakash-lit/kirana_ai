@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/locale/locale_provider.dart';
 import '../../../core/theme/brand_theme.dart';
@@ -40,25 +39,10 @@ class _LanguageSelectScreenState extends ConsumerState<LanguageSelectScreen> {
     Color(0xFFFBBF24), // gold
   ];
 
-  /// Resolve the right Noto script font for a language code so Indic glyphs
-  /// render instead of tofu. Mirrors `brand_theme.dart`.
-  TextStyle _scriptStyle(String code, TextStyle base) {
-    switch (code) {
-      case 'te':
-        return GoogleFonts.notoSansTelugu(textStyle: base);
-      case 'hi':
-      case 'mr':
-        return GoogleFonts.notoSansDevanagari(textStyle: base);
-      case 'ta':
-        return GoogleFonts.notoSansTamil(textStyle: base);
-      case 'kn':
-        return GoogleFonts.notoSansKannada(textStyle: base);
-      case 'ml':
-        return GoogleFonts.notoSansMalayalam(textStyle: base);
-      default:
-        return GoogleFonts.dmSans(textStyle: base);
-    }
-  }
+  /// Resolve the right bundled Noto script font for a language code so Indic
+  /// glyphs render instead of tofu. Uses the shared mapping in `brand_theme.dart`.
+  TextStyle _scriptStyle(String code, TextStyle base) =>
+      base.copyWith(fontFamily: fontFamilyForLocale(Locale(code)));
 
   void _continue() {
     ref.read(localeProvider.notifier).setLocale(Locale(_selected));

@@ -146,8 +146,8 @@ class PrinterNotifier extends Notifier<PrinterStateData> {
     await _svc.requestPermissions();
 
     final saved = await _svc.getSelectedPrinter();
-    
-    // On iOS, the Bluetooth manager (CBCentralManager) might take a moment 
+
+    // On iOS, the Bluetooth manager (CBCentralManager) might take a moment
     // to reach the .poweredOn state after the app starts.
     bool btEnabled = false;
     for (int i = 0; i < 5; i++) {

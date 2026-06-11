@@ -1980,6 +1980,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get finSendWhatsappReminder => 'WhatsApp रिमाइंडर भेजें';
 
   @override
+  String get finRemind => 'याद दिलाएं';
+
+  @override
+  String get finRemindedToday => 'आज याद दिला दिया';
+
+  @override
   String get finRecover => 'वसूल करें';
 
   @override

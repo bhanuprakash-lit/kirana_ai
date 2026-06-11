@@ -574,6 +574,8 @@
   "finWhatsappReminderSent": "WhatsApp स्मरणपत्र पाठवले!",
   "finFailedSendReminder": "स्मरणपत्र पाठवण्यात अयशस्वी: {error}",
   "finSendWhatsappReminder": "WhatsApp स्मरणपत्र पाठवा",
+  "finRemind": "आठवण करा",
+  "finRemindedToday": "आज आठवण दिली",
   "finRecover": "वसूल करा",
   "finHistory": "इतिहास",
   "finSettled": "निकाली काढले",

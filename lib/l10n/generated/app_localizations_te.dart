@@ -2002,6 +2002,12 @@ class AppLocalizationsTe extends AppLocalizations {
   String get finSendWhatsappReminder => 'WhatsApp రిమైండర్ పంపు';
 
   @override
+  String get finRemind => 'గుర్తు చేయి';
+
+  @override
+  String get finRemindedToday => 'ఈరోజు గుర్తు చేశారు';
+
+  @override
   String get finRecover => 'వసూలు';
 
   @override

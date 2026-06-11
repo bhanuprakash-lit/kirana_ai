@@ -93,14 +93,22 @@ class _LanguageTile extends StatelessWidget {
 
   String _getLanguageCharacter(String code) {
     switch (code) {
-      case 'en': return 'A';
-      case 'hi': return 'अ';
-      case 'kn': return 'ಅ';
-      case 'ml': return 'അ';
-      case 'mr': return 'अ';
-      case 'ta': return 'அ';
-      case 'te': return 'అ';
-      default: return 'A';
+      case 'en':
+        return 'A';
+      case 'hi':
+        return 'अ';
+      case 'kn':
+        return 'ಅ';
+      case 'ml':
+        return 'അ';
+      case 'mr':
+        return 'अ';
+      case 'ta':
+        return 'அ';
+      case 'te':
+        return 'అ';
+      default:
+        return 'A';
     }
   }
 
@@ -117,7 +125,9 @@ class _LanguageTile extends StatelessWidget {
             : BrandColors.surfaceTint,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: selected ? BrandColors.primary : BrandColors.border.withValues(alpha: 0.5),
+          color: selected
+              ? BrandColors.primary
+              : BrandColors.border.withValues(alpha: 0.5),
           width: selected ? 2 : 1,
         ),
         boxShadow: selected
@@ -126,7 +136,7 @@ class _LanguageTile extends StatelessWidget {
                   color: BrandColors.primary.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
-                )
+                ),
               ]
             : [],
       ),
@@ -162,18 +172,27 @@ class _LanguageTile extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: selected ? BrandColors.primary : Colors.white,
+                              color: selected
+                                  ? BrandColors.primary
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(6),
-                              border: selected ? null : Border.all(color: BrandColors.border),
+                              border: selected
+                                  ? null
+                                  : Border.all(color: BrandColors.border),
                             ),
                             child: Text(
                               locale.languageCode.toUpperCase(),
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w900,
-                                color: selected ? Colors.white : BrandColors.muted,
+                                color: selected
+                                    ? Colors.white
+                                    : BrandColors.muted,
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -189,10 +208,15 @@ class _LanguageTile extends StatelessWidget {
                       const Spacer(),
                       Text(
                         nativeName,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: selected ? BrandColors.primary : BrandColors.ink,
-                          fontWeight: selected ? FontWeight.bold : FontWeight.w600,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: selected
+                                  ? BrandColors.primary
+                                  : BrandColors.ink,
+                              fontWeight: selected
+                                  ? FontWeight.bold
+                                  : FontWeight.w600,
+                            ),
                       ),
                     ],
                   ),

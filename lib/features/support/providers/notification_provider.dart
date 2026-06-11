@@ -197,7 +197,8 @@ class NotificationService {
         settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
 
-    if (!granted) return; // Don't setup foreground styling/local notifs if not allowed
+    if (!granted)
+      return; // Don't setup foreground styling/local notifs if not allowed
 
     await _setupForegroundHandling();
   }

@@ -48,12 +48,16 @@ class _TrialCountdownWidgetState extends ConsumerState<TrialCountdownWidget> {
     final subAsync = ref.watch(subscriptionProvider);
     final info = subAsync.asData?.value;
 
-    if (info == null || !info.isTrial || info.trialEndsAt == null) {
+    if (info == null || !info.isTrial) {
       return const SizedBox.shrink();
     }
 
-    final remaining = info.trialEndsAt!.difference(DateTime.now());
-    if (remaining.isNegative) return const SizedBox.shrink();
+    // Server-authoritative remaining time (immune to timezone parsing of the
+    // naive trial_ends_at timestamp).
+    final remaining = info.trialRemaining;
+    if (remaining == null || remaining.inSeconds <= 0) {
+      return const SizedBox.shrink();
+    }
 
     final isUrgent = remaining.inHours < 24;
     final color = isUrgent ? Colors.red.shade400 : const Color(0xFFFF8C00);

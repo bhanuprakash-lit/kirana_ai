@@ -42,6 +42,10 @@ class UdhaarItem {
   final int daysPending;
   final bool isRecovered;
 
+  /// Server-tracked: this customer already got a WhatsApp reminder today.
+  /// Used to disable the Remind button (one reminder per customer per day).
+  final bool remindedToday;
+
   const UdhaarItem({
     required this.khataId,
     required this.customerId,
@@ -55,6 +59,7 @@ class UdhaarItem {
     required this.dateTaken,
     required this.daysPending,
     this.isRecovered = false,
+    this.remindedToday = false,
   });
 
   factory UdhaarItem.fromJson(Map<String, dynamic> j) {
@@ -73,6 +78,7 @@ class UdhaarItem {
       dateTaken: parseAsUtc(j['date_taken'] as String?),
       daysPending: (j['days_pending'] as num?)?.toInt() ?? 0,
       isRecovered: status == 'settled' || bal <= 0,
+      remindedToday: j['reminded_today'] as bool? ?? false,
     );
   }
 }

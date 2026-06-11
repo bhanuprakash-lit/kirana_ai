@@ -1263,6 +1263,8 @@
     }
   },
   "finSendWhatsappReminder": "Send WhatsApp Reminder",
+  "finRemind": "Remind",
+  "finRemindedToday": "Reminded today",
   "finRecover": "Recover",
   "finHistory": "History",
   "finSettled": "Settled",

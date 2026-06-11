@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class BrandColors {
   static const Color primary = Color(0xFF243B6B);
@@ -24,33 +23,40 @@ class BrandColors {
   static const Color error = Color(0xFFDC2626);
 }
 
-/// Picks a base text theme whose font actually has glyphs for the active
-/// script. DM Sans (the brand font) covers Latin only, so for Indic locales we
-/// swap in the matching Noto Sans family — otherwise translated text renders as
-/// empty boxes (tofu).
-TextTheme _baseTextThemeFor(Locale locale) {
+/// Picks the bundled font family that actually has glyphs for the active
+/// script. GoogleSans (the brand face) covers Latin only, so for Indic locales
+/// we swap in the matching Noto Sans family — otherwise translated text renders
+/// as empty boxes (tofu). All families are bundled as assets (see pubspec), so
+/// nothing is fetched over the network at runtime.
+String fontFamilyForLocale(Locale locale) {
   switch (locale.languageCode) {
     case 'te':
-      return GoogleFonts.notoSansTeluguTextTheme();
+      return 'NotoSansTelugu';
     case 'hi':
     case 'mr':
-      return GoogleFonts.notoSansDevanagariTextTheme();
+      return 'NotoSansDevanagari';
     case 'ta':
-      return GoogleFonts.notoSansTamilTextTheme();
+      return 'NotoSansTamil';
     case 'kn':
-      return GoogleFonts.notoSansKannadaTextTheme();
+      return 'NotoSansKannada';
     case 'ml':
-      return GoogleFonts.notoSansMalayalamTextTheme();
+      return 'NotoSansMalayalam';
     default:
-      return GoogleFonts.dmSansTextTheme();
+      return 'GoogleSans';
   }
 }
 
 ThemeData buildBrandTheme(Locale locale) {
-  final baseTextTheme = _baseTextThemeFor(locale);
+  final family = fontFamilyForLocale(locale);
+  // Apply the bundled family to Material's default text theme, then layer the
+  // brand weight/colour overrides on top (mirrors the old GoogleFonts setup).
+  final baseTextTheme = ThemeData(
+    useMaterial3: true,
+  ).textTheme.apply(fontFamily: family);
 
   return ThemeData(
     useMaterial3: true,
+    fontFamily: family,
     scaffoldBackgroundColor: BrandColors.background,
 
     colorScheme: const ColorScheme.light(

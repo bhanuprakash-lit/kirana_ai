@@ -574,6 +574,8 @@
   "finWhatsappReminderSent": "WhatsApp ಜ್ಞಾಪನೆ ಕಳುಹಿಸಲಾಗಿದೆ!",
   "finFailedSendReminder": "ಜ್ಞಾಪನೆ ಕಳುಹಿಸಲು ವಿಫಲವಾಗಿದೆ: {error}",
   "finSendWhatsappReminder": "WhatsApp ಜ್ಞಾಪನೆ ಕಳುಹಿಸಿ",
+  "finRemind": "ನೆನಪಿಸಿ",
+  "finRemindedToday": "ಇಂದು ನೆನಪಿಸಲಾಗಿದೆ",
   "finRecover": "ಮರುಪಡೆಯಿರಿ",
   "finHistory": "ಇತಿಹಾಸ",
   "finSettled": "ಇತ್ಯರ್ಥವಾಗಿದೆ",

@@ -29,7 +29,10 @@ class DeviceTelemetry {
       } else if (Platform.isIOS) {
         final i = await plugin.iosInfo;
         out['X-Device-Brand'] = 'Apple';
-        out['X-Device-Model'] = _clamp(i.utsname.machine, 100); // e.g. iPhone15,2
+        out['X-Device-Model'] = _clamp(
+          i.utsname.machine,
+          100,
+        ); // e.g. iPhone15,2
         out['X-OS-Name'] = 'iOS';
         out['X-OS-Version'] = _clamp(i.systemVersion, 50);
       }

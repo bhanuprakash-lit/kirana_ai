@@ -49,6 +49,11 @@ class SubscriptionInfo {
   final int daysRemaining;
   final int secondsRemaining;
 
+  /// When this info was fetched from the server (device clock). Used to anchor
+  /// the server's `seconds_remaining` countdown so we never depend on parsing
+  /// the naive `trial_ends_at` timestamp against the device timezone.
+  final DateTime? fetchedAt;
+
   const SubscriptionInfo({
     required this.tier,
     this.isTrial = false,
@@ -59,6 +64,7 @@ class SubscriptionInfo {
     this.daysRemaining = 0,
     this.secondsRemaining = 0,
     this.serverExpired = false,
+    this.fetchedAt,
   });
 
   static const none = SubscriptionInfo(tier: SubTier.none);
@@ -85,10 +91,37 @@ class SubscriptionInfo {
       !isExpired;
 
   bool get isActive => hasAppAccess && !isExpired;
-  // Server is authoritative; fall back to local clock if server didn't send the flag.
-  bool get isExpired =>
-      serverExpired ||
-      (isTrial && trialEndsAt != null && trialEndsAt!.isBefore(DateTime.now()));
+
+  /// Authoritative remaining trial time. Prefers the server's `seconds_remaining`
+  /// (a pure duration, immune to device timezone/clock parsing of the naive
+  /// `trial_ends_at` TIMESTAMP) anchored to when we fetched it. Falls back to the
+  /// parsed `trial_ends_at` only if the server didn't send a countdown.
+  Duration? get trialRemaining {
+    if (!isTrial) return null;
+    if (fetchedAt != null && secondsRemaining > 0) {
+      final rem =
+          Duration(seconds: secondsRemaining) -
+          DateTime.now().difference(fetchedAt!);
+      return rem.isNegative ? Duration.zero : rem;
+    }
+    if (trialEndsAt != null) {
+      final rem = trialEndsAt!.difference(DateTime.now());
+      return rem.isNegative ? Duration.zero : rem;
+    }
+    return null;
+  }
+
+  // Server is authoritative. Only treat a trial as expired when the server says
+  // so, or when its own countdown has truly run out — never from a locally
+  // (mis)parsed trial_ends_at while time still remains.
+  bool get isExpired {
+    if (serverExpired) return true;
+    if (!isTrial) return false;
+    if (secondsRemaining > 0) return false; // server still counting down
+    final rem = trialRemaining;
+    return rem != null && rem.inSeconds <= 0;
+  }
+
   bool get isPending => tier == SubTier.pending;
 
   // Server explicitly told us this trial is expired.
@@ -119,6 +152,7 @@ class SubscriptionInfo {
       daysRemaining: json['days_remaining'] as int? ?? 0,
       secondsRemaining: json['seconds_remaining'] as int? ?? 0,
       serverExpired: json['is_expired'] as bool? ?? false,
+      fetchedAt: DateTime.now(),
     );
   }
 }

@@ -2033,6 +2033,12 @@ class AppLocalizationsKn extends AppLocalizations {
   String get finSendWhatsappReminder => 'WhatsApp ಜ್ಞಾಪನೆ ಕಳುಹಿಸಿ';
 
   @override
+  String get finRemind => 'ನೆನಪಿಸಿ';
+
+  @override
+  String get finRemindedToday => 'ಇಂದು ನೆನಪಿಸಲಾಗಿದೆ';
+
+  @override
   String get finRecover => 'ಮರುಪಡೆಯಿರಿ';
 
   @override

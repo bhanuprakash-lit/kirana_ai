@@ -249,6 +249,10 @@ class _HandwritingOrderSheetState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final matched = _matches.where((m) => m.inStock).length;
+    final size = MediaQuery.of(context).size;
+    // Once items are detected the canvas collapses to a compact preview so the
+    // results list gets the room it needs (critical on small screens).
+    final reviewing = _detectState == _DetectState.done;
 
     // ── Pro + usage gating ─────────────────────────────────────────────────────
     final subInfo = ref.watch(subInfoProvider);
@@ -405,55 +409,57 @@ class _HandwritingOrderSheetState
               ),
             if (!isPro || remaining == 0) const SizedBox(height: 8),
 
-            // Language banner
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _ScriptBanner(),
-            ),
-            const SizedBox(height: 8),
+            // Language banner + auto-detect toggle (drawing mode only)
+            if (!reviewing) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _ScriptBanner(),
+              ),
+              const SizedBox(height: 8),
 
-            // Auto-detect toggle row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.timer_rounded,
-                    size: 14,
-                    color: BrandColors.muted,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      l10n.procAutoDetectAfter5s,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: BrandColors.muted,
+              // Auto-detect toggle row
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.timer_rounded,
+                      size: 14,
+                      color: BrandColors.muted,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        l10n.procAutoDetectAfter5s,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: BrandColors.muted,
+                        ),
                       ),
                     ),
-                  ),
-                  Transform.scale(
-                    scale: 0.8,
-                    child: Switch(
-                      value: _autoDetectEnabled,
-                      onChanged: canUse
-                          ? (v) => setState(() => _autoDetectEnabled = v)
-                          : null,
-                      activeTrackColor: BrandColors.purple,
-                      activeThumbColor: Colors.white,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    Transform.scale(
+                      scale: 0.8,
+                      child: Switch(
+                        value: _autoDetectEnabled,
+                        onChanged: canUse
+                            ? (v) => setState(() => _autoDetectEnabled = v)
+                            : null,
+                        activeTrackColor: BrandColors.purple,
+                        activeThumbColor: Colors.white,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 6),
+              const SizedBox(height: 6),
+            ],
 
-            // Canvas
+            // Canvas — large while drawing, compact preview while reviewing.
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.46,
+                height: reviewing ? size.height * 0.15 : size.height * 0.46,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -478,15 +484,24 @@ class _HandwritingOrderSheetState
                       RepaintBoundary(
                         key: _repaintKey,
                         child: GestureDetector(
-                          onPanStart: canUse ? _onPanStart : null,
-                          onPanUpdate: canUse ? _onPanUpdate : null,
-                          onPanEnd: canUse ? _onPanEnd : null,
+                          // opaque + an expanding child make the WHOLE canvas
+                          // box capture strokes. Previously the painter was
+                          // fixed at 220px tall, so anything below that height
+                          // was a dead zone the user couldn't write in.
+                          behavior: HitTestBehavior.opaque,
+                          onPanStart: (canUse && !reviewing)
+                              ? _onPanStart
+                              : null,
+                          onPanUpdate: (canUse && !reviewing)
+                              ? _onPanUpdate
+                              : null,
+                          onPanEnd: (canUse && !reviewing) ? _onPanEnd : null,
                           child: CustomPaint(
                             painter: _StrokePainter(
                               strokes: _strokes,
                               current: _current,
                             ),
-                            size: const Size(double.infinity, 220),
+                            child: const SizedBox.expand(),
                           ),
                         ),
                       ),
@@ -533,46 +548,48 @@ class _HandwritingOrderSheetState
             ),
             const SizedBox(height: 10),
 
-            // Detect button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: ElevatedButton.icon(
-                  onPressed:
-                      (!canUse ||
-                          _detectState == _DetectState.processing ||
-                          !_hasDrawn)
-                      ? null
-                      : _detect,
-                  icon: _detectState == _DetectState.processing
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.auto_awesome_rounded, size: 16),
-                  label: Text(
-                    _detectState == _DetectState.processing
-                        ? l10n.procDetecting
-                        : l10n.procDetectItems,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: BrandColors.purple,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+            // Detect button (drawing mode only)
+            if (!reviewing) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    onPressed:
+                        (!canUse ||
+                            _detectState == _DetectState.processing ||
+                            !_hasDrawn)
+                        ? null
+                        : _detect,
+                    icon: _detectState == _DetectState.processing
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.auto_awesome_rounded, size: 16),
+                    label: Text(
+                      _detectState == _DetectState.processing
+                          ? l10n.procDetecting
+                          : l10n.procDetectItems,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: BrandColors.purple,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 14),
+              const SizedBox(height: 14),
+            ],
 
             // Results
             Expanded(

@@ -534,5 +534,6 @@ class PosScanRequestNotifier extends Notifier<int> {
   void request() => state++;
 }
 
-final posScanRequestProvider =
-    NotifierProvider<PosScanRequestNotifier, int>(PosScanRequestNotifier.new);
+final posScanRequestProvider = NotifierProvider<PosScanRequestNotifier, int>(
+  PosScanRequestNotifier.new,
+);

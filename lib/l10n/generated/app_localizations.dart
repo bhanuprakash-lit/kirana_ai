@@ -3552,6 +3552,18 @@ abstract class AppLocalizations {
   /// **'Send WhatsApp Reminder'**
   String get finSendWhatsappReminder;
 
+  /// No description provided for @finRemind.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind'**
+  String get finRemind;
+
+  /// No description provided for @finRemindedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminded today'**
+  String get finRemindedToday;
+
   /// No description provided for @finRecover.
   ///
   /// In en, this message translates to:

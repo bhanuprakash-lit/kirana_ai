@@ -62,6 +62,7 @@ firebase.json
 ./android/app/google-services.json
 ./ios/Runner/GoogleService-Info.plist
 
+/lib/firebase_remote_config_test.dart
 # Common editor / OS junk
 Thumbs.db
 ehthumbs.db
@@ -69,3 +70,7 @@ Desktop.ini
 *.tmp
 *.bak
 *~
+
+# Local tooling / raw font downloads (bundled copies live in assets/fonts/)
+.gemini/
+/fonts/

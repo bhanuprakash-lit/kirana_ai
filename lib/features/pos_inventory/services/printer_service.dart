@@ -365,25 +365,6 @@ class PrinterService {
     return '$l$a';
   }
 
-  List<String> _wordWrap(String text, int width) {
-    if (text.length <= width) return [text];
-    final words = text.split(' ');
-    final lines = <String>[];
-    var line = '';
-    for (final w in words) {
-      if (line.isEmpty) {
-        line = w;
-      } else if (line.length + 1 + w.length <= width) {
-        line += ' $w';
-      } else {
-        lines.add(line);
-        line = w;
-      }
-    }
-    if (line.isNotEmpty) lines.add(line);
-    return lines;
-  }
-
   // ── Encoding ─────────────────────────────────────────────────────────────────
   // Printer default codepage is ASCII-compatible. Non-ASCII → '?'.
   static List<int> _ascii(String s) =>

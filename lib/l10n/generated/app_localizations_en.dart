@@ -2018,6 +2018,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get finSendWhatsappReminder => 'Send WhatsApp Reminder';
 
   @override
+  String get finRemind => 'Remind';
+
+  @override
+  String get finRemindedToday => 'Reminded today';
+
+  @override
   String get finRecover => 'Recover';
 
   @override
