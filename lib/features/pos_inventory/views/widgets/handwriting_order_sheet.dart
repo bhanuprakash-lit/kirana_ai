@@ -69,7 +69,7 @@ class _HandwritingOrderSheetState
   _DetectState _detectState = _DetectState.idle;
   String _transcript = '';
   List<_MatchedItem> _matches = [];
-  bool _autoDetectEnabled = true; // toggle in sheet
+  bool _autoDetectEnabled = false; // toggle in sheet
   String _errorMsg = '';
   bool _hasDrawn = false;
 

@@ -91,8 +91,9 @@ class _CatalogProduct {
     final parts = <String>[];
     if (brand != null) parts.add(brand!);
     if (parentCategoryName != null) parts.add(parentCategoryName!);
-    if (categoryName != null && categoryName != parentCategoryName)
+    if (categoryName != null && categoryName != parentCategoryName) {
       parts.add(categoryName!);
+    }
     return parts.join(' · ');
   }
 }
@@ -897,8 +898,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   onPressed: () => setState(() {
                     final v = _VariantData();
                     // Inherit unit from catalog so V2 matches V1's unit
-                    if (_linked != null)
+                    if (_linked != null) {
                       v.selectedUnit = _linked!.unit ?? 'pcs';
+                    }
                     _variants.add(v);
                   }),
                   icon: const Icon(Icons.add_rounded, size: 16),
@@ -999,7 +1001,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: v.selectedUnit,
+                  initialValue: v.selectedUnit,
                   decoration: InputDecoration(
                     labelText: l10n.invUnit,
                     isDense: true,
@@ -1272,7 +1274,7 @@ class _CatalogResultTile extends StatelessWidget {
                       width: 48,
                       height: 48,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => _iconFallback(),
+                      errorBuilder: (_, _, _) => _iconFallback(),
                     )
                   : _iconFallback(),
             ),
@@ -1361,7 +1363,7 @@ class _LinkedChip extends StatelessWidget {
                 width: 44,
                 height: 44,
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
               ),
             ),
           if (product.imageUrl != null) const SizedBox(width: 12),

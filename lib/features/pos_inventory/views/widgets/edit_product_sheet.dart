@@ -93,8 +93,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
       _priceCtrl,
       _mrpCtrl,
       _stockCtrl,
-    ])
+    ]) {
       c.dispose();
+    }
     super.dispose();
   }
 
@@ -252,7 +253,7 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     child: Image.network(
                       widget.item.imageUrl!,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const Icon(
+                      errorBuilder: (_, _, _) => const Icon(
                         Icons.inventory_2_rounded,
                         color: BrandColors.muted,
                         size: 36,
@@ -362,7 +363,7 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _selectedUnit,
+                    initialValue: _selectedUnit,
                     decoration: InputDecoration(labelText: l10n.invSellingUnit),
                     isExpanded: true,
                     items: _editUnits

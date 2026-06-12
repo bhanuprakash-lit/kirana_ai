@@ -28,6 +28,7 @@ class InventoryTab extends ConsumerStatefulWidget {
 class _InventoryTabState extends ConsumerState<InventoryTab> {
   final _searchCtrl = TextEditingController();
   String? _selectedCategory;
+  String? _selectedFlag; // AI-tag (ML flag) filter, null = all
   String _searchQuery = '';
   bool _isExpanded = false;
 
@@ -98,17 +99,33 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                   .toList()
                 ..sort();
 
+          // AI tags (ML flags) per product — same source as the per-item chips.
+          final mlFlags =
+              ref.watch(inventoryFlagsProvider).asData?.value ??
+              const <int, List<String>>{};
+          // Only offer tag filters for flags that actually occur in this store.
+          final availableFlags = [
+            for (final f in _flagOrder)
+              if (data.items.any(
+                (it) => (mlFlags[it.productId] ?? const []).contains(f),
+              ))
+                f,
+          ];
+
           final q = _searchQuery.toLowerCase().trim();
           final filteredItems = data.items.where((item) {
             final matchesCategory =
                 _selectedCategory == null ||
                 item.categoryName == _selectedCategory;
+            final matchesFlag =
+                _selectedFlag == null ||
+                (mlFlags[item.productId] ?? const []).contains(_selectedFlag);
             final matchesSearch =
                 q.isEmpty ||
                 item.name.toLowerCase().contains(q) ||
                 (item.categoryName?.toLowerCase().contains(q) ?? false) ||
                 (item.brand?.toLowerCase().contains(q) ?? false);
-            return matchesCategory && matchesSearch;
+            return matchesCategory && matchesFlag && matchesSearch;
           }).toList();
 
           final Map<String, List<InventoryItem>> filteredGrouped = {};
@@ -119,9 +136,6 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
 
           final nearExpiryCount = ref.watch(nearExpiryCountProvider);
           final missingPriceCount = ref.watch(missingPriceCountProvider);
-          final mlFlags =
-              ref.watch(inventoryFlagsProvider).asData?.value ??
-              const <int, List<String>>{};
 
           return RefreshIndicator.adaptive(
             onRefresh: () => ref.read(inventoryProvider.notifier).refresh(),
@@ -259,6 +273,9 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                                       _selectedCategory = cat == 'All'
                                           ? null
                                           : cat;
+                                      // Collapse the expanded chip list once a
+                                      // category is picked.
+                                      _isExpanded = false;
                                     }),
                                   ),
 
@@ -302,6 +319,47 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                     ),
                   ),
                 ),
+
+                // ── AI tag filters (ML flags) ────────────────────────────
+                if (availableFlags.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 2),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(
+                              top: 4,
+                              right: 6,
+                              bottom: 8,
+                            ),
+                            child: Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 15,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                          Expanded(
+                            child: Wrap(
+                              children: [
+                                for (final f in availableFlags)
+                                  _FlagChip(
+                                    flag: f,
+                                    isSelected: _selectedFlag == f,
+                                    onTap: () => setState(() {
+                                      _selectedFlag = _selectedFlag == f
+                                          ? null
+                                          : f;
+                                    }),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
                 // ── Pending (optimistic) items ───────────────────────────
                 if (data.pendingItems.isNotEmpty)
@@ -411,35 +469,91 @@ class _NearExpiryBanner extends StatelessWidget {
   }
 }
 
+// ── AI tags (ML flags) — shared metadata used by per-item chips + filters ─────
+
+const _flagOrder = <String>[
+  'fast_moving',
+  'reorder_now',
+  'stockout_risk',
+  'dead_stock',
+  'profit_opportunity',
+];
+
+const _flagMeta = <String, (IconData, Color)>{
+  'fast_moving': (Icons.trending_up_rounded, BrandColors.success),
+  'reorder_now': (Icons.refresh_rounded, BrandColors.accent),
+  'stockout_risk': (Icons.warning_amber_rounded, BrandColors.error),
+  'dead_stock': (Icons.snooze_rounded, Color(0xFFB08D57)),
+  'profit_opportunity': (Icons.stars_rounded, BrandColors.primary),
+};
+
+String _flagLabel(AppLocalizations l10n, String flag) {
+  switch (flag) {
+    case 'fast_moving':
+      return l10n.invFlagFast;
+    case 'reorder_now':
+      return l10n.invFlagReorder;
+    case 'stockout_risk':
+      return l10n.invFlagLowStock;
+    case 'dead_stock':
+      return l10n.invFlagDead;
+    case 'profit_opportunity':
+      return l10n.invFlagProfit;
+    default:
+      return flag;
+  }
+}
+
+/// A selectable filter chip for one AI tag (ML flag), coloured per tag.
+class _FlagChip extends StatelessWidget {
+  final String flag;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FlagChip({
+    required this.flag,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final meta = _flagMeta[flag];
+    final color = meta?.$2 ?? BrandColors.primary;
+    final icon = meta?.$1 ?? Icons.auto_awesome_rounded;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8, bottom: 8),
+      child: ChoiceChip(
+        avatar: Icon(icon, size: 14, color: isSelected ? Colors.white : color),
+        label: Text(_flagLabel(l10n, flag)),
+        selected: isSelected,
+        onSelected: (_) => onTap(),
+        selectedColor: color,
+        backgroundColor: color.withValues(alpha: 0.08),
+        labelStyle: TextStyle(
+          color: isSelected ? Colors.white : color,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(
+            color: isSelected ? color : color.withValues(alpha: 0.4),
+          ),
+        ),
+        showCheckmark: false,
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+        visualDensity: const VisualDensity(horizontal: -2, vertical: -3),
+      ),
+    );
+  }
+}
+
 /// Renders every ML flag an item carries (fast moving, reorder, etc.) as chips.
 class _MlFlagChips extends StatelessWidget {
   final List<String> flags;
   const _MlFlagChips({required this.flags});
-
-  static const _meta = <String, (IconData, Color)>{
-    'fast_moving': (Icons.trending_up_rounded, BrandColors.success),
-    'reorder_now': (Icons.refresh_rounded, BrandColors.accent),
-    'stockout_risk': (Icons.warning_amber_rounded, BrandColors.error),
-    'dead_stock': (Icons.snooze_rounded, Color(0xFFB08D57)),
-    'profit_opportunity': (Icons.stars_rounded, BrandColors.primary),
-  };
-
-  String _labelFor(AppLocalizations l10n, String flag) {
-    switch (flag) {
-      case 'fast_moving':
-        return l10n.invFlagFast;
-      case 'reorder_now':
-        return l10n.invFlagReorder;
-      case 'stockout_risk':
-        return l10n.invFlagLowStock;
-      case 'dead_stock':
-        return l10n.invFlagDead;
-      case 'profit_opportunity':
-        return l10n.invFlagProfit;
-      default:
-        return flag;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -448,7 +562,7 @@ class _MlFlagChips extends StatelessWidget {
     final seen = <String>{};
     final chips = <Widget>[];
     for (final f in flags) {
-      final m = _meta[f];
+      final m = _flagMeta[f];
       if (m == null || !seen.add(f)) continue;
       chips.add(
         Container(
@@ -463,7 +577,7 @@ class _MlFlagChips extends StatelessWidget {
               Icon(m.$1, size: 10, color: m.$2),
               const SizedBox(width: 3),
               Text(
-                _labelFor(l10n, f),
+                _flagLabel(l10n, f),
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
@@ -715,7 +829,7 @@ class _InventoryTile extends StatelessWidget {
                   width: 40,
                   height: 40,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => _iconBox(catColor),
+                  errorBuilder: (_, _, _) => _iconBox(catColor),
                 )
               : _iconBox(catColor),
         ),

@@ -9,16 +9,60 @@ import '../../../shared/widgets/action_widgets.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../../pos_inventory/models/pos_product.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
+import '../../subscription/providers/subscription_provider.dart';
+import '../../subscription/views/paywall_sheet.dart';
 import '../models/basket_model.dart';
+import '../models/basket_tier_config.dart';
 import '../providers/basket_provider.dart';
+import 'basket_tier_config_screen.dart';
+
+/// Localized tier name (Bronze/Silver/Gold/Platinum kept as proper nouns).
+String tierLabel(AppLocalizations l10n, String? tier) {
+  switch (tier) {
+    case 'bronze':
+      return l10n.mktTierBronze;
+    case 'silver':
+      return l10n.mktTierSilver;
+    case 'gold':
+      return l10n.mktTierGold;
+    case 'platinum':
+      return l10n.mktTierPlatinum;
+    default:
+      return '';
+  }
+}
 
 class BasketsScreen extends ConsumerWidget {
   const BasketsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncData = ref.watch(basketProvider);
     final l10n = AppLocalizations.of(context);
+
+    // Baskets are an entirely Pro-tier feature.
+    final canAccess = ref.watch(subInfoProvider).canAccessBaskets;
+    if (!canAccess) {
+      return Scaffold(
+        backgroundColor: BrandColors.background,
+        appBar: AppBar(
+          title: Text(
+            l10n.mktMyBaskets,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+        ),
+        body: _BasketsProGate(
+          onUpgrade: () => showPaywallSheet(
+            context,
+            featureName: l10n.mktMyBaskets,
+            featureDescription: l10n.mktBasketsProDesc,
+            featureIcon: Icons.shopping_basket_rounded,
+          ),
+        ),
+      );
+    }
+
+    final asyncData = ref.watch(basketProvider);
+    final showArchived = ref.watch(basketProvider.notifier).includeArchived;
 
     return Scaffold(
       backgroundColor: BrandColors.background,
@@ -29,8 +73,20 @@ class BasketsScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_rounded),
-            onPressed: () => _showCreateSheet(context, ref),
+            tooltip: l10n.mktTierSettings,
+            icon: const Icon(Icons.tune_rounded),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const BasketTierConfigScreen()),
+            ),
+          ),
+          IconButton(
+            tooltip: showArchived ? l10n.mktHideArchived : l10n.mktShowArchived,
+            icon: Icon(
+              showArchived ? Icons.unarchive_rounded : Icons.archive_outlined,
+            ),
+            onPressed: () => ref
+                .read(basketProvider.notifier)
+                .setIncludeArchived(!showArchived),
           ),
         ],
       ),
@@ -77,13 +133,16 @@ class BasketsScreen extends ConsumerWidget {
                     basket: baskets[i],
                     onDelete: () => _confirmDelete(context, ref, baskets[i]),
                     onAlert: () => _sendAlert(context, ref, baskets[i]),
+                    onEdit: () => _showSheet(context, ref, basket: baskets[i]),
+                    onArchive: () => _archive(context, ref, baskets[i]),
+                    onRestore: () => _restore(context, ref, baskets[i]),
                   ),
                 ),
               ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'baskets_fab',
-        onPressed: () => _showCreateSheet(context, ref),
+        onPressed: () => _showSheet(context, ref),
         backgroundColor: BrandColors.primary,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text(
@@ -131,7 +190,7 @@ class BasketsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 28),
             ElevatedButton.icon(
-              onPressed: () => _showCreateSheet(context, ref),
+              onPressed: () => _showSheet(context, ref),
               icon: const Icon(Icons.add_rounded),
               label: Text(l10n.mktCreateFirstBasket),
             ),
@@ -141,12 +200,12 @@ class BasketsScreen extends ConsumerWidget {
     );
   }
 
-  void _showCreateSheet(BuildContext context, WidgetRef ref) {
+  void _showSheet(BuildContext context, WidgetRef ref, {Basket? basket}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const _CreateBasketSheet(),
+      builder: (_) => _BasketSheet(existing: basket),
     );
   }
 
@@ -195,6 +254,56 @@ class BasketsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _archive(
+    BuildContext context,
+    WidgetRef ref,
+    Basket basket,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      await ref.read(basketProvider.notifier).archiveBasket(basket.basketId);
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.mktBasketArchived)));
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.mktSomethingWentWrong),
+            backgroundColor: BrandColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _restore(
+    BuildContext context,
+    WidgetRef ref,
+    Basket basket,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      await ref.read(basketProvider.notifier).restoreBasket(basket.basketId);
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.mktBasketRestored)));
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.mktSomethingWentWrong),
+            backgroundColor: BrandColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _sendAlert(
     BuildContext context,
     WidgetRef ref,
@@ -227,6 +336,7 @@ class BasketsScreen extends ConsumerWidget {
       if (context.mounted) {
         final sent = (res['sent'] as num?)?.toInt() ?? 0;
         final total = (res['total'] as num?)?.toInt() ?? 0;
+        final err = res['error'] as String?;
         String msg;
         Color bg;
         if (sent > 0) {
@@ -235,6 +345,10 @@ class BasketsScreen extends ConsumerWidget {
         } else if (total == 0) {
           msg = l10n.mktNoCustomersWithPhone;
           bg = BrandColors.muted;
+        } else if (err != null && err.isNotEmpty) {
+          // Surface the real Meta/template error instead of a vague message.
+          msg = l10n.mktAlertFailed(err);
+          bg = BrandColors.error;
         } else {
           msg = l10n.mktWhatsAppNotActiveYet(total);
           bg = const Color(0xFFE87722);
@@ -251,7 +365,7 @@ class BasketsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.mktAlertFailed(e.toString())),
+            content: Text(l10n.mktAlertFailed(_msg(e))),
             backgroundColor: BrandColors.error,
           ),
         );
@@ -260,28 +374,41 @@ class BasketsScreen extends ConsumerWidget {
   }
 }
 
+String _msg(Object e) {
+  final s = e.toString();
+  return s.startsWith('Exception: ') ? s.substring(11) : s;
+}
+
 // ── Basket card ───────────────────────────────────────────────────────────────
 
 class _BasketCard extends StatelessWidget {
   final Basket basket;
   final VoidCallback onDelete;
   final VoidCallback onAlert;
+  final VoidCallback onEdit;
+  final VoidCallback onArchive;
+  final VoidCallback onRestore;
 
   const _BasketCard({
     required this.basket,
     required this.onDelete,
     required this.onAlert,
+    required this.onEdit,
+    required this.onArchive,
+    required this.onRestore,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isExpired = basket.isExpired;
+    final isArchived = basket.isArchived;
+    final dimmed = isExpired || isArchived;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isArchived ? BrandColors.surfaceTint : Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: BrandColors.border),
         boxShadow: [
@@ -305,6 +432,10 @@ class _BasketCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
+                          if (basket.tier != null) ...[
+                            _TierBadge(tier: basket.tier!),
+                            const SizedBox(width: 8),
+                          ],
                           Flexible(
                             child: Text(
                               basket.name,
@@ -312,31 +443,23 @@ class _BasketCard extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 16,
-                                color: isExpired
+                                color: dimmed
                                     ? BrandColors.muted
                                     : BrandColors.ink,
                               ),
                             ),
                           ),
-                          if (isExpired) ...[
+                          if (isArchived) ...[
                             const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: BrandColors.error.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                l10n.mktExpired,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: BrandColors.error,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
+                            _Pill(
+                              text: l10n.mktArchived,
+                              color: BrandColors.muted,
+                            ),
+                          ] else if (isExpired) ...[
+                            const SizedBox(width: 8),
+                            _Pill(
+                              text: l10n.mktExpired,
+                              color: BrandColors.error,
                             ),
                           ],
                         ],
@@ -354,27 +477,34 @@ class _BasketCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (basket.price != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: BrandColors.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '₹${basket.price!.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                        color: BrandColors.primary,
-                      ),
-                    ),
-                  ),
+                if (basket.price != null) _PriceBlock(basket: basket),
               ],
             ),
+
+            if (basket.savings != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.sell_rounded,
+                    size: 13,
+                    color: BrandColors.success,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    l10n.mktYouSave(
+                      basket.savings!.toStringAsFixed(0),
+                      (basket.discountPct ?? 0).toStringAsFixed(0),
+                    ),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: BrandColors.success,
+                    ),
+                  ),
+                ],
+              ),
+            ],
 
             if (basket.items.isNotEmpty) ...[
               const SizedBox(height: 10),
@@ -434,42 +564,217 @@ class _BasketCard extends StatelessWidget {
             ],
 
             const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: isExpired ? null : onAlert,
-                    icon: const Icon(Icons.message_rounded, size: 16),
-                    label: Text(
-                      l10n.mktAlertCustomers,
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF25D366),
-                      side: const BorderSide(color: Color(0xFF25D366)),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+            if (isArchived)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onRestore,
+                      icon: const Icon(Icons.unarchive_rounded, size: 16),
+                      label: Text(l10n.mktRestore),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(
-                    Icons.delete_outline_rounded,
-                    color: BrandColors.error,
-                    size: 20,
+                  const SizedBox(width: 10),
+                  _DeleteButton(onDelete: onDelete),
+                ],
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: (isExpired || basket.alertedToday)
+                          ? null
+                          : onAlert,
+                      icon: const Icon(Icons.message_rounded, size: 16),
+                      label: Text(
+                        basket.alertedToday
+                            ? l10n.mktAlertedToday
+                            : l10n.mktAlertCustomers,
+                        style: const TextStyle(fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF25D366),
+                        side: const BorderSide(color: Color(0xFF25D366)),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                      ),
+                    ),
                   ),
-                  style: IconButton.styleFrom(
-                    backgroundColor: BrandColors.error.withValues(alpha: 0.06),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    tooltip: l10n.mktEdit,
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit_outlined, size: 20),
+                    style: IconButton.styleFrom(
+                      backgroundColor: BrandColors.surfaceTint,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert_rounded, size: 20),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    onSelected: (v) {
+                      if (v == 'archive') onArchive();
+                      if (v == 'delete') onDelete();
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'archive',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.archive_outlined, size: 18),
+                            const SizedBox(width: 10),
+                            Text(l10n.mktArchive),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.delete_outline_rounded,
+                              size: 18,
+                              color: BrandColors.error,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              l10n.mktDelete,
+                              style: const TextStyle(color: BrandColors.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _PriceBlock extends StatelessWidget {
+  final Basket basket;
+  const _PriceBlock({required this.basket});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasDiscount = basket.savings != null && basket.grossTotal != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (hasDiscount)
+          Text(
+            '₹${basket.grossTotal!.toStringAsFixed(0)}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: BrandColors.muted,
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: BrandColors.primary.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            '₹${basket.price!.toStringAsFixed(0)}',
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 16,
+              color: BrandColors.primary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TierBadge extends StatelessWidget {
+  final String tier;
+  const _TierBadge({required this.tier});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final style = TierStyle.of(tier);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: style.color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(7),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(style.icon, size: 12, color: style.color),
+          const SizedBox(width: 3),
+          Text(
+            tierLabel(l10n, tier),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: style.color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  final String text;
+  final Color color;
+  const _Pill({required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          color: color,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _DeleteButton extends StatelessWidget {
+  final VoidCallback onDelete;
+  const _DeleteButton({required this.onDelete});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onDelete,
+      icon: const Icon(
+        Icons.delete_outline_rounded,
+        color: BrandColors.error,
+        size: 20,
+      ),
+      style: IconButton.styleFrom(
+        backgroundColor: BrandColors.error.withValues(alpha: 0.06),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -487,27 +792,35 @@ class _SelectedItem {
     required this.productId,
     required this.productName,
     required this.price,
-  }) : qtyCtrl = TextEditingController(text: '1');
+    double qty = 1,
+  }) : qtyCtrl = TextEditingController(
+         text: qty == qty.roundToDouble()
+             ? qty.toStringAsFixed(0)
+             : qty.toString(),
+       );
+
+  double get qty => double.tryParse(qtyCtrl.text) ?? 1.0;
+  double get lineTotal => price * qty;
 
   void dispose() => qtyCtrl.dispose();
 }
 
-// ── Create Basket Sheet ───────────────────────────────────────────────────────
+// ── Create / Edit Basket Sheet ────────────────────────────────────────────────
 
-class _CreateBasketSheet extends ConsumerStatefulWidget {
-  const _CreateBasketSheet();
+class _BasketSheet extends ConsumerStatefulWidget {
+  final Basket? existing;
+  const _BasketSheet({this.existing});
 
   @override
-  ConsumerState<_CreateBasketSheet> createState() => _CreateBasketSheetState();
+  ConsumerState<_BasketSheet> createState() => _BasketSheetState();
 }
 
-class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
+class _BasketSheetState extends ConsumerState<_BasketSheet> {
   AppLocalizations get _l10n =>
       lookupAppLocalizations(ref.read(localeProvider));
 
-  final _nameCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
-  final _priceCtrl = TextEditingController();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _descCtrl;
   final _items = <_SelectedItem>[];
 
   String? _validFrom;
@@ -515,16 +828,47 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
   bool _saving = false;
   String? _error;
 
+  bool get _isEdit => widget.existing != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final b = widget.existing;
+    _nameCtrl = TextEditingController(text: b?.name ?? '');
+    _descCtrl = TextEditingController(text: b?.description ?? '');
+    _validFrom = b?.validFrom;
+    _validTo = b?.validTo;
+    if (b != null) {
+      // Map saved items back to selected items, resolving current prices.
+      final products = ref.read(posProvider).products;
+      for (final it in b.items) {
+        final matches = products
+            .where((x) => x.productId == it.productId)
+            .toList();
+        final p = matches.isNotEmpty ? matches.first : null;
+        _items.add(
+          _SelectedItem(
+            productId: it.productId,
+            productName: it.productName ?? p?.displayName ?? _l10n.mktItem,
+            price: p?.price ?? 0,
+            qty: it.qty,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _nameCtrl.dispose();
     _descCtrl.dispose();
-    _priceCtrl.dispose();
     for (final i in _items) {
       i.dispose();
     }
     super.dispose();
   }
+
+  double get _grossTotal => _items.fold(0.0, (sum, i) => sum + i.lineTotal);
 
   Future<void> _pickDate({required bool isFrom}) async {
     final now = DateTime.now();
@@ -538,10 +882,11 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
     final label =
         '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
     setState(() {
-      if (isFrom)
+      if (isFrom) {
         _validFrom = label;
-      else
+      } else {
         _validTo = label;
+      }
     });
   }
 
@@ -603,37 +948,45 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
           (i) => {
             'product_id': i.productId,
             'product_name': i.productName,
-            'qty': double.tryParse(i.qtyCtrl.text) ?? 1.0,
+            'qty': i.qty,
           },
         )
         .toList();
 
+    final payload = {
+      'name': _nameCtrl.text.trim(),
+      'description': _descCtrl.text.trim().isNotEmpty
+          ? _descCtrl.text.trim()
+          : null,
+      'valid_from': _validFrom,
+      'valid_to': _validTo,
+      'items': items,
+    };
+
     try {
-      await ref.read(basketProvider.notifier).createBasket({
-        'name': _nameCtrl.text.trim(),
-        'description': _descCtrl.text.trim().isNotEmpty
-            ? _descCtrl.text.trim()
-            : null,
-        'price': _priceCtrl.text.isNotEmpty
-            ? double.tryParse(_priceCtrl.text)
-            : null,
-        'valid_from': _validFrom,
-        'valid_to': _validTo,
-        'items': items,
-      });
+      final notifier = ref.read(basketProvider.notifier);
+      if (_isEdit) {
+        await notifier.updateBasket(widget.existing!.basketId, payload);
+      } else {
+        await notifier.createBasket(payload);
+      }
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _saving = false;
-          _error = e.toString();
+          _error = _msg(e);
         });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final configAsync = ref.watch(basketTierConfigProvider);
+    final config = configAsync.asData?.value ?? BasketTierConfig.defaults;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       maxChildSize: 0.95,
@@ -662,7 +1015,7 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      l10n.mktNewBasket,
+                      _isEdit ? l10n.mktEditBasket : l10n.mktNewBasket,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 20,
@@ -730,24 +1083,10 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                       hintText: l10n.mktDescriptionHint,
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  // Bundle price
-                  TextField(
-                    controller: _priceCtrl,
-                    enabled: !_saving,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d+\.?\d{0,2}'),
-                      ),
-                    ],
-                    decoration: InputDecoration(
-                      labelText: l10n.mktBundlePriceOptional,
-                      prefixText: '₹ ',
-                    ),
-                  ),
+                  const SizedBox(height: 20),
+
+                  // Auto-priced tier preview
+                  _TierPreview(grossTotal: _grossTotal, config: config),
                   const SizedBox(height: 20),
 
                   // Validity dates
@@ -764,76 +1103,24 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                   Row(
                     children: [
                       Expanded(
-                        child: GestureDetector(
+                        child: _DateField(
+                          icon: Icons.calendar_today_rounded,
+                          caption: l10n.mktFromDateLabel,
+                          value: _validFrom,
+                          placeholder: l10n.mktSelectDate,
                           onTap: _saving ? null : () => _pickDate(isFrom: true),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 13,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: BrandColors.border),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.calendar_today_rounded,
-                                  size: 16,
-                                  color: BrandColors.muted,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  _validFrom ?? l10n.mktFromDateLabel,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: _validFrom != null
-                                        ? BrandColors.ink
-                                        : BrandColors.muted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: GestureDetector(
+                        child: _DateField(
+                          icon: Icons.event_rounded,
+                          caption: l10n.mktToDateLabel,
+                          value: _validTo,
+                          placeholder: l10n.mktSelectDate,
                           onTap: _saving
                               ? null
                               : () => _pickDate(isFrom: false),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 13,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: BrandColors.border),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.event_rounded,
-                                  size: 16,
-                                  color: BrandColors.muted,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  _validTo ?? l10n.mktToDateLabel,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: _validTo != null
-                                        ? BrandColors.ink
-                                        : BrandColors.muted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                       ),
                     ],
@@ -955,6 +1242,7 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                                   ),
                                 ],
                                 textAlign: TextAlign.center,
+                                onChanged: (_) => setState(() {}),
                                 decoration: InputDecoration(
                                   labelText: l10n.mktQty,
                                   isDense: true,
@@ -987,13 +1275,311 @@ class _CreateBasketSheetState extends ConsumerState<_CreateBasketSheet> {
                   SizedBox(
                     height: 52,
                     child: LoadingButton(
-                      label: l10n.mktCreateBasket,
+                      label: _isEdit
+                          ? l10n.mktSaveChanges
+                          : l10n.mktCreateBasket,
                       isLoading: _saving,
                       onPressed: _saving ? null : _save,
                     ),
                   ),
                   const SizedBox(height: 32),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Live, read-only preview of the tier + auto-discount for the current items.
+class _TierPreview extends StatelessWidget {
+  final double grossTotal;
+  final BasketTierConfig config;
+  const _TierPreview({required this.grossTotal, required this.config});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (grossTotal <= 0) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: BrandColors.surfaceTint,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: BrandColors.border),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.auto_awesome_rounded,
+              size: 18,
+              color: BrandColors.muted,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.mktAddItemsForPrice,
+                style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    final tier = config.tierFor(grossTotal);
+    final finalPrice = config.priceFor(grossTotal);
+    final savings = grossTotal - finalPrice;
+    final style = TierStyle.of(tier.name);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: style.color.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: style.color.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(style.icon, size: 18, color: style.color),
+              const SizedBox(width: 8),
+              Text(
+                l10n.mktTierBasketLabel(tierLabel(l10n, tier.name)),
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: style.color,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: style.color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  l10n.mktPctOff(tier.discountPct.toStringAsFixed(0)),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    color: style.color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _priceCol(
+                l10n.mktItemsTotal,
+                '₹${grossTotal.toStringAsFixed(0)}',
+                BrandColors.muted,
+                false,
+              ),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                size: 16,
+                color: BrandColors.muted,
+              ),
+              _priceCol(
+                l10n.mktBundlePrice,
+                '₹${finalPrice.toStringAsFixed(0)}',
+                BrandColors.primary,
+                true,
+              ),
+              const Spacer(),
+              if (savings > 0)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      l10n.mktSaveAmount(savings.toStringAsFixed(0)),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                        color: BrandColors.success,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _priceCol(String label, String value, Color color, bool bold) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10, color: BrandColors.muted),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: bold ? FontWeight.w900 : FontWeight.w600,
+              fontSize: 15,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DateField extends StatelessWidget {
+  final IconData icon;
+  final String caption;
+  final String? value;
+  final String placeholder;
+  final VoidCallback? onTap;
+  const _DateField({
+    required this.icon,
+    required this.caption,
+    required this.value,
+    required this.placeholder,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSet = value != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          caption,
+          style: const TextStyle(
+            fontSize: 11,
+            color: BrandColors.muted,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 4),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: BrandColors.border),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 16, color: BrandColors.muted),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    value ?? placeholder,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isSet ? BrandColors.ink : BrandColors.muted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Pro gate ──────────────────────────────────────────────────────────────────
+
+class _BasketsProGate extends StatelessWidget {
+  final VoidCallback onUpgrade;
+  const _BasketsProGate({required this.onUpgrade});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    const purple = Color(0xFF7C3AED);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: purple.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.shopping_basket_rounded,
+                size: 48,
+                color: purple,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: purple,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                l10n.posProOnly,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.mktBasketsProTitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: BrandColors.ink,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              l10n.mktBasketsProDesc,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: BrandColors.muted,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: onUpgrade,
+                icon: const Icon(Icons.workspace_premium_rounded, size: 18),
+                label: Text(l10n.posUpgradeToProDay),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
+                  backgroundColor: purple,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
               ),
             ),
           ],

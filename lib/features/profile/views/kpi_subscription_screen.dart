@@ -908,8 +908,9 @@ class _MlInsightsView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: map.entries.map((e) {
-          if (e.value is List)
+          if (e.value is List) {
             return const SizedBox.shrink(); // Skip complex lists for now
+          }
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
@@ -1207,26 +1208,33 @@ class _CategoryInfo {
 
 _CategoryInfo _getCategoryInfo(String category) {
   final cat = category.toLowerCase();
-  if (cat.contains('finance'))
+  if (cat.contains('finance')) {
     return const _CategoryInfo(
       Icons.account_balance_rounded,
       Color(0xFF0891B2),
     );
-  if (cat.contains('sales'))
+  }
+  if (cat.contains('sales')) {
     return const _CategoryInfo(Icons.shopping_bag_rounded, Color(0xFFEA580C));
-  if (cat.contains('customer'))
+  }
+  if (cat.contains('customer')) {
     return const _CategoryInfo(Icons.people_rounded, Color(0xFF7C3AED));
-  if (cat.contains('inventory'))
+  }
+  if (cat.contains('inventory')) {
     return const _CategoryInfo(Icons.inventory_2_rounded, Color(0xFF059669));
-  if (cat.contains('risk'))
+  }
+  if (cat.contains('risk')) {
     return const _CategoryInfo(Icons.warning_rounded, Color(0xFFDC2626));
-  if (cat.contains('operations'))
+  }
+  if (cat.contains('operations')) {
     return const _CategoryInfo(
       Icons.settings_suggest_rounded,
       Color(0xFF4B5563),
     );
-  if (cat.contains('insights'))
+  }
+  if (cat.contains('insights')) {
     return const _CategoryInfo(Icons.stars_rounded, BrandColors.primary);
+  }
   return const _CategoryInfo(Icons.analytics_rounded, BrandColors.muted);
 }
 

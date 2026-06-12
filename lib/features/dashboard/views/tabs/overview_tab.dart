@@ -348,7 +348,7 @@ class _GreetingHeader extends ConsumerWidget {
                 const SizedBox(width: 12),
 
                 // Trial countdown (shown only during trial)
-                const TrialCountdownWidget(),
+                const TrialCountdownWidget.detailed(),
                 const SizedBox(width: 8),
 
                 // 1️⃣ Notifications first
@@ -1209,8 +1209,8 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
                 scrollDirection: Axis.horizontal,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: 4,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (_, __) => Container(
+                separatorBuilder: (_, _) => const SizedBox(width: 10),
+                itemBuilder: (_, _) => Container(
                   width: 110,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -1220,7 +1220,7 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
               ),
             ),
           ),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
           data: (cards) {
             if (cards.isEmpty) return const SizedBox.shrink();
             WidgetsBinding.instance.addPostFrameCallback((_) => _update());
@@ -1233,7 +1233,7 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     scrollDirection: Axis.horizontal,
                     itemCount: cards.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 10),
+                    separatorBuilder: (_, _) => const SizedBox(width: 10),
                     itemBuilder: (_, i) => _KpiMiniCard(card: cards[i]),
                   ),
                 ),

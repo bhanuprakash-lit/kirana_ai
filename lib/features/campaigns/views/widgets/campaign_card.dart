@@ -8,12 +8,14 @@ import '../../models/campaign_model.dart';
 class CampaignCard extends StatelessWidget {
   final Campaign campaign;
   final VoidCallback onAddAll;
+  final VoidCallback? onSaveAsBasket;
   final int index;
 
   const CampaignCard({
     super.key,
     required this.campaign,
     required this.onAddAll,
+    this.onSaveAsBasket,
     required this.index,
   });
 
@@ -206,8 +208,11 @@ class CampaignCard extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) =>
-          CampaignDetailSheet(campaign: campaign, onAddAll: onAddAll),
+      builder: (_) => CampaignDetailSheet(
+        campaign: campaign,
+        onAddAll: onAddAll,
+        onSaveAsBasket: onSaveAsBasket,
+      ),
     );
   }
 }
@@ -273,10 +278,12 @@ class _ItemChip extends StatelessWidget {
 class CampaignDetailSheet extends StatelessWidget {
   final Campaign campaign;
   final VoidCallback onAddAll;
+  final VoidCallback? onSaveAsBasket;
   const CampaignDetailSheet({
     super.key,
     required this.campaign,
     required this.onAddAll,
+    this.onSaveAsBasket,
   });
 
   static const _typeColors = <String, Color>{
@@ -452,6 +459,36 @@ class CampaignDetailSheet extends StatelessWidget {
                       ],
                     ),
                   const SizedBox(height: 12),
+                  if (onSaveAsBasket != null) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: campaign.stockedItems.isEmpty
+                            ? null
+                            : () {
+                                Navigator.pop(context);
+                                onSaveAsBasket!();
+                              },
+                        icon: const Icon(Icons.shopping_basket_outlined),
+                        label: Text(l10n.mktSaveAsBasket),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                          foregroundColor: _color,
+                          side: BorderSide(
+                            color: _color.withValues(alpha: 0.5),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(

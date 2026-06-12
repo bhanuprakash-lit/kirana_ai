@@ -85,6 +85,9 @@ class SubscriptionInfo {
   /// Referral marketing — Pro or Pro trial
   bool get canAccessReferral => tier == SubTier.pro || _isProTrial;
 
+  /// Basket bundles + tier auto-discount — Pro or Pro trial
+  bool get canAccessBaskets => tier == SubTier.pro || _isProTrial;
+
   /// App access (trial, basic, pro — not none/pending/expired)
   bool get hasAppAccess =>
       (tier == SubTier.trial || tier == SubTier.basic || tier == SubTier.pro) &&

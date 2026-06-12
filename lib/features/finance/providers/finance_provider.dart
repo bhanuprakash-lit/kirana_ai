@@ -75,6 +75,37 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
     }
   }
 
+  /// Records a single customer payment across their open khatas oldest-first:
+  /// the amount fully clears the oldest debt, then rolls into the next, until
+  /// it runs out. Posts to the same per-khata recovery endpoint without
+  /// refreshing between calls, then refreshes once at the end so the list and
+  /// stats update in a single pass. [openOldestFirst] must be the customer's
+  /// open (unsettled) entries sorted oldest-first.
+  Future<void> recordCustomerRecovery(
+    List<UdhaarItem> openOldestFirst,
+    double amount,
+  ) async {
+    final client = ref.read(apiClientProvider);
+    try {
+      var remaining = amount;
+      for (final entry in openOldestFirst) {
+        if (remaining <= 0.001) break;
+        final pay = remaining < entry.balance ? remaining : entry.balance;
+        if (pay <= 0) continue;
+        await client.post('/kirana/finance/udhaar/recovery', {
+          'khata_id': entry.khataId,
+          'amount': pay,
+        });
+        remaining -= pay;
+      }
+      await refresh();
+      // Keep the dashboard "Customer Dues" tile in sync (same as recordRecovery).
+      ref.invalidate(overviewProvider);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> sendReminder(int khataId) async {
     final client = ref.read(apiClientProvider);
     try {

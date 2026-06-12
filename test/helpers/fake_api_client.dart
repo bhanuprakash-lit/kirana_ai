@@ -136,4 +136,9 @@ class FakeApiClient implements ApiClient {
     calls.add('OLTP DELETE $table');
     return _dequeue(table) as Map<String, dynamic>;
   }
+  
+  @override
+  Future<dynamic> put(String path, body) {
+    throw UnimplementedError();
+  }
 }

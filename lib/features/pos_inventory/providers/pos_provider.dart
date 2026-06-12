@@ -10,6 +10,7 @@ import '../../profile/providers/customer_provider.dart';
 import '../../referral/models/referral_models.dart';
 import '../../referral/providers/referral_provider.dart';
 import '../models/cart_item.dart';
+import '../models/customer_price.dart';
 import '../models/pos_product.dart';
 
 class PosState {
@@ -24,6 +25,25 @@ class PosState {
   final String? referralReferrerName;
   final PendingReferralScan? pendingReferral;
 
+  /// Customer-specific price suggestions for the selected customer (products
+  /// whose last-paid price differs from catalog).
+  final List<CustomerPrice> customerPrices;
+
+  /// True once the shopkeeper accepted the customer's prices (drives the
+  /// per-line badge and makes newly-added items inherit the customer price).
+  final bool customerPricesApplied;
+
+  /// True if the shopkeeper dismissed the suggestion banner without applying.
+  final bool customerPricesDismissed;
+
+  /// Basket attribution for the current cart — set when a full basket bundle
+  /// deal is added, so the resulting order records which basket it came from
+  /// plus the bundle value and savings. All null for an ordinary cart.
+  final int? appliedBasketId;
+  final String? appliedBasketName;
+  final double? basketGross; // basket value (Σ normal prices)
+  final double? basketSavings; // amount saved vs. the bundle price
+
   const PosState({
     this.products = const [],
     this.isLoadingProducts = false,
@@ -35,6 +55,13 @@ class PosState {
     this.referralDiscountPct,
     this.referralReferrerName,
     this.pendingReferral,
+    this.customerPrices = const [],
+    this.customerPricesApplied = false,
+    this.customerPricesDismissed = false,
+    this.appliedBasketId,
+    this.appliedBasketName,
+    this.basketGross,
+    this.basketSavings,
   });
 
   PosState copyWith({
@@ -51,6 +78,14 @@ class PosState {
     String? referralReferrerName,
     PendingReferralScan? pendingReferral,
     bool clearReferral = false,
+    List<CustomerPrice>? customerPrices,
+    bool? customerPricesApplied,
+    bool? customerPricesDismissed,
+    int? appliedBasketId,
+    String? appliedBasketName,
+    double? basketGross,
+    double? basketSavings,
+    bool clearBasket = false,
   }) => PosState(
     products: products ?? this.products,
     isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
@@ -72,13 +107,46 @@ class PosState {
     pendingReferral: clearReferral
         ? null
         : (pendingReferral ?? this.pendingReferral),
+    // Customer-price state is cleared whenever the customer is cleared.
+    customerPrices: clearCustomer
+        ? const []
+        : (customerPrices ?? this.customerPrices),
+    customerPricesApplied: clearCustomer
+        ? false
+        : (customerPricesApplied ?? this.customerPricesApplied),
+    customerPricesDismissed: clearCustomer
+        ? false
+        : (customerPricesDismissed ?? this.customerPricesDismissed),
+    appliedBasketId: clearBasket
+        ? null
+        : (appliedBasketId ?? this.appliedBasketId),
+    appliedBasketName: clearBasket
+        ? null
+        : (appliedBasketName ?? this.appliedBasketName),
+    basketGross: clearBasket ? null : (basketGross ?? this.basketGross),
+    basketSavings: clearBasket ? null : (basketSavings ?? this.basketSavings),
   );
 
   double get subtotal => cart.fold(0, (sum, item) => sum + item.lineTotal);
 
+  /// The customer-specific price for [productId], if one was suggested.
+  CustomerPrice? customerPriceFor(int productId) {
+    for (final cp in customerPrices) {
+      if (cp.productId == productId) return cp;
+    }
+    return null;
+  }
+
+  /// Whether the suggestion banner should be shown.
+  bool get showCustomerPriceBanner =>
+      customerPrices.isNotEmpty &&
+      !customerPricesApplied &&
+      !customerPricesDismissed;
+
   double get discountedSubtotal {
-    if (referralDiscountPct == null || referralDiscountPct! <= 0)
+    if (referralDiscountPct == null || referralDiscountPct! <= 0) {
       return subtotal;
+    }
     return subtotal * (1 - referralDiscountPct! / 100);
   }
 
@@ -236,6 +304,11 @@ class PosNotifier extends Notifier<PosState> {
     double qty = 1.0,
     double? unitPriceOverride,
   }) {
+    // When the customer's prices are in effect, new items inherit their price
+    // unless the caller passed an explicit override (e.g. basket/bundle deal).
+    if (unitPriceOverride == null && state.customerPricesApplied) {
+      unitPriceOverride = state.customerPriceFor(product.productId)?.price;
+    }
     final existing = state.cart.indexWhere(
       (i) => i.product.productId == product.productId,
     );
@@ -288,13 +361,117 @@ class PosNotifier extends Notifier<PosState> {
       cart: const [],
       clearCustomer: true,
       clearReferral: true,
+      clearBasket: true,
     );
     _cartPingTimer?.cancel();
     _doPing(converted: false);
   }
 
+  /// Tags the current cart as sourced from a basket/combo so the placed order
+  /// records the attribution (name + value + optional savings). [id] is the
+  /// saved-basket id, or null for an AI campaign (no saved id, no discount).
+  /// Cleared with the cart. Resets any prior attribution first so a campaign
+  /// (id null) can't inherit a previously-added basket's id.
+  void setAppliedBasket({
+    int? id,
+    required String name,
+    double? gross,
+    double? savings,
+  }) {
+    state = state
+        .copyWith(clearBasket: true)
+        .copyWith(
+          appliedBasketId: id,
+          appliedBasketName: name,
+          basketGross: gross,
+          basketSavings: savings,
+        );
+  }
+
   void setCustomer(int id, String name) {
-    state = state.copyWith(selectedCustomerId: id, selectedCustomerName: name);
+    state = state.copyWith(
+      selectedCustomerId: id,
+      selectedCustomerName: name,
+      // Reset any prior customer's price suggestions before loading this one's.
+      customerPrices: const [],
+      customerPricesApplied: false,
+      customerPricesDismissed: false,
+    );
+    _fetchCustomerPrices(id);
+  }
+
+  /// Loads the selected customer's price memory (last-paid vs catalog). Silent
+  /// on failure — the feature is purely additive, never blocks a sale.
+  Future<void> _fetchCustomerPrices(int customerId) async {
+    final client = ref.read(apiClientProvider);
+    try {
+      final res = await client.get(
+        '/kirana/customers/$customerId/price-memory',
+      );
+      final list = ((res['prices'] as List?) ?? const [])
+          .cast<Map<String, dynamic>>()
+          .map(CustomerPrice.fromJson)
+          .toList();
+      // Ignore if the customer changed/cleared while the request was in flight.
+      if (state.selectedCustomerId != customerId) {
+        return;
+      }
+      state = state.copyWith(customerPrices: list);
+    } catch (_) {
+      // Leave suggestions empty.
+    }
+  }
+
+  /// Apply the customer's prices to all matching cart lines, and flag so any
+  /// items added afterwards inherit the customer price too.
+  void applyCustomerPrices() {
+    final updated = state.cart.map((line) {
+      final cp = state.customerPriceFor(line.product.productId);
+      if (cp == null) return line;
+      return line.copyWith(unitPriceOverride: cp.price);
+    }).toList();
+    state = state.copyWith(cart: updated, customerPricesApplied: true);
+    _schedulePing();
+  }
+
+  void dismissCustomerPrices() {
+    state = state.copyWith(customerPricesDismissed: true);
+  }
+
+  /// Pin a customer-specific price for a product (or pass null to remove it),
+  /// then apply it to the matching cart line immediately. Returns success.
+  Future<bool> setCustomerPrice(int productId, double? price) async {
+    final customerId = state.selectedCustomerId;
+    if (customerId == null) return false;
+    final client = ref.read(apiClientProvider);
+    try {
+      await client.post('/kirana/customers/$customerId/price', {
+        'product_id': productId,
+        'price': price,
+      });
+    } catch (_) {
+      return false;
+    }
+    // Reflect the change on the matching cart line right away.
+    final updated = state.cart
+        .map(
+          (line) => line.product.productId == productId
+              ? line.copyWith(
+                  unitPriceOverride: price,
+                  clearOverride: price == null,
+                )
+              : line,
+        )
+        .toList();
+    state = state.copyWith(
+      cart: updated,
+      // A deliberate pin counts as accepting customer pricing for this sale.
+      customerPricesApplied: price != null ? true : state.customerPricesApplied,
+    );
+    _schedulePing();
+    // Refresh suggestions so source/badges reflect the new pin.
+    await _fetchCustomerPrices(customerId);
+    return true;
   }
 
   void clearCustomer() {
@@ -324,6 +501,15 @@ class PosNotifier extends Notifier<PosState> {
     try {
       final res = await client.getOltp('customer', filters: {'limit': '500'});
       final rows = (res['rows'] as List).cast<Map<String, dynamic>>();
+      // Sort alphabetically by name (case-insensitive); unnamed customers last.
+      rows.sort((a, b) {
+        final an = (a['name'] as String? ?? '').trim().toLowerCase();
+        final bn = (b['name'] as String? ?? '').trim().toLowerCase();
+        if (an.isEmpty && bn.isEmpty) return 0;
+        if (an.isEmpty) return 1;
+        if (bn.isEmpty) return -1;
+        return an.compareTo(bn);
+      });
       if (query.isEmpty) return rows;
       final q = query.toLowerCase();
       return rows.where((r) {
@@ -406,6 +592,14 @@ class PosNotifier extends Notifier<PosState> {
           'udhaar_amount': udhaarAmount,
           'cash_paid': totalAmount - udhaarAmount,
         },
+        // Basket/combo attribution — gated on the name so AI campaigns (which
+        // have a null basket_id) are recorded too.
+        if (state.appliedBasketName != null) ...{
+          'basket_id': state.appliedBasketId,
+          'basket_name': state.appliedBasketName,
+          'basket_gross': state.basketGross,
+          'basket_savings': state.basketSavings,
+        },
       };
       final order = await client.posPost('/pos/orders', body);
       if (order != null) {
@@ -473,8 +667,9 @@ class PosNotifier extends Notifier<PosState> {
     if (status != null) params['status'] = status;
     if (paymentMethod != null) params['payment_method'] = paymentMethod;
     if (customerId != null) params['customer_id'] = '$customerId';
-    if (startDate != null)
+    if (startDate != null) {
       params['start_date'] = startDate.toUtc().toIso8601String();
+    }
     if (endDate != null) params['end_date'] = endDate.toUtc().toIso8601String();
     if (minAmount != null) params['min_amount'] = '$minAmount';
     if (maxAmount != null) params['max_amount'] = '$maxAmount';

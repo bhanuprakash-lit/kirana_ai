@@ -1369,6 +1369,15 @@ class AppLocalizationsMr extends AppLocalizations {
   String get posRecordedAsCredit => 'क्रेडिट म्हणून नोंदवले — उधार टॅब तपासा';
 
   @override
+  String get posBoughtAsBasket => 'बास्केट म्हणून खरेदी केले';
+
+  @override
+  String get posBasketValue => 'बास्केट मूल्य';
+
+  @override
+  String get posCustomerSaved => 'ग्राहकाने वाचवले';
+
+  @override
   String get invSearchItemsOrCategories => 'वस्तू किंवा श्रेणी शोधा...';
 
   @override
@@ -2039,6 +2048,31 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get finSettled => 'निकाली काढले';
+
+  @override
+  String get finRecordPayment => 'पेमेंट नोंदवा';
+
+  @override
+  String get finPaymentOldestFirstNote => 'सर्वात जुन्या थकबाकीवर प्रथम लागू';
+
+  @override
+  String get finTaken => 'घेतले';
+
+  @override
+  String get finPaid => 'भरले';
+
+  @override
+  String get finBalanceShort => 'शिल्लक';
+
+  @override
+  String finOpenDuesSummary(int count, int days) {
+    return '$count थकबाकी · सर्वात जुने $days दिवस';
+  }
+
+  @override
+  String finSettledSectionTitle(int count) {
+    return 'निकाली ($count)';
+  }
 
   @override
   String finRecoverUdhaarFrom(String name) {
@@ -4583,4 +4617,165 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get visionComingSoon => 'व्हिजन AI लवकरच येत आहे!';
+
+  @override
+  String get mktTierBronze => 'Bronze';
+
+  @override
+  String get mktTierSilver => 'Silver';
+
+  @override
+  String get mktTierGold => 'Gold';
+
+  @override
+  String get mktTierPlatinum => 'Platinum';
+
+  @override
+  String get mktTierSettings => 'टियर सेटिंग्ज';
+
+  @override
+  String get mktShowArchived => 'संग्रहित दाखवा';
+
+  @override
+  String get mktHideArchived => 'संग्रहित लपवा';
+
+  @override
+  String get mktArchived => 'संग्रहित';
+
+  @override
+  String get mktEdit => 'संपादित करा';
+
+  @override
+  String get mktAlertedToday => 'आज सूचित केले';
+
+  @override
+  String get mktRestore => 'पुनर्संचयित करा';
+
+  @override
+  String get mktArchive => 'संग्रहित करा';
+
+  @override
+  String get mktBasketArchived => 'बास्केट संग्रहित';
+
+  @override
+  String get mktBasketRestored => 'बास्केट पुनर्संचयित';
+
+  @override
+  String get mktSomethingWentWrong =>
+      'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String get mktEditBasket => 'बास्केट संपादित करा';
+
+  @override
+  String get mktSaveChanges => 'बदल जतन करा';
+
+  @override
+  String get mktAddItemsForPrice =>
+      'स्वयं-सवलत बंडल किंमत पाहण्यासाठी वस्तू जोडा';
+
+  @override
+  String get mktItemsTotal => 'वस्तू एकूण';
+
+  @override
+  String get mktBundlePrice => 'बंडल किंमत';
+
+  @override
+  String get mktTierConfigTitle => 'बास्केट टियर';
+
+  @override
+  String get mktTierConfigIntro =>
+      'बास्केटची एकूण किंमत त्यांच्या एकूण मूल्यानुसार आपोआप ठरते. प्रत्येक टियरसाठी मूल्य श्रेणी व सवलत सेट करा — वस्तू जोडताच जुळणाऱ्या टियरची सवलत आपोआप लागू होते.';
+
+  @override
+  String get mktTierRangeInvalid =>
+      'प्रत्येक टियरची मर्यादा मागील पेक्षा जास्त असावी, आणि सवलत 0–100% दरम्यान.';
+
+  @override
+  String get mktTiersSaved => 'टियर जतन केले';
+
+  @override
+  String get mktRecomputeTitle => 'विद्यमान बास्केट पुन्हा मोजायचे?';
+
+  @override
+  String get mktKeepAsIs => 'जसे आहे तसे ठेवा';
+
+  @override
+  String get mktRecompute => 'पुन्हा मोजा';
+
+  @override
+  String get mktSaveTiers => 'टियर जतन करा';
+
+  @override
+  String get mktUpToLabel => 'पर्यंत';
+
+  @override
+  String get mktTopTierHint => 'मागील टियरच्या वरील सर्व काही';
+
+  @override
+  String get mktDiscountLabel => 'सवलत';
+
+  @override
+  String get psetBasketTiers => 'बास्केट टियर';
+
+  @override
+  String get psetBasketTiersHint => 'मूल्यानुसार बास्केटवर स्वयं-सवलत';
+
+  @override
+  String mktYouSave(String amount, String pct) {
+    return '₹$amount वाचवा ($pct% सवलत)';
+  }
+
+  @override
+  String mktTierBasketLabel(String tier) {
+    return '$tier बास्केट';
+  }
+
+  @override
+  String mktPctOff(String pct) {
+    return '$pct% सवलत';
+  }
+
+  @override
+  String mktSaveAmount(String amount) {
+    return '₹$amount वाचवा';
+  }
+
+  @override
+  String mktRecomputeBody(int count) {
+    return '$count विद्यमान बास्केट जुन्या टियरनुसार किंमत असलेले आहेत. त्यांनाही नवीन टियर लागू करायचे?';
+  }
+
+  @override
+  String mktBasketsRecomputed(int count) {
+    return '$count बास्केट अपडेट केले';
+  }
+
+  @override
+  String mktAboveAmount(String amount) {
+    return '₹$amount वर';
+  }
+
+  @override
+  String mktRangeAmount(String from, String to) {
+    return '₹$from – ₹$to';
+  }
+
+  @override
+  String get mktSaveAsBasket => 'बास्केट म्हणून जतन करा';
+
+  @override
+  String mktBasketSavedFromCampaign(String name) {
+    return '\"$name\" तुमच्या बास्केटमध्ये जतन केले';
+  }
+
+  @override
+  String get mktSelectDate => 'तारीख निवडा';
+
+  @override
+  String get mktBasketsProTitle => 'बास्केट हे एक Pro वैशिष्ट्य आहे';
+
+  @override
+  String get mktBasketsProDesc =>
+      'स्वयंचलित टियर सवलतींसह कॉम्बो डील तयार करा आणि ग्राहकांना WhatsApp वर सूचित करा. बास्केट अनलॉक करण्यासाठी Pro मध्ये अपग्रेड करा.';
 }

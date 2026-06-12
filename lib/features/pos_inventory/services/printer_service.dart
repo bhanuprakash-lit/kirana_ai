@@ -61,7 +61,6 @@ class ReceiptLineItem {
 class PrinterService {
   static const String _kMac = 'pos_printer_mac';
   static const String _kName = 'pos_printer_name';
-
   // ── Persistence ─────────────────────────────────────────────────────────────
 
   Future<PrinterDevice?> getSelectedPrinter() async {
@@ -299,13 +298,26 @@ class PrinterService {
       //           truncated at 32 chars only if absolutely necessary
       // Line 2 — qty + amount right-aligned under the header columns
       //           indent(18) + qty(6) + amount(8) = 32 chars
-      final nameLine = item.name.length > 32
-          ? item.name.substring(0, 32)
-          : item.name;
-      s(nameLine);
-      nl();
-      s(''.padRight(18) + qtyStr.padLeft(6) + amtStr.padLeft(8));
-      nl();
+      // final nameLine = item.name.length > 32
+      //     ? item.name.substring(0, 32)
+      //     : item.name;
+      // s(nameLine);
+      // nl();
+      // s(''.padRight(18) + qtyStr.padLeft(6) + amtStr.padLeft(8));
+      // nl();
+      final nameLines = _wrapText(item.name, 18);
+
+      for (int i = 0; i < nameLines.length; i++) {
+        final isLast = i == nameLines.length - 1;
+
+        if (isLast) {
+          s(nameLines[i].padRight(18) + qtyStr.padLeft(6) + amtStr.padLeft(8));
+        } else {
+          s(nameLines[i].padRight(18));
+        }
+
+        nl();
+      }
     }
     sep('=');
 
@@ -363,6 +375,47 @@ class PrinterService {
     final l = label.length > 20 ? label.substring(0, 20) : label.padRight(20);
     final a = amt.padLeft(12);
     return '$l$a';
+  }
+
+  List<String> _wrapText(String text, int width) {
+    final words = text.split(RegExp(r'\s+'));
+    final lines = <String>[];
+    String current = '';
+
+    for (final word in words) {
+      // Break very long words
+      if (word.length > width) {
+        if (current.isNotEmpty) {
+          lines.add(current);
+          current = '';
+        }
+
+        for (int i = 0; i < word.length; i += width) {
+          lines.add(
+            word.substring(
+              i,
+              (i + width > word.length) ? word.length : i + width,
+            ),
+          );
+        }
+        continue;
+      }
+
+      final candidate = current.isEmpty ? word : '$current $word';
+
+      if (candidate.length <= width) {
+        current = candidate;
+      } else {
+        lines.add(current);
+        current = word;
+      }
+    }
+
+    if (current.isNotEmpty) {
+      lines.add(current);
+    }
+
+    return lines;
   }
 
   // ── Encoding ─────────────────────────────────────────────────────────────────

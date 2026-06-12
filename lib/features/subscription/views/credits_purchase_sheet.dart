@@ -88,8 +88,6 @@ class _CreditsPurchaseSheetState extends State<_CreditsPurchaseSheet> {
     setState(() => _buying = pack.feature);
 
     // ── Payment confirmation dialog ─────────────────────────────────────────
-    // TODO: Replace with real Razorpay payment when backend endpoint is ready.
-    // Endpoint: POST /kirana/credits/purchase  { pack_type, amount }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

@@ -47,8 +47,9 @@ class AuthRepository {
     await _storage.write(key: _tokenKey, value: result.accessToken);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('user_id', result.user.userId);
-    if (result.user.storeId != null)
+    if (result.user.storeId != null) {
       await prefs.setInt('store_id', result.user.storeId!);
+    }
     await prefs.setString('username', result.user.username);
     await prefs.setString('full_name', result.user.fullName);
     await prefs.setString('role', result.user.role);

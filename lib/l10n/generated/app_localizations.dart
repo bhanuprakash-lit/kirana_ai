@@ -2436,6 +2436,24 @@ abstract class AppLocalizations {
   /// **'Recorded as credit — check Udhaar tab'**
   String get posRecordedAsCredit;
 
+  /// No description provided for @posBoughtAsBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought as a basket'**
+  String get posBoughtAsBasket;
+
+  /// No description provided for @posBasketValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Basket value'**
+  String get posBasketValue;
+
+  /// No description provided for @posCustomerSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer saved'**
+  String get posCustomerSaved;
+
   /// No description provided for @invSearchItemsOrCategories.
   ///
   /// In en, this message translates to:
@@ -3581,6 +3599,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settled'**
   String get finSettled;
+
+  /// No description provided for @finRecordPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Record payment'**
+  String get finRecordPayment;
+
+  /// No description provided for @finPaymentOldestFirstNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied to oldest dues first'**
+  String get finPaymentOldestFirstNote;
+
+  /// No description provided for @finTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get finTaken;
+
+  /// No description provided for @finPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get finPaid;
+
+  /// No description provided for @finBalanceShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get finBalanceShort;
+
+  /// No description provided for @finOpenDuesSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} open · oldest {days}d'**
+  String finOpenDuesSummary(int count, int days);
+
+  /// No description provided for @finSettledSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled ({count})'**
+  String finSettledSectionTitle(int count);
 
   /// No description provided for @finRecoverUdhaarFrom.
   ///
@@ -7984,6 +8044,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vision AI is coming soon!'**
   String get visionComingSoon;
+
+  /// No description provided for @mktTierBronze.
+  ///
+  /// In en, this message translates to:
+  /// **'Bronze'**
+  String get mktTierBronze;
+
+  /// No description provided for @mktTierSilver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get mktTierSilver;
+
+  /// No description provided for @mktTierGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get mktTierGold;
+
+  /// No description provided for @mktTierPlatinum.
+  ///
+  /// In en, this message translates to:
+  /// **'Platinum'**
+  String get mktTierPlatinum;
+
+  /// No description provided for @mktTierSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Tier settings'**
+  String get mktTierSettings;
+
+  /// No description provided for @mktShowArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived'**
+  String get mktShowArchived;
+
+  /// No description provided for @mktHideArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide archived'**
+  String get mktHideArchived;
+
+  /// No description provided for @mktArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get mktArchived;
+
+  /// No description provided for @mktEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get mktEdit;
+
+  /// No description provided for @mktAlertedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerted today'**
+  String get mktAlertedToday;
+
+  /// No description provided for @mktRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get mktRestore;
+
+  /// No description provided for @mktArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get mktArchive;
+
+  /// No description provided for @mktBasketArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Basket archived'**
+  String get mktBasketArchived;
+
+  /// No description provided for @mktBasketRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Basket restored'**
+  String get mktBasketRestored;
+
+  /// No description provided for @mktSomethingWentWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get mktSomethingWentWrong;
+
+  /// No description provided for @mktEditBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Basket'**
+  String get mktEditBasket;
+
+  /// No description provided for @mktSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get mktSaveChanges;
+
+  /// No description provided for @mktAddItemsForPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Add items to see the auto-discounted bundle price'**
+  String get mktAddItemsForPrice;
+
+  /// No description provided for @mktItemsTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Items total'**
+  String get mktItemsTotal;
+
+  /// No description provided for @mktBundlePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Bundle price'**
+  String get mktBundlePrice;
+
+  /// No description provided for @mktTierConfigTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Basket Tiers'**
+  String get mktTierConfigTitle;
+
+  /// No description provided for @mktTierConfigIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Baskets are auto-priced by their total value. Set the value range and discount for each tier — the matching tier\'s discount is applied automatically as you add items.'**
+  String get mktTierConfigIntro;
+
+  /// No description provided for @mktTierRangeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Each tier\'s limit must be higher than the previous, and discounts between 0–100%.'**
+  String get mktTierRangeInvalid;
+
+  /// No description provided for @mktTiersSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiers saved'**
+  String get mktTiersSaved;
+
+  /// No description provided for @mktRecomputeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recompute existing baskets?'**
+  String get mktRecomputeTitle;
+
+  /// No description provided for @mktKeepAsIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep as-is'**
+  String get mktKeepAsIs;
+
+  /// No description provided for @mktRecompute.
+  ///
+  /// In en, this message translates to:
+  /// **'Recompute'**
+  String get mktRecompute;
+
+  /// No description provided for @mktSaveTiers.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Tiers'**
+  String get mktSaveTiers;
+
+  /// No description provided for @mktUpToLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to'**
+  String get mktUpToLabel;
+
+  /// No description provided for @mktTopTierHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything above the previous tier'**
+  String get mktTopTierHint;
+
+  /// No description provided for @mktDiscountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get mktDiscountLabel;
+
+  /// No description provided for @psetBasketTiers.
+  ///
+  /// In en, this message translates to:
+  /// **'Basket Tiers'**
+  String get psetBasketTiers;
+
+  /// No description provided for @psetBasketTiersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-discount baskets by value'**
+  String get psetBasketTiersHint;
+
+  /// No description provided for @mktYouSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save ₹{amount} ({pct}% off)'**
+  String mktYouSave(String amount, String pct);
+
+  /// No description provided for @mktTierBasketLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{tier} basket'**
+  String mktTierBasketLabel(String tier);
+
+  /// No description provided for @mktPctOff.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}% off'**
+  String mktPctOff(String pct);
+
+  /// No description provided for @mktSaveAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Save ₹{amount}'**
+  String mktSaveAmount(String amount);
+
+  /// No description provided for @mktRecomputeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} existing baskets are priced under your old tiers. Apply the new tiers to them too?'**
+  String mktRecomputeBody(int count);
+
+  /// No description provided for @mktBasketsRecomputed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} baskets updated'**
+  String mktBasketsRecomputed(int count);
+
+  /// No description provided for @mktAboveAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Above ₹{amount}'**
+  String mktAboveAmount(String amount);
+
+  /// No description provided for @mktRangeAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'₹{from} – ₹{to}'**
+  String mktRangeAmount(String from, String to);
+
+  /// No description provided for @mktSaveAsBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as Basket'**
+  String get mktSaveAsBasket;
+
+  /// No description provided for @mktBasketSavedFromCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved \"{name}\" to your baskets'**
+  String mktBasketSavedFromCampaign(String name);
+
+  /// No description provided for @mktSelectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get mktSelectDate;
+
+  /// No description provided for @mktBasketsProTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Baskets is a Pro feature'**
+  String get mktBasketsProTitle;
+
+  /// No description provided for @mktBasketsProDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create combo deals with automatic tier discounts and alert customers on WhatsApp. Upgrade to Pro to unlock baskets.'**
+  String get mktBasketsProDesc;
 }
 
 class _AppLocalizationsDelegate

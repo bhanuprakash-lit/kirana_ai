@@ -223,6 +223,12 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
             ),
           ),
 
+          // ── Basket attribution (only for basket-sourced orders) ───────────
+          if (widget.order['basket_name'] != null) ...[
+            const SizedBox(height: 16),
+            _BasketAttributionCard(order: widget.order, l10n: l10n),
+          ],
+
           const SizedBox(height: 28),
           Row(
             children: [
@@ -679,6 +685,139 @@ class _PaymentSummaryCard extends StatelessWidget {
               fontSize: 22,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Basket attribution card ───────────────────────────────────────────────────
+
+class _BasketAttributionCard extends StatelessWidget {
+  final Map<String, dynamic> order;
+  final AppLocalizations l10n;
+
+  const _BasketAttributionCard({required this.order, required this.l10n});
+
+  String _fmt(double v) => '₹${v.toStringAsFixed(2)}';
+
+  @override
+  Widget build(BuildContext context) {
+    final name = order['basket_name'] as String? ?? '';
+    final gross = (order['basket_gross'] as num?)?.toDouble();
+    final savings = (order['basket_savings'] as num?)?.toDouble();
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: BrandColors.success.withValues(alpha: 0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: BrandColors.ink.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: BrandColors.success.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.shopping_basket_rounded,
+                  size: 18,
+                  color: BrandColors.success,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.posBoughtAsBasket,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: BrandColors.muted,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: BrandColors.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (gross != null || (savings != null && savings > 0)) ...[
+            const SizedBox(height: 16),
+            const Divider(height: 1),
+            const SizedBox(height: 14),
+            if (gross != null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.posBasketValue,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: BrandColors.ink,
+                    ),
+                  ),
+                  Text(
+                    _fmt(gross),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: BrandColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+            if (savings != null && savings > 0) ...[
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.posCustomerSaved,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: BrandColors.success,
+                    ),
+                  ),
+                  Text(
+                    '− ${_fmt(savings)}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      color: BrandColors.success,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
         ],
       ),
     );

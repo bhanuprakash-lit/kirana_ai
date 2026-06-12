@@ -116,8 +116,7 @@ class InventoryCard extends StatelessWidget {
                                   width: 40,
                                   height: 40,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) =>
-                                      _iconBox(catColor),
+                                  errorBuilder: (_, _, _) => _iconBox(catColor),
                                 )
                               : _iconBox(catColor),
                         ),

@@ -30,9 +30,14 @@ class Basket {
   final String name;
   final String? description;
   final double? price;
+  final String? tier;
+  final double? grossTotal;
+  final double? discountPct;
   final String? validFrom;
   final String? validTo;
   final bool isActive;
+  final String? archivedAt;
+  final bool alertedToday;
   final List<BasketItem> items;
 
   const Basket({
@@ -40,9 +45,14 @@ class Basket {
     required this.name,
     this.description,
     this.price,
+    this.tier,
+    this.grossTotal,
+    this.discountPct,
     this.validFrom,
     this.validTo,
     this.isActive = true,
+    this.archivedAt,
+    this.alertedToday = false,
     this.items = const [],
   });
 
@@ -51,14 +61,28 @@ class Basket {
     name: j['name'] as String,
     description: j['description'] as String?,
     price: (j['price'] as num?)?.toDouble(),
+    tier: j['tier'] as String?,
+    grossTotal: (j['gross_total'] as num?)?.toDouble(),
+    discountPct: (j['discount_pct'] as num?)?.toDouble(),
     validFrom: j['valid_from'] as String?,
     validTo: j['valid_to'] as String?,
     isActive: j['is_active'] as bool? ?? true,
+    archivedAt: j['archived_at'] as String?,
+    alertedToday: j['alerted_today'] as bool? ?? false,
     items: (j['items'] as List? ?? [])
         .cast<Map<String, dynamic>>()
         .map(BasketItem.fromJson)
         .toList(),
   );
+
+  bool get isArchived => archivedAt != null;
+
+  /// Savings vs. gross total (₹), or null when no discount applied.
+  double? get savings {
+    if (grossTotal == null || price == null) return null;
+    final s = grossTotal! - price!;
+    return s > 0 ? s : null;
+  }
 
   bool get isExpired {
     if (validTo == null) return false;

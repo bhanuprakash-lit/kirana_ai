@@ -51,54 +51,69 @@ class UdhaarTab extends ConsumerWidget {
           ],
         ),
       ),
-      data: (data) => RefreshIndicator.adaptive(
-        onRefresh: () => ref.read(financeProvider.notifier).refresh(),
-        color: BrandColors.primary,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            _UdhaarStatsCard(stats: data.stats),
-            const SizedBox(height: 16),
-            if (data.udhaarList.isNotEmpty) ...[
-              _SmartRemindersBanner(
-                highRisk: ref.watch(highRiskUdhaarCountProvider),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SmartRemindersScreen(),
-                  ),
-                ),
-              ),
+      data: (data) {
+        // Group the flat khata list by customer so each customer shows as one
+        // expandable card instead of one row per udhaar sale. Active customers
+        // (with an open balance) come first, sorted by largest balance; fully
+        // settled customers drop into a muted collapsed section.
+        final groups = _groupByCustomer(data.udhaarList);
+        final active = groups.where((g) => !g.isSettled).toList()
+          ..sort((a, b) => b.totalBalance.compareTo(a.totalBalance));
+        final settled = groups.where((g) => g.isSettled).toList();
+        return RefreshIndicator.adaptive(
+          onRefresh: () => ref.read(financeProvider.notifier).refresh(),
+          color: BrandColors.primary,
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              _UdhaarStatsCard(stats: data.stats),
               const SizedBox(height: 16),
-            ],
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.finCustomerDues,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+              if (data.udhaarList.isNotEmpty) ...[
+                _SmartRemindersBanner(
+                  highRisk: ref.watch(highRiskUdhaarCountProvider),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const SmartRemindersScreen(),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                TextButton.icon(
-                  onPressed: () => _showAddUdhaarSheet(context, ref),
-                  icon: const Icon(Icons.add_rounded, size: 18),
-                  label: Text(l10n.finNewUdhaar),
-                ),
+                const SizedBox(height: 16),
               ],
-            ),
-            const SizedBox(height: 12),
-            if (data.udhaarList.isEmpty)
-              const _EmptyUdhaar()
-            else
-              ...data.udhaarList.map((item) => _UdhaarTile(item: item)),
-            const SizedBox(height: 80),
-          ],
-        ),
-      ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.finCustomerDues,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton.icon(
+                    onPressed: () => _showAddUdhaarSheet(context, ref),
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: Text(l10n.finNewUdhaar),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (data.udhaarList.isEmpty)
+                const _EmptyUdhaar()
+              else ...[
+                for (final group in active) _CustomerUdhaarCard(group: group),
+                if (settled.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  _SettledSection(groups: settled),
+                ],
+              ],
+              const SizedBox(height: 80),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -743,210 +758,90 @@ class _SmartRemindersBanner extends StatelessWidget {
   }
 }
 
-class _UdhaarTile extends ConsumerWidget {
-  final UdhaarItem item;
+// ── Customer grouping ─────────────────────────────────────────────────────────
 
-  const _UdhaarTile({required this.item});
+/// All of one customer's khata rows, with the aggregates the grouped card needs.
+class _CustomerUdhaar {
+  final int customerId;
+  final String customerName;
+  final String phone;
+  final List<UdhaarItem> entries;
+
+  _CustomerUdhaar({
+    required this.customerId,
+    required this.customerName,
+    required this.phone,
+    required this.entries,
+  });
+
+  /// Open (unsettled) debts, oldest-first — the order recovery is applied in.
+  List<UdhaarItem> get openOldestFirst =>
+      entries.where((e) => !e.isRecovered).toList()
+        ..sort((a, b) => a.dateTaken.compareTo(b.dateTaken));
+
+  /// All debts newest-first — the order they're listed in when expanded.
+  List<UdhaarItem> get entriesNewestFirst =>
+      List<UdhaarItem>.from(entries)
+        ..sort((a, b) => b.dateTaken.compareTo(a.dateTaken));
+
+  double get totalBalance => openOldestFirst.fold(0.0, (s, e) => s + e.balance);
+  double get totalTaken => entries.fold(0.0, (s, e) => s + e.originalAmount);
+  double get totalPaid => entries.fold(0.0, (s, e) => s + e.amountPaid);
+  int get openCount => openOldestFirst.length;
+  int get oldestDays => openOldestFirst.isEmpty
+      ? 0
+      : openOldestFirst
+            .map((e) => e.daysPending)
+            .reduce((a, b) => a > b ? a : b);
+  bool get remindedToday => openOldestFirst.any((e) => e.remindedToday);
+  bool get isSettled => openCount == 0;
+  int? get oldestOpenKhataId =>
+      openOldestFirst.isEmpty ? null : openOldestFirst.first.khataId;
+}
+
+List<_CustomerUdhaar> _groupByCustomer(List<UdhaarItem> items) {
+  final byCustomer = <int, List<UdhaarItem>>{};
+  for (final it in items) {
+    byCustomer.putIfAbsent(it.customerId, () => []).add(it);
+  }
+  return byCustomer.entries.map((e) {
+    final first = e.value.first;
+    return _CustomerUdhaar(
+      customerId: e.key,
+      customerName: first.customerName,
+      phone: first.phone,
+      entries: e.value,
+    );
+  }).toList();
+}
+
+String _formatUdhaarDate(DateTime date) {
+  final d = date.toLocal();
+  return "${d.day}/${d.month}/${d.year}";
+}
+
+/// Urgency colour for a customer based on how long their oldest debt is overdue.
+Color _urgencyColor(int oldestDays) {
+  if (oldestDays >= 30) return BrandColors.error;
+  if (oldestDays >= 14) return const Color(0xFFD97706);
+  return BrandColors.primary;
+}
+
+// ── Customer card (collapsed profile → expands to udhaar history) ─────────────
+
+class _CustomerUdhaarCard extends ConsumerStatefulWidget {
+  final _CustomerUdhaar group;
+  const _CustomerUdhaarCard({required this.group});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isRecovered = item.isRecovered;
-    final l10n = AppLocalizations.of(context);
+  ConsumerState<_CustomerUdhaarCard> createState() =>
+      _CustomerUdhaarCardState();
+}
 
-    return Opacity(
-      opacity: isRecovered ? 0.6 : 1.0,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isRecovered ? BrandColors.surfaceTint : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: BrandColors.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Identity + balance.
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  backgroundColor: isRecovered
-                      ? BrandColors.muted
-                      : BrandColors.primary.withValues(alpha: 0.1),
-                  child: Text(
-                    item.customerName.isNotEmpty
-                        ? item.customerName[0].toUpperCase()
-                        : '?',
-                    style: TextStyle(
-                      color: isRecovered
-                          ? BrandColors.muted
-                          : BrandColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.customerName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      if (item.phone.isNotEmpty)
-                        Text(
-                          item.phone,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: BrandColors.muted,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      Text(
-                        l10n.finTakenDaysAgo(
-                          _formatDate(item.dateTaken),
-                          item.daysPending,
-                        ),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: BrandColors.muted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '₹${item.balance.toStringAsFixed(0)}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
-                    color: isRecovered ? BrandColors.muted : BrandColors.error,
-                  ),
-                ),
-              ],
-            ),
+class _CustomerUdhaarCardState extends ConsumerState<_CustomerUdhaarCard> {
+  bool _expanded = false;
 
-            // Actions / settled state on their own full-width row so the
-            // translated labels never squeeze the details above.
-            if (!isRecovered) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  // One WhatsApp reminder per customer per day (server-enforced).
-                  // When already reminded today the button is disabled and shows
-                  // a "Reminded today" state instead of an icon-only tap target.
-                  if (item.remindedToday)
-                    TextButton.icon(
-                      onPressed: null,
-                      icon: const Icon(Icons.check_circle_rounded, size: 18),
-                      label: Text(l10n.finRemindedToday),
-                      style: TextButton.styleFrom(
-                        foregroundColor: BrandColors.muted,
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                    )
-                  else
-                    TextButton.icon(
-                      onPressed: () async {
-                        final notifier = ref.read(financeProvider.notifier);
-                        final messenger = ScaffoldMessenger.of(context);
-                        try {
-                          await notifier.sendReminder(item.khataId);
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.finWhatsappReminderSent),
-                              backgroundColor: BrandColors.success,
-                            ),
-                          );
-                          // Refresh so the button flips to "Reminded today".
-                          await notifier.refresh();
-                        } catch (e) {
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                l10n.finFailedSendReminder(e.toString()),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.message_rounded, size: 18),
-                      label: Text(l10n.finRemind),
-                      style: TextButton.styleFrom(
-                        foregroundColor: BrandColors.success,
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                    ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => _showRecoveryBottomSheet(context, ref),
-                    style: TextButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    child: Text(l10n.finRecover),
-                  ),
-                  const SizedBox(width: 4),
-                  TextButton(
-                    onPressed: () => _showHistorySheet(context, ref),
-                    style: TextButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                      foregroundColor: BrandColors.muted,
-                    ),
-                    child: Text(l10n.finHistory),
-                  ),
-                ],
-              ),
-            ],
-
-            if (isRecovered)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    l10n.finSettled,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: BrandColors.success,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final d = date.toLocal();
-    return "${d.day}/${d.month}/${d.year}";
-  }
-
-  void _showRecoveryBottomSheet(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => _RecoverUdhaarSheet(ref: ref, item: item),
-    );
-  }
-
-  void _showHistorySheet(BuildContext context, WidgetRef ref) {
+  void _openHistory(UdhaarItem item) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -954,19 +849,494 @@ class _UdhaarTile extends ConsumerWidget {
       builder: (_) => _UdhaarHistorySheet(ref: ref, item: item),
     );
   }
-}
 
-class _RecoverUdhaarSheet extends StatefulWidget {
-  final WidgetRef ref;
-  final UdhaarItem item;
+  void _openRecover() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _RecoverCustomerSheet(ref: ref, group: widget.group),
+    );
+  }
 
-  const _RecoverUdhaarSheet({required this.ref, required this.item});
+  Future<void> _remind() async {
+    final khataId = widget.group.oldestOpenKhataId;
+    if (khataId == null) return;
+    final l10n = AppLocalizations.of(context);
+    final notifier = ref.read(financeProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await notifier.sendReminder(khataId);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.finWhatsappReminderSent),
+          backgroundColor: BrandColors.success,
+        ),
+      );
+      await notifier.refresh();
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.finFailedSendReminder(e.toString()))),
+      );
+    }
+  }
 
   @override
-  State<_RecoverUdhaarSheet> createState() => _RecoverUdhaarSheetState();
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final g = widget.group;
+    final accent = _urgencyColor(g.oldestDays);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Collapsed header (always visible, tap to expand) ──────────────
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: accent.withValues(alpha: 0.1),
+                    child: Text(
+                      g.customerName.isNotEmpty
+                          ? g.customerName[0].toUpperCase()
+                          : '?',
+                      style: TextStyle(
+                        color: accent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          g.customerName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        if (g.phone.isNotEmpty)
+                          Text(
+                            g.phone,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: BrandColors.muted,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.finOpenDuesSummary(g.openCount, g.oldestDays),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: accent,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '₹${g.totalBalance.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 17,
+                          color: BrandColors.error,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      AnimatedRotation(
+                        turns: _expanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 200),
+                        child: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: BrandColors.muted,
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Expanded body ─────────────────────────────────────────────────
+          AnimatedCrossFade(
+            firstChild: const SizedBox(width: double.infinity),
+            secondChild: _ExpandedBody(
+              group: g,
+              onRecover: _openRecover,
+              onRemind: _remind,
+              onOpenHistory: _openHistory,
+            ),
+            crossFadeState: _expanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 200),
+            sizeCurve: Curves.easeInOut,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
+class _ExpandedBody extends StatelessWidget {
+  final _CustomerUdhaar group;
+  final VoidCallback onRecover;
+  final Future<void> Function() onRemind;
+  final void Function(UdhaarItem) onOpenHistory;
+
+  const _ExpandedBody({
+    required this.group,
+    required this.onRecover,
+    required this.onRemind,
+    required this.onOpenHistory,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(height: 1),
+          const SizedBox(height: 12),
+          // Summary strip: Taken / Paid / Balance.
+          Row(
+            children: [
+              _SummaryCell(
+                label: l10n.finTaken,
+                value: '₹${group.totalTaken.toStringAsFixed(0)}',
+                color: BrandColors.ink,
+              ),
+              _SummaryCell(
+                label: l10n.finPaid,
+                value: '₹${group.totalPaid.toStringAsFixed(0)}',
+                color: BrandColors.success,
+              ),
+              _SummaryCell(
+                label: l10n.finBalanceShort,
+                value: '₹${group.totalBalance.toStringAsFixed(0)}',
+                color: BrandColors.error,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Action row.
+          Row(
+            children: [
+              if (group.remindedToday)
+                TextButton.icon(
+                  onPressed: null,
+                  icon: const Icon(Icons.check_circle_rounded, size: 18),
+                  label: Text(l10n.finRemindedToday),
+                  style: TextButton.styleFrom(
+                    foregroundColor: BrandColors.muted,
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                )
+              else
+                TextButton.icon(
+                  onPressed: onRemind,
+                  icon: const Icon(Icons.message_rounded, size: 18),
+                  label: Text(l10n.finRemind),
+                  style: TextButton.styleFrom(
+                    foregroundColor: BrandColors.success,
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                ),
+              const Spacer(),
+              FilledButton.tonalIcon(
+                onPressed: onRecover,
+                icon: const Icon(Icons.payments_rounded, size: 18),
+                label: Text(l10n.finRecordPayment),
+                style: FilledButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Per-debt history list.
+          ...group.entriesNewestFirst.map(
+            (e) => _DebtRow(item: e, onTap: () => onOpenHistory(e), l10n: l10n),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryCell extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _SummaryCell({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              color: BrandColors.muted,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DebtRow extends StatelessWidget {
+  final UdhaarItem item;
+  final VoidCallback onTap;
+  final AppLocalizations l10n;
+
+  const _DebtRow({required this.item, required this.onTap, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final settled = item.isRecovered;
+    return Opacity(
+      opacity: settled ? 0.55 : 1.0,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: (settled ? BrandColors.success : BrandColors.error)
+                      .withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(
+                  settled ? Icons.check_rounded : Icons.receipt_long_outlined,
+                  size: 17,
+                  color: settled ? BrandColors.success : BrandColors.error,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '₹${item.originalAmount.toStringAsFixed(0)} · ${_formatUdhaarDate(item.dateTaken)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: BrandColors.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      settled
+                          ? l10n.finSettled
+                          : l10n.finBalanceLabel(
+                              item.balance.toStringAsFixed(0),
+                            ),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: settled
+                            ? BrandColors.success
+                            : BrandColors.muted,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: BrandColors.muted,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Settled customers (muted, collapsible) ────────────────────────────────────
+
+class _SettledSection extends StatefulWidget {
+  final List<_CustomerUdhaar> groups;
+  const _SettledSection({required this.groups});
+
+  @override
+  State<_SettledSection> createState() => _SettledSectionState();
+}
+
+class _SettledSectionState extends State<_SettledSection> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: BrandColors.surfaceTint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.check_circle_outline_rounded,
+                    size: 18,
+                    color: BrandColors.muted,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.finSettledSectionTitle(widget.groups.length),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: BrandColors.muted,
+                      ),
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: _expanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: BrandColors.muted,
+                      size: 22,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_expanded)
+            ...widget.groups.map(
+              (g) => Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: BrandColors.muted.withValues(
+                        alpha: 0.15,
+                      ),
+                      child: Text(
+                        g.customerName.isNotEmpty
+                            ? g.customerName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          color: BrandColors.muted,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        g.customerName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: BrandColors.ink,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      l10n.finSettled,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.success,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecoverCustomerSheet extends StatefulWidget {
+  final WidgetRef ref;
+  final _CustomerUdhaar group;
+
+  const _RecoverCustomerSheet({required this.ref, required this.group});
+
+  @override
+  State<_RecoverCustomerSheet> createState() => _RecoverCustomerSheetState();
+}
+
+class _RecoverCustomerSheetState extends State<_RecoverCustomerSheet> {
   final _controller = TextEditingController();
   bool _saving = false;
   bool _success = false;
@@ -981,6 +1351,7 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final totalBalance = widget.group.totalBalance;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -1008,7 +1379,7 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
           ),
           const SizedBox(height: 24),
           Text(
-            l10n.finRecoverUdhaarFrom(widget.item.customerName),
+            l10n.finRecoverUdhaarFrom(widget.group.customerName),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
@@ -1033,9 +1404,8 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
               labelText: l10n.finAmount,
               prefixText: '₹ ',
               prefixIcon: const Icon(Icons.currency_rupee_rounded),
-              helperText: l10n.finBalanceLabel(
-                widget.item.balance.toStringAsFixed(0),
-              ),
+              helperText:
+                  '${l10n.finBalanceLabel(totalBalance.toStringAsFixed(0))} · ${l10n.finPaymentOldestFirstNote}',
             ),
           ),
           const SizedBox(height: 28),
@@ -1053,10 +1423,10 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
                         setState(() => _error = l10n.finEnterValidAmount);
                         return;
                       }
-                      if (amount > widget.item.balance) {
+                      if (amount > totalBalance) {
                         setState(
                           () => _error = l10n.finAmountExceedsBalance(
-                            widget.item.balance.toStringAsFixed(0),
+                            totalBalance.toStringAsFixed(0),
                           ),
                         );
                         return;
@@ -1069,7 +1439,10 @@ class _RecoverUdhaarSheetState extends State<_RecoverUdhaarSheet> {
                       try {
                         await widget.ref
                             .read(financeProvider.notifier)
-                            .recordRecovery(widget.item.khataId, amount);
+                            .recordCustomerRecovery(
+                              widget.group.openOldestFirst,
+                              amount,
+                            );
                         if (mounted) {
                           setState(() {
                             _saving = false;

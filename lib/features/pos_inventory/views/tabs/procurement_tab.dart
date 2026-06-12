@@ -915,8 +915,9 @@ class ProcurementTab extends ConsumerWidget {
                                         );
                                     if (ctx.mounted) Navigator.pop(ctx);
                                   } finally {
-                                    if (ctx.mounted)
+                                    if (ctx.mounted) {
                                       setState(() => saving = false);
+                                    }
                                   }
                                 },
                           style: ElevatedButton.styleFrom(

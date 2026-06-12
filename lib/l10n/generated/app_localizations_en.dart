@@ -1363,6 +1363,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posRecordedAsCredit => 'Recorded as credit — check Udhaar tab';
 
   @override
+  String get posBoughtAsBasket => 'Bought as a basket';
+
+  @override
+  String get posBasketValue => 'Basket value';
+
+  @override
+  String get posCustomerSaved => 'Customer saved';
+
+  @override
   String get invSearchItemsOrCategories => 'Search items or categories...';
 
   @override
@@ -2031,6 +2040,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get finSettled => 'Settled';
+
+  @override
+  String get finRecordPayment => 'Record payment';
+
+  @override
+  String get finPaymentOldestFirstNote => 'Applied to oldest dues first';
+
+  @override
+  String get finTaken => 'Taken';
+
+  @override
+  String get finPaid => 'Paid';
+
+  @override
+  String get finBalanceShort => 'Balance';
+
+  @override
+  String finOpenDuesSummary(int count, int days) {
+    return '$count open · oldest ${days}d';
+  }
+
+  @override
+  String finSettledSectionTitle(int count) {
+    return 'Settled ($count)';
+  }
 
   @override
   String finRecoverUdhaarFrom(String name) {
@@ -4564,4 +4598,164 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get visionComingSoon => 'Vision AI is coming soon!';
+
+  @override
+  String get mktTierBronze => 'Bronze';
+
+  @override
+  String get mktTierSilver => 'Silver';
+
+  @override
+  String get mktTierGold => 'Gold';
+
+  @override
+  String get mktTierPlatinum => 'Platinum';
+
+  @override
+  String get mktTierSettings => 'Tier settings';
+
+  @override
+  String get mktShowArchived => 'Show archived';
+
+  @override
+  String get mktHideArchived => 'Hide archived';
+
+  @override
+  String get mktArchived => 'Archived';
+
+  @override
+  String get mktEdit => 'Edit';
+
+  @override
+  String get mktAlertedToday => 'Alerted today';
+
+  @override
+  String get mktRestore => 'Restore';
+
+  @override
+  String get mktArchive => 'Archive';
+
+  @override
+  String get mktBasketArchived => 'Basket archived';
+
+  @override
+  String get mktBasketRestored => 'Basket restored';
+
+  @override
+  String get mktSomethingWentWrong => 'Something went wrong. Please try again.';
+
+  @override
+  String get mktEditBasket => 'Edit Basket';
+
+  @override
+  String get mktSaveChanges => 'Save Changes';
+
+  @override
+  String get mktAddItemsForPrice =>
+      'Add items to see the auto-discounted bundle price';
+
+  @override
+  String get mktItemsTotal => 'Items total';
+
+  @override
+  String get mktBundlePrice => 'Bundle price';
+
+  @override
+  String get mktTierConfigTitle => 'Basket Tiers';
+
+  @override
+  String get mktTierConfigIntro =>
+      'Baskets are auto-priced by their total value. Set the value range and discount for each tier — the matching tier\'s discount is applied automatically as you add items.';
+
+  @override
+  String get mktTierRangeInvalid =>
+      'Each tier\'s limit must be higher than the previous, and discounts between 0–100%.';
+
+  @override
+  String get mktTiersSaved => 'Tiers saved';
+
+  @override
+  String get mktRecomputeTitle => 'Recompute existing baskets?';
+
+  @override
+  String get mktKeepAsIs => 'Keep as-is';
+
+  @override
+  String get mktRecompute => 'Recompute';
+
+  @override
+  String get mktSaveTiers => 'Save Tiers';
+
+  @override
+  String get mktUpToLabel => 'Up to';
+
+  @override
+  String get mktTopTierHint => 'Everything above the previous tier';
+
+  @override
+  String get mktDiscountLabel => 'Discount';
+
+  @override
+  String get psetBasketTiers => 'Basket Tiers';
+
+  @override
+  String get psetBasketTiersHint => 'Auto-discount baskets by value';
+
+  @override
+  String mktYouSave(String amount, String pct) {
+    return 'Save ₹$amount ($pct% off)';
+  }
+
+  @override
+  String mktTierBasketLabel(String tier) {
+    return '$tier basket';
+  }
+
+  @override
+  String mktPctOff(String pct) {
+    return '$pct% off';
+  }
+
+  @override
+  String mktSaveAmount(String amount) {
+    return 'Save ₹$amount';
+  }
+
+  @override
+  String mktRecomputeBody(int count) {
+    return '$count existing baskets are priced under your old tiers. Apply the new tiers to them too?';
+  }
+
+  @override
+  String mktBasketsRecomputed(int count) {
+    return '$count baskets updated';
+  }
+
+  @override
+  String mktAboveAmount(String amount) {
+    return 'Above ₹$amount';
+  }
+
+  @override
+  String mktRangeAmount(String from, String to) {
+    return '₹$from – ₹$to';
+  }
+
+  @override
+  String get mktSaveAsBasket => 'Save as Basket';
+
+  @override
+  String mktBasketSavedFromCampaign(String name) {
+    return 'Saved \"$name\" to your baskets';
+  }
+
+  @override
+  String get mktSelectDate => 'Select date';
+
+  @override
+  String get mktBasketsProTitle => 'Baskets is a Pro feature';
+
+  @override
+  String get mktBasketsProDesc =>
+      'Create combo deals with automatic tier discounts and alert customers on WhatsApp. Upgrade to Pro to unlock baskets.';
 }

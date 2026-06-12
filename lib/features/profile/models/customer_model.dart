@@ -70,8 +70,9 @@ class Customer {
     if (currentBalance > 0) segs.add('credit');
     if (!isInactive && totalSpent >= 10000) segs.add('bulk');
     if (!isInactive && orders30d >= 3) segs.add('regular');
-    if (!isInactive && !segs.contains('regular') && orders90d >= 1)
+    if (!isInactive && !segs.contains('regular') && orders90d >= 1) {
       segs.add('occasional');
+    }
     if (!isInactive && segs.isEmpty) segs.add('impulse');
 
     return segs;

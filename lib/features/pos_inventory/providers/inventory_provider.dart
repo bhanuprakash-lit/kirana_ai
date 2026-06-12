@@ -275,7 +275,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
             'barcode': barcode,
             'is_perishable': isPerishable,
             'is_loose': isLoose,
-            if (imageUrl != null) 'image_url': imageUrl,
+            'image_url': ?imageUrl,
           });
           productId = (res['row']?['product_id'] as num?)?.toInt();
         } catch (_) {

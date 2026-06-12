@@ -117,8 +117,9 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
                   hint: l10n.businessEmailHint,
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return l10n.businessEmailRequired;
+                    }
                     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
                       return l10n.businessEmailInvalid;
                     }

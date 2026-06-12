@@ -1374,6 +1374,15 @@ class AppLocalizationsKn extends AppLocalizations {
       'ಸಾಲವಾಗಿ ದಾಖಲಿಸಲಾಗಿದೆ — ಉಧಾರ್ ಟ್ಯಾಬ್ ಪರಿಶೀಲಿಸಿ';
 
   @override
+  String get posBoughtAsBasket => 'ಬುಟ್ಟಿಯಾಗಿ ಖರೀದಿಸಲಾಗಿದೆ';
+
+  @override
+  String get posBasketValue => 'ಬುಟ್ಟಿ ಮೌಲ್ಯ';
+
+  @override
+  String get posCustomerSaved => 'ಗ್ರಾಹಕ ಉಳಿಸಿದ್ದು';
+
+  @override
   String get invSearchItemsOrCategories => 'ವಸ್ತುಗಳು ಅಥವಾ ವರ್ಗಗಳನ್ನು ಹುಡುಕಿ...';
 
   @override
@@ -2046,6 +2055,31 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get finSettled => 'ಇತ್ಯರ್ಥವಾಗಿದೆ';
+
+  @override
+  String get finRecordPayment => 'ಪಾವತಿ ದಾಖಲಿಸಿ';
+
+  @override
+  String get finPaymentOldestFirstNote => 'ಹಳೆಯ ಬಾಕಿಗಳಿಗೆ ಮೊದಲು ಅನ್ವಯಿಸಲಾಗಿದೆ';
+
+  @override
+  String get finTaken => 'ತೆಗೆದುಕೊಂಡದ್ದು';
+
+  @override
+  String get finPaid => 'ಪಾವತಿಸಿದ್ದು';
+
+  @override
+  String get finBalanceShort => 'ಬಾಕಿ';
+
+  @override
+  String finOpenDuesSummary(int count, int days) {
+    return '$count ಬಾಕಿ · ಹಳೆಯದು $days ದಿನ';
+  }
+
+  @override
+  String finSettledSectionTitle(int count) {
+    return 'ಇತ್ಯರ್ಥ ($count)';
+  }
 
   @override
   String finRecoverUdhaarFrom(String name) {
@@ -4594,4 +4628,167 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get visionComingSoon => 'ವಿಷನ್ AI ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!';
+
+  @override
+  String get mktTierBronze => 'Bronze';
+
+  @override
+  String get mktTierSilver => 'Silver';
+
+  @override
+  String get mktTierGold => 'Gold';
+
+  @override
+  String get mktTierPlatinum => 'Platinum';
+
+  @override
+  String get mktTierSettings => 'ಶ್ರೇಣಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳು';
+
+  @override
+  String get mktShowArchived => 'ಆರ್ಕೈವ್ ಮಾಡಿದವು ತೋರಿಸಿ';
+
+  @override
+  String get mktHideArchived => 'ಆರ್ಕೈವ್ ಮಾಡಿದವು ಮರೆಮಾಡಿ';
+
+  @override
+  String get mktArchived => 'ಆರ್ಕೈವ್ ಮಾಡಲಾಗಿದೆ';
+
+  @override
+  String get mktEdit => 'ಸಂಪಾದಿಸಿ';
+
+  @override
+  String get mktAlertedToday => 'ಇಂದು ತಿಳಿಸಲಾಗಿದೆ';
+
+  @override
+  String get mktRestore => 'ಮರುಸ್ಥಾಪಿಸಿ';
+
+  @override
+  String get mktArchive => 'ಆರ್ಕೈವ್ ಮಾಡಿ';
+
+  @override
+  String get mktBasketArchived => 'ಬಾಸ್ಕೆಟ್ ಆರ್ಕೈವ್ ಆಗಿದೆ';
+
+  @override
+  String get mktBasketRestored => 'ಬಾಸ್ಕೆಟ್ ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ';
+
+  @override
+  String get mktSomethingWentWrong =>
+      'ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get mktEditBasket => 'ಬಾಸ್ಕೆಟ್ ಸಂಪಾದಿಸಿ';
+
+  @override
+  String get mktSaveChanges => 'ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ';
+
+  @override
+  String get mktAddItemsForPrice =>
+      'ಸ್ವಯಂ-ರಿಯಾಯಿತಿ ಬಂಡಲ್ ಬೆಲೆ ನೋಡಲು ವಸ್ತುಗಳನ್ನು ಸೇರಿಸಿ';
+
+  @override
+  String get mktItemsTotal => 'ವಸ್ತುಗಳ ಒಟ್ಟು';
+
+  @override
+  String get mktBundlePrice => 'ಬಂಡಲ್ ಬೆಲೆ';
+
+  @override
+  String get mktTierConfigTitle => 'ಬಾಸ್ಕೆಟ್ ಶ್ರೇಣಿಗಳು';
+
+  @override
+  String get mktTierConfigIntro =>
+      'ಬಾಸ್ಕೆಟ್‌ಗಳಿಗೆ ಅವುಗಳ ಒಟ್ಟು ಮೌಲ್ಯದ ಆಧಾರದ ಮೇಲೆ ಸ್ವಯಂ ಬೆಲೆ ನಿಗದಿಯಾಗುತ್ತದೆ. ಪ್ರತಿ ಶ್ರೇಣಿಗೆ ಮೌಲ್ಯ ವ್ಯಾಪ್ತಿ ಮತ್ತು ರಿಯಾಯಿತಿ ಹೊಂದಿಸಿ — ವಸ್ತುಗಳನ್ನು ಸೇರಿಸಿದಂತೆ ಹೊಂದುವ ಶ್ರೇಣಿಯ ರಿಯಾಯಿತಿ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಅನ್ವಯಿಸುತ್ತದೆ.';
+
+  @override
+  String get mktTierRangeInvalid =>
+      'ಪ್ರತಿ ಶ್ರೇಣಿಯ ಮಿತಿ ಹಿಂದಿನದಕ್ಕಿಂತ ಹೆಚ್ಚಿರಬೇಕು, ರಿಯಾಯಿತಿ 0–100% ನಡುವೆ.';
+
+  @override
+  String get mktTiersSaved => 'ಶ್ರೇಣಿಗಳು ಉಳಿಸಲಾಗಿದೆ';
+
+  @override
+  String get mktRecomputeTitle =>
+      'ಅಸ್ತಿತ್ವದ ಬಾಸ್ಕೆಟ್‌ಗಳನ್ನು ಮರು-ಲೆಕ್ಕ ಹಾಕಬೇಕೆ?';
+
+  @override
+  String get mktKeepAsIs => 'ಇರುವಂತೆಯೇ ಇರಿಸಿ';
+
+  @override
+  String get mktRecompute => 'ಮರು-ಲೆಕ್ಕ ಹಾಕಿ';
+
+  @override
+  String get mktSaveTiers => 'ಶ್ರೇಣಿಗಳನ್ನು ಉಳಿಸಿ';
+
+  @override
+  String get mktUpToLabel => 'ವರೆಗೆ';
+
+  @override
+  String get mktTopTierHint => 'ಹಿಂದಿನ ಶ್ರೇಣಿಗಿಂತ ಮೇಲಿನ ಎಲ್ಲವೂ';
+
+  @override
+  String get mktDiscountLabel => 'ರಿಯಾಯಿತಿ';
+
+  @override
+  String get psetBasketTiers => 'ಬಾಸ್ಕೆಟ್ ಶ್ರೇಣಿಗಳು';
+
+  @override
+  String get psetBasketTiersHint =>
+      'ಮೌಲ್ಯದ ಆಧಾರದ ಮೇಲೆ ಬಾಸ್ಕೆಟ್‌ಗಳಿಗೆ ಸ್ವಯಂ-ರಿಯಾಯಿತಿ';
+
+  @override
+  String mktYouSave(String amount, String pct) {
+    return '₹$amount ಉಳಿಸಿ ($pct% ರಿಯಾಯಿತಿ)';
+  }
+
+  @override
+  String mktTierBasketLabel(String tier) {
+    return '$tier ಬಾಸ್ಕೆಟ್';
+  }
+
+  @override
+  String mktPctOff(String pct) {
+    return '$pct% ರಿಯಾಯಿತಿ';
+  }
+
+  @override
+  String mktSaveAmount(String amount) {
+    return '₹$amount ಉಳಿಸಿ';
+  }
+
+  @override
+  String mktRecomputeBody(int count) {
+    return '$count ಅಸ್ತಿತ್ವದ ಬಾಸ್ಕೆಟ್‌ಗಳು ಹಳೆಯ ಶ್ರೇಣಿಗಳ ಪ್ರಕಾರ ಬೆಲೆ ಹೊಂದಿವೆ. ಅವುಗಳಿಗೂ ಹೊಸ ಶ್ರೇಣಿಗಳನ್ನು ಅನ್ವಯಿಸಬೇಕೆ?';
+  }
+
+  @override
+  String mktBasketsRecomputed(int count) {
+    return '$count ಬಾಸ್ಕೆಟ್‌ಗಳು ನವೀಕರಿಸಲಾಗಿದೆ';
+  }
+
+  @override
+  String mktAboveAmount(String amount) {
+    return '₹$amount ಮೇಲೆ';
+  }
+
+  @override
+  String mktRangeAmount(String from, String to) {
+    return '₹$from – ₹$to';
+  }
+
+  @override
+  String get mktSaveAsBasket => 'ಬಾಸ್ಕೆಟ್ ಆಗಿ ಉಳಿಸಿ';
+
+  @override
+  String mktBasketSavedFromCampaign(String name) {
+    return '\"$name\" ಅನ್ನು ನಿಮ್ಮ ಬಾಸ್ಕೆಟ್‌ಗಳಿಗೆ ಉಳಿಸಲಾಗಿದೆ';
+  }
+
+  @override
+  String get mktSelectDate => 'ದಿನಾಂಕ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get mktBasketsProTitle => 'ಬಾಸ್ಕೆಟ್‌ಗಳು ಒಂದು Pro ವೈಶಿಷ್ಟ್ಯ';
+
+  @override
+  String get mktBasketsProDesc =>
+      'ಸ್ವಯಂಚಾಲಿತ ಶ್ರೇಣಿ ರಿಯಾಯಿತಿಗಳೊಂದಿಗೆ ಕಾಂಬೋ ಡೀಲ್‌ಗಳನ್ನು ರಚಿಸಿ ಮತ್ತು ಗ್ರಾಹಕರಿಗೆ WhatsApp‌ನಲ್ಲಿ ತಿಳಿಸಿ. ಬಾಸ್ಕೆಟ್‌ಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಲು Pro‌ಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ.';
 }

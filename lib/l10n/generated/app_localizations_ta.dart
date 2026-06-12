@@ -1386,6 +1386,15 @@ class AppLocalizationsTa extends AppLocalizations {
       'கடனாக பதிவு செய்யப்பட்டது — உதார் தாவலைச் சரிபார்க்கவும்';
 
   @override
+  String get posBoughtAsBasket => 'கூடையாக வாங்கப்பட்டது';
+
+  @override
+  String get posBasketValue => 'கூடை மதிப்பு';
+
+  @override
+  String get posCustomerSaved => 'வாடிக்கையாளர் சேமித்தது';
+
+  @override
   String get invSearchItemsOrCategories => 'பொருட்கள் அல்லது வகைகளைத் தேடு...';
 
   @override
@@ -2063,6 +2072,32 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get finSettled => 'தீர்க்கப்பட்டது';
+
+  @override
+  String get finRecordPayment => 'கட்டணம் பதிவு செய்';
+
+  @override
+  String get finPaymentOldestFirstNote =>
+      'பழைய நிலுவைகளுக்கு முதலில் பயன்படுத்தப்படும்';
+
+  @override
+  String get finTaken => 'எடுத்தது';
+
+  @override
+  String get finPaid => 'செலுத்தியது';
+
+  @override
+  String get finBalanceShort => 'மீதம்';
+
+  @override
+  String finOpenDuesSummary(int count, int days) {
+    return '$count நிலுவை · பழையது $days நாட்கள்';
+  }
+
+  @override
+  String finSettledSectionTitle(int count) {
+    return 'தீர்க்கப்பட்டது ($count)';
+  }
 
   @override
   String finRecoverUdhaarFrom(String name) {
@@ -4629,4 +4664,166 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get visionComingSoon => 'விஷன் AI விரைவில் வருகிறது!';
+
+  @override
+  String get mktTierBronze => 'Bronze';
+
+  @override
+  String get mktTierSilver => 'Silver';
+
+  @override
+  String get mktTierGold => 'Gold';
+
+  @override
+  String get mktTierPlatinum => 'Platinum';
+
+  @override
+  String get mktTierSettings => 'அடுக்கு அமைப்புகள்';
+
+  @override
+  String get mktShowArchived => 'காப்பகப்படுத்தியதைக் காட்டு';
+
+  @override
+  String get mktHideArchived => 'காப்பகப்படுத்தியதை மறை';
+
+  @override
+  String get mktArchived => 'காப்பகப்படுத்தப்பட்டது';
+
+  @override
+  String get mktEdit => 'திருத்து';
+
+  @override
+  String get mktAlertedToday => 'இன்று அறிவிக்கப்பட்டது';
+
+  @override
+  String get mktRestore => 'மீட்டமை';
+
+  @override
+  String get mktArchive => 'காப்பகப்படுத்து';
+
+  @override
+  String get mktBasketArchived => 'கூடை காப்பகப்படுத்தப்பட்டது';
+
+  @override
+  String get mktBasketRestored => 'கூடை மீட்டமைக்கப்பட்டது';
+
+  @override
+  String get mktSomethingWentWrong =>
+      'ஏதோ தவறு நடந்தது. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get mktEditBasket => 'கூடையைத் திருத்து';
+
+  @override
+  String get mktSaveChanges => 'மாற்றங்களைச் சேமி';
+
+  @override
+  String get mktAddItemsForPrice =>
+      'தானியங்கி தள்ளுபடி பண்டில் விலையைப் பார்க்க பொருட்களைச் சேர்க்கவும்';
+
+  @override
+  String get mktItemsTotal => 'பொருட்கள் மொத்தம்';
+
+  @override
+  String get mktBundlePrice => 'பண்டில் விலை';
+
+  @override
+  String get mktTierConfigTitle => 'கூடை அடுக்குகள்';
+
+  @override
+  String get mktTierConfigIntro =>
+      'கூடைகள் அவற்றின் மொத்த மதிப்பின் அடிப்படையில் தானாக விலை நிர்ணயிக்கப்படுகின்றன. ஒவ்வொரு அடுக்குக்கும் மதிப்பு வரம்பு மற்றும் தள்ளுபடியை அமைக்கவும் — பொருட்களைச் சேர்க்கும்போது பொருந்தும் அடுக்கின் தள்ளுபடி தானாகவே பயன்படுத்தப்படும்.';
+
+  @override
+  String get mktTierRangeInvalid =>
+      'ஒவ்வொரு அடுக்கின் வரம்பும் முந்தையதை விட அதிகமாக இருக்க வேண்டும், தள்ளுபடி 0–100% இடையே.';
+
+  @override
+  String get mktTiersSaved => 'அடுக்குகள் சேமிக்கப்பட்டன';
+
+  @override
+  String get mktRecomputeTitle => 'தற்போதுள்ள கூடைகளை மீண்டும் கணக்கிடவா?';
+
+  @override
+  String get mktKeepAsIs => 'உள்ளபடியே வைத்திரு';
+
+  @override
+  String get mktRecompute => 'மீண்டும் கணக்கிடு';
+
+  @override
+  String get mktSaveTiers => 'அடுக்குகளைச் சேமி';
+
+  @override
+  String get mktUpToLabel => 'வரை';
+
+  @override
+  String get mktTopTierHint => 'முந்தைய அடுக்குக்கு மேல் அனைத்தும்';
+
+  @override
+  String get mktDiscountLabel => 'தள்ளுபடி';
+
+  @override
+  String get psetBasketTiers => 'கூடை அடுக்குகள்';
+
+  @override
+  String get psetBasketTiersHint =>
+      'மதிப்பின் அடிப்படையில் கூடைகளுக்கு தானியங்கி தள்ளுபடி';
+
+  @override
+  String mktYouSave(String amount, String pct) {
+    return '₹$amount சேமி ($pct% தள்ளுபடி)';
+  }
+
+  @override
+  String mktTierBasketLabel(String tier) {
+    return '$tier கூடை';
+  }
+
+  @override
+  String mktPctOff(String pct) {
+    return '$pct% தள்ளுபடி';
+  }
+
+  @override
+  String mktSaveAmount(String amount) {
+    return '₹$amount சேமி';
+  }
+
+  @override
+  String mktRecomputeBody(int count) {
+    return '$count தற்போதுள்ள கூடைகள் பழைய அடுக்குகளின் கீழ் விலை நிர்ணயிக்கப்பட்டுள்ளன. அவற்றுக்கும் புதிய அடுக்குகளைப் பயன்படுத்தவா?';
+  }
+
+  @override
+  String mktBasketsRecomputed(int count) {
+    return '$count கூடைகள் புதுப்பிக்கப்பட்டன';
+  }
+
+  @override
+  String mktAboveAmount(String amount) {
+    return '₹$amount மேல்';
+  }
+
+  @override
+  String mktRangeAmount(String from, String to) {
+    return '₹$from – ₹$to';
+  }
+
+  @override
+  String get mktSaveAsBasket => 'கூடையாகச் சேமி';
+
+  @override
+  String mktBasketSavedFromCampaign(String name) {
+    return '\"$name\" உங்கள் கூடைகளில் சேமிக்கப்பட்டது';
+  }
+
+  @override
+  String get mktSelectDate => 'தேதியைத் தேர்ந்தெடு';
+
+  @override
+  String get mktBasketsProTitle => 'கூடைகள் ஒரு Pro அம்சம்';
+
+  @override
+  String get mktBasketsProDesc =>
+      'தானியங்கி அடுக்கு தள்ளுபடிகளுடன் காம்போ டீல்களை உருவாக்கி வாடிக்கையாளர்களை WhatsApp இல் அறிவிக்கவும். கூடைகளைத் திறக்க Pro க்கு மேம்படுத்தவும்.';
 }

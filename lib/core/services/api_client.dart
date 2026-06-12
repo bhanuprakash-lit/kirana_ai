@@ -82,6 +82,25 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
+  Future<dynamic> put(String path, dynamic body) async {
+    final token = await _getAuthToken();
+    final res = await _client.put(
+      Uri.parse('${AppConfig.apiBaseUrl}$path'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+    if (res.statusCode == 200 ||
+        res.statusCode == 201 ||
+        res.statusCode == 204) {
+      if (res.body.isEmpty) return {};
+      return jsonDecode(res.body);
+    }
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
   Future<dynamic> patch(String path, dynamic body) async {
     final token = await _getAuthToken();
     final res = await _client.patch(

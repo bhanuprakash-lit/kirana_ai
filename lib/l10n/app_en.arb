@@ -824,6 +824,9 @@
   "posUdhaarSale": "Udhaar Sale",
   "posTotalPaid": "Total Paid",
   "posRecordedAsCredit": "Recorded as credit — check Udhaar tab",
+  "posBoughtAsBasket": "Bought as a basket",
+  "posBasketValue": "Basket value",
+  "posCustomerSaved": "Customer saved",
   "invSearchItemsOrCategories": "Search items or categories...",
   "invShowLess": "Show Less",
   "invViewMore": "+{count} more",
@@ -1268,6 +1271,24 @@
   "finRecover": "Recover",
   "finHistory": "History",
   "finSettled": "Settled",
+  "finRecordPayment": "Record payment",
+  "finPaymentOldestFirstNote": "Applied to oldest dues first",
+  "finTaken": "Taken",
+  "finPaid": "Paid",
+  "finBalanceShort": "Balance",
+  "finOpenDuesSummary": "{count} open · oldest {days}d",
+  "@finOpenDuesSummary": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "days": { "type": "int" }
+    }
+  },
+  "finSettledSectionTitle": "Settled ({count})",
+  "@finSettledSectionTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "finRecoverUdhaarFrom": "Recover Udhaar from {name}",
   "@finRecoverUdhaarFrom": {
     "placeholders": {
@@ -2821,5 +2842,120 @@
   "widgetUnitToPay": "to pay",
   "widgetSignIn": "Open Kirana AI to sign in",
   "widgetNoData": "Open the app to load today's numbers",
-  "visionComingSoon": "Vision AI is coming soon!"
+  "visionComingSoon": "Vision AI is coming soon!",
+  "mktTierBronze": "Bronze",
+  "mktTierSilver": "Silver",
+  "mktTierGold": "Gold",
+  "mktTierPlatinum": "Platinum",
+  "mktTierSettings": "Tier settings",
+  "mktShowArchived": "Show archived",
+  "mktHideArchived": "Hide archived",
+  "mktArchived": "Archived",
+  "mktEdit": "Edit",
+  "mktAlertedToday": "Alerted today",
+  "mktRestore": "Restore",
+  "mktArchive": "Archive",
+  "mktBasketArchived": "Basket archived",
+  "mktBasketRestored": "Basket restored",
+  "mktSomethingWentWrong": "Something went wrong. Please try again.",
+  "mktEditBasket": "Edit Basket",
+  "mktSaveChanges": "Save Changes",
+  "mktAddItemsForPrice": "Add items to see the auto-discounted bundle price",
+  "mktItemsTotal": "Items total",
+  "mktBundlePrice": "Bundle price",
+  "mktTierConfigTitle": "Basket Tiers",
+  "mktTierConfigIntro": "Baskets are auto-priced by their total value. Set the value range and discount for each tier — the matching tier's discount is applied automatically as you add items.",
+  "mktTierRangeInvalid": "Each tier's limit must be higher than the previous, and discounts between 0–100%.",
+  "mktTiersSaved": "Tiers saved",
+  "mktRecomputeTitle": "Recompute existing baskets?",
+  "mktKeepAsIs": "Keep as-is",
+  "mktRecompute": "Recompute",
+  "mktSaveTiers": "Save Tiers",
+  "mktUpToLabel": "Up to",
+  "mktTopTierHint": "Everything above the previous tier",
+  "mktDiscountLabel": "Discount",
+  "psetBasketTiers": "Basket Tiers",
+  "psetBasketTiersHint": "Auto-discount baskets by value",
+  "mktYouSave": "Save ₹{amount} ({pct}% off)",
+  "@mktYouSave": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "mktTierBasketLabel": "{tier} basket",
+  "@mktTierBasketLabel": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "mktPctOff": "{pct}% off",
+  "@mktPctOff": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "mktSaveAmount": "Save ₹{amount}",
+  "@mktSaveAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "mktRecomputeBody": "{count} existing baskets are priced under your old tiers. Apply the new tiers to them too?",
+  "@mktRecomputeBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mktBasketsRecomputed": "{count} baskets updated",
+  "@mktBasketsRecomputed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mktAboveAmount": "Above ₹{amount}",
+  "@mktAboveAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "mktRangeAmount": "₹{from} – ₹{to}",
+  "@mktRangeAmount": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "mktSaveAsBasket": "Save as Basket",
+  "mktBasketSavedFromCampaign": "Saved \"{name}\" to your baskets",
+  "@mktBasketSavedFromCampaign": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mktSelectDate": "Select date",
+  "mktBasketsProTitle": "Baskets is a Pro feature",
+  "mktBasketsProDesc": "Create combo deals with automatic tier discounts and alert customers on WhatsApp. Upgrade to Pro to unlock baskets."
 }

@@ -150,6 +150,7 @@ class _TransactionHistoryScreenState
                           dateStr: _formatDate(date),
                           payment: payment,
                           status: status,
+                          basketName: o['basket_name'] as String?,
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -197,6 +198,7 @@ class _OrderTile extends StatelessWidget {
   final String dateStr;
   final String payment;
   final String status;
+  final String? basketName;
   final VoidCallback onTap;
 
   const _OrderTile({
@@ -205,6 +207,7 @@ class _OrderTile extends StatelessWidget {
     required this.dateStr,
     required this.payment,
     required this.status,
+    this.basketName,
     required this.onTap,
   });
 
@@ -260,6 +263,43 @@ class _OrderTile extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                    if (basketName != null && basketName!.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: BrandColors.success.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.shopping_basket_rounded,
+                              size: 12,
+                              color: BrandColors.success,
+                            ),
+                            const SizedBox(width: 4),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 160),
+                              child: Text(
+                                basketName!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: BrandColors.success,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

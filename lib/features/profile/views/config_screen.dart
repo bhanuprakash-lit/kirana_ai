@@ -5,6 +5,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../core/locale/locale_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
+import '../../baskets/views/basket_tier_config_screen.dart';
 import '../providers/config_provider.dart';
 
 class ConfigScreen extends ConsumerStatefulWidget {
@@ -362,6 +363,61 @@ class _ConfigScreenState extends ConsumerState<ConfigScreen> {
                         value: d.allowSocialMarketing,
                         onChanged: (v) =>
                             _update(d.copyWith(allowSocialMarketing: v)),
+                      ),
+                      const _Divider(),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const BasketTierConfigScreen(),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: BrandColors.surfaceTint,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.workspace_premium_rounded,
+                                  size: 18,
+                                  color: BrandColors.muted,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.psetBasketTiers,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                        color: BrandColors.ink,
+                                      ),
+                                    ),
+                                    Text(
+                                      l10n.psetBasketTiersHint,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: BrandColors.muted,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(
+                                Icons.chevron_right_rounded,
+                                color: BrandColors.muted,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),

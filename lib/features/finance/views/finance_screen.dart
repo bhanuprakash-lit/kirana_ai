@@ -61,7 +61,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: Text(l10n.finFinance),
+        title: Text(l10n.dashNavKhata),
         actions: const [NotificationBell(), SizedBox(width: 8)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(92),

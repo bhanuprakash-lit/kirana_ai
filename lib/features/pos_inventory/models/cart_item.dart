@@ -15,10 +15,16 @@ class CartItem {
     this.unitPriceOverride,
   });
 
-  CartItem copyWith({double? quantity, double? unitPriceOverride}) => CartItem(
+  CartItem copyWith({
+    double? quantity,
+    double? unitPriceOverride,
+    bool clearOverride = false,
+  }) => CartItem(
     product: product,
     quantity: quantity ?? this.quantity,
-    unitPriceOverride: unitPriceOverride ?? this.unitPriceOverride,
+    unitPriceOverride: clearOverride
+        ? null
+        : (unitPriceOverride ?? this.unitPriceOverride),
   );
 
   /// Effective per-unit price charged for this line.

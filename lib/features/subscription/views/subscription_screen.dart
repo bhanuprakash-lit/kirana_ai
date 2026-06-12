@@ -326,26 +326,18 @@ class _CurrentPlanCard extends StatelessWidget {
                   fontSize: 15,
                 ),
               ),
+              Spacer(),
+              if (info.isTrial)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: TrialCountdownWidget(),
+                ),
             ],
           ),
-          if (info.isTrial && info.isActive) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(
-                  Icons.timer_outlined,
-                  color: Colors.white70,
-                  size: 14,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  l10n.subTimeRemaining,
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-                const TrialCountdownWidget(),
-              ],
-            ),
-          ] else if (info.tier.isPaid) ...[
+          if (info.tier.isPaid) ...[
             const SizedBox(height: 8),
             Text(
               info.tier.priceLabel,
@@ -369,7 +361,7 @@ class _CurrentPlanCard extends StatelessWidget {
         return const Color(0xFFFF8C00);
       case SubTier.trial:
         return info.trialTier == 'pro'
-            ? const Color(0xFF7C3AED)
+            ? BrandColors.purple
             : BrandColors.primary;
       case SubTier.basic:
         return BrandColors.primary;

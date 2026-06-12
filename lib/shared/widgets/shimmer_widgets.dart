@@ -68,7 +68,7 @@ class OverviewShimmer extends StatelessWidget {
                     MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.4),
               ),
               itemCount: 6,
-              itemBuilder: (_, __) => Container(
+              itemBuilder: (_, _) => Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),

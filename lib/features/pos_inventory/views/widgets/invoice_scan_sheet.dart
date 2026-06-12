@@ -195,8 +195,10 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
       if (s.name.toLowerCase() == v) return s;
     }
     for (final s in suppliers) {
-      if (s.name.toLowerCase().contains(v) || v.contains(s.name.toLowerCase()))
+      if (s.name.toLowerCase().contains(v) ||
+          v.contains(s.name.toLowerCase())) {
         return s;
+      }
     }
     final words = v.split(RegExp(r'\s+')).where((w) => w.length >= 4).toList();
     for (final word in words) {
