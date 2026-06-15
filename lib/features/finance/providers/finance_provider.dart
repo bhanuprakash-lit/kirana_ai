@@ -43,6 +43,7 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
     required String name,
     required String phone,
     required double amount,
+    DateTime? dueDate,
   }) async {
     final client = ref.read(apiClientProvider);
     try {
@@ -50,6 +51,7 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
         'customer_name': name,
         'phone': phone,
         'amount': amount,
+        if (dueDate != null) 'due_date': _isoDate(dueDate),
       });
       // Invalidate customer list as this might create a new customer
       ref.invalidate(customerProvider);
@@ -127,6 +129,10 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
     }
   }
 }
+
+/// Formats a date as ISO `yyyy-mm-dd` for the backend's DATE columns (no time).
+String _isoDate(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
 final financeProvider = AsyncNotifierProvider<FinanceNotifier, FinanceData>(
   FinanceNotifier.new,

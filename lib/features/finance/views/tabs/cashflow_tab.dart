@@ -70,11 +70,12 @@ class CashflowTab extends ConsumerWidget {
         final todaySales =
             overviewAsync.whenOrNull(data: (d) => d.dailySales?.totalSales) ??
             0.0;
+        // Of THIS month's sales, how much went out on credit. Uses credit given
+        // this month (not all-time outstanding), so a month with no udhaar sales
+        // correctly reads 0% instead of being pinned at 100%.
         final creditRatio = stats.monthlySalesAmount > 0
-            ? (stats.totalUdhaarPending / stats.monthlySalesAmount * 100).clamp(
-                0.0,
-                100.0,
-              )
+            ? (stats.monthlyCreditAmount / stats.monthlySalesAmount * 100)
+                  .clamp(0.0, 100.0)
             : 0.0;
         final ratioColor = creditRatio < 20
             ? BrandColors.success

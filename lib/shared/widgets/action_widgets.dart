@@ -57,6 +57,8 @@ class ActionStatusOverlay extends StatelessWidget {
   final String? error;
   final bool isSuccess;
   final String? successMessage;
+  // Optional override for the "saving…" text (e.g. "Clearing 3 dues…").
+  final String? savingMessage;
   final VoidCallback? onRetry;
 
   const ActionStatusOverlay({
@@ -65,6 +67,7 @@ class ActionStatusOverlay extends StatelessWidget {
     this.error,
     this.isSuccess = false,
     this.successMessage,
+    this.savingMessage,
     this.onRetry,
   });
 
@@ -88,12 +91,14 @@ class ActionStatusOverlay extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              AppLocalizations.of(context).shrSavingChanges,
-              style: const TextStyle(
-                color: BrandColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
+            Expanded(
+              child: Text(
+                savingMessage ?? AppLocalizations.of(context).shrSavingChanges,
+                style: const TextStyle(
+                  color: BrandColors.primary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ),
           ],

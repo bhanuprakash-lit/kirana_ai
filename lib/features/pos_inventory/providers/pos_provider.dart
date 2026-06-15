@@ -36,6 +36,10 @@ class PosState {
   /// True if the shopkeeper dismissed the suggestion banner without applying.
   final bool customerPricesDismissed;
 
+  /// Customer-price edits made in the current cart. These are saved only after
+  /// an order is placed; abandoning the cart must not change stored prices.
+  final Map<int, double?> pendingCustomerPriceEdits;
+
   /// Basket attribution for the current cart — set when a full basket bundle
   /// deal is added, so the resulting order records which basket it came from
   /// plus the bundle value and savings. All null for an ordinary cart.
@@ -58,6 +62,7 @@ class PosState {
     this.customerPrices = const [],
     this.customerPricesApplied = false,
     this.customerPricesDismissed = false,
+    this.pendingCustomerPriceEdits = const {},
     this.appliedBasketId,
     this.appliedBasketName,
     this.basketGross,
@@ -81,6 +86,7 @@ class PosState {
     List<CustomerPrice>? customerPrices,
     bool? customerPricesApplied,
     bool? customerPricesDismissed,
+    Map<int, double?>? pendingCustomerPriceEdits,
     int? appliedBasketId,
     String? appliedBasketName,
     double? basketGross,
@@ -117,6 +123,9 @@ class PosState {
     customerPricesDismissed: clearCustomer
         ? false
         : (customerPricesDismissed ?? this.customerPricesDismissed),
+    pendingCustomerPriceEdits: clearCustomer
+        ? const {}
+        : (pendingCustomerPriceEdits ?? this.pendingCustomerPriceEdits),
     appliedBasketId: clearBasket
         ? null
         : (appliedBasketId ?? this.appliedBasketId),
@@ -137,9 +146,17 @@ class PosState {
     return null;
   }
 
-  /// Whether the suggestion banner should be shown.
+  /// How many items *currently in the cart* have a special price for this
+  /// customer. The banner offers to reprice the cart, so it must count what's
+  /// actually here — not the customer's whole saved price list (which would
+  /// claim "4 special prices" even when none of those items are in the cart).
+  int get customerPricedCartCount =>
+      cart.where((l) => customerPriceFor(l.product.productId) != null).length;
+
+  /// Whether the suggestion banner should be shown. Only when at least one cart
+  /// item would actually be repriced.
   bool get showCustomerPriceBanner =>
-      customerPrices.isNotEmpty &&
+      customerPricedCartCount > 0 &&
       !customerPricesApplied &&
       !customerPricesDismissed;
 
@@ -416,7 +433,9 @@ class PosNotifier extends Notifier<PosState> {
       if (state.selectedCustomerId != customerId) {
         return;
       }
-      state = state.copyWith(customerPrices: list);
+      state = state.copyWith(
+        customerPrices: _applyPendingCustomerPriceEdits(list),
+      );
     } catch (_) {
       // Leave suggestions empty.
     }
@@ -438,21 +457,13 @@ class PosNotifier extends Notifier<PosState> {
     state = state.copyWith(customerPricesDismissed: true);
   }
 
-  /// Pin a customer-specific price for a product (or pass null to remove it),
-  /// then apply it to the matching cart line immediately. Returns success.
+  /// Set a customer-specific price for this cart only.
+  ///
+  /// The backend write is deferred until an order is placed. If the cart is
+  /// abandoned, cleared, or the customer changes, the edit is discarded.
   Future<bool> setCustomerPrice(int productId, double? price) async {
-    final customerId = state.selectedCustomerId;
-    if (customerId == null) return false;
-    final client = ref.read(apiClientProvider);
-    try {
-      await client.post('/kirana/customers/$customerId/price', {
-        'product_id': productId,
-        'price': price,
-      });
-    } catch (_) {
-      return false;
-    }
-    // Reflect the change on the matching cart line right away.
+    if (state.selectedCustomerId == null) return false;
+
     final updated = state.cart
         .map(
           (line) => line.product.productId == productId
@@ -463,15 +474,72 @@ class PosNotifier extends Notifier<PosState> {
               : line,
         )
         .toList();
+    final pending = Map<int, double?>.from(state.pendingCustomerPriceEdits);
+    pending[productId] = price;
     state = state.copyWith(
       cart: updated,
-      // A deliberate pin counts as accepting customer pricing for this sale.
+      customerPrices: _applyPendingCustomerPriceEdits(
+        state.customerPrices,
+        edits: pending,
+      ),
+      pendingCustomerPriceEdits: pending,
       customerPricesApplied: price != null ? true : state.customerPricesApplied,
     );
     _schedulePing();
-    // Refresh suggestions so source/badges reflect the new pin.
-    await _fetchCustomerPrices(customerId);
     return true;
+  }
+
+  List<CustomerPrice> _applyPendingCustomerPriceEdits(
+    List<CustomerPrice> prices, {
+    Map<int, double?>? edits,
+  }) {
+    final pending = edits ?? state.pendingCustomerPriceEdits;
+    if (pending.isEmpty) return prices;
+
+    final merged = <CustomerPrice>[...prices];
+    for (final entry in pending.entries) {
+      final productId = entry.key;
+      final price = entry.value;
+      final index = merged.indexWhere((cp) => cp.productId == productId);
+      if (price == null) {
+        if (index >= 0) merged.removeAt(index);
+        continue;
+      }
+
+      final product = state.products
+          .where((p) => p.productId == productId)
+          .firstOrNull;
+      final existing = index >= 0 ? merged[index] : null;
+      final customerPrice = CustomerPrice(
+        productId: productId,
+        productName: existing?.productName ?? product?.displayName ?? '',
+        unit: existing?.unit ?? product?.unit,
+        price: price,
+        source: 'pinned',
+        lastPaidPrice: existing?.lastPaidPrice,
+        lastPaidDate: existing?.lastPaidDate,
+        catalogPrice: existing?.catalogPrice ?? product?.price,
+      );
+      if (index >= 0) {
+        merged[index] = customerPrice;
+      } else {
+        merged.add(customerPrice);
+      }
+    }
+    return merged;
+  }
+
+  Future<void> _persistPendingCustomerPriceEdits(int customerId) async {
+    final pending = Map<int, double?>.from(state.pendingCustomerPriceEdits);
+    if (pending.isEmpty) return;
+
+    final client = ref.read(apiClientProvider);
+    for (final entry in pending.entries) {
+      await client.post('/kirana/customers/$customerId/price', {
+        'product_id': entry.key,
+        'price': entry.value,
+      });
+    }
   }
 
   void clearCustomer() {
@@ -550,6 +618,7 @@ class PosNotifier extends Notifier<PosState> {
     double? udhaarAmount, // null = full amount is udhaar (or not applicable)
     int?
     customerId, // overrides the POS-selected customer (e.g. the udhaar customer)
+    DateTime? udhaarDueDate, // repayment deadline for udhaar orders
   }) async {
     if (state.cart.isEmpty) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
@@ -592,6 +661,10 @@ class PosNotifier extends Notifier<PosState> {
           'udhaar_amount': udhaarAmount,
           'cash_paid': totalAmount - udhaarAmount,
         },
+        // Repayment deadline for the auto-created khata (udhaar orders only).
+        if (paymentMethod == 'udhaar' && udhaarDueDate != null)
+          'due_date':
+              '${udhaarDueDate.year.toString().padLeft(4, '0')}-${udhaarDueDate.month.toString().padLeft(2, '0')}-${udhaarDueDate.day.toString().padLeft(2, '0')}',
         // Basket/combo attribution — gated on the name so AI campaigns (which
         // have a null basket_id) are recorded too.
         if (state.appliedBasketName != null) ...{
@@ -604,6 +677,7 @@ class PosNotifier extends Notifier<PosState> {
       final order = await client.posPost('/pos/orders', body);
       if (order != null) {
         final orderId = order['order_id'] as int?;
+        final priceMemoryCustomerId = orderCustomerId;
 
         // Now process the referral with the real order_id (creates customer + referral record)
         if (pending != null) {
@@ -624,9 +698,25 @@ class PosNotifier extends Notifier<PosState> {
                 );
               } catch (_) {}
             }
+            if (priceMemoryCustomerId == null) {
+              try {
+                await _persistPendingCustomerPriceEdits(
+                  scanResult.newCustomerId,
+                );
+              } catch (_) {}
+            }
             ref.invalidate(customerProvider);
           } catch (_) {
             // referral processing failed — order is already placed, so ignore
+          }
+        }
+
+        if (priceMemoryCustomerId != null) {
+          try {
+            await _persistPendingCustomerPriceEdits(priceMemoryCustomerId);
+          } catch (_) {
+            // The order is already placed; don't fail the sale if price-memory
+            // persistence has a transient problem.
           }
         }
 

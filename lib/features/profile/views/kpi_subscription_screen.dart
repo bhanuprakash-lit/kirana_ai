@@ -13,7 +13,10 @@ import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 
 class KpiSubscriptionScreen extends ConsumerStatefulWidget {
-  const KpiSubscriptionScreen({super.key});
+  /// Optional KPI endpoint slug (e.g. "avg-basket-value") to open straight to
+  /// that KPI's detail sheet — used when arriving from a home-screen KPI card.
+  final String? focusSlug;
+  const KpiSubscriptionScreen({super.key, this.focusSlug});
 
   @override
   ConsumerState<KpiSubscriptionScreen> createState() =>
@@ -22,6 +25,55 @@ class KpiSubscriptionScreen extends ConsumerStatefulWidget {
 
 class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
   bool _isEditing = false;
+  bool _focusHandled = false;
+
+  /// Opens the detail sheet for [widget.focusSlug] once data is available.
+  /// Works even if the KPI isn't in the user's subscribed set by synthesising
+  /// a KpiData from the registry (the sheet fetches live detail by endpoint).
+  void _maybeOpenFocused(KpiState state) {
+    if (_focusHandled || widget.focusSlug == null) return;
+    final slug = widget.focusSlug!;
+    KpiRegistryItem? reg;
+    for (final r in state.registry) {
+      if ((r.endpoint ?? '').endsWith('/$slug')) {
+        reg = r;
+        break;
+      }
+    }
+    if (reg == null) return; // unknown slug — just show the screen
+    _focusHandled = true;
+
+    final key = slug.replaceAll('-', '_');
+    KpiData? data;
+    for (final d in state.subscribedData) {
+      if (d.kpiId == reg.kpiId || d.kpiKey == key) {
+        data = d;
+        break;
+      }
+    }
+    data ??= KpiData(
+      kpiId: reg.kpiId,
+      kpiKey: key,
+      name: reg.name,
+      status: reg.status,
+    );
+
+    final regItem = reg;
+    final kpiData = data;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => _KpiDetailBottomSheet(
+          kpi: kpiData,
+          registry: regItem,
+          categoryInfo: _getCategoryInfo(regItem.category),
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +99,8 @@ class _KpiSubscriptionScreenState extends ConsumerState<KpiSubscriptionScreen> {
         ),
       ),
       data: (state) {
+        // Deep-link from a home KPI card: open that KPI's detail directly.
+        _maybeOpenFocused(state);
         // When no subscriptions exist, auto-enter edit mode so that tapping
         // a KPI doesn't immediately flip back to the empty dashboard view.
         if (!_isEditing && state.subscribedIds.isEmpty) {

@@ -1233,13 +1233,13 @@ abstract class AppLocalizations {
   /// No description provided for @dashStatOrders.
   ///
   /// In en, this message translates to:
-  /// **'Orders'**
+  /// **'Bills'**
   String get dashStatOrders;
 
   /// No description provided for @dashStatAvgOrder.
   ///
   /// In en, this message translates to:
-  /// **'Avg order'**
+  /// **'Avg bill'**
   String get dashStatAvgOrder;
 
   /// No description provided for @dashStoreOverview.
@@ -1263,8 +1263,14 @@ abstract class AppLocalizations {
   /// No description provided for @dashStoreDailyBudget.
   ///
   /// In en, this message translates to:
-  /// **'Daily budget'**
+  /// **'Daily stock cost'**
   String get dashStoreDailyBudget;
+
+  /// No description provided for @dashKpiPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Last {days} days'**
+  String dashKpiPeriod(int days);
 
   /// No description provided for @dashCouldNotLoad.
   ///
@@ -2051,6 +2057,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Udhaar'**
   String get posPayUdhaar;
+
+  /// No description provided for @posUdhaarDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Repayment due'**
+  String get posUdhaarDueDate;
+
+  /// No description provided for @posUdhaarDueDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When will the customer repay?'**
+  String get posUdhaarDueDateHint;
+
+  /// No description provided for @posBundlePercentOff.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}% OFF'**
+  String posBundlePercentOff(int pct);
+
+  /// No description provided for @posBundleYouSave.
+  ///
+  /// In en, this message translates to:
+  /// **'You save {amount}'**
+  String posBundleYouSave(String amount);
+
+  /// No description provided for @posBundleRegularPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Added at regular price (bundle needs all items in stock)'**
+  String get posBundleRegularPrice;
 
   /// No description provided for @posPayUpi.
   ///
@@ -3965,6 +4001,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'High — many sales are on credit'**
   String get finCreditHigh;
+
+  /// No description provided for @finConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Record customer consent'**
+  String get finConsentTitle;
+
+  /// No description provided for @finConsentSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice confirmation of this udhaar'**
+  String get finConsentSubtitle;
+
+  /// No description provided for @finConsentScriptIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'ASK THE CUSTOMER TO SAY:'**
+  String get finConsentScriptIntro;
+
+  /// No description provided for @finConsentScript.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree — total {total}, udhaar {udhaar}, I will repay by {date}.'**
+  String finConsentScript(String total, String udhaar, String date);
+
+  /// No description provided for @finConsentTapToRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the mic and let the customer speak'**
+  String get finConsentTapToRecord;
+
+  /// No description provided for @finConsentRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording'**
+  String get finConsentRecording;
+
+  /// No description provided for @finConsentSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Consent saved — uploading in background'**
+  String get finConsentSaved;
+
+  /// No description provided for @finConsentSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get finConsentSkip;
+
+  /// No description provided for @finConsentSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice consent'**
+  String get finConsentSectionTitle;
+
+  /// No description provided for @finConsentStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded · analysis pending'**
+  String get finConsentStatusPending;
+
+  /// No description provided for @finConsentStatusAnalyzed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get finConsentStatusAnalyzed;
+
+  /// No description provided for @finConsentMatchScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice match: {pct}%'**
+  String finConsentMatchScore(String pct);
+
+  /// No description provided for @finConsentNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No voice consent recorded'**
+  String get finConsentNone;
+
+  /// No description provided for @finDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Repayment due date'**
+  String get finDueDate;
+
+  /// No description provided for @finDueDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When will the customer repay?'**
+  String get finDueDateHint;
+
+  /// No description provided for @finDueBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Due by {date}'**
+  String finDueBy(String date);
+
+  /// No description provided for @finClearingDues.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing {count, plural, =1{1 due} other{{count} dues}}…'**
+  String finClearingDues(int count);
+
+  /// No description provided for @finDuesCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 due cleared} other{{count} dues cleared}}'**
+  String finDuesCleared(int count);
 
   /// No description provided for @finSmartReminders.
   ///
@@ -8320,6 +8464,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create combo deals with automatic tier discounts and alert customers on WhatsApp. Upgrade to Pro to unlock baskets.'**
   String get mktBasketsProDesc;
+
+  /// No description provided for @visionNavLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision'**
+  String get visionNavLabel;
+
+  /// No description provided for @visionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision'**
+  String get visionTitle;
+
+  /// No description provided for @visionTabShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf Scan'**
+  String get visionTabShelf;
+
+  /// No description provided for @visionTabResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Results'**
+  String get visionTabResults;
+
+  /// No description provided for @visionTabCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter'**
+  String get visionTabCounter;
+
+  /// No description provided for @visionProTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision AI'**
+  String get visionProTitle;
+
+  /// No description provided for @visionProDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Snap your shelf morning and evening — AI counts your stock and tells you what sold.'**
+  String get visionProDesc;
+
+  /// No description provided for @visionFromCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get visionFromCamera;
+
+  /// No description provided for @visionFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get visionFromGallery;
+
+  /// No description provided for @visionMorningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning — Start of Day'**
+  String get visionMorningTitle;
+
+  /// No description provided for @visionEveningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening — End of Day'**
+  String get visionEveningTitle;
+
+  /// No description provided for @visionTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Photos'**
+  String get visionTakePhoto;
+
+  /// No description provided for @visionRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake'**
+  String get visionRetake;
+
+  /// No description provided for @visionReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get visionReview;
+
+  /// No description provided for @visionAnalyzing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing shelf… this can take up to a minute'**
+  String get visionAnalyzing;
+
+  /// No description provided for @visionScanFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan failed. Please retake the photo.'**
+  String get visionScanFailed;
+
+  /// No description provided for @visionNoPhotoYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo taken yet.'**
+  String get visionNoPhotoYet;
+
+  /// No description provided for @visionProductsIdentified.
+  ///
+  /// In en, this message translates to:
+  /// **'Products identified'**
+  String get visionProductsIdentified;
+
+  /// No description provided for @visionUnitsCounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Units counted'**
+  String get visionUnitsCounted;
+
+  /// No description provided for @visionNeedsReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs review'**
+  String get visionNeedsReview;
+
+  /// No description provided for @visionViewSales.
+  ///
+  /// In en, this message translates to:
+  /// **'View Today\'s Sales'**
+  String get visionViewSales;
+
+  /// No description provided for @visionTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: take the morning photo before opening and the evening photo before closing. AI works out how many of each product sold.'**
+  String get visionTip;
+
+  /// No description provided for @visionSalesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a morning and an evening photo to see what sold today.'**
+  String get visionSalesEmpty;
+
+  /// No description provided for @visionTotalSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Total items sold'**
+  String get visionTotalSold;
+
+  /// No description provided for @visionSold.
+  ///
+  /// In en, this message translates to:
+  /// **'sold'**
+  String get visionSold;
+
+  /// No description provided for @visionMorningCount.
+  ///
+  /// In en, this message translates to:
+  /// **'AM'**
+  String get visionMorningCount;
+
+  /// No description provided for @visionEveningCount.
+  ///
+  /// In en, this message translates to:
+  /// **'PM'**
+  String get visionEveningCount;
+
+  /// No description provided for @visionUnknownItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown — tap to fix'**
+  String get visionUnknownItem;
+
+  /// No description provided for @visionCorrected.
+  ///
+  /// In en, this message translates to:
+  /// **'Corrected'**
+  String get visionCorrected;
+
+  /// No description provided for @visionCorrectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which product is this?'**
+  String get visionCorrectTitle;
+
+  /// No description provided for @visionSearchProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your products'**
+  String get visionSearchProducts;
+
+  /// No description provided for @visionClearCorrection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear correction'**
+  String get visionClearCorrection;
+
+  /// No description provided for @visionNoProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'No products loaded yet. Open the Billing tab once, then come back.'**
+  String get visionNoProducts;
+
+  /// No description provided for @visionCounterSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Counter — coming soon'**
+  String get visionCounterSoonTitle;
+
+  /// No description provided for @visionCounterSoonDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Point your phone at the billing counter to auto-count sales as items pass. We\'re putting the finishing touches on it.'**
+  String get visionCounterSoonDesc;
+
+  /// No description provided for @visionAddPhotosTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add shelf photos'**
+  String get visionAddPhotosTitle;
+
+  /// No description provided for @visionAddPhotosHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Take 3 to 10 photos covering your shelves.'**
+  String get visionAddPhotosHint;
+
+  /// No description provided for @visionMinPhotosHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least 3 photos'**
+  String get visionMinPhotosHint;
+
+  /// No description provided for @visionMaxReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 10 photos'**
+  String get visionMaxReached;
+
+  /// No description provided for @visionAnalyze.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze'**
+  String get visionAnalyze;
 }
 
 class _AppLocalizationsDelegate

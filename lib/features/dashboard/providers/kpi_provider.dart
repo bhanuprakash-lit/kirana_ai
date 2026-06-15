@@ -11,6 +11,9 @@ class KpiCard {
   // % of billed revenue that has cost data behind it (profit-confidence).
   // Only meaningful for gross-profit-margin; null elsewhere.
   final double? coveragePct;
+  // The window (in days) the KPI is computed over, surfaced so the home screen
+  // can show "Last 30 days" instead of leaving the period ambiguous.
+  final int? periodDays;
 
   const KpiCard({
     required this.slug,
@@ -19,12 +22,13 @@ class KpiCard {
     required this.direction,
     this.pctChange,
     this.coveragePct,
+    this.periodDays,
   });
 
   static const _slugMeta = {
     'daily-revenue': ('Revenue', '₹', false),
     'gross-profit-margin': ('Margin', '%', false),
-    'avg-basket-value': ('Avg Order', '₹', false),
+    'avg-basket-value': ('Avg Bill', '₹', false),
     'stockout-rate': ('Stockout', '%', true), // lower is better
     'dead-stock': ('Dead Stock', '', true),
     'repeat-customer-frequency': ('Loyal Customers', '%', false),
@@ -60,6 +64,7 @@ class KpiCard {
       direction: dir,
       pctChange: pct,
       coveragePct: (j['cost_coverage_pct'] as num?)?.toDouble(),
+      periodDays: (j['period_days'] as num?)?.toInt(),
     );
   }
 }

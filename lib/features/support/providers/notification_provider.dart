@@ -77,6 +77,12 @@ const List<_Channel> _channels = <_Channel>[
     'Subscription and account updates',
     Importance.high,
   ),
+  _Channel(
+    'vision',
+    'Vision Scans',
+    'Shelf scan results — products counted and what sold',
+    Importance.high,
+  ),
   // Legacy / fallback channel — also the manifest default_notification_channel_id.
   _Channel(
     kDefaultChannelId,

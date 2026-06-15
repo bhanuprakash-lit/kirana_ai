@@ -8,10 +8,13 @@ import '../../../core/theme/brand_theme.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
+import '../../vision/providers/vision_provider.dart';
+import '../../vision/views/vision_screen.dart';
 import '../../finance/views/finance_screen.dart';
 import '../../auth/providers/user_provider.dart';
 import '../../subscription/providers/subscription_provider.dart';
 import '../../support/providers/notification_provider.dart';
+import '../../finance/services/consent_upload_queue.dart';
 import 'tabs/overview_tab.dart';
 
 // ── Tab providers ─────────────────────────────────────────────────────────────
@@ -66,6 +69,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       ref.read(userProvider.notifier).refresh();
       _initSubscription();
       _handlePendingNotification();
+      // Retry any consent clips that didn't finish uploading last session.
+      ref.read(consentUploadQueueProvider).drain();
       // Record initial foreground event
       _trackEvent('foreground');
       _foregroundStart = DateTime.now();
@@ -85,6 +90,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       case AppLifecycleState.resumed:
         _foregroundStart = DateTime.now();
         _trackEvent('foreground');
+        // Connectivity may have returned while backgrounded — flush the queue.
+        ref.read(consentUploadQueueProvider).drain();
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
@@ -123,6 +130,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final tabIndex = switch (tab) {
       'finance' => 1,
       'pos' => 2,
+      'vision' => 3,
       'home' || 'overview' => 0,
       _ => null,
     };
@@ -135,6 +143,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     if (subIndex != null) {
       if (tab == 'finance') {
         ref.read(financeSubTabProvider.notifier).setSubTab(subIndex);
+      } else if (tab == 'vision') {
+        ref.read(visionSubTabProvider.notifier).set(subIndex);
       } else {
         ref.read(dashboardSubTabProvider.notifier).setSubTab(subIndex);
       }
@@ -157,17 +167,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       });
     }
 
-    // 5) Vision AI widget — feature not built yet; land on the dashboard and
-    //    show a "coming soon" toast.
-    if (action == 'vision') {
-      Future.delayed(const Duration(milliseconds: 400), () {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).visionComingSoon),
-          ),
-        );
-      });
+    // 5) Vision AI widget / notification — open the Vision tab.
+    if (action == 'vision' || action == 'open_vision') {
+      ref.read(dashboardTabProvider.notifier).switchTab(3);
     }
   }
 
@@ -208,7 +210,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     return Scaffold(
       body: IndexedStack(
         index: currentTab,
-        children: const [OverviewTab(), FinanceScreen(), PosInventoryScreen()],
+        children: const [
+          OverviewTab(),
+          FinanceScreen(),
+          PosInventoryScreen(),
+          VisionScreen(),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentTab,
@@ -229,6 +236,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             icon: const Icon(Icons.storefront_outlined),
             selectedIcon: const Icon(Icons.storefront_rounded),
             label: l10n.dashNavBilling,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.center_focus_weak_outlined),
+            selectedIcon: const Icon(Icons.center_focus_strong_rounded),
+            label: l10n.visionNavLabel,
           ),
         ],
       ),

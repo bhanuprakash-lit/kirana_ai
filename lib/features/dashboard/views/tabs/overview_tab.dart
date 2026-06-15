@@ -1178,6 +1178,19 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
     final asyncKpis = ref.watch(kpiCardsProvider);
     final l10n = AppLocalizations.of(context);
 
+    // The window the KPIs are computed over, surfaced so the shopkeeper knows
+    // "Margin 18%" etc. is over the last N days — not all-time. Falls back to
+    // the backend's default 30-day window when the response omits the field.
+    final periodDays = asyncKpis.maybeWhen(
+      data: (cards) {
+        for (final c in cards) {
+          if (c.periodDays != null) return c.periodDays!;
+        }
+        return 30;
+      },
+      orElse: () => 30,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1191,9 +1204,22 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
                 color: BrandColors.primary,
               ),
               const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l10n.dashStoreKpis,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 6),
               Text(
-                l10n.dashStoreKpis,
-                style: Theme.of(context).textTheme.titleMedium,
+                l10n.dashKpiPeriod(periodDays),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: BrandColors.muted,
+                ),
               ),
             ],
           ),
@@ -1327,85 +1353,98 @@ class _KpiMiniCard extends StatelessWidget {
         ? Icons.arrow_downward_rounded
         : Icons.remove_rounded;
 
-    return Container(
-      width: 112,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        // Tapping a KPI opens that KPI's detail (value, trend, AI explanation)
+        // directly in the KPI screen.
+        onTap: () => context.push('/profile/kpis?focus=${card.slug}'),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BrandColors.border.withValues(alpha: 0.8)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            card.label,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: BrandColors.muted,
+        child: Ink(
+          width: 112,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: BrandColors.border.withValues(alpha: 0.8),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Row(
-            children: [
-              Flexible(
-                child: Text(
-                  card.value,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: BrandColors.ink,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
-              // Profit-confidence dot: margin is based on only part of sales.
-              if (card.coveragePct != null && card.coveragePct! < 90) ...[
-                const SizedBox(width: 4),
-                Tooltip(
-                  message: AppLocalizations.of(context).dashKpiCoverageTooltip(
-                    card.coveragePct!.toStringAsFixed(0),
-                  ),
-                  child: Container(
-                    width: 7,
-                    height: 7,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE87722),
-                      shape: BoxShape.circle,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                card.label,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: BrandColors.muted,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      card.value,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: BrandColors.ink,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
-              ],
-            ],
-          ),
-          Row(
-            children: [
-              Icon(trendIcon, size: 12, color: trendColor),
-              const SizedBox(width: 3),
-              Text(
-                card.pctChange != null
-                    ? '${card.pctChange!.abs().toStringAsFixed(1)}%'
-                    : '—',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: trendColor,
-                ),
+                  // Profit-confidence dot: margin is based on only part of sales.
+                  if (card.coveragePct != null && card.coveragePct! < 90) ...[
+                    const SizedBox(width: 4),
+                    Tooltip(
+                      message: AppLocalizations.of(context)
+                          .dashKpiCoverageTooltip(
+                            card.coveragePct!.toStringAsFixed(0),
+                          ),
+                      child: Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFE87722),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              Row(
+                children: [
+                  Icon(trendIcon, size: 12, color: trendColor),
+                  const SizedBox(width: 3),
+                  Text(
+                    card.pctChange != null
+                        ? '${card.pctChange!.abs().toStringAsFixed(1)}%'
+                        : '—',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: trendColor,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

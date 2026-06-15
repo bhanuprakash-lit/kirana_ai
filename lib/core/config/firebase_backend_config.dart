@@ -50,7 +50,7 @@ class FirebaseBackendConfig {
 
       final defaultUrl = AppConfig.devBaseUrl;
       await remoteConfig.setDefaults({
-        'backend_url': defaultUrl,
+        'backend_dev_url': defaultUrl,
         'app_blocked': false,
         'blocked_reason': '',
         // JSON array of store IDs to block, e.g. "[12, 34]"
@@ -74,8 +74,8 @@ class FirebaseBackendConfig {
 
   static void _apply(FirebaseRemoteConfig rc) {
     // ── Backend URL ────────────────────────────────────────────────────────────
-    final url = rc.getString('backend_url').trim();
-    debugPrint('Remote Config backend_url: $url');
+    final url = rc.getString('backend_dev_url').trim();
+    debugPrint('Remote Config backend_dev_url: $url');
     AppConfig.updateFromRemote(url.isEmpty ? null : url);
 
     // ── App / store blocking ───────────────────────────────────────────────────

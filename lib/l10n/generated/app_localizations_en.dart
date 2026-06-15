@@ -616,10 +616,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashStatRevenue => 'Revenue';
 
   @override
-  String get dashStatOrders => 'Orders';
+  String get dashStatOrders => 'Bills';
 
   @override
-  String get dashStatAvgOrder => 'Avg order';
+  String get dashStatAvgOrder => 'Avg bill';
 
   @override
   String get dashStoreOverview => 'Store Overview';
@@ -631,7 +631,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashStoreFootfall => 'Daily footfall';
 
   @override
-  String get dashStoreDailyBudget => 'Daily budget';
+  String get dashStoreDailyBudget => 'Daily stock cost';
+
+  @override
+  String dashKpiPeriod(int days) {
+    return 'Last $days days';
+  }
 
   @override
   String get dashCouldNotLoad => 'Could not load data';
@@ -1123,6 +1128,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get posPayUdhaar => 'Udhaar';
+
+  @override
+  String get posUdhaarDueDate => 'Repayment due';
+
+  @override
+  String get posUdhaarDueDateHint => 'When will the customer repay?';
+
+  @override
+  String posBundlePercentOff(int pct) {
+    return '$pct% OFF';
+  }
+
+  @override
+  String posBundleYouSave(String amount) {
+    return 'You save $amount';
+  }
+
+  @override
+  String get posBundleRegularPrice =>
+      'Added at regular price (bundle needs all items in stock)';
 
   @override
   String get posPayUpi => 'UPI';
@@ -2252,6 +2277,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get finCreditHigh => 'High — many sales are on credit';
+
+  @override
+  String get finConsentTitle => 'Record customer consent';
+
+  @override
+  String get finConsentSubtitle => 'Voice confirmation of this udhaar';
+
+  @override
+  String get finConsentScriptIntro => 'ASK THE CUSTOMER TO SAY:';
+
+  @override
+  String finConsentScript(String total, String udhaar, String date) {
+    return 'I agree — total $total, udhaar $udhaar, I will repay by $date.';
+  }
+
+  @override
+  String get finConsentTapToRecord => 'Tap the mic and let the customer speak';
+
+  @override
+  String get finConsentRecording => 'Recording';
+
+  @override
+  String get finConsentSaved => 'Consent saved — uploading in background';
+
+  @override
+  String get finConsentSkip => 'Skip';
+
+  @override
+  String get finConsentSectionTitle => 'Voice consent';
+
+  @override
+  String get finConsentStatusPending => 'Uploaded · analysis pending';
+
+  @override
+  String get finConsentStatusAnalyzed => 'Verified';
+
+  @override
+  String finConsentMatchScore(String pct) {
+    return 'Voice match: $pct%';
+  }
+
+  @override
+  String get finConsentNone => 'No voice consent recorded';
+
+  @override
+  String get finDueDate => 'Repayment due date';
+
+  @override
+  String get finDueDateHint => 'When will the customer repay?';
+
+  @override
+  String finDueBy(String date) {
+    return 'Due by $date';
+  }
+
+  @override
+  String finClearingDues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dues',
+      one: '1 due',
+    );
+    return 'Clearing $_temp0…';
+  }
+
+  @override
+  String finDuesCleared(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dues cleared',
+      one: '1 due cleared',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get finSmartReminders => 'Smart Reminders';
@@ -4758,4 +4859,130 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get mktBasketsProDesc =>
       'Create combo deals with automatic tier discounts and alert customers on WhatsApp. Upgrade to Pro to unlock baskets.';
+
+  @override
+  String get visionNavLabel => 'Vision';
+
+  @override
+  String get visionTitle => 'Vision';
+
+  @override
+  String get visionTabShelf => 'Shelf Scan';
+
+  @override
+  String get visionTabResults => 'Results';
+
+  @override
+  String get visionTabCounter => 'Counter';
+
+  @override
+  String get visionProTitle => 'Vision AI';
+
+  @override
+  String get visionProDesc =>
+      'Snap your shelf morning and evening — AI counts your stock and tells you what sold.';
+
+  @override
+  String get visionFromCamera => 'Take a photo';
+
+  @override
+  String get visionFromGallery => 'Choose from gallery';
+
+  @override
+  String get visionMorningTitle => 'Morning — Start of Day';
+
+  @override
+  String get visionEveningTitle => 'Evening — End of Day';
+
+  @override
+  String get visionTakePhoto => 'Add Photos';
+
+  @override
+  String get visionRetake => 'Retake';
+
+  @override
+  String get visionReview => 'Review';
+
+  @override
+  String get visionAnalyzing => 'Analyzing shelf… this can take up to a minute';
+
+  @override
+  String get visionScanFailed => 'Scan failed. Please retake the photo.';
+
+  @override
+  String get visionNoPhotoYet => 'No photo taken yet.';
+
+  @override
+  String get visionProductsIdentified => 'Products identified';
+
+  @override
+  String get visionUnitsCounted => 'Units counted';
+
+  @override
+  String get visionNeedsReview => 'Needs review';
+
+  @override
+  String get visionViewSales => 'View Today\'s Sales';
+
+  @override
+  String get visionTip =>
+      'Tip: take the morning photo before opening and the evening photo before closing. AI works out how many of each product sold.';
+
+  @override
+  String get visionSalesEmpty =>
+      'Take a morning and an evening photo to see what sold today.';
+
+  @override
+  String get visionTotalSold => 'Total items sold';
+
+  @override
+  String get visionSold => 'sold';
+
+  @override
+  String get visionMorningCount => 'AM';
+
+  @override
+  String get visionEveningCount => 'PM';
+
+  @override
+  String get visionUnknownItem => 'Unknown — tap to fix';
+
+  @override
+  String get visionCorrected => 'Corrected';
+
+  @override
+  String get visionCorrectTitle => 'Which product is this?';
+
+  @override
+  String get visionSearchProducts => 'Search your products';
+
+  @override
+  String get visionClearCorrection => 'Clear correction';
+
+  @override
+  String get visionNoProducts =>
+      'No products loaded yet. Open the Billing tab once, then come back.';
+
+  @override
+  String get visionCounterSoonTitle => 'Live Counter — coming soon';
+
+  @override
+  String get visionCounterSoonDesc =>
+      'Point your phone at the billing counter to auto-count sales as items pass. We\'re putting the finishing touches on it.';
+
+  @override
+  String get visionAddPhotosTitle => 'Add shelf photos';
+
+  @override
+  String get visionAddPhotosHint =>
+      'Take 3 to 10 photos covering your shelves.';
+
+  @override
+  String get visionMinPhotosHint => 'Add at least 3 photos';
+
+  @override
+  String get visionMaxReached => 'Maximum 10 photos';
+
+  @override
+  String get visionAnalyze => 'Analyze';
 }

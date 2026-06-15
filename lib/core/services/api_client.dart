@@ -66,6 +66,20 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
+  /// Authed GET that returns the raw response bytes (not JSON) — used to fetch
+  /// binary blobs like the udhaar voice-consent clip from the proxy endpoint.
+  Future<List<int>> getBytes(String path) async {
+    final token = await _getAuthToken();
+    final res = await _client
+        .get(
+          Uri.parse('${AppConfig.apiBaseUrl}$path'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(const Duration(seconds: 60));
+    if (res.statusCode == 200) return res.bodyBytes;
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
   Future<dynamic> post(String path, dynamic body) async {
     final token = await _getAuthToken();
     final res = await _client.post(
@@ -128,6 +142,41 @@ class ApiClient {
       },
     );
     if (res.statusCode == 200 || res.statusCode == 204) {
+      if (res.body.isEmpty) return {};
+      return jsonDecode(res.body);
+    }
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
+  /// Multipart upload on the Kirana (Bearer) token — used by Vision shelf scans.
+  /// All [filePaths] are uploaded under the same field name [fileField] (so the
+  /// backend reads them as a list); extra string [fields] are added as form
+  /// fields. Accepts 200/201/202 (the vision analyze endpoint returns 202
+  /// Accepted while it processes in the background).
+  Future<dynamic> postMultipart(
+    String path, {
+    required List<String> filePaths,
+    String fileField = 'files',
+    Map<String, String>? fields,
+  }) async {
+    final token = await _getAuthToken();
+    final req = http.MultipartRequest(
+      'POST',
+      Uri.parse('${AppConfig.apiBaseUrl}$path'),
+    );
+    req.headers['Authorization'] = 'Bearer $token';
+    if (fields != null) req.fields.addAll(fields);
+    for (final p in filePaths) {
+      req.files.add(await http.MultipartFile.fromPath(fileField, p));
+    }
+
+    final streamed = await _client
+        .send(req)
+        .timeout(const Duration(seconds: 120));
+    final res = await http.Response.fromStream(streamed);
+    if (res.statusCode == 200 ||
+        res.statusCode == 201 ||
+        res.statusCode == 202) {
       if (res.body.isEmpty) return {};
       return jsonDecode(res.body);
     }

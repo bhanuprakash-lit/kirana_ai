@@ -624,10 +624,10 @@ class AppLocalizationsKn extends AppLocalizations {
   String get dashStatRevenue => 'ಆದಾಯ';
 
   @override
-  String get dashStatOrders => 'ಆರ್ಡರ್‌ಗಳು';
+  String get dashStatOrders => 'ಬಿಲ್‌ಗಳು';
 
   @override
-  String get dashStatAvgOrder => 'ಸರಾಸರಿ ಆರ್ಡರ್';
+  String get dashStatAvgOrder => 'ಸರಾಸರಿ ಬಿಲ್';
 
   @override
   String get dashStoreOverview => 'ಅಂಗಡಿ ಅವಲೋಕನ';
@@ -639,7 +639,12 @@ class AppLocalizationsKn extends AppLocalizations {
   String get dashStoreFootfall => 'ದೈನಂದಿನ ಗ್ರಾಹಕ ಸಂಖ್ಯೆ';
 
   @override
-  String get dashStoreDailyBudget => 'ದೈನಂದಿನ ಬಜೆಟ್';
+  String get dashStoreDailyBudget => 'ದೈನಂದಿನ ಸರಕು ವೆಚ್ಚ';
+
+  @override
+  String dashKpiPeriod(int days) {
+    return 'ಕಳೆದ $days ದಿನಗಳು';
+  }
 
   @override
   String get dashCouldNotLoad => 'ಡೇಟಾ ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ';
@@ -1132,6 +1137,26 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get posPayUdhaar => 'ಉಧಾರ್';
+
+  @override
+  String get posUdhaarDueDate => 'ಪಾವತಿ ದಿನಾಂಕ';
+
+  @override
+  String get posUdhaarDueDateHint => 'ಗ್ರಾಹಕ ಯಾವಾಗ ಮರುಪಾವತಿಸುತ್ತಾರೆ?';
+
+  @override
+  String posBundlePercentOff(int pct) {
+    return '$pct% ರಿಯಾಯಿತಿ';
+  }
+
+  @override
+  String posBundleYouSave(String amount) {
+    return '$amount ಉಳಿತಾಯ';
+  }
+
+  @override
+  String get posBundleRegularPrice =>
+      'ಸಾಮಾನ್ಯ ಬೆಲೆಗೆ ಸೇರಿಸಲಾಗಿದೆ (ಬಂಡಲ್‌ಗೆ ಎಲ್ಲಾ ವಸ್ತುಗಳು ಸ್ಟಾಕ್‌ನಲ್ಲಿರಬೇಕು)';
 
   @override
   String get posPayUpi => 'UPI';
@@ -2266,6 +2291,71 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get finCreditHigh => 'ಹೆಚ್ಚು — ಅನೇಕ ಮಾರಾಟಗಳು ಸಾಲದಲ್ಲಿವೆ';
+
+  @override
+  String get finConsentTitle => 'ಗ್ರಾಹಕರ ಒಪ್ಪಿಗೆ ರೆಕಾರ್ಡ್ ಮಾಡಿ';
+
+  @override
+  String get finConsentSubtitle => 'ಈ ಉಧಾರ್‌ಗೆ ಧ್ವನಿ ದೃಢೀಕರಣ';
+
+  @override
+  String get finConsentScriptIntro => 'ಗ್ರಾಹಕರಿಗೆ ಹೀಗೆ ಹೇಳಲು ಹೇಳಿ:';
+
+  @override
+  String finConsentScript(String total, String udhaar, String date) {
+    return 'ನಾನು ಒಪ್ಪುತ್ತೇನೆ — ಒಟ್ಟು $total, ಉಧಾರ್ $udhaar, $date ಒಳಗೆ ಮರುಪಾವತಿಸುತ್ತೇನೆ.';
+  }
+
+  @override
+  String get finConsentTapToRecord => 'ಮೈಕ್ ಒತ್ತಿ ಗ್ರಾಹಕರಿಗೆ ಮಾತನಾಡಲು ಬಿಡಿ';
+
+  @override
+  String get finConsentRecording => 'ರೆಕಾರ್ಡ್ ಆಗುತ್ತಿದೆ';
+
+  @override
+  String get finConsentSaved =>
+      'ಒಪ್ಪಿಗೆ ಉಳಿಸಲಾಗಿದೆ — ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ';
+
+  @override
+  String get finConsentSkip => 'ಬಿಟ್ಟುಬಿಡಿ';
+
+  @override
+  String get finConsentSectionTitle => 'ಧ್ವನಿ ಒಪ್ಪಿಗೆ';
+
+  @override
+  String get finConsentStatusPending => 'ಅಪ್‌ಲೋಡ್ ಆಗಿದೆ · ವಿಶ್ಲೇಷಣೆ ಬಾಕಿ';
+
+  @override
+  String get finConsentStatusAnalyzed => 'ಪರಿಶೀಲಿಸಲಾಗಿದೆ';
+
+  @override
+  String finConsentMatchScore(String pct) {
+    return 'ಧ್ವನಿ ಹೊಂದಾಣಿಕೆ: $pct%';
+  }
+
+  @override
+  String get finConsentNone => 'ಧ್ವನಿ ಒಪ್ಪಿಗೆ ರೆಕಾರ್ಡ್ ಆಗಿಲ್ಲ';
+
+  @override
+  String get finDueDate => 'ಮರುಪಾವತಿ ದಿನಾಂಕ';
+
+  @override
+  String get finDueDateHint => 'ಗ್ರಾಹಕ ಯಾವಾಗ ಮರುಪಾವತಿಸುತ್ತಾರೆ?';
+
+  @override
+  String finDueBy(String date) {
+    return '$date ಒಳಗೆ ಪಾವತಿಸಬೇಕು';
+  }
+
+  @override
+  String finClearingDues(int count) {
+    return '$count ಸಾಲಗಳನ್ನು ತೀರಿಸಲಾಗುತ್ತಿದೆ…';
+  }
+
+  @override
+  String finDuesCleared(int count) {
+    return '$count ಸಾಲಗಳು ತೀರಿದವು';
+  }
 
   @override
   String get finSmartReminders => 'ಸ್ಮಾರ್ಟ್ ಜ್ಞಾಪನೆಗಳು';
@@ -4791,4 +4881,132 @@ class AppLocalizationsKn extends AppLocalizations {
   @override
   String get mktBasketsProDesc =>
       'ಸ್ವಯಂಚಾಲಿತ ಶ್ರೇಣಿ ರಿಯಾಯಿತಿಗಳೊಂದಿಗೆ ಕಾಂಬೋ ಡೀಲ್‌ಗಳನ್ನು ರಚಿಸಿ ಮತ್ತು ಗ್ರಾಹಕರಿಗೆ WhatsApp‌ನಲ್ಲಿ ತಿಳಿಸಿ. ಬಾಸ್ಕೆಟ್‌ಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಲು Pro‌ಗೆ ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ.';
+
+  @override
+  String get visionNavLabel => 'ವಿಷನ್';
+
+  @override
+  String get visionTitle => 'ವಿಷನ್';
+
+  @override
+  String get visionTabShelf => 'ಶೆಲ್ಫ್ ಸ್ಕ್ಯಾನ್';
+
+  @override
+  String get visionTabResults => 'ಫಲಿತಾಂಶಗಳು';
+
+  @override
+  String get visionTabCounter => 'ಕೌಂಟರ್';
+
+  @override
+  String get visionProTitle => 'ವಿಷನ್ AI';
+
+  @override
+  String get visionProDesc =>
+      'ಬೆಳಿಗ್ಗೆ ಮತ್ತು ಸಂಜೆ ನಿಮ್ಮ ಶೆಲ್ಫ್ ಫೋಟೋ ತೆಗೆಯಿರಿ — AI ನಿಮ್ಮ ಸ್ಟಾಕ್ ಎಣಿಸಿ ಏನು ಮಾರಾಟವಾಯಿತು ಎಂದು ಹೇಳುತ್ತದೆ.';
+
+  @override
+  String get visionFromCamera => 'ಫೋಟೋ ತೆಗೆಯಿರಿ';
+
+  @override
+  String get visionFromGallery => 'ಗ್ಯಾಲರಿಯಿಂದ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get visionMorningTitle => 'ಬೆಳಿಗ್ಗೆ — ದಿನದ ಆರಂಭ';
+
+  @override
+  String get visionEveningTitle => 'ಸಂಜೆ — ದಿನದ ಕೊನೆ';
+
+  @override
+  String get visionTakePhoto => 'ಫೋಟೋ ತೆಗೆಯಿರಿ';
+
+  @override
+  String get visionRetake => 'ಮತ್ತೆ ತೆಗೆಯಿರಿ';
+
+  @override
+  String get visionReview => 'ಪರಿಶೀಲಿಸಿ';
+
+  @override
+  String get visionAnalyzing =>
+      'ಶೆಲ್ಫ್ ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ… ಇದಕ್ಕೆ ಒಂದು ನಿಮಿಷದವರೆಗೆ ತೆಗೆದುಕೊಳ್ಳಬಹುದು';
+
+  @override
+  String get visionScanFailed =>
+      'ಸ್ಕ್ಯಾನ್ ವಿಫಲವಾಯಿತು. ದಯವಿಟ್ಟು ಮತ್ತೆ ಫೋಟೋ ತೆಗೆಯಿರಿ.';
+
+  @override
+  String get visionNoPhotoYet => 'ಇನ್ನೂ ಫೋಟೋ ತೆಗೆದಿಲ್ಲ.';
+
+  @override
+  String get visionProductsIdentified => 'ಗುರುತಿಸಲಾದ ಉತ್ಪನ್ನಗಳು';
+
+  @override
+  String get visionUnitsCounted => 'ಎಣಿಸಲಾದ ಯೂನಿಟ್‌ಗಳು';
+
+  @override
+  String get visionNeedsReview => 'ಪರಿಶೀಲನೆ ಅಗತ್ಯ';
+
+  @override
+  String get visionViewSales => 'ಇಂದಿನ ಮಾರಾಟ ನೋಡಿ';
+
+  @override
+  String get visionTip =>
+      'ಸಲಹೆ: ಅಂಗಡಿ ತೆರೆಯುವ ಮೊದಲು ಬೆಳಗಿನ ಫೋಟೋ ಮತ್ತು ಮುಚ್ಚುವ ಮೊದಲು ಸಂಜೆಯ ಫೋಟೋ ತೆಗೆಯಿರಿ. ಪ್ರತಿ ಉತ್ಪನ್ನ ಎಷ್ಟು ಮಾರಾಟವಾಯಿತು ಎಂದು AI ಲೆಕ್ಕ ಹಾಕುತ್ತದೆ.';
+
+  @override
+  String get visionSalesEmpty =>
+      'ಇಂದು ಏನು ಮಾರಾಟವಾಯಿತು ಎಂದು ನೋಡಲು ಬೆಳಗಿನ ಮತ್ತು ಸಂಜೆಯ ಒಂದೊಂದು ಫೋಟೋ ತೆಗೆಯಿರಿ.';
+
+  @override
+  String get visionTotalSold => 'ಒಟ್ಟು ಮಾರಾಟವಾದ ವಸ್ತುಗಳು';
+
+  @override
+  String get visionSold => 'ಮಾರಾಟ';
+
+  @override
+  String get visionMorningCount => 'AM';
+
+  @override
+  String get visionEveningCount => 'PM';
+
+  @override
+  String get visionUnknownItem => 'ಅಜ್ಞಾತ — ಸರಿಪಡಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ';
+
+  @override
+  String get visionCorrected => 'ಸರಿಪಡಿಸಲಾಗಿದೆ';
+
+  @override
+  String get visionCorrectTitle => 'ಇದು ಯಾವ ಉತ್ಪನ್ನ?';
+
+  @override
+  String get visionSearchProducts => 'ನಿಮ್ಮ ಉತ್ಪನ್ನಗಳನ್ನು ಹುಡುಕಿ';
+
+  @override
+  String get visionClearCorrection => 'ತಿದ್ದುಪಡಿ ತೆರವುಗೊಳಿಸಿ';
+
+  @override
+  String get visionNoProducts =>
+      'ಇನ್ನೂ ಉತ್ಪನ್ನಗಳು ಲೋಡ್ ಆಗಿಲ್ಲ. ಒಮ್ಮೆ ಬಿಲ್ಲಿಂಗ್ ಟ್ಯಾಬ್ ತೆರೆದು, ಮತ್ತೆ ಬನ್ನಿ.';
+
+  @override
+  String get visionCounterSoonTitle => 'ಲೈವ್ ಕೌಂಟರ್ — ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ';
+
+  @override
+  String get visionCounterSoonDesc =>
+      'ಬಿಲ್ಲಿಂಗ್ ಕೌಂಟರ್ ಕಡೆಗೆ ನಿಮ್ಮ ಫೋನ್ ತೋರಿಸಿ, ವಸ್ತುಗಳು ದಾಟುತ್ತಿದ್ದಂತೆ ಮಾರಾಟ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಎಣಿಕೆಯಾಗುತ್ತದೆ. ನಾವು ಇದಕ್ಕೆ ಅಂತಿಮ ಸ್ಪರ್ಶ ನೀಡುತ್ತಿದ್ದೇವೆ.';
+
+  @override
+  String get visionAddPhotosTitle => 'ಶೆಲ್ಫ್ ಫೋಟೋಗಳನ್ನು ಸೇರಿಸಿ';
+
+  @override
+  String get visionAddPhotosHint =>
+      'ನಿಮ್ಮ ಶೆಲ್ಫ್‌ಗಳನ್ನು ಒಳಗೊಂಡಂತೆ 3 ರಿಂದ 10 ಫೋಟೋಗಳನ್ನು ತೆಗೆಯಿರಿ.';
+
+  @override
+  String get visionMinPhotosHint => 'ಕನಿಷ್ಠ 3 ಫೋಟೋಗಳನ್ನು ಸೇರಿಸಿ';
+
+  @override
+  String get visionMaxReached => 'ಗರಿಷ್ಠ 10 ಫೋಟೋಗಳು';
+
+  @override
+  String get visionAnalyze => 'ವಿಶ್ಲೇಷಿಸಿ';
 }

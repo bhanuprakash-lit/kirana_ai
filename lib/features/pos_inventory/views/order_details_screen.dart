@@ -1,9 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
+import 'dart:typed_data';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/brand_theme.dart';
+import '../../../core/services/api_client.dart';
+import '../../auth/repositories/auth_repository.dart' show ApiException;
 import '../../../l10n/generated/app_localizations.dart';
 import '../providers/pos_provider.dart';
 import '../providers/printer_provider.dart';
@@ -227,6 +232,13 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
           if (widget.order['basket_name'] != null) ...[
             const SizedBox(height: 16),
             _BasketAttributionCard(order: widget.order, l10n: l10n),
+          ],
+
+          // ── Voice consent (udhaar orders) ─────────────────────────────────
+          if (paymentMethod.toLowerCase() == 'udhaar' &&
+              widget.order['order_id'] != null) ...[
+            const SizedBox(height: 16),
+            _ConsentCard(orderId: (widget.order['order_id'] as num).toInt()),
           ],
 
           const SizedBox(height: 28),
@@ -870,6 +882,271 @@ class _SplitRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Voice consent card ────────────────────────────────────────────────────────
+
+/// Shows the udhaar voice-consent status for an order: whether a clip was
+/// recorded, whether the in-house model has analysed it yet, and (once analysed)
+/// the speaker-match score + extracted terms. A 404 means none was recorded.
+class _ConsentCard extends ConsumerStatefulWidget {
+  final int orderId;
+  const _ConsentCard({required this.orderId});
+
+  @override
+  ConsumerState<_ConsentCard> createState() => _ConsentCardState();
+}
+
+class _ConsentCardState extends ConsumerState<_ConsentCard> {
+  bool _loading = true;
+  Map<String, dynamic>? _data;
+  bool _none = false;
+
+  // Playback of the stored clip (fetched once via the authed proxy, then
+  // played from memory).
+  final AudioPlayer _player = AudioPlayer();
+  Uint8List? _audioBytes;
+  bool _playing = false;
+  bool _loadingAudio = false;
+
+  static const _color = Color(0xFF8B5CF6);
+
+  @override
+  void initState() {
+    super.initState();
+    _player.onPlayerComplete.listen((_) {
+      if (mounted) setState(() => _playing = false);
+    });
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _togglePlay() async {
+    if (_playing) {
+      await _player.pause();
+      if (mounted) setState(() => _playing = false);
+      return;
+    }
+    final url = _data?['audio_url'] as String?;
+    if (url == null) return;
+    try {
+      if (_audioBytes == null) {
+        setState(() => _loadingAudio = true);
+        final bytes = await ref.read(apiClientProvider).getBytes(url);
+        _audioBytes = Uint8List.fromList(bytes);
+        if (mounted) setState(() => _loadingAudio = false);
+      }
+      await _player.play(BytesSource(_audioBytes!));
+      if (mounted) setState(() => _playing = true);
+    } catch (_) {
+      if (mounted) setState(() => _loadingAudio = false);
+    }
+  }
+
+  Future<void> _load() async {
+    try {
+      final res = await ref
+          .read(apiClientProvider)
+          .get('/kirana/finance/udhaar/consent/${widget.orderId}');
+      if (mounted) {
+        setState(() {
+          _data = res as Map<String, dynamic>;
+          _loading = false;
+        });
+      }
+    } on ApiException catch (e) {
+      if (mounted) {
+        setState(() {
+          _none = e.statusCode == 404;
+          _loading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    Widget body;
+    if (_loading) {
+      body = Row(
+        children: [
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2, color: _color),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            l10n.finConsentSectionTitle,
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: BrandColors.ink,
+            ),
+          ),
+        ],
+      );
+    } else if (_none || _data == null) {
+      body = Row(
+        children: [
+          const Icon(Icons.mic_off_rounded, size: 18, color: BrandColors.muted),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              l10n.finConsentNone,
+              style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+            ),
+          ),
+        ],
+      );
+    } else {
+      final status = _data!['status'] as String? ?? 'pending';
+      final analyzed = status == 'analyzed' || status == 'verified';
+      final match = (_data!['voice_match_score'] as num?)?.toDouble();
+      final promised = _data!['promised_date'] as String?;
+      body = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.record_voice_over_rounded,
+                size: 18,
+                color: _color,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  l10n.finConsentSectionTitle,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                    color: BrandColors.ink,
+                  ),
+                ),
+              ),
+              // Play / pause the stored clip.
+              _PlayButton(
+                playing: _playing,
+                loading: _loadingAudio,
+                color: _color,
+                onTap: _togglePlay,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Status on its own line so the descriptive label has room.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: (analyzed ? BrandColors.success : _color).withValues(
+                alpha: 0.12,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  analyzed ? Icons.verified_rounded : Icons.cloud_done_rounded,
+                  size: 12,
+                  color: analyzed ? BrandColors.success : _color,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  analyzed
+                      ? l10n.finConsentStatusAnalyzed
+                      : l10n.finConsentStatusPending,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: analyzed ? BrandColors.success : _color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (analyzed && match != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              l10n.finConsentMatchScore((match * 100).toStringAsFixed(0)),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: BrandColors.ink,
+              ),
+            ),
+          ],
+          if (promised != null && promised.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              l10n.finDueBy(promised),
+              style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+            ),
+          ],
+        ],
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _color.withValues(alpha: 0.18)),
+      ),
+      child: body,
+    );
+  }
+}
+
+class _PlayButton extends StatelessWidget {
+  final bool playing;
+  final bool loading;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _PlayButton({
+    required this.playing,
+    required this.loading,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: loading ? null : onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          shape: BoxShape.circle,
+        ),
+        child: loading
+            ? Padding(
+                padding: const EdgeInsets.all(9),
+                child: CircularProgressIndicator(strokeWidth: 2, color: color),
+              )
+            : Icon(
+                playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                color: color,
+                size: 20,
+              ),
+      ),
     );
   }
 }

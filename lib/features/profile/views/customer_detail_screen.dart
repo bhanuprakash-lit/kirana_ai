@@ -384,9 +384,7 @@ class _AssociationRow extends ConsumerWidget {
                 data: (list) {
                   if (list.isEmpty) {
                     return GestureDetector(
-                      onTap: () => Navigator.of(
-                        context,
-                      ).pushNamed('/profile/associations'),
+                      onTap: () => context.push('/profile/associations'),
                       child: Text(
                         l10n.profNoAreasTapToAdd,
                         style: const TextStyle(

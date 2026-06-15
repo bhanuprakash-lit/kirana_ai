@@ -632,10 +632,10 @@ class AppLocalizationsTa extends AppLocalizations {
   String get dashStatRevenue => 'வருவாய்';
 
   @override
-  String get dashStatOrders => 'ஆர்டர்கள்';
+  String get dashStatOrders => 'பில்கள்';
 
   @override
-  String get dashStatAvgOrder => 'சராசரி ஆர்டர்';
+  String get dashStatAvgOrder => 'சராசரி பில்';
 
   @override
   String get dashStoreOverview => 'கடை மேலோட்டம்';
@@ -647,7 +647,12 @@ class AppLocalizationsTa extends AppLocalizations {
   String get dashStoreFootfall => 'தினசரி வருகை';
 
   @override
-  String get dashStoreDailyBudget => 'தினசரி பட்ஜெட்';
+  String get dashStoreDailyBudget => 'தினசரி சரக்கு செலவு';
+
+  @override
+  String dashKpiPeriod(int days) {
+    return 'கடந்த $days நாட்கள்';
+  }
 
   @override
   String get dashCouldNotLoad => 'தரவை ஏற்ற முடியவில்லை';
@@ -1142,6 +1147,27 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get posPayUdhaar => 'உதார் (கடன்)';
+
+  @override
+  String get posUdhaarDueDate => 'செலுத்தும் தேதி';
+
+  @override
+  String get posUdhaarDueDateHint =>
+      'வாடிக்கையாளர் எப்போது திருப்பிச் செலுத்துவார்?';
+
+  @override
+  String posBundlePercentOff(int pct) {
+    return '$pct% தள்ளுபடி';
+  }
+
+  @override
+  String posBundleYouSave(String amount) {
+    return '$amount சேமிப்பு';
+  }
+
+  @override
+  String get posBundleRegularPrice =>
+      'வழக்கமான விலையில் சேர்க்கப்பட்டது (பண்டிலுக்கு அனைத்து பொருட்களும் கையிருப்பில் தேவை)';
 
   @override
   String get posPayUpi => 'UPI';
@@ -2286,6 +2312,74 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get finCreditHigh => 'அதிகம் — பல விற்பனைகள் கடனில் உள்ளன';
+
+  @override
+  String get finConsentTitle => 'வாடிக்கையாளர் ஒப்புதலைப் பதிவு செய்க';
+
+  @override
+  String get finConsentSubtitle => 'இந்த உதாருக்கு குரல் உறுதிப்படுத்தல்';
+
+  @override
+  String get finConsentScriptIntro =>
+      'வாடிக்கையாளரை இப்படிச் சொல்லச் சொல்லுங்கள்:';
+
+  @override
+  String finConsentScript(String total, String udhaar, String date) {
+    return 'நான் ஒப்புக்கொள்கிறேன் — மொத்தம் $total, உதார் $udhaar, $date க்குள் திருப்பிச் செலுத்துவேன்.';
+  }
+
+  @override
+  String get finConsentTapToRecord =>
+      'மைக்கை அழுத்தி வாடிக்கையாளரைப் பேச விடுங்கள்';
+
+  @override
+  String get finConsentRecording => 'பதிவாகிறது';
+
+  @override
+  String get finConsentSaved =>
+      'ஒப்புதல் சேமிக்கப்பட்டது — பின்னணியில் பதிவேற்றப்படுகிறது';
+
+  @override
+  String get finConsentSkip => 'தவிர்';
+
+  @override
+  String get finConsentSectionTitle => 'குரல் ஒப்புதல்';
+
+  @override
+  String get finConsentStatusPending =>
+      'பதிவேற்றப்பட்டது · பகுப்பாய்வு நிலுவையில்';
+
+  @override
+  String get finConsentStatusAnalyzed => 'சரிபார்க்கப்பட்டது';
+
+  @override
+  String finConsentMatchScore(String pct) {
+    return 'குரல் பொருத்தம்: $pct%';
+  }
+
+  @override
+  String get finConsentNone => 'குரல் ஒப்புதல் பதிவு இல்லை';
+
+  @override
+  String get finDueDate => 'திருப்பிச் செலுத்தும் தேதி';
+
+  @override
+  String get finDueDateHint => 'வாடிக்கையாளர் எப்போது திருப்பிச் செலுத்துவார்?';
+
+  @override
+  String finDueBy(String date) {
+    return '$date க்குள் செலுத்த வேண்டும்';
+  }
+
+  @override
+  String finClearingDues(int count) {
+    return '$count கடன்கள் முடிக்கப்படுகின்றன…';
+  }
+
+  @override
+  String finDuesCleared(int count) {
+    return '$count கடன்கள் முடிக்கப்பட்டன';
+  }
 
   @override
   String get finSmartReminders => 'ஸ்மார்ட் நினைவூட்டல்கள்';
@@ -4826,4 +4920,132 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get mktBasketsProDesc =>
       'தானியங்கி அடுக்கு தள்ளுபடிகளுடன் காம்போ டீல்களை உருவாக்கி வாடிக்கையாளர்களை WhatsApp இல் அறிவிக்கவும். கூடைகளைத் திறக்க Pro க்கு மேம்படுத்தவும்.';
+
+  @override
+  String get visionNavLabel => 'விஷன்';
+
+  @override
+  String get visionTitle => 'விஷன்';
+
+  @override
+  String get visionTabShelf => 'அலமாரி ஸ்கேன்';
+
+  @override
+  String get visionTabResults => 'முடிவுகள்';
+
+  @override
+  String get visionTabCounter => 'கவுண்டர்';
+
+  @override
+  String get visionProTitle => 'விஷன் AI';
+
+  @override
+  String get visionProDesc =>
+      'காலையிலும் மாலையிலும் உங்கள் அலமாரியைப் புகைப்படம் எடுங்கள் — AI உங்கள் ஸ்டாக்கை எண்ணி என்ன விற்றது என்று சொல்லும்.';
+
+  @override
+  String get visionFromCamera => 'புகைப்படம் எடுக்கவும்';
+
+  @override
+  String get visionFromGallery => 'கேலரியில் இருந்து தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get visionMorningTitle => 'காலை — நாளின் தொடக்கம்';
+
+  @override
+  String get visionEveningTitle => 'மாலை — நாளின் முடிவு';
+
+  @override
+  String get visionTakePhoto => 'புகைப்படம் எடுக்கவும்';
+
+  @override
+  String get visionRetake => 'மீண்டும் எடுக்கவும்';
+
+  @override
+  String get visionReview => 'மதிப்பாய்வு';
+
+  @override
+  String get visionAnalyzing =>
+      'அலமாரி பகுப்பாய்வு செய்யப்படுகிறது… இதற்கு ஒரு நிமிடம் வரை ஆகலாம்';
+
+  @override
+  String get visionScanFailed =>
+      'ஸ்கேன் தோல்வியடைந்தது. மீண்டும் புகைப்படம் எடுக்கவும்.';
+
+  @override
+  String get visionNoPhotoYet => 'இன்னும் புகைப்படம் எடுக்கப்படவில்லை.';
+
+  @override
+  String get visionProductsIdentified => 'அடையாளம் காணப்பட்ட பொருட்கள்';
+
+  @override
+  String get visionUnitsCounted => 'எண்ணப்பட்ட யூனிட்கள்';
+
+  @override
+  String get visionNeedsReview => 'மதிப்பாய்வு தேவை';
+
+  @override
+  String get visionViewSales => 'இன்றைய விற்பனையைப் பார்க்கவும்';
+
+  @override
+  String get visionTip =>
+      'குறிப்பு: கடையைத் திறப்பதற்கு முன் காலைப் புகைப்படமும், மூடுவதற்கு முன் மாலைப் புகைப்படமும் எடுக்கவும். ஒவ்வொரு பொருளும் எவ்வளவு விற்றது என்பதை AI கணக்கிடும்.';
+
+  @override
+  String get visionSalesEmpty =>
+      'இன்று என்ன விற்றது என்று பார்க்க காலை மற்றும் மாலை ஒவ்வொரு புகைப்படம் எடுக்கவும்.';
+
+  @override
+  String get visionTotalSold => 'மொத்தம் விற்ற பொருட்கள்';
+
+  @override
+  String get visionSold => 'விற்றது';
+
+  @override
+  String get visionMorningCount => 'AM';
+
+  @override
+  String get visionEveningCount => 'PM';
+
+  @override
+  String get visionUnknownItem => 'தெரியவில்லை — சரிசெய்ய தட்டவும்';
+
+  @override
+  String get visionCorrected => 'சரிசெய்யப்பட்டது';
+
+  @override
+  String get visionCorrectTitle => 'இது எந்தப் பொருள்?';
+
+  @override
+  String get visionSearchProducts => 'உங்கள் பொருட்களைத் தேடுங்கள்';
+
+  @override
+  String get visionClearCorrection => 'திருத்தத்தை அழிக்கவும்';
+
+  @override
+  String get visionNoProducts =>
+      'இன்னும் பொருட்கள் ஏற்றப்படவில்லை. ஒருமுறை பில்லிங் தாவலைத் திறந்து, மீண்டும் வரவும்.';
+
+  @override
+  String get visionCounterSoonTitle => 'லைவ் கவுண்டர் — விரைவில் வருகிறது';
+
+  @override
+  String get visionCounterSoonDesc =>
+      'பில்லிங் கவுண்டரை நோக்கி உங்கள் ஃபோனைக் காட்டுங்கள், பொருட்கள் கடக்கும்போதே விற்பனை தானாக எண்ணப்படும். நாங்கள் இறுதி வேலைகளைச் செய்து வருகிறோம்.';
+
+  @override
+  String get visionAddPhotosTitle => 'அலமாரி புகைப்படங்களைச் சேர்க்கவும்';
+
+  @override
+  String get visionAddPhotosHint =>
+      'உங்கள் அலமாரிகளை உள்ளடக்கும்படி 3 முதல் 10 புகைப்படங்கள் எடுக்கவும்.';
+
+  @override
+  String get visionMinPhotosHint => 'குறைந்தது 3 புகைப்படங்களைச் சேர்க்கவும்';
+
+  @override
+  String get visionMaxReached => 'அதிகபட்சம் 10 புகைப்படங்கள்';
+
+  @override
+  String get visionAnalyze => 'பகுப்பாய்வு செய்';
 }

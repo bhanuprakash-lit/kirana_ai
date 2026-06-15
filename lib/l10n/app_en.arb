@@ -259,12 +259,20 @@
   "dashTodaysPerformance": "Today's Performance",
   "dashPosNotAvailable": "POS data not available",
   "dashStatRevenue": "Revenue",
-  "dashStatOrders": "Orders",
-  "dashStatAvgOrder": "Avg order",
+  "dashStatOrders": "Bills",
+  "dashStatAvgOrder": "Avg bill",
   "dashStoreOverview": "Store Overview",
   "dashStoreSkus": "SKUs",
   "dashStoreFootfall": "Daily footfall",
-  "dashStoreDailyBudget": "Daily budget",
+  "dashStoreDailyBudget": "Daily stock cost",
+  "dashKpiPeriod": "Last {days} days",
+  "@dashKpiPeriod": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "dashCouldNotLoad": "Could not load data",
   "dashRetry": "Retry",
   "dashAlerts": "ALERTS",
@@ -664,6 +672,25 @@
   "posPaymentMethod": "Payment Method",
   "posPayCash": "Cash",
   "posPayUdhaar": "Udhaar",
+  "posUdhaarDueDate": "Repayment due",
+  "posUdhaarDueDateHint": "When will the customer repay?",
+  "posBundlePercentOff": "{pct}% OFF",
+  "@posBundlePercentOff": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "posBundleYouSave": "You save {amount}",
+  "@posBundleYouSave": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "posBundleRegularPrice": "Added at regular price (bundle needs all items in stock)",
   "posPayUpi": "UPI",
   "posComingSoon": "Coming soon",
   "posSelectCustomerRequired": "Select customer (required for Udhaar)",
@@ -1420,6 +1447,57 @@
   "finCreditHealthy": "Healthy — credit exposure is low",
   "finCreditModerate": "Moderate — consider collecting dues",
   "finCreditHigh": "High — many sales are on credit",
+  "finConsentTitle": "Record customer consent",
+  "finConsentSubtitle": "Voice confirmation of this udhaar",
+  "finConsentScriptIntro": "ASK THE CUSTOMER TO SAY:",
+  "finConsentScript": "I agree — total {total}, udhaar {udhaar}, I will repay by {date}.",
+  "@finConsentScript": {
+    "placeholders": {
+      "total": { "type": "String" },
+      "udhaar": { "type": "String" },
+      "date": { "type": "String" }
+    }
+  },
+  "finConsentTapToRecord": "Tap the mic and let the customer speak",
+  "finConsentRecording": "Recording",
+  "finConsentSaved": "Consent saved — uploading in background",
+  "finConsentSkip": "Skip",
+  "finConsentSectionTitle": "Voice consent",
+  "finConsentStatusPending": "Uploaded · analysis pending",
+  "finConsentStatusAnalyzed": "Verified",
+  "finConsentMatchScore": "Voice match: {pct}%",
+  "@finConsentMatchScore": {
+    "placeholders": {
+      "pct": { "type": "String" }
+    }
+  },
+  "finConsentNone": "No voice consent recorded",
+  "finDueDate": "Repayment due date",
+  "finDueDateHint": "When will the customer repay?",
+  "finDueBy": "Due by {date}",
+  "@finDueBy": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "finClearingDues": "Clearing {count, plural, =1{1 due} other{{count} dues}}…",
+  "@finClearingDues": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "finDuesCleared": "{count, plural, =1{1 due cleared} other{{count} dues cleared}}",
+  "@finDuesCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "finSmartReminders": "Smart Reminders",
   "finCouldNotLoadReminders": "Could not load reminders",
   "finDaysPending": "{days} days pending",
@@ -2957,5 +3035,45 @@
   },
   "mktSelectDate": "Select date",
   "mktBasketsProTitle": "Baskets is a Pro feature",
-  "mktBasketsProDesc": "Create combo deals with automatic tier discounts and alert customers on WhatsApp. Upgrade to Pro to unlock baskets."
+  "mktBasketsProDesc": "Create combo deals with automatic tier discounts and alert customers on WhatsApp. Upgrade to Pro to unlock baskets.",
+  "visionNavLabel": "Vision",
+  "visionTitle": "Vision",
+  "visionTabShelf": "Shelf Scan",
+  "visionTabResults": "Results",
+  "visionTabCounter": "Counter",
+  "visionProTitle": "Vision AI",
+  "visionProDesc": "Snap your shelf morning and evening — AI counts your stock and tells you what sold.",
+  "visionFromCamera": "Take a photo",
+  "visionFromGallery": "Choose from gallery",
+  "visionMorningTitle": "Morning — Start of Day",
+  "visionEveningTitle": "Evening — End of Day",
+  "visionTakePhoto": "Add Photos",
+  "visionRetake": "Retake",
+  "visionReview": "Review",
+  "visionAnalyzing": "Analyzing shelf… this can take up to a minute",
+  "visionScanFailed": "Scan failed. Please retake the photo.",
+  "visionNoPhotoYet": "No photo taken yet.",
+  "visionProductsIdentified": "Products identified",
+  "visionUnitsCounted": "Units counted",
+  "visionNeedsReview": "Needs review",
+  "visionViewSales": "View Today's Sales",
+  "visionTip": "Tip: take the morning photo before opening and the evening photo before closing. AI works out how many of each product sold.",
+  "visionSalesEmpty": "Take a morning and an evening photo to see what sold today.",
+  "visionTotalSold": "Total items sold",
+  "visionSold": "sold",
+  "visionMorningCount": "AM",
+  "visionEveningCount": "PM",
+  "visionUnknownItem": "Unknown — tap to fix",
+  "visionCorrected": "Corrected",
+  "visionCorrectTitle": "Which product is this?",
+  "visionSearchProducts": "Search your products",
+  "visionClearCorrection": "Clear correction",
+  "visionNoProducts": "No products loaded yet. Open the Billing tab once, then come back.",
+  "visionCounterSoonTitle": "Live Counter — coming soon",
+  "visionCounterSoonDesc": "Point your phone at the billing counter to auto-count sales as items pass. We're putting the finishing touches on it.",
+  "visionAddPhotosTitle": "Add shelf photos",
+  "visionAddPhotosHint": "Take 3 to 10 photos covering your shelves.",
+  "visionMinPhotosHint": "Add at least 3 photos",
+  "visionMaxReached": "Maximum 10 photos",
+  "visionAnalyze": "Analyze"
 }

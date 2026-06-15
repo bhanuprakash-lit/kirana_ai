@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kirana_ai/features/pos_inventory/views/widgets/add_product_sheet.dart';
 
 import '../../../core/locale/locale_provider.dart';
+import '../../auth/repositories/auth_repository.dart' show ApiException;
 import '../../../core/providers/usage_limits_provider.dart';
 import '../../../core/services/usage_limits_service.dart';
 import '../../../core/theme/brand_theme.dart';
@@ -18,6 +19,7 @@ import '../providers/inventory_provider.dart';
 import '../../../../core/services/contact_service.dart';
 import 'widgets/continuous_scanner_sheet.dart';
 import 'widgets/order_dialog.dart';
+import 'widgets/basket_savings_banner.dart';
 import '../../baskets/models/basket_model.dart';
 import '../../baskets/providers/basket_provider.dart';
 import '../../subscription/models/subscription_model.dart';
@@ -368,6 +370,9 @@ class _PosTabState extends ConsumerState<PosTab> {
         'valid_to': null,
         'items': items,
       });
+      // Make sure the Baskets screen reflects the new basket even if it was
+      // already built and cached this session.
+      ref.invalidate(basketProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -376,12 +381,19 @@ class _PosTabState extends ConsumerState<PosTab> {
           ),
         );
       }
-    } catch (_) {
+    } catch (e) {
+      // Surface the real reason (e.g. a 4xx/validation error) instead of a
+      // vague "something went wrong" — the swallowed error hid why AI baskets
+      // weren't saving.
       if (mounted) {
+        final msg = e is ApiException
+            ? e.message
+            : e.toString().replaceFirst('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_l10n.mktSomethingWentWrong),
+            content: Text(msg),
             backgroundColor: BrandColors.error,
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -1067,6 +1079,9 @@ class _PosTabState extends ConsumerState<PosTab> {
             _OrderFooter(
               subtotal: state.subtotal,
               itemCount: state.cartItemCount,
+              basketName: state.appliedBasketName,
+              basketGross: state.basketGross,
+              basketSavings: state.basketSavings,
               isPlacing: state.isPlacingOrder,
               selectedCustomer: state.selectedCustomerName,
               onSelectCustomer: _showCustomerSearchSheet,
@@ -1415,33 +1430,96 @@ Future<void> _showSetCustomerPriceSheet(
   final cp = state.customerPriceFor(product.productId);
   final hasPin = cp?.isPinned ?? false;
   final initial = currentOverride ?? cp?.price ?? product.price;
-  final ctrl = TextEditingController(
-    text: initial > 0
-        ? (initial == initial.roundToDouble()
-              ? initial.toStringAsFixed(0)
-              : initial.toStringAsFixed(2))
-        : '',
-  );
+  final notifier = ref.read(posProvider.notifier);
+  final messenger = ScaffoldMessenger.maybeOf(context);
 
-  Future<void> save(double? price) async {
-    final ok = await ref
-        .read(posProvider.notifier)
-        .setCustomerPrice(product.productId, price);
-    if (!context.mounted) return;
-    Navigator.pop(context);
-    if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not save price. Try again.')),
-      );
-    }
-  }
-
-  await showModalBottomSheet(
+  // The sheet is a StatefulWidget so its TextEditingController is disposed in
+  // the normal element-unmount order when the route pops, and we pop
+  // synchronously. The earlier inline builder + function-scoped controller +
+  // post-pop `endOfFrame`/delayed mutation tore down out of order and tripped
+  // the framework's `_dependents.isEmpty` MediaQuery assertion on save.
+  final action = await showModalBottomSheet<_CustomerPriceEditAction>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+    builder: (_) => _SetCustomerPriceSheet(
+      product: product,
+      customerName: name,
+      hasPin: hasPin,
+      initial: initial,
+    ),
+  );
+
+  if (action == null) return;
+  final ok = await notifier.setCustomerPrice(product.productId, action.price);
+  if (!ok && (messenger?.mounted ?? false)) {
+    messenger!.showSnackBar(
+      const SnackBar(content: Text('Could not save price. Try again.')),
+    );
+  }
+}
+
+class _CustomerPriceEditAction {
+  final double? price;
+
+  const _CustomerPriceEditAction.remove() : price = null;
+  const _CustomerPriceEditAction.set(this.price);
+}
+
+/// Bottom sheet that edits a customer's personal price for one product. Owns
+/// and disposes its controller, and pops synchronously with the chosen
+/// [_CustomerPriceEditAction] — the caller persists it after the sheet closes.
+class _SetCustomerPriceSheet extends StatefulWidget {
+  final PosProduct product;
+  final String customerName;
+  final bool hasPin;
+  final double initial;
+
+  const _SetCustomerPriceSheet({
+    required this.product,
+    required this.customerName,
+    required this.hasPin,
+    required this.initial,
+  });
+
+  @override
+  State<_SetCustomerPriceSheet> createState() => _SetCustomerPriceSheetState();
+}
+
+class _SetCustomerPriceSheetState extends State<_SetCustomerPriceSheet> {
+  late final TextEditingController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    final v = widget.initial;
+    _ctrl = TextEditingController(
+      text: v > 0
+          ? (v == v.roundToDouble()
+                ? v.toStringAsFixed(0)
+                : v.toStringAsFixed(2))
+          : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final price = double.tryParse(_ctrl.text.trim());
+    if (price == null || price < 0) return;
+    Navigator.pop(context, _CustomerPriceEditAction.set(price));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -1451,7 +1529,7 @@ Future<void> _showSetCustomerPriceSheet(
           20,
           14,
           20,
-          20 + MediaQuery.of(ctx).padding.bottom,
+          20 + MediaQuery.of(context).padding.bottom,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1469,17 +1547,17 @@ Future<void> _showSetCustomerPriceSheet(
             ),
             const SizedBox(height: 16),
             Text(
-              'Price for $name',
+              'Price for ${widget.customerName}',
               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 2),
             Text(
-              '${product.displayName}  ·  catalog ₹${product.price.toStringAsFixed(1)}',
+              '${widget.product.displayName}  ·  catalog ₹${widget.product.price.toStringAsFixed(1)}',
               style: const TextStyle(fontSize: 12.5, color: BrandColors.muted),
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: ctrl,
+              controller: _ctrl,
               autofocus: true,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -1495,18 +1573,18 @@ Future<void> _showSetCustomerPriceSheet(
                 ),
               ),
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-              onSubmitted: (v) {
-                final price = double.tryParse(v.trim());
-                if (price != null && price >= 0) save(price);
-              },
+              onSubmitted: (_) => _submit(),
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                if (hasPin)
+                if (widget.hasPin)
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => save(null),
+                      onPressed: () => Navigator.pop(
+                        context,
+                        const _CustomerPriceEditAction.remove(),
+                      ),
                       icon: const Icon(Icons.delete_outline_rounded, size: 18),
                       label: const Text('Remove'),
                       style: OutlinedButton.styleFrom(
@@ -1516,13 +1594,10 @@ Future<void> _showSetCustomerPriceSheet(
                       ),
                     ),
                   ),
-                if (hasPin) const SizedBox(width: 12),
+                if (widget.hasPin) const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {
-                      final price = double.tryParse(ctrl.text.trim());
-                      if (price != null && price >= 0) save(price);
-                    },
+                    onPressed: _submit,
                     style: FilledButton.styleFrom(
                       backgroundColor: BrandColors.accent,
                       minimumSize: const Size.fromHeight(48),
@@ -1538,8 +1613,8 @@ Future<void> _showSetCustomerPriceSheet(
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _CartTile extends ConsumerWidget {
@@ -2589,7 +2664,9 @@ class _CustomerPriceBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(posProvider);
-    final count = state.customerPrices.length;
+    // Count items actually in the cart that have a special price — not the
+    // customer's whole saved list, which would over-count items that aren't here.
+    final count = state.customerPricedCartCount;
     if (count == 0) return const SizedBox.shrink();
     final name = state.selectedCustomerName?.trim().isNotEmpty == true
         ? state.selectedCustomerName!.trim()
@@ -2663,6 +2740,9 @@ class _CustomerPriceBanner extends ConsumerWidget {
 class _OrderFooter extends StatelessWidget {
   final double subtotal;
   final double itemCount;
+  final String? basketName;
+  final double? basketGross;
+  final double? basketSavings;
   final bool isPlacing;
   final String? selectedCustomer;
   final VoidCallback onSelectCustomer;
@@ -2672,6 +2752,9 @@ class _OrderFooter extends StatelessWidget {
   const _OrderFooter({
     required this.subtotal,
     required this.itemCount,
+    this.basketName,
+    this.basketGross,
+    this.basketSavings,
     required this.isPlacing,
     this.selectedCustomer,
     required this.onSelectCustomer,
@@ -2702,6 +2785,16 @@ class _OrderFooter extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Bundle savings banner — shows the original value, % off and net so
+          // the shopkeeper sees exactly what the basket discount is doing.
+          if (basketName != null) ...[
+            BasketSavingsBanner(
+              name: basketName!,
+              gross: basketGross,
+              savings: basketSavings,
+            ),
+            const SizedBox(height: 8),
+          ],
           // Row 1: customer chip (left) + item count & total (right)
           Row(
             children: [

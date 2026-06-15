@@ -164,6 +164,9 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
   bool _success = false;
   String? _error;
   Customer? _selectedCustomer;
+  // Repayment deadline; defaults to 30 Jun 2026 (same default as the backend
+  // backfill) and is editable.
+  DateTime _dueDate = DateTime(2026, 6, 30);
 
   void _fillFromCustomer(Customer c) {
     setState(() {
@@ -408,6 +411,39 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
               prefixIcon: const Icon(Icons.currency_rupee_rounded),
             ),
           ),
+          const SizedBox(height: 16),
+          // Repayment due date — when the customer promises to clear the dues.
+          InkWell(
+            onTap: (_saving || _success)
+                ? null
+                : () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _dueDate,
+                      firstDate: DateTime.now().subtract(
+                        const Duration(days: 1),
+                      ),
+                      lastDate: DateTime(2030, 12, 31),
+                      helpText: l10n.finDueDateHint,
+                    );
+                    if (picked != null) setState(() => _dueDate = picked);
+                  },
+            borderRadius: BorderRadius.circular(14),
+            child: InputDecorator(
+              decoration: InputDecoration(
+                labelText: l10n.finDueDate,
+                prefixIcon: const Icon(Icons.event_rounded),
+              ),
+              child: Text(
+                '${_dueDate.day}/${_dueDate.month}/${_dueDate.year}',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: BrandColors.ink,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 28),
           SizedBox(
             width: double.infinity,
@@ -440,6 +476,7 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
                               name: widget.nameController.text,
                               phone: widget.phoneController.text,
                               amount: amount,
+                              dueDate: _dueDate,
                             );
                         if (mounted) {
                           setState(() {
@@ -1197,6 +1234,19 @@ class _DebtRow extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                    if (!settled && item.effectiveDueDate != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.finDueBy(
+                          _formatUdhaarDate(item.effectiveDueDate!),
+                        ),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFFD97706),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -1341,6 +1391,10 @@ class _RecoverCustomerSheetState extends State<_RecoverCustomerSheet> {
   bool _saving = false;
   bool _success = false;
   String? _error;
+  // For the progress/success message: how many open dues this payment touches,
+  // and how many it fully clears (recovery is applied oldest-first).
+  int _affectedCount = 0;
+  int _settledCount = 0;
 
   @override
   void dispose() {
@@ -1392,7 +1446,10 @@ class _RecoverCustomerSheetState extends State<_RecoverCustomerSheet> {
             isSaving: _saving,
             error: _error,
             isSuccess: _success,
-            successMessage: l10n.finRecoveryRecorded,
+            savingMessage: l10n.finClearingDues(_affectedCount),
+            successMessage: _settledCount > 0
+                ? l10n.finDuesCleared(_settledCount)
+                : l10n.finRecoveryRecorded,
           ),
           if (_saving || _error != null || _success) const SizedBox(height: 16),
 
@@ -1432,9 +1489,25 @@ class _RecoverCustomerSheetState extends State<_RecoverCustomerSheet> {
                         return;
                       }
 
+                      // Pre-compute how many dues this payment touches/clears
+                      // (oldest-first) so the progress + success messages can
+                      // say "Clearing 3 dues…" instead of a generic spinner.
+                      final open = widget.group.openOldestFirst;
+                      var remaining = amount;
+                      var affected = 0;
+                      var settled = 0;
+                      for (final e in open) {
+                        if (remaining <= 0.001) break;
+                        affected++;
+                        if (remaining >= e.balance - 0.001) settled++;
+                        remaining -= e.balance;
+                      }
+
                       setState(() {
                         _saving = true;
                         _error = null;
+                        _affectedCount = affected;
+                        _settledCount = settled;
                       });
                       try {
                         await widget.ref

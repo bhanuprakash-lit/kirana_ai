@@ -9,10 +9,14 @@ import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/pos_provider.dart';
 import '../../providers/printer_provider.dart';
 import '../order_details_screen.dart';
+import 'basket_savings_banner.dart';
 import '../../../finance/providers/finance_provider.dart';
+import '../../../finance/views/consent_recorder_sheet.dart';
 import '../../../profile/models/customer_model.dart';
 import '../../../profile/providers/customer_provider.dart';
 import '../../../profile/providers/store_settings_provider.dart';
+import '../../../subscription/models/subscription_model.dart';
+import '../../../subscription/providers/subscription_provider.dart';
 
 Future<void> showOrderDialog(BuildContext context, WidgetRef ref) async {
   final result = await showModalBottomSheet<Map<String, dynamic>>(
@@ -23,8 +27,38 @@ Future<void> showOrderDialog(BuildContext context, WidgetRef ref) async {
   );
 
   if (result != null && context.mounted) {
-    final autoPrint = result['auto_print'] as bool? ?? false;
-    _showSuccessDialog(context, ref, result, autoPrint: autoPrint);
+    // Pro + udhaar → capture the customer's spoken consent while they're still
+    // at the counter. The clip uploads via a persistent background queue, so
+    // this step is quick and skippable and never blocks the sale.
+    final isPro = ref.read(subInfoProvider).effectiveTier == SubTier.pro;
+    if (isPro &&
+        result['payment_method'] == 'udhaar' &&
+        result['order_id'] != null) {
+      final recorded = await showConsentRecorderSheet(
+        context,
+        ref,
+        orderId: (result['order_id'] as num?)?.toInt(),
+        customerId: (result['customer_id'] as num?)?.toInt(),
+        total: (result['total_amount'] as num?)?.toDouble(),
+        udhaar:
+            (result['udhaar_amount'] as num?)?.toDouble() ??
+            (result['total_amount'] as num?)?.toDouble(),
+        promisedDate: result['due_date'] as String?,
+      );
+      if (recorded == true && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context).finConsentSaved),
+            backgroundColor: BrandColors.success,
+            duration: const Duration(milliseconds: 1800),
+          ),
+        );
+      }
+    }
+    if (context.mounted) {
+      final autoPrint = result['auto_print'] as bool? ?? false;
+      _showSuccessDialog(context, ref, result, autoPrint: autoPrint);
+    }
   } else {
     ref.read(posProvider.notifier).clearError();
   }
@@ -270,6 +304,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   // Partial-udhaar slider — how much of the order goes on credit.
   // Initialised to the full order total when Udhaar is chosen.
   double _udhaarAmount = 0;
+  // Repayment deadline for the credit. Defaults to 30 Jun 2026 (the same
+  // default applied to existing udhaars) and is editable by the shopkeeper.
+  DateTime _udhaarDueDate = DateTime(2026, 6, 30);
 
   AppLocalizations get _l10n =>
       lookupAppLocalizations(ref.read(localeProvider));
@@ -336,6 +373,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           // linked to this order. No separate /finance/udhaar/add call — that
           // was producing a duplicate, unlinked khata row.
           customerId: _paymentMethod == 'udhaar' ? _udhaarCustomerId : null,
+          udhaarDueDate: _paymentMethod == 'udhaar' ? _udhaarDueDate : null,
         );
     if (!mounted) return;
     if (result != null) {
@@ -351,12 +389,20 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
       if (mounted) {
         final enriched = Map<String, dynamic>.from(result);
         enriched['auto_print'] = _autoPrint;
+        enriched['payment_method'] = _paymentMethod;
         // Persist the split so OrderDetailsScreen can show the breakdown
         // even in the same session before backend returns the fields.
         if (_paymentMethod == 'udhaar' && udhaarAmt != null) {
           final total = (result['total_amount'] as num?)?.toDouble() ?? 0.0;
           enriched['udhaar_amount'] = udhaarAmt;
           enriched['cash_paid'] = total - udhaarAmt;
+        }
+        // Carry the udhaar customer + due date so the post-sale voice-consent
+        // step can attach them to the clip.
+        if (_paymentMethod == 'udhaar') {
+          enriched['customer_id'] = _udhaarCustomerId;
+          enriched['due_date'] =
+              '${_udhaarDueDate.year.toString().padLeft(4, '0')}-${_udhaarDueDate.month.toString().padLeft(2, '0')}-${_udhaarDueDate.day.toString().padLeft(2, '0')}';
         }
         Navigator.pop(context, enriched);
       }
@@ -377,322 +423,371 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 12,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 32,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 48,
-              height: 5,
-              decoration: BoxDecoration(
-                color: BrandColors.border.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(2.5),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
+      // Cap the sheet height and scroll the body so adding the udhaar fields
+      // (customer, split slider, due date) never overflows or forces the sheet
+      // to take over the whole screen.
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 48,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: BrandColors.border.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            l10n.posConfirmOrder,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              color: BrandColors.ink,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          ActionStatusOverlay(
-            isSaving: _placing,
-            error: _localError ?? state.error,
-            isSuccess: _success,
-            successMessage: l10n.posOrderConfirmed,
-          ),
-          if (_placing ||
-              _localError != null ||
-              state.error != null ||
-              _success)
             const SizedBox(height: 16),
-
-          // ── Cart summary ──────────────────────────────────────────────────
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.3,
-            ),
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: cart.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final item = cart[index];
-                return Row(
+            Flexible(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 32,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        '${item.product.name} × ${item.quantity}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: BrandColors.ink,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      l10n.posConfirmOrder,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: BrandColors.ink,
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    ActionStatusOverlay(
+                      isSaving: _placing,
+                      error: _localError ?? state.error,
+                      isSuccess: _success,
+                      successMessage: l10n.posOrderConfirmed,
+                    ),
+                    if (_placing ||
+                        _localError != null ||
+                        state.error != null ||
+                        _success)
+                      const SizedBox(height: 16),
+
+                    // ── Cart summary ──────────────────────────────────────────────────
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: cart.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final item = cart[index];
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${item.product.name} × ${item.quantity}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: BrandColors.ink,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Text(
+                              _fmt(item.lineTotal),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: BrandColors.ink,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Divider(height: 1),
+                    ),
+
+                    // ── Referral discount ─────────────────────────────────────────────
+                    if (state.referralDiscountPct != null) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            l10n.posSubtotal,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                          Text(
+                            _fmt(state.subtotal),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.card_giftcard_rounded,
+                                  size: 14,
+                                  color: BrandColors.accent,
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    l10n.posReferralDiscount(
+                                      state.referralDiscountPct!
+                                          .toStringAsFixed(0),
+                                      state.referralReferrerName != null
+                                          ? " · ${state.referralReferrerName}"
+                                          : "",
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: BrandColors.accent,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '-${_fmt(state.discountAmount)}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: BrandColors.accent,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+
+                    // ── Grand total ───────────────────────────────────────────────────
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.posGrandTotal,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _fmt(state.discountedSubtotal),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: BrandColors.success,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // ── Bundle savings breakdown ──────────────────────────────────────
+                    if (state.appliedBasketName != null) ...[
+                      const SizedBox(height: 12),
+                      BasketSavingsBanner(
+                        name: state.appliedBasketName!,
+                        gross: state.basketGross,
+                        savings: state.basketSavings,
+                      ),
+                    ],
+                    const SizedBox(height: 28),
+
+                    // ── Payment method ────────────────────────────────────────────────
                     Text(
-                      _fmt(item.lineTotal),
+                      l10n.posPaymentMethod,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
                         fontSize: 14,
                         color: BrandColors.ink,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        _PaymentOption(
+                          icon: Icons.payments_rounded,
+                          label: l10n.posPayCash,
+                          value: 'cash',
+                          groupValue: _paymentMethod,
+                          enabled: !_placing && !_success,
+                          onTap: () => setState(() => _paymentMethod = 'cash'),
+                        ),
+                        const SizedBox(width: 12),
+                        _PaymentOption(
+                          icon: Icons.account_balance_wallet_outlined,
+                          label: l10n.posPayUdhaar,
+                          value: 'udhaar',
+                          groupValue: _paymentMethod,
+                          enabled: !_placing && !_success,
+                          onTap: () => _onUdhaarSelected(),
+                        ),
+                        const SizedBox(width: 12),
+                        _PaymentOption(
+                          icon: Icons.qr_code_rounded,
+                          label: l10n.posPayUpi,
+                          value: 'upi',
+                          groupValue: _paymentMethod,
+                          comingSoon: true,
+                          enabled: false,
+                          onTap: null,
+                        ),
+                      ],
+                    ),
+                    if (_paymentMethod == 'udhaar') ...[
+                      const SizedBox(height: 14),
+                      _UdhaarCustomerPicker(
+                        selectedId: _udhaarCustomerId,
+                        selectedName: _udhaarCustomerName,
+                        onSelected: (c) => setState(() {
+                          _udhaarCustomerId = c.customerId;
+                          _udhaarCustomerName = c.name;
+                        }),
+                      ),
+                      const SizedBox(height: 12),
+                      _UdhaarSplitSlider(
+                        total: state.discountedSubtotal,
+                        udhaarAmount: _udhaarAmount,
+                        onChanged: (v) => setState(() => _udhaarAmount = v),
+                        enabled: !_placing && !_success,
+                      ),
+                      const SizedBox(height: 12),
+                      _UdhaarDueDatePicker(
+                        dueDate: _udhaarDueDate,
+                        enabled: !_placing && !_success,
+                        onPick: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _udhaarDueDate,
+                            firstDate: DateTime.now().subtract(
+                              const Duration(days: 1),
+                            ),
+                            lastDate: DateTime(2030, 12, 31),
+                            helpText: l10n.posUdhaarDueDateHint,
+                          );
+                          if (picked != null) {
+                            setState(() => _udhaarDueDate = picked);
+                          }
+                        },
+                      ),
+                    ],
+
+                    // ── Auto-print toggle ─────────────────────────────────────────────
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: BrandColors.surfaceTint,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: BrandColors.border),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.print_rounded,
+                            size: 18,
+                            color: _autoPrint
+                                ? printerState.statusColor
+                                : BrandColors.muted,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.posPrintAutomatically,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                    color: BrandColors.ink,
+                                  ),
+                                ),
+                                Text(
+                                  _autoPrint
+                                      ? (printerState.isConnected
+                                            ? l10n.posWillPrintAfter
+                                            : l10n.posPrinterStatus(
+                                                printerState.statusLabel,
+                                              ))
+                                      : l10n.posAutoPrintDisabled,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: _autoPrint
+                                        ? printerState.statusColor
+                                        : BrandColors.muted,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch.adaptive(
+                            value: _autoPrint,
+                            onChanged: _placing || _success
+                                ? null
+                                : (v) => setState(() => _autoPrint = v),
+                            activeThumbColor: BrandColors.primary,
+                            activeTrackColor: BrandColors.primary.withValues(
+                              alpha: 0.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 28),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: LoadingButton(
+                        label: l10n.posPlaceOrderAmount(
+                          _fmt(state.discountedSubtotal),
+                        ),
+                        isLoading: _placing,
+                        onPressed: _success ? null : _confirm,
+                      ),
+                    ),
                   ],
-                );
-              },
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Divider(height: 1),
-          ),
-
-          // ── Referral discount ─────────────────────────────────────────────
-          if (state.referralDiscountPct != null) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.posSubtotal,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: BrandColors.muted,
-                  ),
-                ),
-                Text(
-                  _fmt(state.subtotal),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: BrandColors.muted,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.card_giftcard_rounded,
-                        size: 14,
-                        color: BrandColors.accent,
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          l10n.posReferralDiscount(
-                            state.referralDiscountPct!.toStringAsFixed(0),
-                            state.referralReferrerName != null
-                                ? " · ${state.referralReferrerName}"
-                                : "",
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: BrandColors.accent,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '-${_fmt(state.discountAmount)}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: BrandColors.accent,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-          ],
-
-          // ── Grand total ───────────────────────────────────────────────────
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  l10n.posGrandTotal,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: BrandColors.muted,
-                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                _fmt(state.discountedSubtotal),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: BrandColors.success,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 28),
-
-          // ── Payment method ────────────────────────────────────────────────
-          Text(
-            l10n.posPaymentMethod,
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-              color: BrandColors.ink,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _PaymentOption(
-                icon: Icons.payments_rounded,
-                label: l10n.posPayCash,
-                value: 'cash',
-                groupValue: _paymentMethod,
-                enabled: !_placing && !_success,
-                onTap: () => setState(() => _paymentMethod = 'cash'),
-              ),
-              const SizedBox(width: 12),
-              _PaymentOption(
-                icon: Icons.account_balance_wallet_outlined,
-                label: l10n.posPayUdhaar,
-                value: 'udhaar',
-                groupValue: _paymentMethod,
-                enabled: !_placing && !_success,
-                onTap: () => _onUdhaarSelected(),
-              ),
-              const SizedBox(width: 12),
-              _PaymentOption(
-                icon: Icons.qr_code_rounded,
-                label: l10n.posPayUpi,
-                value: 'upi',
-                groupValue: _paymentMethod,
-                comingSoon: true,
-                enabled: false,
-                onTap: null,
-              ),
-            ],
-          ),
-          if (_paymentMethod == 'udhaar') ...[
-            const SizedBox(height: 14),
-            _UdhaarCustomerPicker(
-              selectedId: _udhaarCustomerId,
-              selectedName: _udhaarCustomerName,
-              onSelected: (c) => setState(() {
-                _udhaarCustomerId = c.customerId;
-                _udhaarCustomerName = c.name;
-              }),
-            ),
-            const SizedBox(height: 12),
-            _UdhaarSplitSlider(
-              total: state.discountedSubtotal,
-              udhaarAmount: _udhaarAmount,
-              onChanged: (v) => setState(() => _udhaarAmount = v),
-              enabled: !_placing && !_success,
             ),
           ],
-
-          // ── Auto-print toggle ─────────────────────────────────────────────
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: BrandColors.surfaceTint,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: BrandColors.border),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.print_rounded,
-                  size: 18,
-                  color: _autoPrint
-                      ? printerState.statusColor
-                      : BrandColors.muted,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.posPrintAutomatically,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                          color: BrandColors.ink,
-                        ),
-                      ),
-                      Text(
-                        _autoPrint
-                            ? (printerState.isConnected
-                                  ? l10n.posWillPrintAfter
-                                  : l10n.posPrinterStatus(
-                                      printerState.statusLabel,
-                                    ))
-                            : l10n.posAutoPrintDisabled,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: _autoPrint
-                              ? printerState.statusColor
-                              : BrandColors.muted,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Switch.adaptive(
-                  value: _autoPrint,
-                  onChanged: _placing || _success
-                      ? null
-                      : (v) => setState(() => _autoPrint = v),
-                  activeThumbColor: BrandColors.primary,
-                  activeTrackColor: BrandColors.primary.withValues(alpha: 0.4),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 28),
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: LoadingButton(
-              label: l10n.posPlaceOrderAmount(_fmt(state.discountedSubtotal)),
-              isLoading: _placing,
-              onPressed: _success ? null : _confirm,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -929,6 +1024,76 @@ class _UdhaarCustomerSheetState extends State<_UdhaarCustomerSheet> {
   }
 }
 
+// ── Udhaar due-date picker ────────────────────────────────────────────────────
+
+class _UdhaarDueDatePicker extends StatelessWidget {
+  final DateTime dueDate;
+  final bool enabled;
+  final VoidCallback onPick;
+
+  const _UdhaarDueDatePicker({
+    required this.dueDate,
+    required this.onPick,
+    this.enabled = true,
+  });
+
+  static const _udhaarColor = Color(0xFFD97706); // amber-600
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final d = dueDate.toLocal();
+    final label = '${d.day}/${d.month}/${d.year}';
+    return InkWell(
+      onTap: enabled ? onPick : null,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: _udhaarColor.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: _udhaarColor.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.event_rounded, size: 18, color: _udhaarColor),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.posUdhaarDueDate,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: BrandColors.muted,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: BrandColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.edit_calendar_rounded,
+              size: 18,
+              color: _udhaarColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // ── Udhaar split slider ───────────────────────────────────────────────────────
 
 class _UdhaarSplitSlider extends StatelessWidget {
@@ -957,154 +1122,84 @@ class _UdhaarSplitSlider extends StatelessWidget {
     final divisions = total.round().clamp(2, 500);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
       decoration: BoxDecoration(
         color: _udhaarColor.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: _udhaarColor.withValues(alpha: 0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ──────────────────────────────────────────────────────
+          // Header + live udhaar amount on one line (keeps it compact).
           Row(
             children: [
-              const Icon(Icons.tune_rounded, size: 16, color: _udhaarColor),
+              const Icon(Icons.tune_rounded, size: 15, color: _udhaarColor),
               const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l10n.posHowMuchUdhaar,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    color: _udhaarColor,
+                  ),
+                ),
+              ),
               Text(
-                l10n.posHowMuchUdhaar,
+                _fmt(credit),
                 style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
                   color: _udhaarColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
 
-          // ── Slider ───────────────────────────────────────────────────────
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: _udhaarColor,
-              thumbColor: _udhaarColor,
-              overlayColor: _udhaarColor.withValues(alpha: 0.12),
-              inactiveTrackColor: _udhaarColor.withValues(alpha: 0.18),
-              trackHeight: 4,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-            ),
-            child: Slider(
-              value: credit,
-              min: 0,
-              max: total,
-              divisions: divisions,
-              onChanged: enabled ? (v) => onChanged(v.roundToDouble()) : null,
-            ),
-          ),
-
-          // ── Min / max labels ─────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '₹0',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: BrandColors.muted,
-                  ),
-                ),
-                Text(
-                  _fmt(total),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: BrandColors.muted,
-                  ),
-                ),
-              ],
+          // Slim slider — height-capped so it doesn't eat vertical space.
+          SizedBox(
+            height: 30,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                activeTrackColor: _udhaarColor,
+                thumbColor: _udhaarColor,
+                overlayColor: _udhaarColor.withValues(alpha: 0.12),
+                inactiveTrackColor: _udhaarColor.withValues(alpha: 0.18),
+                trackHeight: 3,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+              ),
+              child: Slider(
+                value: credit,
+                min: 0,
+                max: total,
+                divisions: divisions,
+                onChanged: enabled ? (v) => onChanged(v.roundToDouble()) : null,
+              ),
             ),
           ),
-          const SizedBox(height: 12),
 
-          // ── Cash / Udhaar breakdown pills ────────────────────────────────
+          // Single compact breakdown line: cash now vs on udhaar.
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Cash paid now
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: BrandColors.success.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: BrandColors.success.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.posCashNow,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: BrandColors.success,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _fmt(cashNow),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: BrandColors.success,
-                        ),
-                      ),
-                    ],
-                  ),
+              Text(
+                '${l10n.posCashNow}: ${_fmt(cashNow)}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: BrandColors.success,
                 ),
               ),
-              const SizedBox(width: 10),
-              // On Udhaar
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _udhaarColor.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _udhaarColor.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.posOnUdhaar,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: _udhaarColor,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _fmt(credit),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: _udhaarColor,
-                        ),
-                      ),
-                    ],
-                  ),
+              Text(
+                '${l10n.posOnUdhaar}: ${_fmt(credit)}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: _udhaarColor,
                 ),
               ),
             ],

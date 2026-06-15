@@ -111,7 +111,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: 'kpis',
-            builder: (context, state) => const KpiSubscriptionScreen(),
+            builder: (context, state) => KpiSubscriptionScreen(
+              focusSlug: state.uri.queryParameters['focus'],
+            ),
           ),
           GoRoute(
             path: 'history',

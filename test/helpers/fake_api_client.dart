@@ -72,6 +72,17 @@ class FakeApiClient implements ApiClient {
     return _dequeue(path);
   }
 
+  @override
+  Future<dynamic> postMultipart(
+    String path, {
+    required List<String> filePaths,
+    String fileField = 'files',
+    Map<String, String>? fields,
+  }) async {
+    calls.add('MULTIPART $path');
+    return _dequeue(path);
+  }
+
   // ── POS surface ────────────────────────────────────────────────────────────
 
   @override
@@ -136,9 +147,15 @@ class FakeApiClient implements ApiClient {
     calls.add('OLTP DELETE $table');
     return _dequeue(table) as Map<String, dynamic>;
   }
-  
+
   @override
   Future<dynamic> put(String path, body) {
     throw UnimplementedError();
+  }
+
+  @override
+  Future<List<int>> getBytes(String path) async {
+    calls.add('GET BYTES $path');
+    return _dequeue(path) as List<int>;
   }
 }
