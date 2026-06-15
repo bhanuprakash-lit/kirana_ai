@@ -173,7 +173,9 @@ class ConsentUploadQueue {
         switch (result) {
           case _UploadResult.success:
           case _UploadResult.drop:
-            await _deleteFile(item.filePath); // uploaded or permanently rejected
+            await _deleteFile(
+              item.filePath,
+            ); // uploaded or permanently rejected
           case _UploadResult.retry:
             final bumped = item.withAttempt();
             if (bumped.attempts >= _maxAttempts) {
