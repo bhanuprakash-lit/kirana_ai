@@ -61,7 +61,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get authErrVerificationFailed => 'सत्यापन विफल। फिर से प्रयास करें।';
 
   @override
-  String get welcomeSlide1Title => 'Kirana AI में\nआपका स्वागत है';
+  String get welcomeSlide1Title => 'Outlet AI में\nआपका स्वागत है';
 
   @override
   String get welcomeSlide1Subtitle =>
@@ -94,7 +94,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get loginWelcomeBack => 'वापसी पर स्वागत है';
 
   @override
-  String get loginSubtitle => 'अपने Kirana AI खाते में साइन इन करें।';
+  String get loginSubtitle => 'अपने Outlet AI खाते में साइन इन करें।';
 
   @override
   String get loginTabPhone => 'फ़ोन OTP';
@@ -312,7 +312,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get businessBudgetInvalid => 'एक मान्य राशि दर्ज करें';
 
   @override
-  String get businessTypeKirana => 'किराना दुकान';
+  String get businessTypeKirana => 'किराना / जनरल स्टोर';
 
   @override
   String get businessTypeGeneral => 'जनरल स्टोर';
@@ -328,6 +328,42 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get businessTypeStationery => 'स्टेशनरी एवं किताबें';
+
+  @override
+  String get businessTypeSupermarket => 'सुपरमार्केट';
+
+  @override
+  String get businessTypeMiniSupermarket => 'मिनी सुपरमार्केट';
+
+  @override
+  String get businessTypeMonoBrand => 'मोनो ब्रांड स्टोर';
+
+  @override
+  String get businessTypeBoutique => 'बुटीक';
+
+  @override
+  String get businessTypeSalon => 'सैलून एवं पार्लर';
+
+  @override
+  String get businessTypeFancyGift => 'फैंसी एवं गिफ्ट स्टोर';
+
+  @override
+  String get businessTypeSportsFitness => 'स्पोर्ट्स एवं फिटनेस';
+
+  @override
+  String get businessTypeFootwear => 'जूते-चप्पल की दुकान';
+
+  @override
+  String get businessTypeOptical => 'ऑप्टिकल स्टोर';
+
+  @override
+  String get businessTypeBakery => 'बेकरी एवं मिठाई की दुकान';
+
+  @override
+  String get businessTypeApparel => 'कपड़े एवं परिधान';
+
+  @override
+  String get businessTypeElectronics => 'मोबाइल एवं इलेक्ट्रॉनिक्स';
 
   @override
   String get businessTypeOthers => 'अन्य';
@@ -393,7 +429,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get consentTermsSummary =>
-      'Kirana AI का उपयोग करके, आप इस सेवा का उपयोग केवल वैध व्यापारिक उद्देश्यों के लिए करने पर सहमत होते हैं। इन शर्तों का उल्लंघन करने वाले खातों को निलंबित करने का अधिकार LohiyaAI के पास सुरक्षित है। आपके डेटा का उपयोग केवल सेवा प्रदान करने और सुधारने के लिए किया जाता है।';
+      'Outlet AI का उपयोग करके, आप इस सेवा का उपयोग केवल वैध व्यापारिक उद्देश्यों के लिए करने पर सहमत होते हैं। इन शर्तों का उल्लंघन करने वाले खातों को निलंबित करने का अधिकार LohiyaAI के पास सुरक्षित है। आपके डेटा का उपयोग केवल सेवा प्रदान करने और सुधारने के लिए किया जाता है।';
 
   @override
   String get consentPrivacyTitle => 'गोपनीयता नीति';
@@ -442,7 +478,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get dashNavBilling => 'बिलिंग';
 
   @override
-  String get dashTrialWelcome => 'Kirana AI में आपका स्वागत है';
+  String get dashTrialWelcome => 'Outlet AI में आपका स्वागत है';
 
   @override
   String get dashTrialChoosePlan =>
@@ -518,7 +554,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get dashUpgradeBody =>
-      'आपका मुफ़्त ट्रायल समाप्त हो गया। Kirana AI का उपयोग जारी रखने और अपनी दुकान बढ़ाते रहने के लिए एक प्लान चुनें।';
+      'आपका मुफ़्त ट्रायल समाप्त हो गया। Outlet AI का उपयोग जारी रखने और अपनी दुकान बढ़ाते रहने के लिए एक प्लान चुनें।';
 
   @override
   String get dashUpgradeBasic => 'Basic';
@@ -2307,6 +2343,16 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String finClearingDuesProgress(int cleared, int total) {
+    return 'बकाया चुकाया जा रहा: $cleared/$total';
+  }
+
+  @override
+  String finDuesClearFailed(int cleared, int total) {
+    return 'सभी बकाया नहीं चुक पाए ($cleared/$total)';
+  }
+
+  @override
   String get finSmartReminders => 'स्मार्ट रिमाइंडर';
 
   @override
@@ -2547,7 +2593,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get procKiranaAiReadsInvoice =>
-      'Kirana AI आइटम, टोटल और सप्लायर की जानकारी पढ़ता है';
+      'Outlet AI आइटम, टोटल और सप्लायर की जानकारी पढ़ता है';
 
   @override
   String get procCamera => 'कैमरा';
@@ -2559,7 +2605,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get procUploadPdfImageFile => 'PDF / इमेज फाइल अपलोड करें';
 
   @override
-  String get procKiranaAiReadingInvoice => 'Kirana AI आपकी इनवॉइस पढ़ रहा है…';
+  String get procKiranaAiReadingInvoice => 'Outlet AI आपकी इनवॉइस पढ़ रहा है…';
 
   @override
   String get procExtractingItems => 'आइटम, क्वांटिटी और टोटल निकाल रहा है';
@@ -2680,7 +2726,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get procTapToStopAndProcess => 'रोकने और प्रोसेस करने के लिए टैप करें';
 
   @override
-  String get procKiranaAiProcessing => 'Kirana AI प्रोसेस कर रहा है…';
+  String get procKiranaAiProcessing => 'Outlet AI प्रोसेस कर रहा है…';
 
   @override
   String get procHeard => 'सुना';
@@ -2999,7 +3045,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get subWhatsAppHelpMessage =>
-      'नमस्ते! मुझे अपने Kirana AI सब्सक्रिप्शन में मदद चाहिए।';
+      'नमस्ते! मुझे अपने Outlet AI सब्सक्रिप्शन में मदद चाहिए।';
 
   @override
   String subCurrentPlanLabel(String plan) {
@@ -3948,14 +3994,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get supBlockedContactUs => 'हमसे संपर्क करें';
 
   @override
-  String get supBlockedEmailSubjectApp => 'ऐप एक्सेस समस्या — Kirana AI';
+  String get supBlockedEmailSubjectApp => 'ऐप एक्सेस समस्या — Outlet AI';
 
   @override
-  String get supBlockedEmailSubjectStore => 'स्टोर एक्सेस समस्या — Kirana AI';
+  String get supBlockedEmailSubjectStore => 'स्टोर एक्सेस समस्या — Outlet AI';
 
   @override
   String supBlockedEmailBody(String reason) {
-    return 'हैलो LohiyaAI टीम,\n\nमैं Kirana AI ऐप एक्सेस नहीं कर पा रहा हूँ.\n\nदिखाया गया कारण: $reason\n\nकृपया एक्सेस वापस पाने में मेरी मदद करें.\n\n— Kirana मालिक';
+    return 'हैलो LohiyaAI टीम,\n\nमैं Outlet AI ऐप एक्सेस नहीं कर पा रहा हूँ.\n\nदिखाया गया कारण: $reason\n\nकृपया एक्सेस वापस पाने में मेरी मदद करें.\n\n— Kirana मालिक';
   }
 
   @override
@@ -4627,7 +4673,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get widgetUnitToPay => 'भुगतान करना है';
 
   @override
-  String get widgetSignIn => 'साइन इन करने के लिए Kirana AI खोलें';
+  String get widgetSignIn => 'साइन इन करने के लिए Outlet AI खोलें';
 
   @override
   String get widgetNoData => 'आज के आंकड़े लोड करने के लिए ऐप खोलें';

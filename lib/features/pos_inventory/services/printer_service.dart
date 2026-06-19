@@ -334,7 +334,7 @@ class PrinterService {
     s('Thank You!  Visit Again.');
     nl();
     b(_boldOff);
-    s('Kirana AI by Lohiya AI');
+    s('Outlet AI by Lohiya AI');
     nl(4);
 
     // nl(2); // feed before cut

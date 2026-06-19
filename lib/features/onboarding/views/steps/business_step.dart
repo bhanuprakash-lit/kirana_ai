@@ -13,11 +13,21 @@ import '../../providers/onboarding_provider.dart';
 /// translating the label can never break the backend mapping.
 List<({String code, String label})> _businessTypes(AppLocalizations l10n) => [
   (code: 'kirana', label: l10n.businessTypeKirana),
-  (code: 'general', label: l10n.businessTypeGeneral),
-  (code: 'provision', label: l10n.businessTypeProvision),
-  (code: 'fruits_vegetables', label: l10n.businessTypeFruitsVeg),
-  (code: 'pharmacy', label: l10n.businessTypePharmacy),
+  (code: 'supermarket', label: l10n.businessTypeSupermarket),
+  (code: 'mini_supermarket', label: l10n.businessTypeMiniSupermarket),
+  (code: 'mono_brand', label: l10n.businessTypeMonoBrand),
+  (code: 'apparel', label: l10n.businessTypeApparel),
+  (code: 'boutique', label: l10n.businessTypeBoutique),
+  (code: 'salon', label: l10n.businessTypeSalon),
+  (code: 'fancy_gift', label: l10n.businessTypeFancyGift),
+  (code: 'sports_fitness', label: l10n.businessTypeSportsFitness),
+  (code: 'electronics', label: l10n.businessTypeElectronics),
+  (code: 'footwear', label: l10n.businessTypeFootwear),
+  (code: 'optical', label: l10n.businessTypeOptical),
+  (code: 'bakery', label: l10n.businessTypeBakery),
   (code: 'stationery', label: l10n.businessTypeStationery),
+  (code: 'pharmacy', label: l10n.businessTypePharmacy),
+  (code: 'fruits_vegetables', label: l10n.businessTypeFruitsVeg),
   (code: 'other', label: l10n.businessTypeOthers),
 ];
 

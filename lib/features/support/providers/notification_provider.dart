@@ -86,8 +86,8 @@ const List<_Channel> _channels = <_Channel>[
   // Legacy / fallback channel — also the manifest default_notification_channel_id.
   _Channel(
     kDefaultChannelId,
-    'Kirana AI Alerts',
-    'Important alerts from Kirana AI',
+    'Outlet AI Alerts',
+    'Important alerts from Outlet AI',
     Importance.high,
   ),
 ];
@@ -267,7 +267,7 @@ class NotificationService {
 
     _localNotifications.show(
       message.hashCode,
-      n.title ?? 'Kirana AI',
+      n.title ?? 'Outlet AI',
       n.body,
       NotificationDetails(
         android: AndroidNotificationDetails(

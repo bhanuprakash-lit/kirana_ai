@@ -201,7 +201,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeSlide1Title.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to\nKirana AI'**
+  /// **'Welcome to\nOutlet AI'**
   String get welcomeSlide1Title;
 
   /// No description provided for @welcomeSlide1Subtitle.
@@ -261,7 +261,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to your Kirana AI account.'**
+  /// **'Sign in to your Outlet AI account.'**
   String get loginSubtitle;
 
   /// No description provided for @loginTabPhone.
@@ -657,7 +657,7 @@ abstract class AppLocalizations {
   /// No description provided for @businessTypeKirana.
   ///
   /// In en, this message translates to:
-  /// **'Grocery Store (Kirana)'**
+  /// **'Kirana / General Stores'**
   String get businessTypeKirana;
 
   /// No description provided for @businessTypeGeneral.
@@ -689,6 +689,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stationery & Books'**
   String get businessTypeStationery;
+
+  /// No description provided for @businessTypeSupermarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Supermarket'**
+  String get businessTypeSupermarket;
+
+  /// No description provided for @businessTypeMiniSupermarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Mini Supermarket'**
+  String get businessTypeMiniSupermarket;
+
+  /// No description provided for @businessTypeMonoBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'Mono Brand Store'**
+  String get businessTypeMonoBrand;
+
+  /// No description provided for @businessTypeBoutique.
+  ///
+  /// In en, this message translates to:
+  /// **'Boutique'**
+  String get businessTypeBoutique;
+
+  /// No description provided for @businessTypeSalon.
+  ///
+  /// In en, this message translates to:
+  /// **'Salon & Parlour'**
+  String get businessTypeSalon;
+
+  /// No description provided for @businessTypeFancyGift.
+  ///
+  /// In en, this message translates to:
+  /// **'Fancy & Gift Store'**
+  String get businessTypeFancyGift;
+
+  /// No description provided for @businessTypeSportsFitness.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports & Fitness'**
+  String get businessTypeSportsFitness;
+
+  /// No description provided for @businessTypeFootwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Footwear Shop'**
+  String get businessTypeFootwear;
+
+  /// No description provided for @businessTypeOptical.
+  ///
+  /// In en, this message translates to:
+  /// **'Optical Store'**
+  String get businessTypeOptical;
+
+  /// No description provided for @businessTypeBakery.
+  ///
+  /// In en, this message translates to:
+  /// **'Bakery & Sweet Shop'**
+  String get businessTypeBakery;
+
+  /// No description provided for @businessTypeApparel.
+  ///
+  /// In en, this message translates to:
+  /// **'Apparel & Clothing'**
+  String get businessTypeApparel;
+
+  /// No description provided for @businessTypeElectronics.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile & Electronics'**
+  String get businessTypeElectronics;
 
   /// No description provided for @businessTypeOthers.
   ///
@@ -807,7 +879,7 @@ abstract class AppLocalizations {
   /// No description provided for @consentTermsSummary.
   ///
   /// In en, this message translates to:
-  /// **'By using Kirana AI, you agree to use the service for legitimate business purposes only. LohiyaAI reserves the right to suspend accounts that violate these terms. Your data is used solely to provide and improve the service.'**
+  /// **'By using Outlet AI, you agree to use the service for legitimate business purposes only. LohiyaAI reserves the right to suspend accounts that violate these terms. Your data is used solely to provide and improve the service.'**
   String get consentTermsSummary;
 
   /// No description provided for @consentPrivacyTitle.
@@ -891,7 +963,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashTrialWelcome.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Kirana AI'**
+  /// **'Welcome to Outlet AI'**
   String get dashTrialWelcome;
 
   /// No description provided for @dashTrialChoosePlan.
@@ -1035,7 +1107,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashUpgradeBody.
   ///
   /// In en, this message translates to:
-  /// **'Your free trial has ended. Choose a plan to continue using Kirana AI and keep growing your store.'**
+  /// **'Your free trial has ended. Choose a plan to continue using Outlet AI and keep growing your store.'**
   String get dashUpgradeBody;
 
   /// No description provided for @dashUpgradeBasic.
@@ -4110,6 +4182,18 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 due cleared} other{{count} dues cleared}}'**
   String finDuesCleared(int count);
 
+  /// No description provided for @finClearingDuesProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing dues: {cleared}/{total}'**
+  String finClearingDuesProgress(int cleared, int total);
+
+  /// No description provided for @finDuesClearFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t clear all dues ({cleared}/{total})'**
+  String finDuesClearFailed(int cleared, int total);
+
   /// No description provided for @finSmartReminders.
   ///
   /// In en, this message translates to:
@@ -4533,7 +4617,7 @@ abstract class AppLocalizations {
   /// No description provided for @procKiranaAiReadsInvoice.
   ///
   /// In en, this message translates to:
-  /// **'Kirana AI reads items, totals & supplier details'**
+  /// **'Outlet AI reads items, totals & supplier details'**
   String get procKiranaAiReadsInvoice;
 
   /// No description provided for @procCamera.
@@ -4557,7 +4641,7 @@ abstract class AppLocalizations {
   /// No description provided for @procKiranaAiReadingInvoice.
   ///
   /// In en, this message translates to:
-  /// **'Kirana AI is reading your invoice…'**
+  /// **'Outlet AI is reading your invoice…'**
   String get procKiranaAiReadingInvoice;
 
   /// No description provided for @procExtractingItems.
@@ -4761,7 +4845,7 @@ abstract class AppLocalizations {
   /// No description provided for @procKiranaAiProcessing.
   ///
   /// In en, this message translates to:
-  /// **'Kirana AI is processing…'**
+  /// **'Outlet AI is processing…'**
   String get procKiranaAiProcessing;
 
   /// No description provided for @procHeard.
@@ -5325,7 +5409,7 @@ abstract class AppLocalizations {
   /// No description provided for @subWhatsAppHelpMessage.
   ///
   /// In en, this message translates to:
-  /// **'Hi! I need help with my Kirana AI subscription.'**
+  /// **'Hi! I need help with my Outlet AI subscription.'**
   String get subWhatsAppHelpMessage;
 
   /// No description provided for @subCurrentPlanLabel.
@@ -6986,19 +7070,19 @@ abstract class AppLocalizations {
   /// No description provided for @supBlockedEmailSubjectApp.
   ///
   /// In en, this message translates to:
-  /// **'App Access Issue — Kirana AI'**
+  /// **'App Access Issue — Outlet AI'**
   String get supBlockedEmailSubjectApp;
 
   /// No description provided for @supBlockedEmailSubjectStore.
   ///
   /// In en, this message translates to:
-  /// **'Store Access Issue — Kirana AI'**
+  /// **'Store Access Issue — Outlet AI'**
   String get supBlockedEmailSubjectStore;
 
   /// No description provided for @supBlockedEmailBody.
   ///
   /// In en, this message translates to:
-  /// **'Hello LohiyaAI Team,\n\nI am unable to access the Kirana AI app.\n\nDisplayed reason: {reason}\n\nPlease help me restore access.\n\n— Kirana Owner'**
+  /// **'Hello LohiyaAI Team,\n\nI am unable to access the Outlet AI app.\n\nDisplayed reason: {reason}\n\nPlease help me restore access.\n\n— Kirana Owner'**
   String supBlockedEmailBody(String reason);
 
   /// No description provided for @supBlockedEmailFallback.
@@ -8174,7 +8258,7 @@ abstract class AppLocalizations {
   /// No description provided for @widgetSignIn.
   ///
   /// In en, this message translates to:
-  /// **'Open Kirana AI to sign in'**
+  /// **'Open Outlet AI to sign in'**
   String get widgetSignIn;
 
   /// No description provided for @widgetNoData.

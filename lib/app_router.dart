@@ -27,7 +27,8 @@ import 'features/support/views/faq_screen.dart';
 import 'features/support/views/report_issue_screen.dart';
 import 'features/splash/views/splash_screen.dart';
 import 'features/profile/views/admin_activity_screen.dart';
-import 'features/baskets/views/baskets_screen.dart';
+// import 'features/baskets/views/baskets_screen.dart';
+import 'features/baskets/views/baskets_screen_new.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(

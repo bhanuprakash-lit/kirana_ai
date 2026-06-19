@@ -251,6 +251,7 @@ class AuthRepository {
     required String fullName,
     required String storeName,
     required String storeType,
+    String? verticalCode,
     int footfall = 40,
     double? budget,
     String? location,
@@ -271,6 +272,8 @@ class AuthRepository {
         'full_name': fullName,
         'store_name': storeName,
         'store_type': storeType,
+        if (verticalCode != null && verticalCode.isNotEmpty)
+          'vertical_code': verticalCode,
         'footfall': footfall,
         'budget': ?budget,
         if (location != null && location.isNotEmpty) 'location': location,

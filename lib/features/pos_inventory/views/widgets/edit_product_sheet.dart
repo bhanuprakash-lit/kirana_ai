@@ -10,7 +10,8 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../models/inventory_item.dart';
 import '../../providers/inventory_provider.dart';
-import 'add_product_sheet.dart' show showCategoryPicker;
+// import 'add_product_sheet.dart' show showCategoryPicker;
+import 'add_product_sheet_new.dart' show showCategoryPicker;
 import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
 

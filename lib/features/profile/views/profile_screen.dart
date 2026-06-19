@@ -382,7 +382,7 @@ class _ProfileFooter extends StatelessWidget {
               // Image.asset('assets/logos/foreground.png', width: 36, height: 36),
               const SizedBox(height: 6),
               const Text(
-                'Kirana AI by LohiyaAI',
+                'Outlet AI by LohiyaAI',
                 style: TextStyle(
                   fontSize: 12,
                   color: BrandColors.muted,

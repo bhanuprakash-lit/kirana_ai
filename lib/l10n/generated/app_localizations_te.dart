@@ -63,7 +63,7 @@ class AppLocalizationsTe extends AppLocalizations {
       'ధృవీకరణ విఫలమైంది. మళ్లీ ప్రయత్నించండి.';
 
   @override
-  String get welcomeSlide1Title => 'Kirana AI కి\n\nస్వాగతం';
+  String get welcomeSlide1Title => 'Outlet AI కి\n\nస్వాగతం';
 
   @override
   String get welcomeSlide1Subtitle =>
@@ -96,7 +96,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get loginWelcomeBack => 'తిరిగి స్వాగతం';
 
   @override
-  String get loginSubtitle => 'మీ Kirana AI ఖాతాలోకి సైన్ ఇన్ చేయండి.';
+  String get loginSubtitle => 'మీ Outlet AI ఖాతాలోకి సైన్ ఇన్ చేయండి.';
 
   @override
   String get loginTabPhone => 'ఫోన్ OTP';
@@ -315,7 +315,7 @@ class AppLocalizationsTe extends AppLocalizations {
       'చెల్లుబాటు అయ్యే మొత్తాన్ని నమోదు చేయండి';
 
   @override
-  String get businessTypeKirana => 'కిరాణా దుకాణం';
+  String get businessTypeKirana => 'కిరాణా / జనరల్ స్టోర్స్';
 
   @override
   String get businessTypeGeneral => 'జనరల్ స్టోర్';
@@ -331,6 +331,42 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get businessTypeStationery => 'స్టేషనరీ & పుస్తకాలు';
+
+  @override
+  String get businessTypeSupermarket => 'సూపర్‌మార్కెట్';
+
+  @override
+  String get businessTypeMiniSupermarket => 'మినీ సూపర్‌మార్కెట్';
+
+  @override
+  String get businessTypeMonoBrand => 'మోనో బ్రాండ్ స్టోర్';
+
+  @override
+  String get businessTypeBoutique => 'బొటిక్';
+
+  @override
+  String get businessTypeSalon => 'సెలూన్ & పార్లర్';
+
+  @override
+  String get businessTypeFancyGift => 'ఫ్యాన్సీ & గిఫ్ట్ స్టోర్';
+
+  @override
+  String get businessTypeSportsFitness => 'స్పోర్ట్స్ & ఫిట్‌నెస్';
+
+  @override
+  String get businessTypeFootwear => 'పాదరక్షల దుకాణం';
+
+  @override
+  String get businessTypeOptical => 'ఆప్టికల్ స్టోర్';
+
+  @override
+  String get businessTypeBakery => 'బేకరీ & స్వీట్ షాప్';
+
+  @override
+  String get businessTypeApparel => 'దుస్తులు & వస్త్రాలు';
+
+  @override
+  String get businessTypeElectronics => 'మొబైల్ & ఎలక్ట్రానిక్స్';
 
   @override
   String get businessTypeOthers => 'ఇతరాలు';
@@ -396,7 +432,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get consentTermsSummary =>
-      'Kirana AIని ఉపయోగించడం ద్వారా, మీరు ఈ సేవను చట్టబద్ధమైన వ్యాపార అవసరాల కోసం మాత్రమే ఉపయోగిస్తారని అంగీకరిస్తారు. ఈ నిబంధనలను ఉల్లంఘించే ఖాతాలను సస్పెండ్ చేసే హక్కు LohiyaAIకి ఉంది. మీ డేటా సేవను అందించడానికి మరియు మెరుగుపరచడానికి మాత్రమే ఉపయోగించబడుతుంది.';
+      'Outlet AIని ఉపయోగించడం ద్వారా, మీరు ఈ సేవను చట్టబద్ధమైన వ్యాపార అవసరాల కోసం మాత్రమే ఉపయోగిస్తారని అంగీకరిస్తారు. ఈ నిబంధనలను ఉల్లంఘించే ఖాతాలను సస్పెండ్ చేసే హక్కు LohiyaAIకి ఉంది. మీ డేటా సేవను అందించడానికి మరియు మెరుగుపరచడానికి మాత్రమే ఉపయోగించబడుతుంది.';
 
   @override
   String get consentPrivacyTitle => 'గోప్యతా విధానం';
@@ -445,7 +481,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get dashNavBilling => 'బిల్లింగ్';
 
   @override
-  String get dashTrialWelcome => 'Kirana AI కి స్వాగతం';
+  String get dashTrialWelcome => 'Outlet AI కి స్వాగతం';
 
   @override
   String get dashTrialChoosePlan =>
@@ -521,7 +557,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get dashUpgradeBody =>
-      'మీ ఉచిత ట్రయల్ ముగిసింది. Kirana AIని వాడటం కొనసాగించడానికి మరియు మీ దుకాణాన్ని వృద్ధి చేయడానికి ఒక ప్లాన్ ఎంచుకోండి.';
+      'మీ ఉచిత ట్రయల్ ముగిసింది. Outlet AIని వాడటం కొనసాగించడానికి మరియు మీ దుకాణాన్ని వృద్ధి చేయడానికి ఒక ప్లాన్ ఎంచుకోండి.';
 
   @override
   String get dashUpgradeBasic => 'Basic';
@@ -2330,6 +2366,16 @@ class AppLocalizationsTe extends AppLocalizations {
   }
 
   @override
+  String finClearingDuesProgress(int cleared, int total) {
+    return 'బకాయిలు తీర్చబడుతున్నాయి: $cleared/$total';
+  }
+
+  @override
+  String finDuesClearFailed(int cleared, int total) {
+    return 'అన్ని బకాయిలు తీర్చలేకపోయాం ($cleared/$total)';
+  }
+
+  @override
   String get finSmartReminders => 'స్మార్ట్ రిమైండర్లు';
 
   @override
@@ -2578,7 +2624,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get procKiranaAiReadsInvoice =>
-      'Kirana AI వస్తువులు, మొత్తాలు & సప్లయర్ వివరాలను చదువుతుంది';
+      'Outlet AI వస్తువులు, మొత్తాలు & సప్లయర్ వివరాలను చదువుతుంది';
 
   @override
   String get procCamera => 'కెమెరా';
@@ -2591,7 +2637,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get procKiranaAiReadingInvoice =>
-      'Kirana AI మీ ఇన్‌వాయిస్‌ను చదువుతోంది…';
+      'Outlet AI మీ ఇన్‌వాయిస్‌ను చదువుతోంది…';
 
   @override
   String get procExtractingItems =>
@@ -2726,7 +2772,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get procTapToStopAndProcess => 'ఆపి ప్రాసెస్ చేయడానికి ట్యాప్ చేయండి';
 
   @override
-  String get procKiranaAiProcessing => 'Kirana AI ప్రాసెస్ చేస్తోంది…';
+  String get procKiranaAiProcessing => 'Outlet AI ప్రాసెస్ చేస్తోంది…';
 
   @override
   String get procHeard => 'విన్నది';
@@ -3053,7 +3099,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get subWhatsAppHelpMessage =>
-      'నమస్తే! నా Kirana AI సబ్‌స్క్రిప్షన్‌తో సహాయం కావాలి.';
+      'నమస్తే! నా Outlet AI సబ్‌స్క్రిప్షన్‌తో సహాయం కావాలి.';
 
   @override
   String subCurrentPlanLabel(String plan) {
@@ -4005,14 +4051,14 @@ class AppLocalizationsTe extends AppLocalizations {
   String get supBlockedContactUs => 'మమ్మల్ని సంప్రదించండి';
 
   @override
-  String get supBlockedEmailSubjectApp => 'యాప్ యాక్సెస్ సమస్య — Kirana AI';
+  String get supBlockedEmailSubjectApp => 'యాప్ యాక్సెస్ సమస్య — Outlet AI';
 
   @override
-  String get supBlockedEmailSubjectStore => 'స్టోర్ యాక్సెస్ సమస్య — Kirana AI';
+  String get supBlockedEmailSubjectStore => 'స్టోర్ యాక్సెస్ సమస్య — Outlet AI';
 
   @override
   String supBlockedEmailBody(String reason) {
-    return 'హలో LohiyaAI టీమ్,\n\nనేను Kirana AI యాప్‌ను యాక్సెస్ చేయలేకపోతున్నాను.\n\nచూపిన కారణం: $reason\n\nదయచేసి యాక్సెస్‌ను తిరిగి పొందడంలో నాకు సహాయం చేయండి.\n\n— Kirana ఓనర్';
+    return 'హలో LohiyaAI టీమ్,\n\nనేను Outlet AI యాప్‌ను యాక్సెస్ చేయలేకపోతున్నాను.\n\nచూపిన కారణం: $reason\n\nదయచేసి యాక్సెస్‌ను తిరిగి పొందడంలో నాకు సహాయం చేయండి.\n\n— Kirana ఓనర్';
   }
 
   @override
@@ -4684,7 +4730,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get widgetUnitToPay => 'చెల్లించాలి';
 
   @override
-  String get widgetSignIn => 'సైన్ ఇన్ చేయడానికి Kirana AI తెరవండి';
+  String get widgetSignIn => 'సైన్ ఇన్ చేయడానికి Outlet AI తెరవండి';
 
   @override
   String get widgetNoData => 'నేటి గణాంకాల కోసం యాప్ తెరవండి';

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_client.dart';
 import '../../dashboard/providers/overview_provider.dart';
@@ -10,6 +11,50 @@ class FinanceData {
 
   const FinanceData({required this.stats, required this.udhaarList});
 }
+
+/// Lifecycle of a background customer-recovery settlement.
+enum RecoveryStatus { running, success, failed }
+
+class RecoveryProgress {
+  final int cleared;
+  final int total;
+  final RecoveryStatus status;
+
+  /// Open entries still owing after a failure — replayed on retry so we never
+  /// re-settle the dues that already went through.
+  final List<UdhaarItem> pending;
+
+  /// Amount still to apply across [pending] when retrying.
+  final double remainingAmount;
+
+  const RecoveryProgress(
+    this.cleared,
+    this.total, {
+    this.status = RecoveryStatus.running,
+    this.pending = const [],
+    this.remainingAmount = 0,
+  });
+}
+
+class RecoveryProgressNotifier extends Notifier<Map<int, RecoveryProgress>> {
+  @override
+  Map<int, RecoveryProgress> build() => {};
+
+  void setProgress(int customerId, RecoveryProgress? p) {
+    if (p == null) {
+      final newState = Map.of(state);
+      newState.remove(customerId);
+      state = newState;
+    } else {
+      state = {...state, customerId: p};
+    }
+  }
+}
+
+final recoveryProgressProvider =
+    NotifierProvider<RecoveryProgressNotifier, Map<int, RecoveryProgress>>(
+      RecoveryProgressNotifier.new,
+    );
 
 class FinanceNotifier extends AsyncNotifier<FinanceData> {
   @override
@@ -69,28 +114,50 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
         'amount': amount,
       });
       await refresh();
-      // Invalidate the overview so the "Customer Dues" intelligence tile
-      // reflects the updated pending-dues count immediately.
+      // Keep dashboard in sync
       ref.invalidate(overviewProvider);
     } catch (e) {
       rethrow;
     }
   }
 
-  /// Records a single customer payment across their open khatas oldest-first:
-  /// the amount fully clears the oldest debt, then rolls into the next, until
-  /// it runs out. Posts to the same per-khata recovery endpoint without
-  /// refreshing between calls, then refreshes once at the end so the list and
-  /// stats update in a single pass. [openOldestFirst] must be the customer's
-  /// open (unsettled) entries sorted oldest-first.
+  /// Bulk recovery: applies [amount] across a customer's open dues oldest-first,
+  /// posting to the per-khata recovery endpoint one due at a time. Runs in the
+  /// background (the caller does not await it) and reports live state through
+  /// [recoveryProgressProvider]: a running x/y progress, a brief success flash,
+  /// or — if a post fails partway — a sticky failed state carrying the leftover
+  /// dues/amount so the UI can offer a retry. Refreshes the list + dashboard on
+  /// both the success and failure paths. [openOldestFirst] must be the
+  /// customer's open (unsettled) entries sorted oldest-first.
   Future<void> recordCustomerRecovery(
     List<UdhaarItem> openOldestFirst,
     double amount,
   ) async {
+    if (openOldestFirst.isEmpty) return;
+    final customerId = openOldestFirst.first.customerId;
+
+    // Pre-calculate total affected entries
+    var remainingCalc = amount;
+    int totalAffected = 0;
+    for (final entry in openOldestFirst) {
+      if (remainingCalc <= 0.001) break;
+      final pay = remainingCalc < entry.balance ? remainingCalc : entry.balance;
+      if (pay > 0) totalAffected++;
+      remainingCalc -= pay;
+    }
+
+    if (totalAffected == 0) return;
+
+    final progress = ref.read(recoveryProgressProvider.notifier);
+    progress.setProgress(customerId, RecoveryProgress(0, totalAffected));
+
     final client = ref.read(apiClientProvider);
+    var remaining = amount;
+    int cleared = 0;
+    int idx = 0;
     try {
-      var remaining = amount;
-      for (final entry in openOldestFirst) {
+      for (idx = 0; idx < openOldestFirst.length; idx++) {
+        final entry = openOldestFirst[idx];
         if (remaining <= 0.001) break;
         final pay = remaining < entry.balance ? remaining : entry.balance;
         if (pay <= 0) continue;
@@ -99,12 +166,42 @@ class FinanceNotifier extends AsyncNotifier<FinanceData> {
           'amount': pay,
         });
         remaining -= pay;
+        cleared++;
+        progress.setProgress(
+          customerId,
+          RecoveryProgress(cleared, totalAffected),
+        );
       }
       await refresh();
-      // Keep the dashboard "Customer Dues" tile in sync (same as recordRecovery).
       ref.invalidate(overviewProvider);
+      // Flash an "all dues cleared" confirmation, then auto-dismiss.
+      progress.setProgress(
+        customerId,
+        RecoveryProgress(
+          totalAffected,
+          totalAffected,
+          status: RecoveryStatus.success,
+        ),
+      );
+      Future.delayed(const Duration(seconds: 2), () {
+        progress.setProgress(customerId, null);
+      });
     } catch (e) {
-      rethrow;
+      debugPrint('Customer recovery failed at $cleared/$totalAffected: $e');
+      // Pull fresh balances (the dues already posted are settled), then keep a
+      // sticky failed banner carrying the leftover so the user can retry.
+      await refresh();
+      ref.invalidate(overviewProvider);
+      progress.setProgress(
+        customerId,
+        RecoveryProgress(
+          cleared,
+          totalAffected,
+          status: RecoveryStatus.failed,
+          pending: openOldestFirst.sublist(idx),
+          remainingAmount: remaining,
+        ),
+      );
     }
   }
 

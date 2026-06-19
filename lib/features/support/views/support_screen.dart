@@ -116,7 +116,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
 
             // Version Info
             Text(
-              'Kirana AI $_version',
+              'Outlet AI $_version',
               style: const TextStyle(color: BrandColors.muted, fontSize: 12),
             ),
             const SizedBox(height: 40),

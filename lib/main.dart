@@ -115,7 +115,7 @@ class _KiranaAppState extends ConsumerState<KiranaApp>
     final router = ref.watch(appRouterProvider);
     final locale = ref.watch(localeProvider);
     return MaterialApp.router(
-      title: 'Kirana AI',
+      title: 'Outlet AI',
       theme: buildBrandTheme(locale),
       routerConfig: router,
       debugShowCheckedModeBanner: false,

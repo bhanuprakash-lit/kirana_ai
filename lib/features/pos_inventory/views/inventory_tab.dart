@@ -14,7 +14,8 @@ import '../providers/price_memory_provider.dart';
 import '../providers/ml_flags_provider.dart';
 import 'near_expiry_screen.dart';
 import 'price_memory_screen.dart';
-import 'widgets/add_product_sheet.dart';
+// import 'widgets/add_product_sheet.dart';
+import 'widgets/add_product_sheet_new.dart';
 import 'widgets/barcode_scanner_overlay.dart';
 import 'widgets/edit_product_sheet.dart';
 
