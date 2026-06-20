@@ -20,6 +20,11 @@ class VerticalConfig {
   /// Whether a feature flag is explicitly enabled for this vertical.
   bool has(String feature) => features[feature] == true;
 
+  /// Whether a feature is explicitly disabled (flag == false). Absent → not off,
+  /// so features default to *shown* unless a vertical opts out (e.g. Vision is
+  /// off for apparel/electronics but stays on for grocery and legacy stores).
+  bool isOff(String feature) => features[feature] == false;
+
   factory VerticalConfig.fromJson(Map<String, dynamic> j) {
     final rawUnits = j['unit_set'];
     final units = rawUnits is List

@@ -69,6 +69,51 @@ class KpiCard {
   }
 }
 
+/// F4 — a KPI the store is allowed to see (vertical pack + admin visibility),
+/// resolved server-side so admin show/hide changes reflect live, no app update.
+class VisibleKpi {
+  final String kpiId;
+  final String name;
+  final String? slug; // endpoint slug, null for coming-soon
+  final String status; // 'ok' | 'data_unavailable'
+  final String category;
+  final String? missingData;
+
+  const VisibleKpi({
+    required this.kpiId,
+    required this.name,
+    required this.slug,
+    required this.status,
+    required this.category,
+    this.missingData,
+  });
+
+  bool get isLive => status == 'ok';
+
+  factory VisibleKpi.fromJson(Map<String, dynamic> j) {
+    final ep = j['endpoint'] as String?;
+    return VisibleKpi(
+      kpiId: j['kpi_id'] as String,
+      name: j['name'] as String? ?? j['kpi_id'] as String,
+      slug: ep?.split('/').last,
+      status: j['status'] as String? ?? 'data_unavailable',
+      category: j['category'] as String? ?? 'Operations',
+      missingData: j['missing_data'] as String?,
+    );
+  }
+}
+
+/// The KPIs this store should show, per its vertical + admin visibility config.
+final visibleKpisProvider = FutureProvider.autoDispose<List<VisibleKpi>>((ref) async {
+  final client = ref.read(apiClientProvider);
+  final data = await client.get('/kirana/kpis/visible');
+  final list = (data is Map ? data['kpis'] : null) as List<dynamic>? ?? [];
+  return list
+      .whereType<Map>()
+      .map((e) => VisibleKpi.fromJson(e.cast<String, dynamic>()))
+      .toList();
+});
+
 final kpiCardsProvider = FutureProvider.autoDispose<List<KpiCard>>((ref) async {
   final client = ref.read(apiClientProvider);
   final prefs = await SharedPreferences.getInstance();
