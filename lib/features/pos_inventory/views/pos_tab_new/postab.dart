@@ -35,6 +35,31 @@ class _PosTabState extends ConsumerState<PosTab> {
   }
 
   Future<void> _handleProductAdd(PosProduct p) async {
+    // F2 — variant verticals: pick the size/colour/model (its price + stock)
+    // before adding. Grocery and products without real variants are unaffected.
+    if (verticalConfigOf(ref).has('variants')) {
+      List<ProductVariant> variants = const [];
+      try {
+        final all = await ref.read(productVariantsProvider(p.productId).future);
+        variants = all.where((v) => !v.isImplicit && v.isActive).toList();
+      } catch (_) {}
+      if (variants.isNotEmpty) {
+        if (!mounted) return;
+        final chosen = await showVariantPickerSheet(
+          context,
+          variants: variants,
+          productName: p.name,
+        );
+        if (chosen == null) return;
+        ref.read(posProvider.notifier).addToCart(
+              p,
+              variantId: chosen.variantId,
+              variantLabel: chosen.label,
+              unitPriceOverride: chosen.price,
+            );
+        return;
+      }
+    }
     if (p.isLoose) {
       final qty = await _showWeightDialog(p);
       if (qty != null && qty > 0) {
@@ -996,7 +1021,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                             separatorBuilder: (_, _) =>
                                 const SizedBox(height: 8),
                             itemBuilder: (_, i) => Dismissible(
-                              key: ValueKey(cart[i].product.productId),
+                              key: ValueKey(cart[i].lineKey),
                               direction: DismissDirection.endToStart,
                               background: Container(
                                 alignment: Alignment.centerRight,
@@ -1012,7 +1037,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                               ),
                               onDismissed: (_) => ref
                                   .read(posProvider.notifier)
-                                  .removeFromCart(cart[i].product.productId),
+                                  .removeFromCart(cart[i].lineKey),
                               child: _CartTile(
                                 item: cart[i],
                                 onEditLoose: (item) async {
@@ -1023,7 +1048,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                                   if (qty != null && qty > 0) {
                                     ref
                                         .read(posProvider.notifier)
-                                        .updateQty(item.product.productId, qty);
+                                        .updateQty(item.lineKey, qty);
                                   }
                                 },
                               ),
@@ -1049,6 +1074,7 @@ class _PosTabState extends ConsumerState<PosTab> {
             _OrderFooter(
               subtotal: state.subtotal,
               itemCount: state.cartItemCount,
+              tax: state.cartTax,
               basketName: state.appliedBasketName,
               basketGross: state.basketGross,
               basketSavings: state.basketSavings,

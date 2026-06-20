@@ -1566,6 +1566,30 @@ abstract class AppLocalizations {
   /// **'Qty'**
   String get posQtyFallback;
 
+  /// No description provided for @posSelectVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Select variant'**
+  String get posSelectVariant;
+
+  /// No description provided for @posInclGst.
+  ///
+  /// In en, this message translates to:
+  /// **'Incl. GST {amount}'**
+  String posInclGst(String amount);
+
+  /// No description provided for @posOutOfStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of stock'**
+  String get posOutOfStock;
+
+  /// No description provided for @posVariantStockLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{stock} in stock'**
+  String posVariantStockLine(String stock);
+
   /// No description provided for @posPriceLabel.
   ///
   /// In en, this message translates to:
@@ -2874,6 +2898,48 @@ abstract class AppLocalizations {
   /// **'Add Variant'**
   String get invAddVariant;
 
+  /// No description provided for @invManageVariants.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Variants'**
+  String get invManageVariants;
+
+  /// No description provided for @invVariants.
+  ///
+  /// In en, this message translates to:
+  /// **'Variants'**
+  String get invVariants;
+
+  /// No description provided for @invEditVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Variant'**
+  String get invEditVariant;
+
+  /// No description provided for @invSaveVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Variant'**
+  String get invSaveVariant;
+
+  /// No description provided for @invNoVariantsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No variants yet. Add sizes, colours or models.'**
+  String get invNoVariantsYet;
+
+  /// No description provided for @invDefaultVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get invDefaultVariant;
+
+  /// No description provided for @invVariantAxisRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose {label}'**
+  String invVariantAxisRequired(String label);
+
   /// No description provided for @invSaveProduct.
   ///
   /// In en, this message translates to:
@@ -3077,6 +3143,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stock'**
   String get invStock;
+
+  /// No description provided for @invGstRate.
+  ///
+  /// In en, this message translates to:
+  /// **'GST %'**
+  String get invGstRate;
+
+  /// No description provided for @invHsnCode.
+  ///
+  /// In en, this message translates to:
+  /// **'HSN code'**
+  String get invHsnCode;
 
   /// No description provided for @invStockInUnit.
   ///

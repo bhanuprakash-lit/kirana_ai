@@ -22,6 +22,9 @@ class InventoryItem {
   // From inventory_batch
   final String? expiryDate;
   final String? imageUrl;
+  // F3 — GST
+  final double? gstRate;
+  final String? hsnCode;
 
   const InventoryItem({
     required this.productId,
@@ -44,6 +47,8 @@ class InventoryItem {
     this.soldToday = 0,
     this.expiryDate,
     this.imageUrl,
+    this.gstRate,
+    this.hsnCode,
   });
 
   bool get isFastMoving =>
@@ -135,6 +140,8 @@ class InventoryItem {
       soldToday: soldToday,
       expiryDate: expiryDate,
       imageUrl: product['image_url'] as String?,
+      gstRate: (product['gst_rate'] as num?)?.toDouble(),
+      hsnCode: product['hsn_code'] as String?,
     );
   }
 }

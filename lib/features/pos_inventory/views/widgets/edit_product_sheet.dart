@@ -5,11 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/locale/locale_provider.dart';
+import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../models/inventory_item.dart';
 import '../../providers/inventory_provider.dart';
+import 'variant_manager_sheet.dart';
 // import 'add_product_sheet.dart' show showCategoryPicker;
 import 'add_product_sheet_new.dart' show showCategoryPicker;
 import 'add_category_sheet.dart';
@@ -71,6 +74,14 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
       widget.item.stockQuantity % 1 == 0 ? 0 : 2,
     ),
   );
+  late final _gstCtrl = TextEditingController(
+    text: widget.item.gstRate != null
+        ? widget.item.gstRate!.toStringAsFixed(
+            widget.item.gstRate! % 1 == 0 ? 0 : 2,
+          )
+        : '',
+  );
+  late final _hsnCtrl = TextEditingController(text: widget.item.hsnCode ?? '');
 
   late int _selectedCategoryId = widget.item.categoryId;
   late String? _selectedCategoryName = widget.item.categoryName;
@@ -94,6 +105,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
       _priceCtrl,
       _mrpCtrl,
       _stockCtrl,
+      _gstCtrl,
+      _hsnCtrl,
     ]) {
       c.dispose();
     }
@@ -157,6 +170,23 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
           isPerishable: _isPerishable,
           isLoose: _isLoose,
         );
+
+    // F3 — persist GST rate / HSN for non-grocery verticals.
+    if (err == null && verticalConfigOf(ref).verticalCode != 'grocery') {
+      try {
+        await ref.read(apiClientProvider).post(
+          '/kirana/products/${widget.item.productId}/tax',
+          {
+            'gst_rate': _gstCtrl.text.trim().isNotEmpty
+                ? double.tryParse(_gstCtrl.text.trim())
+                : null,
+            'hsn_code': _hsnCtrl.text.trim().isNotEmpty
+                ? _hsnCtrl.text.trim()
+                : null,
+          },
+        );
+      } catch (_) {}
+    }
 
     if (!mounted) return;
     if (err == null) {
@@ -529,6 +559,68 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               enabled: !_saving && !_success,
               onChanged: (v) => setState(() => _isPerishable = v),
             ),
+            // F3 — GST / HSN, only for non-grocery (taxable) verticals.
+            if (verticalConfigOf(ref).verticalCode != 'grocery') ...[
+              const SizedBox(height: 24),
+              _SectionHeader(l10n.invGstRate),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _gstCtrl,
+                      enabled: !_saving && !_success,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d{0,2}'),
+                        ),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: l10n.invGstRate,
+                        suffixText: '%',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _hsnCtrl,
+                      enabled: !_saving && !_success,
+                      decoration: InputDecoration(labelText: l10n.invHsnCode),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            // F2 — variants (size/colour/model…) only for variant verticals.
+            if (verticalConfigOf(ref).has('variants')) ...[
+              const SizedBox(height: 24),
+              _SectionHeader(l10n.invVariants),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: (_saving || _success)
+                    ? null
+                    : () => showVariantManagerSheet(
+                          context,
+                          ref,
+                          productId: widget.item.productId,
+                          productName: widget.item.name,
+                        ),
+                icon: const Icon(Icons.tune_rounded),
+                label: Text(l10n.invManageVariants),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  foregroundColor: BrandColors.primary,
+                  side: const BorderSide(color: BrandColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 40),
             SizedBox(
               height: 56,

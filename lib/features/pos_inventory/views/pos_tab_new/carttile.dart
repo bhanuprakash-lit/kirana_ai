@@ -53,6 +53,15 @@ class _CartTile extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if ((item.variantLabel as String?)?.isNotEmpty ?? false)
+                  Text(
+                    item.variantLabel as String,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: BrandColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 if (isCustomerPriced)
                   GestureDetector(
                     onTap: hasCustomer
@@ -175,10 +184,10 @@ class _CartTile extends ConsumerWidget {
               qty: item.quantity.toInt(),
               onDecrement: () => ref
                   .read(posProvider.notifier)
-                  .updateQty(p.productId, item.quantity - 1),
+                  .updateQty(item.lineKey, item.quantity - 1),
               onIncrement: () => ref
                   .read(posProvider.notifier)
-                  .updateQty(p.productId, item.quantity + 1),
+                  .updateQty(item.lineKey, item.quantity + 1),
             ),
 
           const SizedBox(width: 12),

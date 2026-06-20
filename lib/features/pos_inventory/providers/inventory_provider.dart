@@ -200,6 +200,9 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     String? expiryDate,
     int? existingProductId,
     String? imageUrl,
+    List<Map<String, dynamic>>? variants,
+    double? gstRate,
+    String? hsnCode,
   }) async {
     final params = <String, dynamic>{
       'name': name,
@@ -217,6 +220,9 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       'expiryDate': expiryDate,
       'existingProductId': existingProductId,
       'imageUrl': imageUrl,
+      'variants': variants,
+      'gstRate': gstRate,
+      'hsnCode': hsnCode,
     };
 
     final categoryName = state.value?.categories
@@ -336,6 +342,36 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
             'cost_price': costPrice,
           });
         } catch (_) {}
+      }
+
+      // F3 — set GST rate / HSN on the product if supplied.
+      final gstRate = p['gstRate'] as double?;
+      final hsnCode = p['hsnCode'] as String?;
+      if (gstRate != null || (hsnCode != null && hsnCode.isNotEmpty)) {
+        try {
+          await client.post('/kirana/products/$productId/tax', {
+            'gst_rate': gstRate,
+            'hsn_code': (hsnCode != null && hsnCode.isNotEmpty) ? hsnCode : null,
+          });
+        } catch (_) {}
+      }
+
+      // F2 — create the product's variants (size/colour/model) if supplied.
+      final variants = p['variants'] as List<Map<String, dynamic>>?;
+      if (variants != null && variants.isNotEmpty) {
+        for (final v in variants) {
+          final vBarcode = (v['barcode'] as String?) ?? '';
+          try {
+            await client.post('/kirana/products/$productId/variants', {
+              'attributes': v['attributes'] ?? <String, String>{},
+              'price': v['price'],
+              'mrp': v['mrp'],
+              'cost': v['cost'],
+              'stock': v['stock'] ?? 0,
+              if (vBarcode.isNotEmpty) 'barcode': vBarcode,
+            });
+          } catch (_) {}
+        }
       }
 
       return null; // success

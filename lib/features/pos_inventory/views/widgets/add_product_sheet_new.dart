@@ -12,6 +12,8 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/inventory_provider.dart';
 import '../../providers/pos_provider.dart';
+import '../../providers/variant_provider.dart';
+import '../../models/product_variant.dart';
 import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
 

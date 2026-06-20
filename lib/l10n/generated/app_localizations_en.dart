@@ -803,6 +803,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posQtyFallback => 'Qty';
 
   @override
+  String get posSelectVariant => 'Select variant';
+
+  @override
+  String posInclGst(String amount) {
+    return 'Incl. GST $amount';
+  }
+
+  @override
+  String get posOutOfStock => 'Out of stock';
+
+  @override
+  String posVariantStockLine(String stock) {
+    return '$stock in stock';
+  }
+
+  @override
   String posPriceLabel(String price) {
     return 'Price: $price';
   }
@@ -1620,6 +1636,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invAddVariant => 'Add Variant';
 
   @override
+  String get invManageVariants => 'Manage Variants';
+
+  @override
+  String get invVariants => 'Variants';
+
+  @override
+  String get invEditVariant => 'Edit Variant';
+
+  @override
+  String get invSaveVariant => 'Save Variant';
+
+  @override
+  String get invNoVariantsYet =>
+      'No variants yet. Add sizes, colours or models.';
+
+  @override
+  String get invDefaultVariant => 'Default';
+
+  @override
+  String invVariantAxisRequired(String label) {
+    return 'Please choose $label';
+  }
+
+  @override
   String get invSaveProduct => 'Save Product';
 
   @override
@@ -1732,6 +1772,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invStock => 'Stock';
+
+  @override
+  String get invGstRate => 'GST %';
+
+  @override
+  String get invHsnCode => 'HSN code';
 
   @override
   String invStockInUnit(String unit) {

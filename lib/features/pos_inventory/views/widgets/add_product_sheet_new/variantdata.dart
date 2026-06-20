@@ -10,6 +10,10 @@ class _VariantData {
   final expiryCtrl = TextEditingController();
   String selectedUnit = 'pcs';
 
+  /// F2 — variant axis values (e.g. {size:'M', colour:'Blue'}). Used instead of
+  /// weight/unit when the store's vertical `has('variants')`.
+  final Map<String, String> attributes = {};
+
   void dispose() {
     weightCtrl.dispose();
     barcodeCtrl.dispose();

@@ -814,6 +814,22 @@ class AppLocalizationsTe extends AppLocalizations {
   String get posQtyFallback => 'క్వాంటిటీ';
 
   @override
+  String get posSelectVariant => 'వేరియంట్ ఎంచుకోండి';
+
+  @override
+  String posInclGst(String amount) {
+    return 'GST తో $amount';
+  }
+
+  @override
+  String get posOutOfStock => 'స్టాక్ లేదు';
+
+  @override
+  String posVariantStockLine(String stock) {
+    return '$stock స్టాక్‌లో';
+  }
+
+  @override
   String posPriceLabel(String price) {
     return 'ధర: $price';
   }
@@ -1601,6 +1617,30 @@ class AppLocalizationsTe extends AppLocalizations {
   String get invAddVariant => 'వేరియంట్ జోడించు';
 
   @override
+  String get invManageVariants => 'వేరియంట్‌లను నిర్వహించండి';
+
+  @override
+  String get invVariants => 'వేరియంట్‌లు';
+
+  @override
+  String get invEditVariant => 'వేరియంట్‌ను సవరించండి';
+
+  @override
+  String get invSaveVariant => 'వేరియంట్‌ను సేవ్ చేయండి';
+
+  @override
+  String get invNoVariantsYet =>
+      'ఇంకా వేరియంట్‌లు లేవు. సైజు, రంగు లేదా మోడల్ జోడించండి.';
+
+  @override
+  String get invDefaultVariant => 'డిఫాల్ట్';
+
+  @override
+  String invVariantAxisRequired(String label) {
+    return 'దయచేసి $label ఎంచుకోండి';
+  }
+
+  @override
   String get invSaveProduct => 'ప్రొడక్ట్ సేవ్ చేయి';
 
   @override
@@ -1715,6 +1755,12 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get invStock => 'స్టాక్';
+
+  @override
+  String get invGstRate => 'GST %';
+
+  @override
+  String get invHsnCode => 'HSN కోడ్';
 
   @override
   String invStockInUnit(String unit) {

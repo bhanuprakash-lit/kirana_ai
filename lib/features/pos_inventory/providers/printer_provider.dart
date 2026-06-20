@@ -291,6 +291,7 @@ class PrinterNotifier extends Notifier<PrinterStateData> {
 
     final dt = DateTime.tryParse(dateStr) ?? DateTime.now().toUtc();
     final total = (order['total_amount'] as num?)?.toDouble() ?? 0;
+    final taxAmount = (order['tax_amount'] as num?)?.toDouble() ?? 0; // F3
     final payment = order['payment_method'] as String? ?? 'Cash';
     final rawItems = (order['items'] as List<dynamic>?) ?? [];
 
@@ -324,6 +325,7 @@ class PrinterNotifier extends Notifier<PrinterStateData> {
       items: items,
       totalAmount: total,
       paymentMethod: payment,
+      taxAmount: taxAmount,
     );
   }
 

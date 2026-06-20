@@ -819,6 +819,22 @@ class AppLocalizationsTa extends AppLocalizations {
   String get posQtyFallback => 'அளவு';
 
   @override
+  String get posSelectVariant => 'வகையைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String posInclGst(String amount) {
+    return 'GST உட்பட $amount';
+  }
+
+  @override
+  String get posOutOfStock => 'கையிருப்பு இல்லை';
+
+  @override
+  String posVariantStockLine(String stock) {
+    return '$stock கையிருப்பில்';
+  }
+
+  @override
   String posPriceLabel(String price) {
     return 'விலை: $price';
   }
@@ -1648,6 +1664,30 @@ class AppLocalizationsTa extends AppLocalizations {
   String get invAddVariant => 'வகைபேதம் சேர்';
 
   @override
+  String get invManageVariants => 'வகைகளை நிர்வகிக்கவும்';
+
+  @override
+  String get invVariants => 'வகைகள்';
+
+  @override
+  String get invEditVariant => 'வகையைத் திருத்து';
+
+  @override
+  String get invSaveVariant => 'வகையைச் சேமி';
+
+  @override
+  String get invNoVariantsYet =>
+      'இன்னும் வகைகள் இல்லை. அளவு, நிறம் அல்லது மாடல் சேர்க்கவும்.';
+
+  @override
+  String get invDefaultVariant => 'இயல்புநிலை';
+
+  @override
+  String invVariantAxisRequired(String label) {
+    return '$label தேர்ந்தெடுக்கவும்';
+  }
+
+  @override
   String get invSaveProduct => 'பொருளைச் சேமி';
 
   @override
@@ -1762,6 +1802,12 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get invStock => 'சரக்கு';
+
+  @override
+  String get invGstRate => 'GST %';
+
+  @override
+  String get invHsnCode => 'HSN குறியீடு';
 
   @override
   String invStockInUnit(String unit) {

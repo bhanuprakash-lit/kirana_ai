@@ -809,6 +809,22 @@ class AppLocalizationsMr extends AppLocalizations {
   String get posQtyFallback => 'प्रमाण';
 
   @override
+  String get posSelectVariant => 'व्हेरियंट निवडा';
+
+  @override
+  String posInclGst(String amount) {
+    return 'GST सह $amount';
+  }
+
+  @override
+  String get posOutOfStock => 'स्टॉक संपला';
+
+  @override
+  String posVariantStockLine(String stock) {
+    return '$stock स्टॉकमध्ये';
+  }
+
+  @override
   String posPriceLabel(String price) {
     return 'किंमत: $price';
   }
@@ -1628,6 +1644,30 @@ class AppLocalizationsMr extends AppLocalizations {
   String get invAddVariant => 'व्हेरियंट जोडा';
 
   @override
+  String get invManageVariants => 'व्हेरियंट व्यवस्थापित करा';
+
+  @override
+  String get invVariants => 'व्हेरियंट';
+
+  @override
+  String get invEditVariant => 'व्हेरियंट संपादित करा';
+
+  @override
+  String get invSaveVariant => 'व्हेरियंट जतन करा';
+
+  @override
+  String get invNoVariantsYet =>
+      'अद्याप व्हेरियंट नाहीत. साइज, रंग किंवा मॉडेल जोडा.';
+
+  @override
+  String get invDefaultVariant => 'डीफॉल्ट';
+
+  @override
+  String invVariantAxisRequired(String label) {
+    return 'कृपया $label निवडा';
+  }
+
+  @override
   String get invSaveProduct => 'उत्पादन जतन करा';
 
   @override
@@ -1740,6 +1780,12 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get invStock => 'स्टॉक';
+
+  @override
+  String get invGstRate => 'GST %';
+
+  @override
+  String get invHsnCode => 'HSN कोड';
 
   @override
   String invStockInUnit(String unit) {

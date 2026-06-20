@@ -28,6 +28,7 @@ class ReceiptData {
   final List<ReceiptLineItem> items;
   final double totalAmount;
   final String paymentMethod;
+  final double taxAmount; // F3 — GST included in totalAmount (0 = none)
 
   const ReceiptData({
     required this.storeName,
@@ -37,6 +38,7 @@ class ReceiptData {
     required this.items,
     required this.totalAmount,
     required this.paymentMethod,
+    this.taxAmount = 0,
   });
 }
 
@@ -320,6 +322,15 @@ class PrinterService {
       }
     }
     sep('=');
+
+    // ── GST breakup (inclusive) — printed only when there are taxable items ────
+    if (data.taxAmount > 0) {
+      final taxable = data.totalAmount - data.taxAmount;
+      s(_totalRow('Taxable', 'Rs.${taxable.toStringAsFixed(2)}'));
+      nl();
+      s(_totalRow('GST (incl.)', 'Rs.${data.taxAmount.toStringAsFixed(2)}'));
+      nl();
+    }
 
     // ── Grand total ───────────────────────────────────────────────────────────
     b(_boldOn);

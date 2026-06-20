@@ -811,6 +811,22 @@ class AppLocalizationsKn extends AppLocalizations {
   String get posQtyFallback => 'ಪ್ರಮಾಣ';
 
   @override
+  String get posSelectVariant => 'ವೇರಿಯಂಟ್ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String posInclGst(String amount) {
+    return 'GST ಸೇರಿ $amount';
+  }
+
+  @override
+  String get posOutOfStock => 'ಸ್ಟಾಕ್ ಇಲ್ಲ';
+
+  @override
+  String posVariantStockLine(String stock) {
+    return '$stock ಸ್ಟಾಕ್‌ನಲ್ಲಿ';
+  }
+
+  @override
   String posPriceLabel(String price) {
     return 'ಬೆಲೆ: $price';
   }
@@ -1634,6 +1650,30 @@ class AppLocalizationsKn extends AppLocalizations {
   String get invAddVariant => 'ರೂಪಾಂತರ ಸೇರಿಸಿ';
 
   @override
+  String get invManageVariants => 'ವೇರಿಯಂಟ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ';
+
+  @override
+  String get invVariants => 'ವೇರಿಯಂಟ್‌ಗಳು';
+
+  @override
+  String get invEditVariant => 'ವೇರಿಯಂಟ್ ಸಂಪಾದಿಸಿ';
+
+  @override
+  String get invSaveVariant => 'ವೇರಿಯಂಟ್ ಉಳಿಸಿ';
+
+  @override
+  String get invNoVariantsYet =>
+      'ಇನ್ನೂ ವೇರಿಯಂಟ್‌ಗಳಿಲ್ಲ. ಸೈಜ್, ಬಣ್ಣ ಅಥವಾ ಮಾಡೆಲ್ ಸೇರಿಸಿ.';
+
+  @override
+  String get invDefaultVariant => 'ಡೀಫಾಲ್ಟ್';
+
+  @override
+  String invVariantAxisRequired(String label) {
+    return 'ದಯವಿಟ್ಟು $label ಆಯ್ಕೆಮಾಡಿ';
+  }
+
+  @override
   String get invSaveProduct => 'ಉತ್ಪನ್ನ ಉಳಿಸಿ';
 
   @override
@@ -1746,6 +1786,12 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get invStock => 'ಸ್ಟಾಕ್';
+
+  @override
+  String get invGstRate => 'GST %';
+
+  @override
+  String get invHsnCode => 'HSN ಕೋಡ್';
 
   @override
   String invStockInUnit(String unit) {

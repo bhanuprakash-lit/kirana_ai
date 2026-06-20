@@ -138,6 +138,9 @@ class PosState {
 
   double get subtotal => cart.fold(0, (sum, item) => sum + item.lineTotal);
 
+  /// F3 — total GST included in the cart (0 = no taxable items).
+  double get cartTax => cart.fold(0.0, (sum, item) => sum + item.taxAmount);
+
   /// The customer-specific price for [productId], if one was suggested.
   CustomerPrice? customerPriceFor(int productId) {
     for (final cp in customerPrices) {
@@ -320,15 +323,17 @@ class PosNotifier extends Notifier<PosState> {
     PosProduct product, {
     double qty = 1.0,
     double? unitPriceOverride,
+    int? variantId,
+    String? variantLabel,
   }) {
     // When the customer's prices are in effect, new items inherit their price
     // unless the caller passed an explicit override (e.g. basket/bundle deal).
     if (unitPriceOverride == null && state.customerPricesApplied) {
       unitPriceOverride = state.customerPriceFor(product.productId)?.price;
     }
-    final existing = state.cart.indexWhere(
-      (i) => i.product.productId == product.productId,
-    );
+    // A product can appear once per variant; grocery uses variantId == null.
+    final lineKey = '${product.productId}:${variantId ?? 0}';
+    final existing = state.cart.indexWhere((i) => i.lineKey == lineKey);
     if (existing >= 0) {
       final updated = List<CartItem>.from(state.cart);
       updated[existing] = updated[existing].copyWith(
@@ -344,6 +349,8 @@ class PosNotifier extends Notifier<PosState> {
             product: product,
             quantity: qty,
             unitPriceOverride: unitPriceOverride,
+            variantId: variantId,
+            variantLabel: variantLabel,
           ),
         ],
       );
@@ -351,23 +358,20 @@ class PosNotifier extends Notifier<PosState> {
     _schedulePing();
   }
 
-  void removeFromCart(int productId) {
+  void removeFromCart(String lineKey) {
     state = state.copyWith(
-      cart: state.cart.where((i) => i.product.productId != productId).toList(),
+      cart: state.cart.where((i) => i.lineKey != lineKey).toList(),
     );
     _schedulePing();
   }
 
-  void updateQty(int productId, double qty) {
+  void updateQty(String lineKey, double qty) {
     if (qty <= 0) {
-      removeFromCart(productId);
+      removeFromCart(lineKey);
       return;
     }
     final updated = state.cart
-        .map(
-          (i) =>
-              i.product.productId == productId ? i.copyWith(quantity: qty) : i,
-        )
+        .map((i) => i.lineKey == lineKey ? i.copyWith(quantity: qty) : i)
         .toList();
     state = state.copyWith(cart: updated);
     _schedulePing();
@@ -649,6 +653,7 @@ class PosNotifier extends Notifier<PosState> {
             .map(
               (i) => {
                 'product_id': i.product.productId,
+                'variant_id': ?i.variantId,
                 'quantity': i.quantity,
                 'selling_price': i.unitPrice,
                 'unit_price': i.unitPrice,

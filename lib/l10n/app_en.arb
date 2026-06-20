@@ -378,6 +378,16 @@
     }
   },
   "posQtyFallback": "Qty",
+  "posSelectVariant": "Select variant",
+  "posInclGst": "Incl. GST {amount}",
+  "@posInclGst": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "posOutOfStock": "Out of stock",
+  "posVariantStockLine": "{stock} in stock",
+  "@posVariantStockLine": {
+    "placeholders": { "stock": { "type": "String" } }
+  },
   "posPriceLabel": "Price: {price}",
   "@posPriceLabel": {
     "placeholders": {
@@ -974,6 +984,16 @@
     }
   },
   "invAddVariant": "Add Variant",
+  "invManageVariants": "Manage Variants",
+  "invVariants": "Variants",
+  "invEditVariant": "Edit Variant",
+  "invSaveVariant": "Save Variant",
+  "invNoVariantsYet": "No variants yet. Add sizes, colours or models.",
+  "invDefaultVariant": "Default",
+  "invVariantAxisRequired": "Please choose {label}",
+  "@invVariantAxisRequired": {
+    "placeholders": { "label": { "type": "String" } }
+  },
   "invSaveProduct": "Save Product",
   "invSaveVariants": "Save {count} Variants",
   "@invSaveVariants": {
@@ -1050,6 +1070,8 @@
   },
   "invMrpOptional": "MRP (optional)",
   "invStock": "Stock",
+  "invGstRate": "GST %",
+  "invHsnCode": "HSN code",
   "invStockInUnit": "Stock (in {unit}) *",
   "@invStockInUnit": {
     "placeholders": {

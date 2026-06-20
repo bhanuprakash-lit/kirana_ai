@@ -3,6 +3,7 @@ part of '../pos_tab_new.dart';
 class _OrderFooter extends StatelessWidget {
   final double subtotal;
   final double itemCount;
+  final double tax; // F3 — GST included in the subtotal (0 = none)
   final String? basketName;
   final double? basketGross;
   final double? basketSavings;
@@ -15,6 +16,7 @@ class _OrderFooter extends StatelessWidget {
   const _OrderFooter({
     required this.subtotal,
     required this.itemCount,
+    this.tax = 0,
     this.basketName,
     this.basketGross,
     this.basketSavings,
@@ -163,6 +165,14 @@ class _OrderFooter extends StatelessWidget {
                       color: BrandColors.ink,
                     ),
                   ),
+                  if (tax > 0)
+                    Text(
+                      AppLocalizations.of(context).posInclGst(_fmt(tax)),
+                      style: const TextStyle(
+                        color: BrandColors.muted,
+                        fontSize: 10,
+                      ),
+                    ),
                 ],
               ),
             ],

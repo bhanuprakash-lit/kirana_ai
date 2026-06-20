@@ -24,6 +24,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _brandCtrl = TextEditingController();
+  final _gstCtrl = TextEditingController(); // F3 — GST %
+  final _hsnCtrl = TextEditingController(); // F3 — HSN code
 
   int? _selectedCategoryId;
   String? _selectedCategoryName;
@@ -59,6 +61,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     _searchCtrl.dispose();
     _nameCtrl.dispose();
     _brandCtrl.dispose();
+    _gstCtrl.dispose();
+    _hsnCtrl.dispose();
     for (final v in _variants) {
       v.dispose();
     }
@@ -253,6 +257,20 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         return;
       }
     }
+    // F2 — each variant must have every axis set so it is uniquely identifiable.
+    if (verticalConfigOf(ref).has('variants')) {
+      final axes = (ref.read(attributeDefsProvider).asData?.value ?? [])
+          .where((a) => a.isVariantAxis)
+          .toList();
+      for (final v in _variants) {
+        for (final a in axes) {
+          if ((v.attributes[a.attrCode] ?? '').trim().isEmpty) {
+            setState(() => _error = _l10n.invVariantAxisRequired(a.label));
+            return;
+          }
+        }
+      }
+    }
     setState(() {
       _saving = true;
       _error = null;
@@ -263,48 +281,97 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     final brand = _brandCtrl.text.trim().isNotEmpty
         ? _brandCtrl.text.trim()
         : null;
+    // F3 — product-level GST (gated to non-grocery in the UI).
+    final gstRate = _gstCtrl.text.trim().isNotEmpty
+        ? double.tryParse(_gstCtrl.text.trim())
+        : null;
+    final hsnCode = _hsnCtrl.text.trim().isNotEmpty ? _hsnCtrl.text.trim() : null;
 
     String? firstError;
-    for (int i = 0; i < _variants.length; i++) {
-      final v = _variants[i];
-      // Only the first variant reuses the catalog product_id.
-      // Each additional variant must create its own product row so it gets
-      // a unique product_id and a separate inventory entry.
-      final err = await ref
-          .read(inventoryProvider.notifier)
-          .addProduct(
+    if (verticalConfigOf(ref).has('variants')) {
+      // F2 — one product carrying many real variants (size/colour/model).
+      final first = _variants.first;
+      double totalStock = 0;
+      final specs = <Map<String, dynamic>>[];
+      for (final v in _variants) {
+        final stock = double.tryParse(v.stockCtrl.text.trim()) ?? 0;
+        totalStock += stock;
+        specs.add({
+          'attributes': Map<String, String>.from(v.attributes),
+          'price': double.tryParse(v.priceCtrl.text.trim()),
+          'mrp': v.mrpCtrl.text.trim().isNotEmpty
+              ? double.tryParse(v.mrpCtrl.text.trim())
+              : null,
+          'cost': v.costCtrl.text.trim().isNotEmpty
+              ? double.tryParse(v.costCtrl.text.trim())
+              : null,
+          'stock': stock,
+          'barcode': v.barcodeCtrl.text.trim(),
+        });
+      }
+      firstError = await ref.read(inventoryProvider.notifier).addProduct(
             name: name,
             categoryId: _selectedCategoryId!,
-            sellingPrice: double.parse(v.priceCtrl.text),
-            initialStock: double.parse(
-              v.stockCtrl.text.isEmpty ? '0' : v.stockCtrl.text,
-            ),
+            sellingPrice: double.parse(first.priceCtrl.text),
+            initialStock: totalStock,
             brand: brand,
-            unit: v.selectedUnit,
-            weight: v.weightCtrl.text.trim().isNotEmpty
-                ? double.tryParse(v.weightCtrl.text.trim())
+            unit: 'pcs',
+            barcode: first.barcodeCtrl.text.trim().isNotEmpty
+                ? first.barcodeCtrl.text.trim()
                 : null,
-            barcode: v.barcodeCtrl.text.trim().isNotEmpty
-                ? v.barcodeCtrl.text.trim()
+            mrp: first.mrpCtrl.text.trim().isNotEmpty
+                ? double.tryParse(first.mrpCtrl.text.trim())
                 : null,
-            mrp: v.mrpCtrl.text.isNotEmpty
-                ? double.tryParse(v.mrpCtrl.text)
-                : null,
-            costPrice: v.costCtrl.text.isNotEmpty
-                ? double.tryParse(v.costCtrl.text)
-                : null,
-            isPerishable: _isPerishable,
-            isLoose: _isLoose,
-            expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty
-                ? v.expiryCtrl.text
-                : null,
-            existingProductId: i == 0 ? _linked?.productId : null,
-            // V2+ create new product rows — copy catalog image so they show the same photo
-            imageUrl: i == 0 ? null : _linked?.imageUrl,
+            existingProductId: _linked?.productId,
+            imageUrl: _linked?.imageUrl,
+            variants: specs,
+            gstRate: gstRate,
+            hsnCode: hsnCode,
           );
-      if (err != null) {
-        firstError = err;
-        break;
+    } else {
+      for (int i = 0; i < _variants.length; i++) {
+        final v = _variants[i];
+        // Only the first variant reuses the catalog product_id.
+        // Each additional variant must create its own product row so it gets
+        // a unique product_id and a separate inventory entry.
+        final err = await ref
+            .read(inventoryProvider.notifier)
+            .addProduct(
+              name: name,
+              categoryId: _selectedCategoryId!,
+              sellingPrice: double.parse(v.priceCtrl.text),
+              initialStock: double.parse(
+                v.stockCtrl.text.isEmpty ? '0' : v.stockCtrl.text,
+              ),
+              brand: brand,
+              unit: v.selectedUnit,
+              weight: v.weightCtrl.text.trim().isNotEmpty
+                  ? double.tryParse(v.weightCtrl.text.trim())
+                  : null,
+              barcode: v.barcodeCtrl.text.trim().isNotEmpty
+                  ? v.barcodeCtrl.text.trim()
+                  : null,
+              mrp: v.mrpCtrl.text.isNotEmpty
+                  ? double.tryParse(v.mrpCtrl.text)
+                  : null,
+              costPrice: v.costCtrl.text.isNotEmpty
+                  ? double.tryParse(v.costCtrl.text)
+                  : null,
+              isPerishable: _isPerishable,
+              isLoose: _isLoose,
+              expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty
+                  ? v.expiryCtrl.text
+                  : null,
+              existingProductId: i == 0 ? _linked?.productId : null,
+              // V2+ create new product rows — copy catalog image so they show the same photo
+              imageUrl: i == 0 ? null : _linked?.imageUrl,
+              gstRate: gstRate,
+              hsnCode: hsnCode,
+            );
+        if (err != null) {
+          firstError = err;
+          break;
+        }
       }
     }
 
@@ -772,13 +839,48 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             const SizedBox(height: 24),
           ],
 
+          // F3 — GST / HSN for non-grocery (taxable) verticals.
+          if (verticalConfigOf(ref).verticalCode != 'grocery') ...[
+            _SectionHeader(l10n.invGstRate),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _gstCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: l10n.invGstRate,
+                      suffixText: '%',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _hsnCtrl,
+                    decoration: InputDecoration(labelText: l10n.invHsnCode),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _SectionHeader(
-                _variants.length == 1
-                    ? l10n.invSizePriceStock
-                    : l10n.invVariantsCount(_variants.length),
+                verticalConfigOf(ref).has('variants')
+                    ? l10n.invVariants
+                    : (_variants.length == 1
+                          ? l10n.invSizePriceStock
+                          : l10n.invVariantsCount(_variants.length)),
               ),
               if (!_saving && !_success)
                 TextButton.icon(
@@ -809,7 +911,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           const SizedBox(height: 12),
 
           for (int i = 0; i < _variants.length; i++) ...[
-            _buildVariantRow(i),
+            verticalConfigOf(ref).has('variants')
+                ? _buildF2VariantRow(i)
+                : _buildVariantRow(i),
             const SizedBox(height: 12),
           ],
 
@@ -817,9 +921,11 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           SizedBox(
             height: 56,
             child: LoadingButton(
-              label: _variants.length == 1
+              label: verticalConfigOf(ref).has('variants')
                   ? l10n.invSaveProduct
-                  : l10n.invSaveVariants(_variants.length),
+                  : (_variants.length == 1
+                        ? l10n.invSaveProduct
+                        : l10n.invSaveVariants(_variants.length)),
               isLoading: _saving,
               onPressed: _success ? null : _save,
             ),
@@ -829,6 +935,104 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
       ),
     );
   }
+
+  /// F2 inline row: variant axes (size/colour/model) + price + stock. Used when
+  /// the store's vertical `has('variants')`; produces one product_variant.
+  Widget _buildF2VariantRow(int idx) {
+    final l10n = AppLocalizations.of(context);
+    final v = _variants[idx];
+    final axes = (ref.watch(attributeDefsProvider).asData?.value ?? [])
+        .where((a) => a.isVariantAxis)
+        .toList();
+    final canRemove = _variants.length > 1 && !_saving && !_success;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.invVariantNumber(idx + 1),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: BrandColors.muted,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              if (canRemove)
+                InkWell(
+                  onTap: () => setState(() {
+                    _variants[idx].dispose();
+                    _variants.removeAt(idx);
+                  }),
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: BrandColors.muted,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          for (final a in axes) ...[
+            _f2AxisField(v, a),
+            const SizedBox(height: 10),
+          ],
+          Row(
+            children: [
+              Expanded(child: _f2NumField(v.priceCtrl, l10n.invPrice, prefix: '₹ ')),
+              const SizedBox(width: 10),
+              Expanded(child: _f2NumField(v.stockCtrl, l10n.invStock)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _f2AxisField(_VariantData v, AttributeDef a) {
+    if (a.isEnum) {
+      return DropdownButtonFormField<String>(
+        initialValue: (v.attributes[a.attrCode]?.isNotEmpty ?? false)
+            ? v.attributes[a.attrCode]
+            : null,
+        isExpanded: true,
+        decoration: InputDecoration(labelText: a.label),
+        items: a.options
+            .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+            .toList(),
+        onChanged: (_saving || _success)
+            ? null
+            : (val) => setState(() => v.attributes[a.attrCode] = val ?? ''),
+      );
+    }
+    return TextFormField(
+      initialValue: v.attributes[a.attrCode],
+      enabled: !_saving && !_success,
+      decoration: InputDecoration(labelText: a.label),
+      onChanged: (val) => v.attributes[a.attrCode] = val.trim(),
+    );
+  }
+
+  Widget _f2NumField(TextEditingController c, String label, {String? prefix}) =>
+      TextField(
+        controller: c,
+        enabled: !_saving && !_success,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+        ],
+        decoration: InputDecoration(labelText: label, prefixText: prefix),
+      );
 
   Widget _buildVariantRow(int idx) {
     final l10n = AppLocalizations.of(context);
