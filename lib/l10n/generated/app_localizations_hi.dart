@@ -3740,6 +3740,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profLoyalty => 'लॉयल्टी एवं ऑफ़र';
 
   @override
+  String get profServices => 'सेवाएँ एवं अपॉइंटमेंट';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override

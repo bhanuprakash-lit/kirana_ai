@@ -3855,6 +3855,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get profLoyalty => 'லாயல்டி & சலுகைகள்';
 
   @override
+  String get profServices => 'சேவைகள் & சந்திப்புகள்';
+
+  @override
   String get profLanguage => 'மொழி';
 
   @override

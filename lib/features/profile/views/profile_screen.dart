@@ -11,6 +11,7 @@ import '../../subscription/models/subscription_model.dart';
 import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../providers/store_settings_provider.dart';
+import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/language_selector.dart';
 
@@ -200,6 +201,12 @@ class ProfileScreen extends ConsumerWidget {
                     label: l10n.profLoyalty,
                     onTap: () => context.push('/profile/loyalty'),
                   ),
+                  if (verticalConfigOf(ref).has('appointments'))
+                    _CompactRow(
+                      icon: Icons.event_note_rounded,
+                      label: l10n.profServices,
+                      onTap: () => context.push('/profile/services'),
+                    ),
                 ],
               ),
 

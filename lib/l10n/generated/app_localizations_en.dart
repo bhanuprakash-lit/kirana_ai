@@ -3809,6 +3809,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profLoyalty => 'Loyalty & Offers';
 
   @override
+  String get profServices => 'Services & Appointments';
+
+  @override
   String get profLanguage => 'Language';
 
   @override

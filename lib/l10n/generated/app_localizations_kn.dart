@@ -3821,6 +3821,9 @@ class AppLocalizationsKn extends AppLocalizations {
   String get profLoyalty => 'ಲಾಯಲ್ಟಿ & ಆಫರ್‌ಗಳು';
 
   @override
+  String get profServices => 'ಸೇವೆಗಳು & ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳು';
+
+  @override
   String get profLanguage => 'ಭಾಷೆ';
 
   @override

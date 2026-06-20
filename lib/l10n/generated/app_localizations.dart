@@ -6605,6 +6605,12 @@ abstract class AppLocalizations {
   /// **'Loyalty & Offers'**
   String get profLoyalty;
 
+  /// No description provided for @profServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Services & Appointments'**
+  String get profServices;
+
   /// No description provided for @profLanguage.
   ///
   /// In en, this message translates to:

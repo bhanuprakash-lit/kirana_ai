@@ -3852,6 +3852,9 @@ class AppLocalizationsMl extends AppLocalizations {
   String get profLoyalty => 'ലോയൽറ്റി & ഓഫറുകൾ';
 
   @override
+  String get profServices => 'സേവനങ്ങൾ & അപ്പോയിന്റ്മെന്റുകൾ';
+
+  @override
   String get profLanguage => 'ഭാഷ';
 
   @override
