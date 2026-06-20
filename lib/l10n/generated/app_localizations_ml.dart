@@ -3849,6 +3849,9 @@ class AppLocalizationsMl extends AppLocalizations {
   String get profMyBaskets => 'എന്റെ ബാസ്കറ്റുകൾ';
 
   @override
+  String get profLoyalty => 'ലോയൽറ്റി & ഓഫറുകൾ';
+
+  @override
   String get profLanguage => 'ഭാഷ';
 
   @override
@@ -3991,6 +3994,12 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get profHouseholdSize => 'കുടുംബ വലുപ്പം';
+
+  @override
+  String get profBirthdayOptional => 'ജന്മദിനം (ഓപ്ഷണൽ)';
+
+  @override
+  String get profAnniversaryOptional => 'വാർഷികം (ഓപ്ഷണൽ)';
 
   @override
   String get profSaveCustomer => 'ഉപഭോക്താവിനെ സംരക്ഷിക്കുക';

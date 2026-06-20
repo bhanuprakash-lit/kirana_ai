@@ -14,6 +14,7 @@ import '../../../finance/providers/finance_provider.dart';
 import '../../../finance/views/consent_recorder_sheet.dart';
 import '../../../profile/models/customer_model.dart';
 import '../../../profile/providers/customer_provider.dart';
+import '../../../loyalty/providers/loyalty_provider.dart';
 import '../../../profile/providers/store_settings_provider.dart';
 import '../../../subscription/models/subscription_model.dart';
 import '../../../subscription/providers/subscription_provider.dart';
@@ -308,6 +309,136 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   // default applied to existing udhaars) and is editable by the shopkeeper.
   DateTime _udhaarDueDate = DateTime(2026, 6, 30);
 
+  // M1 — coupon + points redeemed at checkout.
+  final _couponCtrl = TextEditingController();
+  int? _couponId;
+  double _couponDiscount = 0;
+  String? _couponMsg;
+  bool _couponOk = false;
+  double _redeemPoints = 0;
+  double _redeemValue = 0;
+
+  @override
+  void dispose() {
+    _couponCtrl.dispose();
+    super.dispose();
+  }
+
+  /// Bill after referral discount, coupon and redeemed points.
+  double _effectiveTotal(PosState state) =>
+      (state.discountedSubtotal - _couponDiscount - _redeemValue)
+          .clamp(0, double.infinity)
+          .toDouble();
+
+  Future<void> _applyCoupon() async {
+    final code = _couponCtrl.text.trim();
+    if (code.isEmpty) return;
+    final base = ref.read(posProvider).discountedSubtotal - _redeemValue;
+    try {
+      final res =
+          await ref.read(loyaltyActionsProvider).validateCoupon(code, base);
+      if (!mounted) return;
+      setState(() {
+        if (res['valid'] == true) {
+          _couponOk = true;
+          _couponId = (res['coupon_id'] as num?)?.toInt();
+          _couponDiscount = (res['discount'] as num?)?.toDouble() ?? 0;
+          _couponMsg = '−${_fmt(_couponDiscount)} applied';
+        } else {
+          _couponOk = false;
+          _couponId = null;
+          _couponDiscount = 0;
+          _couponMsg = (res['reason'] ?? 'Invalid coupon').toString();
+        }
+      });
+    } catch (e) {
+      if (mounted) setState(() => _couponMsg = 'Could not check coupon');
+    }
+  }
+
+  Widget _buildLoyaltySection(PosState state) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _couponCtrl,
+                textCapitalization: TextCapitalization.characters,
+                decoration: const InputDecoration(
+                  hintText: 'Coupon code',
+                  isDense: true,
+                  prefixIcon: Icon(Icons.local_offer_outlined, size: 18),
+                ),
+              ),
+            ),
+            TextButton(onPressed: _applyCoupon, child: const Text('Apply')),
+          ],
+        ),
+        if (_couponMsg != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 4, top: 2),
+            child: Text(
+              _couponMsg!,
+              style: TextStyle(
+                fontSize: 12,
+                color: _couponOk ? BrandColors.success : BrandColors.error,
+              ),
+            ),
+          ),
+        if (state.selectedCustomerId != null)
+          _pointsRedeemTile(state.selectedCustomerId!, state),
+      ],
+    );
+  }
+
+  Widget _pointsRedeemTile(int customerId, PosState state) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final loyalty = ref.watch(customerLoyaltyProvider(customerId)).asData?.value;
+        final cfg = ref.watch(loyaltyConfigProvider).asData?.value;
+        if (loyalty == null || cfg == null || loyalty.points <= 0) {
+          return const SizedBox.shrink();
+        }
+        final billBeforePoints =
+            (state.discountedSubtotal - _couponDiscount).clamp(0, double.infinity).toDouble();
+        final maxValue =
+            loyalty.redeemValue < billBeforePoints ? loyalty.redeemValue : billBeforePoints;
+        final maxPoints = cfg.redeemPaisePerPoint > 0
+            ? maxValue * 100 / cfg.redeemPaisePerPoint
+            : 0.0;
+        return CheckboxListTile(
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+          value: _redeemPoints > 0,
+          onChanged: maxPoints <= 0
+              ? null
+              : (v) => setState(() {
+                    if (v == true) {
+                      _redeemPoints =
+                          double.parse(maxPoints.toStringAsFixed(0));
+                      _redeemValue = double.parse(
+                          (_redeemPoints * cfg.redeemPaisePerPoint / 100)
+                              .toStringAsFixed(2));
+                    } else {
+                      _redeemPoints = 0;
+                      _redeemValue = 0;
+                    }
+                  }),
+          title: Text(
+            'Redeem ${loyalty.points.toStringAsFixed(0)} points (${_fmt(maxValue)})',
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            '${loyalty.tier} tier',
+            style: const TextStyle(fontSize: 11, color: BrandColors.muted),
+          ),
+        );
+      },
+    );
+  }
+
   AppLocalizations get _l10n =>
       lookupAppLocalizations(ref.read(localeProvider));
 
@@ -321,7 +452,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   /// already selected on the POS screen.  Loads the customer list on demand
   /// so the picker never silently blocks on an empty list.
   Future<void> _onUdhaarSelected() async {
-    final total = ref.read(posProvider).discountedSubtotal;
+    final total = _effectiveTotal(ref.read(posProvider));
     setState(() {
       _paymentMethod = 'udhaar';
       _udhaarAmount = total; // default: full amount on credit
@@ -374,6 +505,10 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           // was producing a duplicate, unlinked khata row.
           customerId: _paymentMethod == 'udhaar' ? _udhaarCustomerId : null,
           udhaarDueDate: _paymentMethod == 'udhaar' ? _udhaarDueDate : null,
+          couponId: _couponOk ? _couponId : null,
+          couponDiscount: _couponOk ? _couponDiscount : 0,
+          redeemPoints: _redeemPoints,
+          redeemValue: _redeemValue,
         );
     if (!mounted) return;
     if (result != null) {
@@ -586,6 +721,13 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                       const SizedBox(height: 10),
                     ],
 
+                    // ── M1: Coupon & points redeem (loyalty active only) ──────────────
+                    if (ref.watch(loyaltyConfigProvider).asData?.value.isActive ??
+                        false) ...[
+                      _buildLoyaltySection(state),
+                      const SizedBox(height: 10),
+                    ],
+
                     // ── Grand total ───────────────────────────────────────────────────
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -603,7 +745,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _fmt(state.discountedSubtotal),
+                          _fmt(_effectiveTotal(state)),
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
@@ -677,7 +819,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                       ),
                       const SizedBox(height: 12),
                       _UdhaarSplitSlider(
-                        total: state.discountedSubtotal,
+                        total: _effectiveTotal(state),
                         udhaarAmount: _udhaarAmount,
                         onChanged: (v) => setState(() => _udhaarAmount = v),
                         enabled: !_placing && !_success,
@@ -776,7 +918,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                       height: 56,
                       child: LoadingButton(
                         label: l10n.posPlaceOrderAmount(
-                          _fmt(state.discountedSubtotal),
+                          _fmt(_effectiveTotal(state)),
                         ),
                         isLoading: _placing,
                         onPressed: _success ? null : _confirm,

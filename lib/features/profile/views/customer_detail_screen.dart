@@ -6,6 +6,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
+import '../../loyalty/providers/loyalty_provider.dart';
 import 'customer_management_screen.dart';
 import '../../associations/providers/association_provider.dart';
 import '../../associations/models/association_model.dart';
@@ -127,6 +128,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
             ),
 
             const SizedBox(height: 16),
+
+            _CustomerLoyaltyCard(customerId: widget.customerId),
 
             // Stats Row
             Padding(
@@ -634,6 +637,79 @@ class _OrderListItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// M1 — customer loyalty points / tier card. Only shown when the store has
+/// loyalty enabled; nothing rendered otherwise.
+class _CustomerLoyaltyCard extends ConsumerWidget {
+  final int customerId;
+  const _CustomerLoyaltyCard({required this.customerId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final active =
+        ref.watch(loyaltyConfigProvider).asData?.value.isActive ?? false;
+    if (!active) return const SizedBox.shrink();
+    final async = ref.watch(customerLoyaltyProvider(customerId));
+    return async.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (l) {
+        final tierColor = l.tier == 'gold'
+            ? const Color(0xFFD4AF37)
+            : l.tier == 'silver'
+                ? const Color(0xFF9CA3AF)
+                : const Color(0xFFB87333);
+        return Container(
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: BrandColors.border),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.card_giftcard_rounded, color: tierColor, size: 28),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${l.points.toStringAsFixed(0)} points',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                            color: BrandColors.ink)),
+                    Text(
+                      '${l.tier[0].toUpperCase()}${l.tier.substring(1)} tier · worth ₹${l.redeemValue.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                          fontSize: 12, color: BrandColors.muted),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: tierColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  l.tier.toUpperCase(),
+                  style: TextStyle(
+                      color: tierColor,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

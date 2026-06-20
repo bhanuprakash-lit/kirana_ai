@@ -3806,6 +3806,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profMyBaskets => 'My Baskets';
 
   @override
+  String get profLoyalty => 'Loyalty & Offers';
+
+  @override
   String get profLanguage => 'Language';
 
   @override
@@ -3946,6 +3949,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profHouseholdSize => 'Household Size';
+
+  @override
+  String get profBirthdayOptional => 'Birthday (optional)';
+
+  @override
+  String get profAnniversaryOptional => 'Anniversary (optional)';
 
   @override
   String get profSaveCustomer => 'Save Customer';

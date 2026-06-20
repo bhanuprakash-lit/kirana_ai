@@ -3852,6 +3852,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get profMyBaskets => 'எனது கூடைகள்';
 
   @override
+  String get profLoyalty => 'லாயல்டி & சலுகைகள்';
+
+  @override
   String get profLanguage => 'மொழி';
 
   @override
@@ -3992,6 +3995,12 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get profHouseholdSize => 'வீட்டின் அளவு';
+
+  @override
+  String get profBirthdayOptional => 'பிறந்தநாள் (விரும்பினால்)';
+
+  @override
+  String get profAnniversaryOptional => 'ஆண்டுவிழா (விரும்பினால்)';
 
   @override
   String get profSaveCustomer => 'வாடிக்கையாளரைச் சேமி';

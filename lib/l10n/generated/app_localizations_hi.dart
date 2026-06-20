@@ -3737,6 +3737,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profMyBaskets => 'मेरी बास्केट';
 
   @override
+  String get profLoyalty => 'लॉयल्टी एवं ऑफ़र';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override
@@ -3877,6 +3880,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get profHouseholdSize => 'घर में लोगों की संख्या';
+
+  @override
+  String get profBirthdayOptional => 'जन्मदिन (वैकल्पिक)';
+
+  @override
+  String get profAnniversaryOptional => 'सालगिरह (वैकल्पिक)';
 
   @override
   String get profSaveCustomer => 'ग्राहक सेव करें';

@@ -623,6 +623,11 @@ class PosNotifier extends Notifier<PosState> {
     int?
     customerId, // overrides the POS-selected customer (e.g. the udhaar customer)
     DateTime? udhaarDueDate, // repayment deadline for udhaar orders
+    // M1 — loyalty/offers applied at checkout (backend records them on the order)
+    int? couponId,
+    double couponDiscount = 0,
+    double redeemPoints = 0,
+    double redeemValue = 0, // ₹ value of the redeemed points
   }) async {
     if (state.cart.isEmpty) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
@@ -640,15 +645,21 @@ class PosNotifier extends Notifier<PosState> {
     // If a referral QR was scanned, we may already have the new customer's ID
     // (pre-set from the scan sheet). Use it if not already overridden by a manual selection.
     final subtotal = state.subtotal;
-    final totalAmount = discountPct > 0
+    final baseTotal = discountPct > 0
         ? subtotal * (1 - discountPct / 100)
         : subtotal;
+    // M1 — apply coupon discount + redeemed-points value to the bill.
+    final totalAmount =
+        (baseTotal - couponDiscount - redeemValue).clamp(0, double.infinity).toDouble();
 
     try {
       final body = <String, dynamic>{
         'total_amount': totalAmount,
         'payment_method': paymentMethod,
         'customer_id': orderCustomerId,
+        'coupon_id': ?couponId,
+        if (couponDiscount > 0) 'coupon_discount': couponDiscount,
+        if (redeemPoints > 0) 'redeem_points': redeemPoints,
         'items': state.cart
             .map(
               (i) => {

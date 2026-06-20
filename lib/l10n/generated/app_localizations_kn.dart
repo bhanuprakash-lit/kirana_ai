@@ -3818,6 +3818,9 @@ class AppLocalizationsKn extends AppLocalizations {
   String get profMyBaskets => 'ನನ್ನ ಬುಟ್ಟಿಗಳು';
 
   @override
+  String get profLoyalty => 'ಲಾಯಲ್ಟಿ & ಆಫರ್‌ಗಳು';
+
+  @override
   String get profLanguage => 'ಭಾಷೆ';
 
   @override
@@ -3959,6 +3962,12 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get profHouseholdSize => 'ಮನೆಯ ಗಾತ್ರ';
+
+  @override
+  String get profBirthdayOptional => 'ಹುಟ್ಟುಹಬ್ಬ (ಐಚ್ಛಿಕ)';
+
+  @override
+  String get profAnniversaryOptional => 'ವಾರ್ಷಿಕೋತ್ಸವ (ಐಚ್ಛಿಕ)';
 
   @override
   String get profSaveCustomer => 'ಗ್ರಾಹಕ ಉಳಿಸಿ';

@@ -6599,6 +6599,12 @@ abstract class AppLocalizations {
   /// **'My Baskets'**
   String get profMyBaskets;
 
+  /// No description provided for @profLoyalty.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty & Offers'**
+  String get profLoyalty;
+
   /// No description provided for @profLanguage.
   ///
   /// In en, this message translates to:
@@ -6856,6 +6862,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Household Size'**
   String get profHouseholdSize;
+
+  /// No description provided for @profBirthdayOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday (optional)'**
+  String get profBirthdayOptional;
+
+  /// No description provided for @profAnniversaryOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Anniversary (optional)'**
+  String get profAnniversaryOptional;
 
   /// No description provided for @profSaveCustomer.
   ///

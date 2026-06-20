@@ -3793,6 +3793,9 @@ class AppLocalizationsTe extends AppLocalizations {
   String get profMyBaskets => 'నా బాస్కెట్‌లు';
 
   @override
+  String get profLoyalty => 'లాయల్టీ & ఆఫర్‌లు';
+
+  @override
   String get profLanguage => 'భాష';
 
   @override
@@ -3933,6 +3936,12 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get profHouseholdSize => 'ఇంట్లో మనుషుల సంఖ్య';
+
+  @override
+  String get profBirthdayOptional => 'పుట్టినరోజు (ఐచ్ఛికం)';
+
+  @override
+  String get profAnniversaryOptional => 'వార్షికోత్సవం (ఐచ్ఛికం)';
 
   @override
   String get profSaveCustomer => 'కస్టమర్‌ను సేవ్ చేయండి';

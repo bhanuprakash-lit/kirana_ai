@@ -195,6 +195,11 @@ class ProfileScreen extends ConsumerWidget {
                     label: l10n.profMyBaskets,
                     onTap: () => context.push('/profile/baskets'),
                   ),
+                  _CompactRow(
+                    icon: Icons.card_giftcard_rounded,
+                    label: l10n.profLoyalty,
+                    onTap: () => context.push('/profile/loyalty'),
+                  ),
                 ],
               ),
 

@@ -634,6 +634,8 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
   final _emailController = TextEditingController();
   final _householdController = TextEditingController(text: '4');
   bool _isSaving = false;
+  DateTime? _birthday;
+  DateTime? _anniversary;
 
   AppLocalizations get _l10n =>
       lookupAppLocalizations(ref.read(localeProvider));
@@ -646,6 +648,30 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
       _phoneController.text = widget.customer!.phone;
       _emailController.text = widget.customer!.email ?? '';
       _householdController.text = widget.customer!.householdSize.toString();
+      _birthday = widget.customer!.birthday;
+      _anniversary = widget.customer!.anniversary;
+    }
+  }
+
+  String _isoDate(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Future<void> _pickDate(bool birthday) async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: (birthday ? _birthday : _anniversary) ?? DateTime(now.year - 25),
+      firstDate: DateTime(1920),
+      lastDate: now,
+    );
+    if (picked != null) {
+      setState(() {
+        if (birthday) {
+          _birthday = picked;
+        } else {
+          _anniversary = picked;
+        }
+      });
     }
   }
 
@@ -754,6 +780,22 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
                 prefixIcon: const Icon(Icons.group_outlined),
               ),
             ),
+            const SizedBox(height: 16),
+            _DatePickerTile(
+              icon: Icons.cake_outlined,
+              label: _l10n.profBirthdayOptional,
+              value: _birthday,
+              onTap: () => _pickDate(true),
+              onClear: () => setState(() => _birthday = null),
+            ),
+            const SizedBox(height: 16),
+            _DatePickerTile(
+              icon: Icons.favorite_outline_rounded,
+              label: _l10n.profAnniversaryOptional,
+              value: _anniversary,
+              onTap: () => _pickDate(false),
+              onClear: () => setState(() => _anniversary = null),
+            ),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
@@ -813,6 +855,8 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
       'phone': phone,
       'email': _emailController.text.isEmpty ? null : _emailController.text,
       'household_size': int.tryParse(_householdController.text) ?? 4,
+      'birthday': _birthday != null ? _isoDate(_birthday!) : null,
+      'anniversary': _anniversary != null ? _isoDate(_anniversary!) : null,
     };
 
     bool success;
@@ -833,5 +877,50 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
         ).showSnackBar(SnackBar(content: Text(_l10n.profCustomerSaved)));
       }
     }
+  }
+}
+
+/// M1 — optional date field tile (birthday / anniversary) for the customer form.
+class _DatePickerTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final DateTime? value;
+  final VoidCallback onTap;
+  final VoidCallback onClear;
+  const _DatePickerTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onTap,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final text = value != null
+        ? '${value!.day}/${value!.month}/${value!.year}'
+        : label;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon),
+          suffixIcon: value != null
+              ? IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  onPressed: onClear,
+                )
+              : const Icon(Icons.calendar_today_rounded, size: 18),
+        ),
+        child: Text(
+          value != null ? text : 'Not set',
+          style: TextStyle(
+            color: value != null ? BrandColors.ink : BrandColors.muted,
+          ),
+        ),
+      ),
+    );
   }
 }

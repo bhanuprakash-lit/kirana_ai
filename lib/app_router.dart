@@ -18,6 +18,7 @@ import 'features/profile/views/config_screen.dart';
 import 'features/profile/views/password_screen.dart';
 import 'features/profile/views/cashflow_screen.dart';
 import 'features/profile/views/customer_detail_screen.dart';
+import 'features/loyalty/views/loyalty_settings_screen.dart';
 import 'features/referral/models/referral_models.dart';
 import 'features/referral/views/referral_screen.dart';
 import 'features/referral/views/referral_qr_screen.dart';
@@ -157,6 +158,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'baskets',
             builder: (context, state) => const BasketsScreen(),
+          ),
+          GoRoute(
+            path: 'loyalty',
+            builder: (context, state) => const LoyaltySettingsScreen(),
           ),
           GoRoute(
             path: 'support',
