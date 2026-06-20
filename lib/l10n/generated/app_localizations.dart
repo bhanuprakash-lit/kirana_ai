@@ -6611,6 +6611,12 @@ abstract class AppLocalizations {
   /// **'Services & Appointments'**
   String get profServices;
 
+  /// No description provided for @profStoreComparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Comparison'**
+  String get profStoreComparison;
+
   /// No description provided for @profLanguage.
   ///
   /// In en, this message translates to:

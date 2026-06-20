@@ -3824,6 +3824,9 @@ class AppLocalizationsKn extends AppLocalizations {
   String get profServices => 'ಸೇವೆಗಳು & ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳು';
 
   @override
+  String get profStoreComparison => 'ಅಂಗಡಿ ಹೋಲಿಕೆ';
+
+  @override
   String get profLanguage => 'ಭಾಷೆ';
 
   @override

@@ -3815,6 +3815,9 @@ class AppLocalizationsMr extends AppLocalizations {
   String get profServices => 'सेवा व अपॉइंटमेंट';
 
   @override
+  String get profStoreComparison => 'दुकान तुलना';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override

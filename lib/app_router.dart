@@ -20,6 +20,7 @@ import 'features/profile/views/cashflow_screen.dart';
 import 'features/profile/views/customer_detail_screen.dart';
 import 'features/loyalty/views/loyalty_settings_screen.dart';
 import 'features/services/views/services_screen.dart';
+import 'features/multistore/views/store_comparison_screen.dart';
 import 'features/referral/models/referral_models.dart';
 import 'features/referral/views/referral_screen.dart';
 import 'features/referral/views/referral_qr_screen.dart';
@@ -167,6 +168,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'services',
             builder: (context, state) => const ServicesScreen(),
+          ),
+          GoRoute(
+            path: 'store-comparison',
+            builder: (context, state) => const StoreComparisonScreen(),
           ),
           GoRoute(
             path: 'support',

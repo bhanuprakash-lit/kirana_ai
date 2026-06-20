@@ -3812,6 +3812,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profServices => 'Services & Appointments';
 
   @override
+  String get profStoreComparison => 'Store Comparison';
+
+  @override
   String get profLanguage => 'Language';
 
   @override

@@ -3799,6 +3799,9 @@ class AppLocalizationsTe extends AppLocalizations {
   String get profServices => 'సేవలు & అపాయింట్‌మెంట్‌లు';
 
   @override
+  String get profStoreComparison => 'స్టోర్ పోలిక';
+
+  @override
   String get profLanguage => 'భాష';
 
   @override

@@ -11,6 +11,7 @@ import '../../subscription/models/subscription_model.dart';
 import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../providers/store_settings_provider.dart';
+import '../../multistore/providers/rollup_provider.dart';
 import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/language_selector.dart';
@@ -206,6 +207,13 @@ class ProfileScreen extends ConsumerWidget {
                       icon: Icons.event_note_rounded,
                       label: l10n.profServices,
                       onTap: () => context.push('/profile/services'),
+                    ),
+                  if (ref.watch(storeRollupProvider).asData?.value.isMultiStore ??
+                      false)
+                    _CompactRow(
+                      icon: Icons.compare_arrows_rounded,
+                      label: l10n.profStoreComparison,
+                      onTap: () => context.push('/profile/store-comparison'),
                     ),
                 ],
               ),

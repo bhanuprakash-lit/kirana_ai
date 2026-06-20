@@ -3858,6 +3858,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get profServices => 'சேவைகள் & சந்திப்புகள்';
 
   @override
+  String get profStoreComparison => 'கடை ஒப்பீடு';
+
+  @override
   String get profLanguage => 'மொழி';
 
   @override

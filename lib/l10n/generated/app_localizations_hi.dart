@@ -3743,6 +3743,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profServices => 'सेवाएँ एवं अपॉइंटमेंट';
 
   @override
+  String get profStoreComparison => 'स्टोर तुलना';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override
