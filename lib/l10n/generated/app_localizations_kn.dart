@@ -3827,6 +3827,21 @@ class AppLocalizationsKn extends AppLocalizations {
   String get profStoreComparison => 'ಅಂಗಡಿ ಹೋಲಿಕೆ';
 
   @override
+  String get profStaff => 'ಸಿಬ್ಬಂದಿ';
+
+  @override
+  String get profEstimatesReturns => 'ಅಂದಾಜು & ರಿಟರ್ನ್‌ಗಳು';
+
+  @override
+  String get profStockRacks => 'ಸ್ಟಾಕ್ ರ್ಯಾಕ್‌ಗಳು';
+
+  @override
+  String get profJobCards => 'ಜಾಬ್ ಕಾರ್ಡ್‌ಗಳು';
+
+  @override
+  String get profWarranty => 'ವಾರಂಟಿ & ಸೀರಿಯಲ್‌ಗಳು';
+
+  @override
   String get profLanguage => 'ಭಾಷೆ';
 
   @override

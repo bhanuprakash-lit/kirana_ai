@@ -3818,6 +3818,21 @@ class AppLocalizationsMr extends AppLocalizations {
   String get profStoreComparison => 'दुकान तुलना';
 
   @override
+  String get profStaff => 'कर्मचारी';
+
+  @override
+  String get profEstimatesReturns => 'अंदाज व परतावा';
+
+  @override
+  String get profStockRacks => 'स्टॉक रॅक';
+
+  @override
+  String get profJobCards => 'जॉब कार्ड';
+
+  @override
+  String get profWarranty => 'वॉरंटी व सीरियल';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override

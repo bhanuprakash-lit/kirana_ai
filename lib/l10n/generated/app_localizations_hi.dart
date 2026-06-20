@@ -3746,6 +3746,21 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profStoreComparison => 'स्टोर तुलना';
 
   @override
+  String get profStaff => 'स्टाफ़';
+
+  @override
+  String get profEstimatesReturns => 'अनुमान एवं वापसी';
+
+  @override
+  String get profStockRacks => 'स्टॉक रैक';
+
+  @override
+  String get profJobCards => 'जॉब कार्ड';
+
+  @override
+  String get profWarranty => 'वारंटी एवं सीरियल';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override

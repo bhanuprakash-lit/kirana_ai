@@ -21,6 +21,11 @@ import 'features/profile/views/customer_detail_screen.dart';
 import 'features/loyalty/views/loyalty_settings_screen.dart';
 import 'features/services/views/services_screen.dart';
 import 'features/multistore/views/store_comparison_screen.dart';
+import 'features/staff/staff_screen.dart';
+import 'features/fulfilment/fulfilment.dart';
+import 'features/stockracks/stock_racks_screen.dart';
+import 'features/warranty/warranty.dart';
+import 'features/jobcards/jobcards.dart';
 import 'features/referral/models/referral_models.dart';
 import 'features/referral/views/referral_screen.dart';
 import 'features/referral/views/referral_qr_screen.dart';
@@ -172,6 +177,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'store-comparison',
             builder: (context, state) => const StoreComparisonScreen(),
+          ),
+          GoRoute(
+            path: 'staff',
+            builder: (context, state) => const StaffScreen(),
+          ),
+          GoRoute(
+            path: 'fulfilment',
+            builder: (context, state) => const FulfilmentScreen(),
+          ),
+          GoRoute(
+            path: 'stock-racks',
+            builder: (context, state) => const StockRacksScreen(),
+          ),
+          GoRoute(
+            path: 'warranty',
+            builder: (context, state) => const WarrantyScreen(),
+          ),
+          GoRoute(
+            path: 'job-cards',
+            builder: (context, state) => const JobCardsScreen(),
           ),
           GoRoute(
             path: 'support',

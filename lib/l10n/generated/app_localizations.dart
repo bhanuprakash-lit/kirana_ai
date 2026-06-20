@@ -6617,6 +6617,36 @@ abstract class AppLocalizations {
   /// **'Store Comparison'**
   String get profStoreComparison;
 
+  /// No description provided for @profStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get profStaff;
+
+  /// No description provided for @profEstimatesReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimates & Returns'**
+  String get profEstimatesReturns;
+
+  /// No description provided for @profStockRacks.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock Racks'**
+  String get profStockRacks;
+
+  /// No description provided for @profJobCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Cards'**
+  String get profJobCards;
+
+  /// No description provided for @profWarranty.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty & Serials'**
+  String get profWarranty;
+
   /// No description provided for @profLanguage.
   ///
   /// In en, this message translates to:

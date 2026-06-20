@@ -215,6 +215,32 @@ class ProfileScreen extends ConsumerWidget {
                       label: l10n.profStoreComparison,
                       onTap: () => context.push('/profile/store-comparison'),
                     ),
+                  _CompactRow(
+                    icon: Icons.badge_outlined,
+                    label: l10n.profStaff,
+                    onTap: () => context.push('/profile/staff'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.receipt_long_outlined,
+                    label: l10n.profEstimatesReturns,
+                    onTap: () => context.push('/profile/fulfilment'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.grid_view_rounded,
+                    label: l10n.profStockRacks,
+                    onTap: () => context.push('/profile/stock-racks'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.build_circle_outlined,
+                    label: l10n.profJobCards,
+                    onTap: () => context.push('/profile/job-cards'),
+                  ),
+                  if (verticalConfigOf(ref).has('warranty'))
+                    _CompactRow(
+                      icon: Icons.verified_user_outlined,
+                      label: l10n.profWarranty,
+                      onTap: () => context.push('/profile/warranty'),
+                    ),
                 ],
               ),
 

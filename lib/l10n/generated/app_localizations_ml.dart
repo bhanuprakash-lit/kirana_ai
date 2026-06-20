@@ -3858,6 +3858,21 @@ class AppLocalizationsMl extends AppLocalizations {
   String get profStoreComparison => 'സ്റ്റോർ താരതമ്യം';
 
   @override
+  String get profStaff => 'സ്റ്റാഫ്';
+
+  @override
+  String get profEstimatesReturns => 'എസ്റ്റിമേറ്റ് & റിട്ടേണുകൾ';
+
+  @override
+  String get profStockRacks => 'സ്റ്റോക്ക് റാക്കുകൾ';
+
+  @override
+  String get profJobCards => 'ജോബ് കാർഡുകൾ';
+
+  @override
+  String get profWarranty => 'വാറന്റി & സീരിയലുകൾ';
+
+  @override
   String get profLanguage => 'ഭാഷ';
 
   @override

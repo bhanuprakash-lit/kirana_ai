@@ -7,6 +7,7 @@ import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
 import '../../loyalty/providers/loyalty_provider.dart';
+import '../../customer360/customer360_provider.dart';
 import 'customer_management_screen.dart';
 import '../../associations/providers/association_provider.dart';
 import '../../associations/models/association_model.dart';
@@ -130,6 +131,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
             const SizedBox(height: 16),
 
             _CustomerLoyaltyCard(customerId: widget.customerId),
+
+            _Customer360Card(customerId: widget.customerId),
 
             // Stats Row
             Padding(
@@ -710,6 +713,203 @@ class _CustomerLoyaltyCard extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// M8 — Customer 360+: prescription/style/size profile + wishlist.
+class _Customer360Card extends ConsumerWidget {
+  final int customerId;
+  const _Customer360Card({required this.customerId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(customerProfileProvider(customerId)).asData?.value;
+    final wishes = ref.watch(wishlistProvider(customerId)).asData?.value ?? [];
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Expanded(
+            child: Text('Profile & Wishlist',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+          ),
+          TextButton(
+            onPressed: () => _editProfile(context, ref, profile),
+            child: const Text('Edit'),
+          ),
+        ]),
+        if (profile != null && !profile.isEmpty) ...[
+          if ((profile.prescription ?? '').isNotEmpty)
+            _line('Prescription', profile.prescription!),
+          if ((profile.styleProfile ?? '').isNotEmpty)
+            _line('Style', profile.styleProfile!),
+          if ((profile.sizeProfile ?? '').isNotEmpty)
+            _line('Size', profile.sizeProfile!),
+        ] else
+          const Text('No profile details yet.',
+              style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+        const Divider(height: 18),
+        Row(children: [
+          Expanded(
+            child: Text('Wishlist (${wishes.length})',
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_rounded, size: 20),
+            onPressed: () => _addWish(context, ref),
+          ),
+        ]),
+        ...wishes.map((w) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(children: [
+                const Icon(Icons.favorite_border_rounded,
+                    size: 14, color: BrandColors.muted),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: Text(
+                        (w['product_name'] ?? w['note'] ?? 'Item').toString(),
+                        style: const TextStyle(fontSize: 13))),
+                InkWell(
+                  onTap: () => ref
+                      .read(customer360ActionsProvider)
+                      .removeWish(customerId, (w['id'] as num).toInt()),
+                  child: const Icon(Icons.close_rounded,
+                      size: 14, color: BrandColors.muted),
+                ),
+              ]),
+            )),
+      ]),
+    );
+  }
+
+  Widget _line(String k, String v) => Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: RichText(
+          text: TextSpan(
+            style: const TextStyle(fontSize: 12, color: BrandColors.ink),
+            children: [
+              TextSpan(
+                  text: '$k: ',
+                  style: const TextStyle(color: BrandColors.muted)),
+              TextSpan(text: v),
+            ],
+          ),
+        ),
+      );
+
+  void _addWish(BuildContext context, WidgetRef ref) {
+    final note = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            left: 20,
+            right: 20,
+            top: 16),
+        child: Container(
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+          padding: const EdgeInsets.all(20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('Add to wishlist',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 16),
+            TextField(
+                controller: note,
+                decoration: const InputDecoration(
+                    labelText: 'Item the customer wants')),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: FilledButton(
+                onPressed: () async {
+                  if (note.text.trim().isEmpty) return;
+                  await ref
+                      .read(customer360ActionsProvider)
+                      .addWish(customerId, note.text.trim());
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: const Text('Add'),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  void _editProfile(BuildContext context, WidgetRef ref, CustomerProfile? p) {
+    final rx = TextEditingController(text: p?.prescription ?? '');
+    final style = TextEditingController(text: p?.styleProfile ?? '');
+    final size = TextEditingController(text: p?.sizeProfile ?? '');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            left: 20,
+            right: 20,
+            top: 16),
+        child: Container(
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+          padding: const EdgeInsets.all(20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('Customer profile',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 16),
+            TextField(
+                controller: rx,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                    labelText: 'Prescription (optical)')),
+            const SizedBox(height: 12),
+            TextField(
+                controller: style,
+                decoration:
+                    const InputDecoration(labelText: 'Style preferences')),
+            const SizedBox(height: 12),
+            TextField(
+                controller: size,
+                decoration:
+                    const InputDecoration(labelText: 'Sizes (e.g. shirt M, shoe 9)')),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: FilledButton(
+                onPressed: () async {
+                  await ref.read(customer360ActionsProvider).saveProfile(
+                    customerId,
+                    {
+                      'prescription': rx.text.trim(),
+                      'style_profile': style.text.trim(),
+                      'size_profile': size.text.trim(),
+                    },
+                  );
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: const Text('Save'),
+              ),
+            ),
+          ]),
+        ),
+      ),
     );
   }
 }

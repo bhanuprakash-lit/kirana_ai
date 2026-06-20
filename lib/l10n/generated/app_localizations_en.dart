@@ -3815,6 +3815,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profStoreComparison => 'Store Comparison';
 
   @override
+  String get profStaff => 'Staff';
+
+  @override
+  String get profEstimatesReturns => 'Estimates & Returns';
+
+  @override
+  String get profStockRacks => 'Stock Racks';
+
+  @override
+  String get profJobCards => 'Job Cards';
+
+  @override
+  String get profWarranty => 'Warranty & Serials';
+
+  @override
   String get profLanguage => 'Language';
 
   @override
