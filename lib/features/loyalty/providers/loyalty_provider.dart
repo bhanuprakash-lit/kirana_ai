@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/loyalty_models.dart';
 
 /// Store loyalty config (cached for the session).
@@ -23,6 +24,7 @@ final customerLoyaltyProvider =
 
 /// Store coupons.
 final couponsProvider = FutureProvider<List<Coupon>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final data = await ref.read(apiClientProvider).get('/kirana/coupons');
   final list = (data is Map ? data['coupons'] : null) as List<dynamic>? ?? [];
   return list

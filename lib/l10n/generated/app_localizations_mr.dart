@@ -1660,6 +1660,10 @@ class AppLocalizationsMr extends AppLocalizations {
       'अद्याप व्हेरियंट नाहीत. साइज, रंग किंवा मॉडेल जोडा.';
 
   @override
+  String get invStockPerVariantNote =>
+      'Stock is tracked per variant. Use Manage Variants below.';
+
+  @override
   String get invDefaultVariant => 'डीफॉल्ट';
 
   @override

@@ -9,6 +9,7 @@ import '../../dashboard/providers/overview_provider.dart';
 import '../../profile/providers/customer_provider.dart';
 import '../../referral/models/referral_models.dart';
 import '../../referral/providers/referral_provider.dart';
+import 'variant_provider.dart';
 import '../models/cart_item.dart';
 import '../models/customer_price.dart';
 import '../models/pos_product.dart';
@@ -746,10 +747,23 @@ class PosNotifier extends Notifier<PosState> {
           }
         }
 
+        // Product ids whose variant stock just changed — refresh their variant
+        // lists so the variant manager / picker show the decremented stock
+        // (the sale decrements product_variant.stock server-side).
+        final soldVariantProductIds = state.cart
+            .where((i) => i.variantId != null)
+            .map((i) => i.product.productId)
+            .toSet();
+
         clearCart();
         _doPing(converted: true);
         state = state.copyWith(isPlacingOrder: false);
         ref.read(overviewProvider.notifier).refresh();
+        // Refresh on-hand stock everywhere it's shown after the sale.
+        reloadProducts();
+        for (final pid in soldVariantProductIds) {
+          ref.invalidate(productVariantsProvider(pid));
+        }
         final mutable = Map<String, dynamic>.from(order);
         mutable['total_amount'] ??= totalAmount;
         return mutable;

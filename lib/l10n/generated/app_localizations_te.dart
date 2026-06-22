@@ -1633,6 +1633,10 @@ class AppLocalizationsTe extends AppLocalizations {
       'ఇంకా వేరియంట్‌లు లేవు. సైజు, రంగు లేదా మోడల్ జోడించండి.';
 
   @override
+  String get invStockPerVariantNote =>
+      'Stock is tracked per variant. Use Manage Variants below.';
+
+  @override
   String get invDefaultVariant => 'డిఫాల్ట్';
 
   @override

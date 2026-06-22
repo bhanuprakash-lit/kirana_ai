@@ -989,6 +989,7 @@
   "invEditVariant": "Edit Variant",
   "invSaveVariant": "Save Variant",
   "invNoVariantsYet": "No variants yet. Add sizes, colours or models.",
+  "invStockPerVariantNote": "Stock is tracked per variant. Use Manage Variants below.",
   "invDefaultVariant": "Default",
   "invVariantAxisRequired": "Please choose {label}",
   "@invVariantAxisRequired": {

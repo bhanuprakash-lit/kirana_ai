@@ -1652,6 +1652,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'No variants yet. Add sizes, colours or models.';
 
   @override
+  String get invStockPerVariantNote =>
+      'Stock is tracked per variant. Use Manage Variants below.';
+
+  @override
   String get invDefaultVariant => 'Default';
 
   @override

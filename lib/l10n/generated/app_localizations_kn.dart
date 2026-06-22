@@ -1666,6 +1666,10 @@ class AppLocalizationsKn extends AppLocalizations {
       'ಇನ್ನೂ ವೇರಿಯಂಟ್‌ಗಳಿಲ್ಲ. ಸೈಜ್, ಬಣ್ಣ ಅಥವಾ ಮಾಡೆಲ್ ಸೇರಿಸಿ.';
 
   @override
+  String get invStockPerVariantNote =>
+      'Stock is tracked per variant. Use Manage Variants below.';
+
+  @override
   String get invDefaultVariant => 'ಡೀಫಾಲ್ಟ್';
 
   @override

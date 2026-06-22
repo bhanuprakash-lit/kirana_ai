@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/api_client.dart';
+import '../../core/store/store_scope.dart';
 import '../../core/theme/brand_theme.dart';
 
 /// Module M7 — Warranty & Serial (electronics).
 
 final claimsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final d = await ref.read(apiClientProvider).get('/kirana/warranty-claims');
   final l = (d is Map ? d['claims'] : null) as List<dynamic>? ?? [];
   return l.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
 });
 
 final serialsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final d = await ref.read(apiClientProvider).get('/kirana/serials');
   final l = (d is Map ? d['serials'] : null) as List<dynamic>? ?? [];
   return l.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();

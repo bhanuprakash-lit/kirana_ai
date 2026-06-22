@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/api_client.dart';
+import '../../core/store/store_scope.dart';
 
 /// Module M5 — Staff Operations providers + lightweight models.
 
@@ -45,12 +46,14 @@ class StaffTask {
 }
 
 final staffListProvider = FutureProvider<List<StaffMember>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final d = await ref.read(apiClientProvider).get('/kirana/staff');
   final l = (d is Map ? d['staff'] : null) as List<dynamic>? ?? [];
   return l.whereType<Map>().map((e) => StaffMember.fromJson(e.cast<String, dynamic>())).toList();
 });
 
 final staffTasksProvider = FutureProvider<List<StaffTask>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final d = await ref.read(apiClientProvider).get('/kirana/staff/tasks');
   final l = (d is Map ? d['tasks'] : null) as List<dynamic>? ?? [];
   return l.whereType<Map>().map((e) => StaffTask.fromJson(e.cast<String, dynamic>())).toList();

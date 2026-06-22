@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../../subscription/models/subscription_model.dart';
 import '../../subscription/providers/subscription_provider.dart';
 
@@ -160,7 +161,10 @@ class KpiState {
 
 class KpiNotifier extends AsyncNotifier<KpiState> {
   @override
-  Future<KpiState> build() => _fetch();
+  Future<KpiState> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<void> refresh() async {
     state = const AsyncLoading();

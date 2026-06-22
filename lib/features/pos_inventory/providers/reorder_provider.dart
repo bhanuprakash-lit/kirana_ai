@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 
 /// A velocity-based reorder suggestion for a low-stock product.
 class ReorderSuggestion {
@@ -51,7 +52,10 @@ class ReorderSuggestion {
 
 class ReorderNotifier extends AsyncNotifier<List<ReorderSuggestion>> {
   @override
-  Future<List<ReorderSuggestion>> build() => _fetch();
+  Future<List<ReorderSuggestion>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<ReorderSuggestion>> _fetch() async {
     final client = ref.read(apiClientProvider);

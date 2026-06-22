@@ -2928,6 +2928,12 @@ abstract class AppLocalizations {
   /// **'No variants yet. Add sizes, colours or models.'**
   String get invNoVariantsYet;
 
+  /// No description provided for @invStockPerVariantNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock is tracked per variant. Use Manage Variants below.'**
+  String get invStockPerVariantNote;
+
   /// No description provided for @invDefaultVariant.
   ///
   /// In en, this message translates to:

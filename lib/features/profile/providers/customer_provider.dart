@@ -108,6 +108,27 @@ class CustomerNotifier extends Notifier<CustomerState> {
     }
   }
 
+  /// Create a customer and return the new record (for the shared customer
+  /// picker's inline "add new" path). Null on failure.
+  Future<Customer?> createAndReturn(String name, String phone) async {
+    final client = ref.read(apiClientProvider);
+    try {
+      final res = await client.postOltp('customer', {
+        'name': name,
+        'phone': phone,
+      });
+      final id = (res['row']?['customer_id'] as num).toInt();
+      await fetchCustomers();
+      return state.customers.firstWhere(
+        (c) => c.customerId == id,
+        orElse: () => Customer(customerId: id, name: name, phone: phone),
+      );
+    } catch (e) {
+      state = state.copyWith(error: 'Create failed: $e');
+      return null;
+    }
+  }
+
   Future<bool> updateCustomer(int customerId, Map<String, dynamic> data) async {
     final client = ref.read(apiClientProvider);
     try {

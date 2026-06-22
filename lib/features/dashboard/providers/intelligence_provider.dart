@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/recommendation_model.dart';
 
 class IntelligenceSortNotifier extends Notifier<Map<String, String>> {
@@ -23,6 +24,7 @@ final intelligenceProvider = FutureProvider.family<List<Recommendation>, String>
   ref,
   type,
 ) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final sortMap = ref.watch(intelligenceSortProvider);
   final sortBy = sortMap[type] ?? 'expected_profit';
 

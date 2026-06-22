@@ -2,17 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/api_client.dart';
+import '../../core/store/store_scope.dart';
 import '../../core/theme/brand_theme.dart';
+import '../profile/models/customer_model.dart';
+import '../../shared/widgets/customer_picker.dart';
 
 /// Module M6 — Orders & Fulfilment: estimates/proforma + customer returns.
 
 final estimatesProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final d = await ref.read(apiClientProvider).get('/kirana/estimates');
   final l = (d is Map ? d['estimates'] : null) as List<dynamic>? ?? [];
   return l.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
 });
 
 final returnsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final d = await ref.read(apiClientProvider).get('/kirana/sales-returns');
   final l = (d is Map ? d['returns'] : null) as List<dynamic>? ?? [];
   return l.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
@@ -166,12 +171,32 @@ class _FulfilmentScreenState extends ConsumerState<FulfilmentScreen>
   }
 
   void _addEstimate() {
-    final name = TextEditingController();
     final item = TextEditingController();
     final qty = TextEditingController(text: '1');
     final price = TextEditingController();
+    Customer? customer;
     _sheet('New estimate', [
-      TextField(controller: name, decoration: const InputDecoration(labelText: 'Customer name')),
+      // Pick the customer from the store list instead of free-typing a name.
+      StatefulBuilder(
+        builder: (ctx, setSt) => InkWell(
+          onTap: () async {
+            final picked = await showCustomerPicker(ctx, ref);
+            if (picked != null) setSt(() => customer = picked);
+          },
+          child: InputDecorator(
+            decoration: const InputDecoration(
+              labelText: 'Customer (optional)',
+              suffixIcon: Icon(Icons.arrow_drop_down_rounded),
+            ),
+            child: Text(
+              customer == null ? 'Select customer' : customer!.name,
+              style: TextStyle(
+                color: customer == null ? BrandColors.muted : BrandColors.ink,
+              ),
+            ),
+          ),
+        ),
+      ),
       const SizedBox(height: 12),
       TextField(controller: item, decoration: const InputDecoration(labelText: 'Item')),
       const SizedBox(height: 12),
@@ -183,7 +208,10 @@ class _FulfilmentScreenState extends ConsumerState<FulfilmentScreen>
     ], () async {
       if (item.text.trim().isEmpty) return false;
       await ref.read(apiClientProvider).post('/kirana/estimates', {
-        if (name.text.trim().isNotEmpty) 'customer_name': name.text.trim(),
+        if (customer != null) ...{
+          'customer_id': customer!.customerId,
+          'customer_name': customer!.name,
+        },
         'items': [
           {
             'name': item.text.trim(),

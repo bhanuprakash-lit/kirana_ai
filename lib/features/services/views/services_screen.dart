@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../profile/models/customer_model.dart';
+import '../../../shared/widgets/customer_picker.dart';
 import '../models/service_models.dart';
 import '../providers/service_provider.dart';
 
@@ -446,39 +448,35 @@ class _BookingSheet extends ConsumerStatefulWidget {
 }
 
 class _BookingSheetState extends ConsumerState<_BookingSheet> {
-  final _nameCtrl = TextEditingController();
-  final _phoneCtrl = TextEditingController();
+  Customer? _customer;
+  late DateTime _date = widget.day;
   int? _serviceId;
   TimeOfDay _time = const TimeOfDay(hour: 10, minute: 0);
   bool _saving = false;
   String? _error;
 
-  @override
-  void dispose() {
-    _nameCtrl.dispose();
-    _phoneCtrl.dispose();
-    super.dispose();
-  }
+  String _keyFor(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   Future<void> _save() async {
-    if (_nameCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'Enter the customer name');
+    if (_customer == null) {
+      setState(() => _error = 'Select a customer');
       return;
     }
     setState(() {
       _saving = true;
       _error = null;
     });
-    final d = widget.day;
+    final d = _date;
     final startsAt = DateTime(d.year, d.month, d.day, _time.hour, _time.minute);
     try {
       await ref.read(serviceActionsProvider).createAppointment({
         'starts_at': startsAt.toUtc().toIso8601String(),
-        'customer_name': _nameCtrl.text.trim(),
-        if (_phoneCtrl.text.trim().isNotEmpty)
-          'customer_phone': _phoneCtrl.text.trim(),
+        'customer_id': _customer!.customerId,
+        'customer_name': _customer!.name,
+        if (_customer!.phone.isNotEmpty) 'customer_phone': _customer!.phone,
         'service_id': ?_serviceId,
-      }, widget.dayKey);
+      }, _keyFor(_date));
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
@@ -511,15 +509,48 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
           const Text('Book appointment',
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
           const SizedBox(height: 16),
-          TextField(
-            controller: _nameCtrl,
-            decoration: const InputDecoration(labelText: 'Customer name'),
+          // Pick the customer from the store list (captures their phone too).
+          InkWell(
+            onTap: () async {
+              final picked = await showCustomerPicker(context, ref);
+              if (picked != null) setState(() => _customer = picked);
+            },
+            child: InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Customer',
+                prefixIcon: Icon(Icons.person_outline_rounded),
+                suffixIcon: Icon(Icons.arrow_drop_down_rounded),
+              ),
+              child: Text(
+                _customer == null
+                    ? 'Select customer'
+                    : '${_customer!.name}${_customer!.phone.isNotEmpty ? " · ${_customer!.phone}" : ""}',
+                style: TextStyle(
+                  color:
+                      _customer == null ? BrandColors.muted : BrandColors.ink,
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: _phoneCtrl,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(labelText: 'Phone (optional)'),
+          // Explicit date (defaults to the day being viewed).
+          InkWell(
+            onTap: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _date,
+                firstDate: DateTime.now().subtract(const Duration(days: 1)),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+              );
+              if (picked != null) setState(() => _date = picked);
+            },
+            child: InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Date',
+                prefixIcon: Icon(Icons.calendar_today_rounded),
+              ),
+              child: Text('${_date.day}/${_date.month}/${_date.year}'),
+            ),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(

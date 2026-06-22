@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/services/api_client.dart';
+import '../../../../core/store/store_scope.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../services/models/service_models.dart';
@@ -32,6 +33,7 @@ class PosDeepLinks {
 
 /// Open job cards (ready to bill) for the store.
 final _openJobCardsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final data = await ref.read(apiClientProvider).get('/kirana/job-cards?status=ready');
   final list = (data is Map ? data['job_cards'] : data) as List<dynamic>? ?? [];
   return list.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
@@ -40,6 +42,7 @@ final _openJobCardsProvider = FutureProvider.autoDispose<List<Map<String, dynami
 /// Active memberships for a customer (for the "use a session" toggle).
 final _membershipsProvider =
     FutureProvider.autoDispose.family<List<Membership>, int>((ref, customerId) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final data = await ref
       .read(apiClientProvider)
       .get('/kirana/memberships?customer_id=$customerId');

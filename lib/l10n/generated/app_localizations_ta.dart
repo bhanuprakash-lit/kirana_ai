@@ -1680,6 +1680,10 @@ class AppLocalizationsTa extends AppLocalizations {
       'இன்னும் வகைகள் இல்லை. அளவு, நிறம் அல்லது மாடல் சேர்க்கவும்.';
 
   @override
+  String get invStockPerVariantNote =>
+      'Stock is tracked per variant. Use Manage Variants below.';
+
+  @override
   String get invDefaultVariant => 'இயல்புநிலை';
 
   @override

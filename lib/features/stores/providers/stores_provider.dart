@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../../../core/vertical/vertical_config_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/user_store.dart';
@@ -71,7 +72,12 @@ class StoreActions {
 
   /// Drop every store-scoped cache so the UI rebuilds for the new store. The
   /// vertical config drives feature gating (tabs/fields), so it's first.
+  ///
+  /// Bumping [storeScopeProvider] refetches every provider that watches it —
+  /// the canonical, rot-proof path (see store_scope.dart). The explicit
+  /// invalidations below remain for the core providers that predate the token.
   void _refreshStoreScope() {
+    ref.read(storeScopeProvider.notifier).bump();
     ref.invalidate(verticalConfigProvider);
     ref.invalidate(subscriptionProvider); // each store has its own plan/trial
     ref.invalidate(myStoresProvider);

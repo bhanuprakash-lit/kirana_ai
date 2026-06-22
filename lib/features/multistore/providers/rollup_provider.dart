@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 
 /// Module M2 — multi-store rollup (one row per store + per city/area).
 class StoreRow {
@@ -106,6 +107,7 @@ class StoreRollup {
 }
 
 final storeRollupProvider = FutureProvider<StoreRollup>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   try {
     final data = await ref.read(apiClientProvider).get('/kirana/stores/rollup');
     if (data is Map) return StoreRollup.fromJson(data.cast<String, dynamic>());

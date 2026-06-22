@@ -1620,6 +1620,10 @@ class AppLocalizationsHi extends AppLocalizations {
       'अभी कोई वेरिएंट नहीं। साइज़, रंग या मॉडल जोड़ें।';
 
   @override
+  String get invStockPerVariantNote =>
+      'Stock is tracked per variant. Use Manage Variants below.';
+
+  @override
   String get invDefaultVariant => 'डिफ़ॉल्ट';
 
   @override

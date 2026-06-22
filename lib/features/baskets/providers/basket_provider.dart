@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/basket_model.dart';
 import '../models/basket_tier_config.dart';
 
@@ -8,7 +9,10 @@ class BasketNotifier extends AsyncNotifier<List<Basket>> {
   bool get includeArchived => _includeArchived;
 
   @override
-  Future<List<Basket>> build() => _fetch();
+  Future<List<Basket>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
@@ -89,6 +93,7 @@ final basketProvider = AsyncNotifierProvider<BasketNotifier, List<Basket>>(
 class BasketTierConfigNotifier extends AsyncNotifier<BasketTierConfig> {
   @override
   Future<BasketTierConfig> build() async {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
     final client = ref.read(apiClientProvider);
     final res =
         await client.get('/kirana/basket-tier-config') as Map<String, dynamic>;

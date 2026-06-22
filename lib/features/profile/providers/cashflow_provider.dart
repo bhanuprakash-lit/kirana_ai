@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/store/store_scope.dart';
 import '../../auth/repositories/auth_repository.dart';
 import '../models/cashflow_model.dart';
 
@@ -15,7 +16,10 @@ final cashflowStatusProvider =
 
 class CashflowNotifier extends AsyncNotifier<CashflowStatus> {
   @override
-  Future<CashflowStatus> build() async => _fetchStatus();
+  Future<CashflowStatus> build() async {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetchStatus();
+  }
 
   Future<CashflowStatus> _fetchStatus() async {
     final prefs = await SharedPreferences.getInstance();

@@ -1681,6 +1681,10 @@ class AppLocalizationsMl extends AppLocalizations {
       'വേരിയന്റുകൾ ഇല്ല. സൈസ്, നിറം അല്ലെങ്കിൽ മോഡൽ ചേർക്കുക.';
 
   @override
+  String get invStockPerVariantNote =>
+      'Stock is tracked per variant. Use Manage Variants below.';
+
+  @override
   String get invDefaultVariant => 'ഡിഫോൾട്ട്';
 
   @override

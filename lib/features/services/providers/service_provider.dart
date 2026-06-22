@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/service_models.dart';
 
 /// Service catalogue for the store.
 final servicesProvider = FutureProvider<List<ServiceItem>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final data = await ref.read(apiClientProvider).get('/kirana/services');
   final list = (data is Map ? data['services'] : null) as List<dynamic>? ?? [];
   return list
@@ -16,6 +18,7 @@ final servicesProvider = FutureProvider<List<ServiceItem>>((ref) async {
 /// Appointments for a given day (yyyy-mm-dd).
 final appointmentsProvider =
     FutureProvider.family<List<Appointment>, String>((ref, day) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final data =
       await ref.read(apiClientProvider).get('/kirana/appointments?day=$day');
   final list =

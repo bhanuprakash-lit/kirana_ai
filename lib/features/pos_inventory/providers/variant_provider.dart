@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/product_variant.dart';
 
-/// F2 — the variant axes the caller's vertical exposes (cached for the session).
+/// F2 — the variant axes the caller's vertical exposes (refetched per store).
 final attributeDefsProvider = FutureProvider<List<AttributeDef>>((ref) async {
+  ref.watch(storeScopeProvider); // vertical-specific axes — refetch on switch
   final data = await ref.read(apiClientProvider).get('/kirana/attribute-defs');
   final list = (data is Map ? data['attributes'] : null) as List<dynamic>? ?? [];
   return list
@@ -16,6 +18,7 @@ final attributeDefsProvider = FutureProvider<List<AttributeDef>>((ref) async {
 /// Active variants for one product (the implicit one is always first).
 final productVariantsProvider =
     FutureProvider.family<List<ProductVariant>, int>((ref, productId) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final data = await ref
       .read(apiClientProvider)
       .get('/kirana/products/$productId/variants');

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 
 /// An open udhaar entry scored by recovery risk (for Smart Reminders).
 class SmartUdhaar {
@@ -47,7 +48,10 @@ class SmartUdhaar {
 
 class SmartUdhaarNotifier extends AsyncNotifier<List<SmartUdhaar>> {
   @override
-  Future<List<SmartUdhaar>> build() => _fetch();
+  Future<List<SmartUdhaar>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<SmartUdhaar>> _fetch() async {
     final client = ref.read(apiClientProvider);

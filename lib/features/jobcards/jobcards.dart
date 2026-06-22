@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/services/api_client.dart';
+import '../../core/store/store_scope.dart';
 import '../../core/theme/brand_theme.dart';
+import '../profile/models/customer_model.dart';
+import '../../shared/widgets/customer_picker.dart';
 
 /// Module M9 — Job Cards (alteration / repair / pre-order).
 
@@ -35,6 +38,7 @@ class JobCard {
 }
 
 final jobCardsProvider = FutureProvider<List<JobCard>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final d = await ref.read(apiClientProvider).get('/kirana/job-cards');
   final l = (d is Map ? d['job_cards'] : null) as List<dynamic>? ?? [];
   return l.whereType<Map>().map((e) => JobCard.fromJson(e.cast<String, dynamic>())).toList();
@@ -131,11 +135,10 @@ class JobCardsScreen extends ConsumerWidget {
   }
 
   void _add(BuildContext context, WidgetRef ref) {
-    final name = TextEditingController();
-    final phone = TextEditingController();
     final item = TextEditingController();
     final charge = TextEditingController();
     String type = 'repair';
+    Customer? customer;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -168,9 +171,31 @@ class JobCardsScreen extends ConsumerWidget {
                 onSelectionChanged: (s) => setSt(() => type = s.first),
               ),
               const SizedBox(height: 12),
-              TextField(controller: name, decoration: const InputDecoration(labelText: 'Customer name')),
-              const SizedBox(height: 12),
-              TextField(controller: phone, decoration: const InputDecoration(labelText: 'Phone (optional)')),
+              // Pick the customer from the store list (never free-typed) — also
+              // captures their phone for follow-up.
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () async {
+                  final picked = await showCustomerPicker(context, ref);
+                  if (picked != null) setSt(() => customer = picked);
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Customer',
+                    suffixIcon: Icon(Icons.arrow_drop_down_rounded),
+                  ),
+                  child: Text(
+                    customer == null
+                        ? 'Select customer'
+                        : '${customer!.name}${customer!.phone.isNotEmpty ? " · ${customer!.phone}" : ""}',
+                    style: TextStyle(
+                      color: customer == null
+                          ? BrandColors.muted
+                          : BrandColors.ink,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
               TextField(controller: item, decoration: const InputDecoration(labelText: 'Item / description')),
               const SizedBox(height: 12),
@@ -185,11 +210,13 @@ class JobCardsScreen extends ConsumerWidget {
                 height: 50,
                 child: FilledButton(
                   onPressed: () async {
-                    if (name.text.trim().isEmpty) return;
+                    if (customer == null) return;
                     await ref.read(apiClientProvider).post('/kirana/job-cards', {
                       'job_type': type,
-                      'customer_name': name.text.trim(),
-                      if (phone.text.trim().isNotEmpty) 'customer_phone': phone.text.trim(),
+                      'customer_id': customer!.customerId,
+                      'customer_name': customer!.name,
+                      if (customer!.phone.isNotEmpty)
+                        'customer_phone': customer!.phone,
                       if (item.text.trim().isNotEmpty) 'item_desc': item.text.trim(),
                       if (charge.text.trim().isNotEmpty)
                         'charge': double.tryParse(charge.text.trim()),

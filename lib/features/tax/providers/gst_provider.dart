@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 
 /// One GST rate slab in the period report.
 class GstSlab {
@@ -72,6 +73,7 @@ class GstSummary {
 /// GST summary for a period. Family key is "yyyy-mm-dd|yyyy-mm-dd".
 final gstSummaryProvider =
     FutureProvider.family.autoDispose<GstSummary, String>((ref, range) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
   final parts = range.split('|');
   final from = parts[0];
   final to = parts.length > 1 ? parts[1] : parts[0];

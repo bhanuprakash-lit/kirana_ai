@@ -12,23 +12,12 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../models/inventory_item.dart';
 import '../../providers/inventory_provider.dart';
+import '../../providers/variant_provider.dart';
 import 'variant_manager_sheet.dart';
 // import 'add_product_sheet.dart' show showCategoryPicker;
 import 'add_product_sheet_new.dart' show showCategoryPicker;
 import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
-
-const _editUnits = [
-  'pcs',
-  'kg',
-  'g',
-  'L',
-  'ml',
-  'dozen',
-  'pack',
-  'box',
-  'bundle',
-];
 
 Future<void> showEditProductSheet(
   BuildContext context,
@@ -212,6 +201,15 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // When a product carries real (non-implicit) variants, each variant tracks
+    // its own stock — so the product-level stock field here is meaningless.
+    final hasRealVariants = verticalConfigOf(ref).has('variants') &&
+        (ref
+                .watch(productVariantsProvider(widget.item.productId))
+                .asData
+                ?.value
+                .any((v) => !v.isImplicit && v.isActive) ??
+            false);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
@@ -397,7 +395,13 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     initialValue: _selectedUnit,
                     decoration: InputDecoration(labelText: l10n.invSellingUnit),
                     isExpanded: true,
-                    items: _editUnits
+                    // Units come from the store's vertical config (e.g. apparel
+                    // shows pcs/pair/set, not kg/ml). Always include the current
+                    // selection so the dropdown value stays valid for legacy items.
+                    items: (<String>{
+                      ...verticalConfigOf(ref).unitSet,
+                      ?_selectedUnit,
+                    })
                         .map((u) => DropdownMenuItem(value: u, child: Text(u)))
                         .toList(),
                     onChanged: (_saving || _success)
@@ -520,34 +524,53 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
 
             _SectionHeader(l10n.invStock),
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _stockCtrl,
-              enabled: !_saving && !_success,
-              decoration: InputDecoration(
-                labelText: _isLoose
-                    ? l10n.invStockInUnit(_selectedUnit ?? '')
-                    : l10n.invStockQuantityStar,
+            if (hasRealVariants)
+              // Variant products track stock per variant — show a note instead
+              // of an editable product-level field that would do nothing.
+              Row(
+                children: [
+                  const Icon(Icons.tune_rounded,
+                      size: 18, color: BrandColors.muted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.invStockPerVariantNote,
+                      style: const TextStyle(
+                          fontSize: 13, color: BrandColors.muted),
+                    ),
+                  ),
+                ],
+              )
+            else ...[
+              TextFormField(
+                controller: _stockCtrl,
+                enabled: !_saving && !_success,
+                decoration: InputDecoration(
+                  labelText: _isLoose
+                      ? l10n.invStockInUnit(_selectedUnit ?? '')
+                      : l10n.invStockQuantityStar,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? l10n.invRequired : null,
               ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              validator: (v) =>
-                  (v == null || v.isEmpty) ? l10n.invRequired : null,
-            ),
-            if (widget.item.isPerishable)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  l10n.invPerishableBatchNote,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: BrandColors.muted.withValues(alpha: 0.8),
+              if (widget.item.isPerishable)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    l10n.invPerishableBatchNote,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
-              ),
+            ],
             const SizedBox(height: 24),
 
             _SectionHeader(l10n.invOther),
