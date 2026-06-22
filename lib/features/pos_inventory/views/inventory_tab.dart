@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/inventory_item.dart';
@@ -88,6 +89,10 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
           if (data.items.isEmpty) {
             return _EmptyInventory(
               onAdd: () => showAddProductSheet(context, ref),
+              title: verticalConfigOf(ref).copy(
+                'empty_inventory',
+                AppLocalizations.of(context).invNoInventoryYet,
+              ),
             );
           }
 
@@ -974,7 +979,8 @@ class _PendingTile extends StatelessWidget {
 
 class _EmptyInventory extends StatelessWidget {
   final VoidCallback onAdd;
-  const _EmptyInventory({required this.onAdd});
+  final String title;
+  const _EmptyInventory({required this.onAdd, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -1000,7 +1006,7 @@ class _EmptyInventory extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              l10n.invNoInventoryYet,
+              title,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),

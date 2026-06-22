@@ -87,6 +87,16 @@ class AuthRepository {
     } catch (_) {}
   }
 
+  /// Re-mint the POS JWT for the CURRENT active store. The POS token carries a
+  /// baked-in store_id (POS rejects mismatched store_id), so after switching the
+  /// active store we must refresh it — otherwise billing/stock 403 or show the
+  /// old store. Safe no-op if there's no kirana token.
+  Future<void> refreshPosToken() async {
+    final kiranaToken = await _storage.read(key: _tokenKey);
+    if (kiranaToken == null || kiranaToken.isEmpty) return;
+    await _obtainPosTokenFromKirana(kiranaToken);
+  }
+
   Future<void> _obtainPosTokenFromKirana(String kiranaToken) async {
     try {
       final telemetry = await DeviceTelemetry.headers();
@@ -256,6 +266,7 @@ class AuthRepository {
     double? budget,
     String? location,
     String? region,
+    String? city,
     String? email,
     String? phoneNumber,
     String? firebaseUid,
@@ -278,6 +289,7 @@ class AuthRepository {
         'budget': ?budget,
         if (location != null && location.isNotEmpty) 'location': location,
         if (region != null && region.isNotEmpty) 'region': region,
+        if (city != null && city.isNotEmpty) 'city': city,
         if (email != null && email.isNotEmpty) 'email': email,
         if (phoneNumber != null && phoneNumber.isNotEmpty)
           'phone_number': phoneNumber,

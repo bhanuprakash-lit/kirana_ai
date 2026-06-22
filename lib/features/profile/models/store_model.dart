@@ -7,6 +7,8 @@ class StoreProfile {
   final double dailyBudget;
   final String? location;
   final String? region;
+  final String? city;          // M2 — zone/city rollup
+  final String? verticalCode;  // F1 — current vertical (switchable)
 
   const StoreProfile({
     required this.storeId,
@@ -17,7 +19,22 @@ class StoreProfile {
     required this.dailyBudget,
     this.location,
     this.region,
+    this.city,
+    this.verticalCode,
   });
+
+  StoreProfile copyWith({String? city, String? verticalCode}) => StoreProfile(
+    storeId: storeId,
+    name: name,
+    type: type,
+    footfall: footfall,
+    budget: budget,
+    dailyBudget: dailyBudget,
+    location: location,
+    region: region,
+    city: city ?? this.city,
+    verticalCode: verticalCode ?? this.verticalCode,
+  );
 
   factory StoreProfile.fromJson(Map<String, dynamic> j) => StoreProfile(
     storeId: j['store_id'] as int,
@@ -28,6 +45,8 @@ class StoreProfile {
     dailyBudget: (j['daily_budget'] as num?)?.toDouble() ?? 0.0,
     location: j['location'] as String?,
     region: j['region'] as String?,
+    city: j['city'] as String?,
+    verticalCode: j['vertical_code'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -38,5 +57,7 @@ class StoreProfile {
     'daily_budget': dailyBudget,
     'location': location,
     'region': region,
+    if (city != null) 'city': city,
+    if (verticalCode != null) 'vertical_code': verticalCode,
   };
 }

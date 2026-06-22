@@ -3761,10 +3761,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get profWarranty => 'वारंटी एवं सीरियल';
 
   @override
+  String get profGstReport => 'जीएसटी रिपोर्ट';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override
   String get profStoreSettings => 'स्टोर सेटिंग्स';
+
+  @override
+  String get profSwitchStore => 'स्टोर बदलें / जोड़ें';
 
   @override
   String get profConfiguration => 'कॉन्फ़िगरेशन';
@@ -4041,6 +4047,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get profStateRegion => 'राज्य / रीजन';
+
+  @override
+  String get profCity => 'शहर';
+
+  @override
+  String get profBusinessVertical => 'व्यवसाय वर्टिकल';
 
   @override
   String get profRequired => 'ज़रूरी है';

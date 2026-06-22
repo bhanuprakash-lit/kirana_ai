@@ -3842,10 +3842,16 @@ class AppLocalizationsKn extends AppLocalizations {
   String get profWarranty => 'ವಾರಂಟಿ & ಸೀರಿಯಲ್‌ಗಳು';
 
   @override
+  String get profGstReport => 'ಜಿಎಸ್‌ಟಿ ವರದಿ';
+
+  @override
   String get profLanguage => 'ಭಾಷೆ';
 
   @override
   String get profStoreSettings => 'ಅಂಗಡಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳು';
+
+  @override
+  String get profSwitchStore => 'ಅಂಗಡಿ ಬದಲಿಸಿ / ಸೇರಿಸಿ';
 
   @override
   String get profConfiguration => 'ಸಂರಚನೆ';
@@ -4124,6 +4130,12 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get profStateRegion => 'ರಾಜ್ಯ / ಪ್ರದೇಶ';
+
+  @override
+  String get profCity => 'ನಗರ';
+
+  @override
+  String get profBusinessVertical => 'ವ್ಯಾಪಾರ ವಿಭಾಗ';
 
   @override
   String get profRequired => 'ಅಗತ್ಯವಿದೆ';

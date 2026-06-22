@@ -3876,10 +3876,16 @@ class AppLocalizationsTa extends AppLocalizations {
   String get profWarranty => 'உத்தரவாதம் & சீரியல்';
 
   @override
+  String get profGstReport => 'ஜிஎஸ்டி அறிக்கை';
+
+  @override
   String get profLanguage => 'மொழி';
 
   @override
   String get profStoreSettings => 'கடை அமைப்புகள்';
+
+  @override
+  String get profSwitchStore => 'கடையை மாற்று / சேர்';
 
   @override
   String get profConfiguration => 'கட்டமைப்பு';
@@ -4158,6 +4164,12 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get profStateRegion => 'மாநிலம் / பகுதி';
+
+  @override
+  String get profCity => 'நகரம்';
+
+  @override
+  String get profBusinessVertical => 'வணிக வகை';
 
   @override
   String get profRequired => 'தேவை';

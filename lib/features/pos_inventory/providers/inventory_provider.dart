@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
 import '../../dashboard/providers/overview_provider.dart';
 import '../models/inventory_item.dart';
 import '../models/pending_inventory_item.dart';
@@ -170,10 +171,15 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
 
   Future<bool> addCategory(String name, {int? parentId}) async {
     final client = ref.read(apiClientProvider);
+    // Tag the new category with the store's vertical so it only shows for this
+    // vertical (a mobile store's category won't leak into a grocery store).
+    final vc =
+        ref.read(verticalConfigProvider).asData?.value.verticalCode ?? 'grocery';
     try {
       await client.postOltp('category', {
         'name': name,
         'parent_category_id': parentId,
+        'vertical_code': vc,
       });
       await refresh();
       return true;

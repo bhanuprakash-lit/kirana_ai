@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
 import '../models/store_model.dart';
 
 class StoreSettingsNotifier extends AsyncNotifier<StoreProfile> {
@@ -26,7 +27,14 @@ class StoreSettingsNotifier extends AsyncNotifier<StoreProfile> {
         '/kirana/stores/${profile.storeId}',
         profile.toJson(),
       );
+      final before = state.value?.verticalCode;
       state = AsyncValue.data(StoreProfile.fromJson(res));
+
+      // F1 — if the vertical changed, refresh the config so gated features
+      // (variants, GST, appointments, etc.) update across the app immediately.
+      if (profile.verticalCode != null && profile.verticalCode != before) {
+        ref.invalidate(verticalConfigProvider);
+      }
 
       // Update local storage if name changed
       final prefs = await SharedPreferences.getInstance();

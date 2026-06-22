@@ -12,6 +12,7 @@ import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../providers/store_settings_provider.dart';
 import '../../multistore/providers/rollup_provider.dart';
+import '../../stores/views/store_switcher_sheet.dart';
 import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/language_selector.dart';
@@ -241,12 +242,23 @@ class ProfileScreen extends ConsumerWidget {
                       label: l10n.profWarranty,
                       onTap: () => context.push('/profile/warranty'),
                     ),
+                  if (verticalConfigOf(ref).verticalCode != 'grocery')
+                    _CompactRow(
+                      icon: Icons.receipt_long_rounded,
+                      label: l10n.profGstReport,
+                      onTap: () => context.push('/profile/gst-report'),
+                    ),
                 ],
               ),
 
               _SectionLabel(l10n.profSectionStoreAccount),
               _GroupCard(
                 rows: [
+                  _CompactRow(
+                    icon: Icons.store_mall_directory_rounded,
+                    label: l10n.profSwitchStore,
+                    onTap: () => showStoreSwitcher(context, ref),
+                  ),
                   _CompactRow(
                     icon: Icons.language_rounded,
                     label: l10n.profLanguage,

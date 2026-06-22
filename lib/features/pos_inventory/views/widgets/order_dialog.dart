@@ -10,6 +10,7 @@ import '../../providers/pos_provider.dart';
 import '../../providers/printer_provider.dart';
 import '../order_details_screen.dart';
 import 'basket_savings_banner.dart';
+import 'pos_deeplink_section.dart';
 import '../../../finance/providers/finance_provider.dart';
 import '../../../finance/views/consent_recorder_sheet.dart';
 import '../../../profile/models/customer_model.dart';
@@ -318,6 +319,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   double _redeemPoints = 0;
   double _redeemValue = 0;
 
+  // POS deep-links (M4/M7/M9) — serials, appointment, membership, job card.
+  final PosDeepLinks _deepLinks = PosDeepLinks();
+
   @override
   void dispose() {
     _couponCtrl.dispose();
@@ -509,6 +513,11 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           couponDiscount: _couponOk ? _couponDiscount : 0,
           redeemPoints: _redeemPoints,
           redeemValue: _redeemValue,
+          // POS deep-links (M4/M7/M9)
+          serials: _deepLinks.serials.isEmpty ? null : _deepLinks.serials,
+          membershipId: _deepLinks.membershipId,
+          appointmentId: _deepLinks.appointmentId,
+          jobCardId: _deepLinks.jobCardId,
         );
     if (!mounted) return;
     if (result != null) {
@@ -727,6 +736,13 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                       _buildLoyaltySection(state),
                       const SizedBox(height: 10),
                     ],
+
+                    // ── POS deep-links (M4/M7/M9), gated by vertical ──────────────────
+                    PosDeepLinkSection(
+                      customerId: state.selectedCustomerId,
+                      links: _deepLinks,
+                      onChanged: () => setState(() {}),
+                    ),
 
                     // ── Grand total ───────────────────────────────────────────────────
                     Row(

@@ -165,6 +165,9 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
                 ? state.data.location
                 : state.data.address,
             region: state.data.region,
+            // M2 — the reverse-geocode stores the detected city in `region`,
+            // so seed store.city from it for the zone/city rollup.
+            city: state.data.region,
             email: state.data.email.isNotEmpty ? state.data.email : null,
             phoneNumber: state.data.phoneNumber.isNotEmpty
                 ? state.data.phoneNumber

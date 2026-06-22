@@ -628,6 +628,11 @@ class PosNotifier extends Notifier<PosState> {
     double couponDiscount = 0,
     double redeemPoints = 0,
     double redeemValue = 0, // ₹ value of the redeemed points
+    // POS deep-links — link module records to this sale (best-effort on backend).
+    List<String>? serials, // M7 serial/IMEI sold on this bill
+    int? membershipId, // M4 consume one membership session
+    int? appointmentId, // M4 complete + bill an appointment
+    int? jobCardId, // M9 bill a finished job card
   }) async {
     if (state.cart.isEmpty) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
@@ -660,6 +665,11 @@ class PosNotifier extends Notifier<PosState> {
         'coupon_id': ?couponId,
         if (couponDiscount > 0) 'coupon_discount': couponDiscount,
         if (redeemPoints > 0) 'redeem_points': redeemPoints,
+        // POS deep-links (M4/M7/M9)
+        if (serials != null && serials.isNotEmpty) 'serials': serials,
+        'membership_id': ?membershipId,
+        'appointment_id': ?appointmentId,
+        'job_card_id': ?jobCardId,
         'items': state.cart
             .map(
               (i) => {

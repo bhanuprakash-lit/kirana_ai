@@ -3830,10 +3830,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profWarranty => 'Warranty & Serials';
 
   @override
+  String get profGstReport => 'GST Report';
+
+  @override
   String get profLanguage => 'Language';
 
   @override
   String get profStoreSettings => 'Store Settings';
+
+  @override
+  String get profSwitchStore => 'Switch / add store';
 
   @override
   String get profConfiguration => 'Configuration';
@@ -4110,6 +4116,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profStateRegion => 'State / Region';
+
+  @override
+  String get profCity => 'City';
+
+  @override
+  String get profBusinessVertical => 'Business vertical';
 
   @override
   String get profRequired => 'Required';

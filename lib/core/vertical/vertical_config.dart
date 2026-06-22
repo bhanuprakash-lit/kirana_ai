@@ -20,6 +20,14 @@ class VerticalConfig {
   /// Whether a feature flag is explicitly enabled for this vertical.
   bool has(String feature) => features[feature] == true;
 
+  /// Vertical-specific UI wording from copyPack, falling back to [fallback] when
+  /// the key is absent (so grocery / legacy stores keep their existing copy).
+  /// e.g. copy('search_hint', l10n.invSearchProducts).
+  String copy(String key, String fallback) {
+    final v = copyPack[key];
+    return (v is String && v.trim().isNotEmpty) ? v : fallback;
+  }
+
   /// Whether a feature is explicitly disabled (flag == false). Absent → not off,
   /// so features default to *shown* unless a vertical opts out (e.g. Vision is
   /// off for apparel/electronics but stays on for grocery and legacy stores).

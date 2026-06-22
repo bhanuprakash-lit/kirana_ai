@@ -3873,10 +3873,16 @@ class AppLocalizationsMl extends AppLocalizations {
   String get profWarranty => 'വാറന്റി & സീരിയലുകൾ';
 
   @override
+  String get profGstReport => 'ജിഎസ്‌ടി റിപ്പോർട്ട്';
+
+  @override
   String get profLanguage => 'ഭാഷ';
 
   @override
   String get profStoreSettings => 'സ്റ്റോർ ക്രമീകരണങ്ങൾ';
+
+  @override
+  String get profSwitchStore => 'സ്റ്റോർ മാറ്റുക / ചേർക്കുക';
 
   @override
   String get profConfiguration => 'കോൺഫിഗറേഷൻ';
@@ -4157,6 +4163,12 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get profStateRegion => 'സംസ്ഥാനം / പ്രദേശം';
+
+  @override
+  String get profCity => 'നഗരം';
+
+  @override
+  String get profBusinessVertical => 'ബിസിനസ് വിഭാഗം';
 
   @override
   String get profRequired => 'ആവശ്യമാണ്';

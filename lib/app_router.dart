@@ -25,6 +25,8 @@ import 'features/staff/staff_screen.dart';
 import 'features/fulfilment/fulfilment.dart';
 import 'features/stockracks/stock_racks_screen.dart';
 import 'features/warranty/warranty.dart';
+import 'features/tax/views/gst_report_screen.dart';
+import 'features/stores/views/store_select_screen.dart';
 import 'features/jobcards/jobcards.dart';
 import 'features/referral/models/referral_models.dart';
 import 'features/referral/views/referral_screen.dart';
@@ -71,6 +73,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/select-store',
+        builder: (context, state) => const StoreSelectScreen(),
+      ),
       GoRoute(
         path: '/home',
         builder: (context, state) => const DashboardScreen(),
@@ -197,6 +203,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'job-cards',
             builder: (context, state) => const JobCardsScreen(),
+          ),
+          GoRoute(
+            path: 'gst-report',
+            builder: (context, state) => const GstReportScreen(),
           ),
           GoRoute(
             path: 'support',

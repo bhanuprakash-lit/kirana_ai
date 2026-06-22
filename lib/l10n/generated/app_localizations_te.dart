@@ -3817,10 +3817,16 @@ class AppLocalizationsTe extends AppLocalizations {
   String get profWarranty => 'వారంటీ & సీరియల్‌లు';
 
   @override
+  String get profGstReport => 'జీఎస్‌టీ నివేదిక';
+
+  @override
   String get profLanguage => 'భాష';
 
   @override
   String get profStoreSettings => 'స్టోర్ సెట్టింగ్‌లు';
+
+  @override
+  String get profSwitchStore => 'స్టోర్ మార్చు / జోడించు';
 
   @override
   String get profConfiguration => 'కాన్ఫిగరేషన్';
@@ -4098,6 +4104,12 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get profStateRegion => 'రాష్ట్రం / రీజియన్';
+
+  @override
+  String get profCity => 'నగరం';
+
+  @override
+  String get profBusinessVertical => 'వ్యాపార విభాగం';
 
   @override
   String get profRequired => 'తప్పనిసరి';

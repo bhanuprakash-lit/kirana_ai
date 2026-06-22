@@ -6647,6 +6647,12 @@ abstract class AppLocalizations {
   /// **'Warranty & Serials'**
   String get profWarranty;
 
+  /// No description provided for @profGstReport.
+  ///
+  /// In en, this message translates to:
+  /// **'GST Report'**
+  String get profGstReport;
+
   /// No description provided for @profLanguage.
   ///
   /// In en, this message translates to:
@@ -6658,6 +6664,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Store Settings'**
   String get profStoreSettings;
+
+  /// No description provided for @profSwitchStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch / add store'**
+  String get profSwitchStore;
 
   /// No description provided for @profConfiguration.
   ///
@@ -7156,6 +7168,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'State / Region'**
   String get profStateRegion;
+
+  /// No description provided for @profCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get profCity;
+
+  /// No description provided for @profBusinessVertical.
+  ///
+  /// In en, this message translates to:
+  /// **'Business vertical'**
+  String get profBusinessVertical;
 
   /// No description provided for @profRequired.
   ///
