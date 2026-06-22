@@ -11,31 +11,55 @@ import '../../shared/widgets/customer_picker.dart';
 
 class JobCard {
   final int jobId;
+  final int? customerId;
   final String jobType;
   final String displayName;
+  final String? phone;
   final String? itemDesc;
   final double? charge;
   final String status;
   final String? promisedDate;
+  final String? receivedDate; // created_at
   const JobCard({
     required this.jobId,
+    this.customerId,
     required this.jobType,
     required this.displayName,
+    this.phone,
     this.itemDesc,
     this.charge,
     required this.status,
     this.promisedDate,
+    this.receivedDate,
   });
   factory JobCard.fromJson(Map<String, dynamic> j) => JobCard(
         jobId: (j['job_id'] as num).toInt(),
+        customerId: (j['customer_id'] as num?)?.toInt(),
         jobType: (j['job_type'] ?? 'repair').toString(),
         displayName: (j['customer_name'] ?? 'Customer').toString(),
+        phone: j['customer_phone'] as String?,
         itemDesc: j['item_desc'] as String?,
         charge: (j['charge'] as num?)?.toDouble(),
         status: (j['status'] ?? 'received').toString(),
         promisedDate: j['promised_date']?.toString(),
+        receivedDate: j['created_at']?.toString(),
       );
 }
+
+/// dd MMM from an ISO/date string; returns the raw string if unparseable.
+String _shortDate(String? s) {
+  if (s == null || s.isEmpty) return '';
+  final dt = DateTime.tryParse(s);
+  if (dt == null) return s;
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  return '${dt.day} ${months[dt.month - 1]}';
+}
+
+String _isoDate(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
 final jobCardsProvider = FutureProvider<List<JobCard>>((ref) async {
   ref.watch(storeScopeProvider); // refetch when the active store changes
@@ -106,13 +130,39 @@ class JobCardsScreen extends ConsumerWidget {
           if (j.charge != null)
             Text('₹${j.charge!.toStringAsFixed(0)}',
                 style: const TextStyle(fontWeight: FontWeight.w800)),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: const Icon(Icons.edit_outlined,
+                size: 18, color: BrandColors.muted),
+            onPressed: () => _edit(context, ref, j),
+          ),
         ]),
         const SizedBox(height: 6),
         Text('${j.displayName}${j.itemDesc != null ? " · ${j.itemDesc}" : ""}',
             style: const TextStyle(fontWeight: FontWeight.w700)),
-        if (j.promisedDate != null)
-          Text('Promised: ${j.promisedDate}',
-              style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+        if (j.phone != null && j.phone!.isNotEmpty)
+          Row(children: [
+            const Icon(Icons.phone_rounded, size: 12, color: BrandColors.muted),
+            const SizedBox(width: 4),
+            Text(j.phone!,
+                style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+          ]),
+        const SizedBox(height: 4),
+        Row(children: [
+          if (j.receivedDate != null && j.receivedDate!.isNotEmpty)
+            Text('Received: ${_shortDate(j.receivedDate)}',
+                style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+          if (j.promisedDate != null && j.promisedDate!.isNotEmpty) ...[
+            const SizedBox(width: 12),
+            Text('Ready by: ${_shortDate(j.promisedDate)}',
+                style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.primary,
+                    fontWeight: FontWeight.w600)),
+          ],
+        ]),
         const SizedBox(height: 8),
         Wrap(
           spacing: 6,
@@ -139,6 +189,7 @@ class JobCardsScreen extends ConsumerWidget {
     final charge = TextEditingController();
     String type = 'repair';
     Customer? customer;
+    DateTime? readyBy;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -204,6 +255,33 @@ class JobCardsScreen extends ConsumerWidget {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(labelText: 'Charge ₹ (optional)'),
               ),
+              const SizedBox(height: 12),
+              // Promised "ready by" date (estimate the customer gets).
+              InkWell(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: ctx,
+                    initialDate: readyBy ?? DateTime.now(),
+                    firstDate: DateTime.now().subtract(const Duration(days: 1)),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (picked != null) setSt(() => readyBy = picked);
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Ready by (optional)',
+                    prefixIcon: Icon(Icons.event_rounded),
+                  ),
+                  child: Text(
+                    readyBy == null
+                        ? 'Select date'
+                        : '${readyBy!.day}/${readyBy!.month}/${readyBy!.year}',
+                    style: TextStyle(
+                      color: readyBy == null ? BrandColors.muted : BrandColors.ink,
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -220,11 +298,107 @@ class JobCardsScreen extends ConsumerWidget {
                       if (item.text.trim().isNotEmpty) 'item_desc': item.text.trim(),
                       if (charge.text.trim().isNotEmpty)
                         'charge': double.tryParse(charge.text.trim()),
+                      if (readyBy != null)
+                        'promised_date': _isoDate(readyBy!),
                     });
                     ref.invalidate(jobCardsProvider);
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
                   child: const Text('Create'),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Edit an existing job card: item/description, charge and the ready-by date.
+  void _edit(BuildContext context, WidgetRef ref, JobCard j) {
+    final item = TextEditingController(text: j.itemDesc ?? '');
+    final charge =
+        TextEditingController(text: j.charge != null ? j.charge!.toStringAsFixed(0) : '');
+    DateTime? readyBy = (j.promisedDate != null && j.promisedDate!.isNotEmpty)
+        ? DateTime.tryParse(j.promisedDate!)
+        : null;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSt) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            left: 20,
+            right: 20,
+            top: 16,
+          ),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('Edit job card',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 4),
+              Text(
+                '${j.displayName}${j.phone != null && j.phone!.isNotEmpty ? " · ${j.phone}" : ""}',
+                style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+              ),
+              const SizedBox(height: 16),
+              TextField(controller: item, decoration: const InputDecoration(labelText: 'Item / description')),
+              const SizedBox(height: 12),
+              TextField(
+                controller: charge,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Charge ₹ (optional)'),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: ctx,
+                    initialDate: readyBy ?? DateTime.now(),
+                    firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (picked != null) setSt(() => readyBy = picked);
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Ready by',
+                    prefixIcon: Icon(Icons.event_rounded),
+                  ),
+                  child: Text(
+                    readyBy == null
+                        ? 'Select date'
+                        : '${readyBy!.day}/${readyBy!.month}/${readyBy!.year}',
+                    style: TextStyle(
+                      color: readyBy == null ? BrandColors.muted : BrandColors.ink,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: FilledButton(
+                  onPressed: () async {
+                    await ref.read(apiClientProvider).patch('/kirana/job-cards/${j.jobId}', {
+                      'item_desc': item.text.trim(),
+                      'charge': charge.text.trim().isNotEmpty
+                          ? double.tryParse(charge.text.trim())
+                          : null,
+                      if (readyBy != null) 'promised_date': _isoDate(readyBy!),
+                    });
+                    ref.invalidate(jobCardsProvider);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  child: const Text('Save changes'),
                 ),
               ),
             ]),

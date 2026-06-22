@@ -634,8 +634,9 @@ class PosNotifier extends Notifier<PosState> {
     int? membershipId, // M4 consume one membership session
     int? appointmentId, // M4 complete + bill an appointment
     int? jobCardId, // M9 bill a finished job card
+    double extraCharge = 0, // M4 — billed appointment's service price (O2)
   }) async {
-    if (state.cart.isEmpty) return null;
+    if (state.cart.isEmpty && extraCharge <= 0) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
 
     final client = ref.read(apiClientProvider);
@@ -655,8 +656,11 @@ class PosNotifier extends Notifier<PosState> {
         ? subtotal * (1 - discountPct / 100)
         : subtotal;
     // M1 — apply coupon discount + redeemed-points value to the bill.
+    // M4/O2 — add any billed appointment's service charge on top.
     final totalAmount =
-        (baseTotal - couponDiscount - redeemValue).clamp(0, double.infinity).toDouble();
+        (baseTotal - couponDiscount - redeemValue + extraCharge)
+            .clamp(0, double.infinity)
+            .toDouble();
 
     try {
       final body = <String, dynamic>{

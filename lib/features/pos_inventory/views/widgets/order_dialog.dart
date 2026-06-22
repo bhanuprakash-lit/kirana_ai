@@ -328,9 +328,13 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
     super.dispose();
   }
 
-  /// Bill after referral discount, coupon and redeemed points.
+  /// Bill after referral discount, coupon and redeemed points, plus any billed
+  /// appointment charge (O2).
   double _effectiveTotal(PosState state) =>
-      (state.discountedSubtotal - _couponDiscount - _redeemValue)
+      (state.discountedSubtotal -
+              _couponDiscount -
+              _redeemValue +
+              _deepLinks.appointmentCharge)
           .clamp(0, double.infinity)
           .toDouble();
 
@@ -518,6 +522,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           membershipId: _deepLinks.membershipId,
           appointmentId: _deepLinks.appointmentId,
           jobCardId: _deepLinks.jobCardId,
+          extraCharge: _deepLinks.appointmentCharge,
         );
     if (!mounted) return;
     if (result != null) {
@@ -743,6 +748,39 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                       links: _deepLinks,
                       onChanged: () => setState(() {}),
                     ),
+
+                    // ── Billed appointment charge (O2) ────────────────────────────────
+                    if (_deepLinks.appointmentCharge > 0) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.event_available_rounded,
+                                  size: 14, color: BrandColors.primary),
+                              SizedBox(width: 4),
+                              Text(
+                                'Appointment',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: BrandColors.muted,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '+${_fmt(_deepLinks.appointmentCharge)}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: BrandColors.ink,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
 
                     // ── Grand total ───────────────────────────────────────────────────
                     Row(

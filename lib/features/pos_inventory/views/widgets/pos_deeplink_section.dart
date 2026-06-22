@@ -7,6 +7,8 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../services/models/service_models.dart';
 import '../../../services/providers/service_provider.dart';
+import '../../../warranty/warranty.dart' show serialsProvider;
+import 'barcode_scanner_overlay.dart';
 
 /// What the shopkeeper linked to this sale at checkout (POS deep-links).
 /// All optional — the backend best-effort applies whatever is set:
@@ -17,11 +19,15 @@ class PosDeepLinks {
   int? membershipId;
   int? appointmentId;
   int? jobCardId;
+  // M4 — when an appointment is billed at checkout, its service price is added
+  // to the order total (O2). 0 when none / membership-covered.
+  double appointmentCharge;
   PosDeepLinks({
     List<String>? serials,
     this.membershipId,
     this.appointmentId,
     this.jobCardId,
+    this.appointmentCharge = 0,
   }) : serials = serials ?? [];
 
   bool get isEmpty =>
@@ -74,6 +80,7 @@ class PosDeepLinkSection extends ConsumerStatefulWidget {
 
 class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
   final _serialCtrl = TextEditingController();
+  String? _serialError;
 
   @override
   void dispose() {
@@ -81,13 +88,51 @@ class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
     super.dispose();
   }
 
+  /// Validate the typed/scanned serials: drop blanks, reject too-short junk
+  /// (e.g. "123"), de-dupe within the bill, and block any serial already sold
+  /// (uniqueness). Only the valid set is attached to the sale.
   void _syncSerials(String raw) {
-    widget.links.serials = raw
+    final parts = raw
         .split(RegExp(r'[\n,]'))
         .map((s) => s.trim())
         .where((s) => s.isNotEmpty)
         .toList();
+    final soldNos = (ref.read(serialsProvider).asData?.value ?? const [])
+        .where((s) => s['status'] == 'sold')
+        .map((s) => s['serial_no'].toString())
+        .toSet();
+    final seen = <String>{};
+    final valid = <String>[];
+    String? err;
+    for (final p in parts) {
+      if (p.length < 6) {
+        err = 'Serial / IMEI "$p" looks too short';
+        continue;
+      }
+      if (!seen.add(p)) {
+        err = 'Duplicate serial "$p"';
+        continue;
+      }
+      if (soldNos.contains(p)) {
+        err = 'Serial "$p" was already sold';
+        continue;
+      }
+      valid.add(p);
+    }
+    widget.links.serials = valid;
+    setState(() => _serialError = err);
     widget.onChanged();
+  }
+
+  Future<void> _scanSerial() async {
+    final scanned = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScannerOverlay()),
+    );
+    if (scanned == null || scanned.trim().isEmpty) return;
+    final existing = _serialCtrl.text.trim();
+    _serialCtrl.text = existing.isEmpty ? scanned.trim() : '$existing\n${scanned.trim()}';
+    _syncSerials(_serialCtrl.text);
   }
 
   @override
@@ -104,15 +149,43 @@ class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
       blocks.add(_block(
         icon: Icons.qr_code_2_rounded,
         title: 'Serial / IMEI sold',
-        child: TextField(
-          controller: _serialCtrl,
-          minLines: 1,
-          maxLines: 3,
-          onChanged: _syncSerials,
-          decoration: const InputDecoration(
-            isDense: true,
-            hintText: 'Scan or type serials (comma / new line)',
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _serialCtrl,
+                    minLines: 1,
+                    maxLines: 3,
+                    onChanged: _syncSerials,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      hintText: 'Scan or type serials (comma / new line)',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Scan',
+                  icon: const Icon(Icons.qr_code_scanner_rounded,
+                      color: BrandColors.primary),
+                  onPressed: _scanSerial,
+                ),
+              ],
+            ),
+            if (_serialError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  _serialError!,
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: BrandColors.error),
+                ),
+              ),
+          ],
         ),
       ));
     }
@@ -124,28 +197,54 @@ class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
       final appts = ref.watch(appointmentsProvider(day)).asData?.value ?? [];
       final booked = appts.where((a) => a.status == 'booked').toList();
       if (booked.isNotEmpty) {
+        final selectedAppt = booked
+            .where((a) => a.appointmentId == widget.links.appointmentId)
+            .firstOrNull;
         blocks.add(_block(
           icon: Icons.event_available_rounded,
           title: 'Bill an appointment',
-          child: DropdownButton<int?>(
-            isExpanded: true,
-            value: widget.links.appointmentId,
-            underline: const SizedBox.shrink(),
-            hint: const Text('Select appointment'),
-            items: [
-              const DropdownMenuItem(value: null, child: Text('None')),
-              ...booked.map((a) => DropdownMenuItem(
-                    value: a.appointmentId,
-                    child: Text(
-                      '${a.displayName} · ${a.serviceName ?? 'Service'}',
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  )),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DropdownButton<int?>(
+                isExpanded: true,
+                value: widget.links.appointmentId,
+                underline: const SizedBox.shrink(),
+                hint: const Text('Select appointment'),
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('None')),
+                  ...booked.map((a) => DropdownMenuItem(
+                        value: a.appointmentId,
+                        child: Text(
+                          '${a.displayName} · ${a.serviceName ?? 'Service'}'
+                          '${a.price != null ? ' · ₹${a.price!.toStringAsFixed(0)}' : ''}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )),
+                ],
+                onChanged: (v) {
+                  final appt = booked
+                      .where((a) => a.appointmentId == v)
+                      .firstOrNull;
+                  setState(() {
+                    widget.links.appointmentId = v;
+                    widget.links.appointmentCharge = appt?.price ?? 0;
+                  });
+                  widget.onChanged();
+                },
+              ),
+              if (selectedAppt?.price != null && selectedAppt!.price! > 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    '+ ₹${selectedAppt.price!.toStringAsFixed(0)} added to the bill',
+                    style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: BrandColors.success),
+                  ),
+                ),
             ],
-            onChanged: (v) {
-              setState(() => widget.links.appointmentId = v);
-              widget.onChanged();
-            },
           ),
         ));
       }
