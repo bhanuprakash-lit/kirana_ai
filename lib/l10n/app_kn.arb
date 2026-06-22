@@ -470,6 +470,7 @@
   "invEditVariant": "ವೇರಿಯಂಟ್ ಸಂಪಾದಿಸಿ",
   "invSaveVariant": "ವೇರಿಯಂಟ್ ಉಳಿಸಿ",
   "invNoVariantsYet": "ಇನ್ನೂ ವೇರಿಯಂಟ್‌ಗಳಿಲ್ಲ. ಸೈಜ್, ಬಣ್ಣ ಅಥವಾ ಮಾಡೆಲ್ ಸೇರಿಸಿ.",
+  "invStockPerVariantNote": "ಸ್ಟಾಕ್ ಪ್ರತಿ ವೇರಿಯಂಟ್‌ಗೆ ಪ್ರತ್ಯೇಕವಾಗಿ ಟ್ರ್ಯಾಕ್ ಆಗುತ್ತದೆ. ಕೆಳಗಿನ 'ವೇರಿಯಂಟ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ' ಬಳಸಿ.",
   "invDefaultVariant": "ಡೀಫಾಲ್ಟ್",
   "invVariantAxisRequired": "ದಯವಿಟ್ಟು {label} ಆಯ್ಕೆಮಾಡಿ",
   "invSaveProduct": "ಉತ್ಪನ್ನ ಉಳಿಸಿ",

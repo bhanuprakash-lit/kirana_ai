@@ -1667,7 +1667,7 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get invStockPerVariantNote =>
-      'Stock is tracked per variant. Use Manage Variants below.';
+      'ಸ್ಟಾಕ್ ಪ್ರತಿ ವೇರಿಯಂಟ್‌ಗೆ ಪ್ರತ್ಯೇಕವಾಗಿ ಟ್ರ್ಯಾಕ್ ಆಗುತ್ತದೆ. ಕೆಳಗಿನ \'ವೇರಿಯಂಟ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ\' ಬಳಸಿ.';
 
   @override
   String get invDefaultVariant => 'ಡೀಫಾಲ್ಟ್';

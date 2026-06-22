@@ -470,6 +470,7 @@
   "invEditVariant": "వేరియంట్‌ను సవరించండి",
   "invSaveVariant": "వేరియంట్‌ను సేవ్ చేయండి",
   "invNoVariantsYet": "ఇంకా వేరియంట్‌లు లేవు. సైజు, రంగు లేదా మోడల్ జోడించండి.",
+  "invStockPerVariantNote": "స్టాక్ ప్రతి వేరియంట్‌కు విడిగా ట్రాక్ చేయబడుతుంది. క్రింద ఉన్న 'వేరియంట్‌లను నిర్వహించండి' ఉపయోగించండి.",
   "invDefaultVariant": "డిఫాల్ట్",
   "invVariantAxisRequired": "దయచేసి {label} ఎంచుకోండి",
   "invSaveProduct": "ప్రొడక్ట్ సేవ్ చేయి",

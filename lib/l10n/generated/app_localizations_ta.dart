@@ -1681,7 +1681,7 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get invStockPerVariantNote =>
-      'Stock is tracked per variant. Use Manage Variants below.';
+      'ஸ்டாக் ஒவ்வொரு வகைக்கும் தனித்தனியாகக் கண்காணிக்கப்படுகிறது. கீழே உள்ள \'வகைகளை நிர்வகிக்கவும்\' ஐப் பயன்படுத்தவும்.';
 
   @override
   String get invDefaultVariant => 'இயல்புநிலை';

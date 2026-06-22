@@ -470,6 +470,7 @@
   "invEditVariant": "व्हेरियंट संपादित करा",
   "invSaveVariant": "व्हेरियंट जतन करा",
   "invNoVariantsYet": "अद्याप व्हेरियंट नाहीत. साइज, रंग किंवा मॉडेल जोडा.",
+  "invStockPerVariantNote": "स्टॉक प्रत्येक व्हेरियंटसाठी वेगळा ट्रॅक केला जातो. खालील 'व्हेरियंट व्यवस्थापित करा' वापरा.",
   "invDefaultVariant": "डीफॉल्ट",
   "invVariantAxisRequired": "कृपया {label} निवडा",
   "invSaveProduct": "उत्पादन जतन करा",

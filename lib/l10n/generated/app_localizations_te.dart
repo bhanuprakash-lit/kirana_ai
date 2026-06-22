@@ -1634,7 +1634,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get invStockPerVariantNote =>
-      'Stock is tracked per variant. Use Manage Variants below.';
+      'స్టాక్ ప్రతి వేరియంట్‌కు విడిగా ట్రాక్ చేయబడుతుంది. క్రింద ఉన్న \'వేరియంట్‌లను నిర్వహించండి\' ఉపయోగించండి.';
 
   @override
   String get invDefaultVariant => 'డిఫాల్ట్';

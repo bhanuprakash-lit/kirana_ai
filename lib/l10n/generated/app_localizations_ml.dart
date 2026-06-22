@@ -1682,7 +1682,7 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get invStockPerVariantNote =>
-      'Stock is tracked per variant. Use Manage Variants below.';
+      'സ്റ്റോക്ക് ഓരോ വേരിയന്റിനും പ്രത്യേകം ട്രാക്ക് ചെയ്യുന്നു. താഴെയുള്ള \'വേരിയന്റുകൾ കൈകാര്യം ചെയ്യുക\' ഉപയോഗിക്കുക.';
 
   @override
   String get invDefaultVariant => 'ഡിഫോൾട്ട്';
