@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 
 class KpiCard {
   final String slug;
@@ -78,6 +79,8 @@ class VisibleKpi {
   final String status; // 'ok' | 'data_unavailable'
   final String category;
   final String? missingData;
+  final String? primaryField; // field in the result that is "the number"
+  final List<String> verticals; // empty = common; non-empty = vertical pack
 
   const VisibleKpi({
     required this.kpiId,
@@ -86,9 +89,12 @@ class VisibleKpi {
     required this.status,
     required this.category,
     this.missingData,
+    this.primaryField,
+    this.verticals = const [],
   });
 
   bool get isLive => status == 'ok';
+  bool get isVerticalPack => verticals.isNotEmpty;
 
   factory VisibleKpi.fromJson(Map<String, dynamic> j) {
     final ep = j['endpoint'] as String?;
@@ -99,9 +105,68 @@ class VisibleKpi {
       status: j['status'] as String? ?? 'data_unavailable',
       category: j['category'] as String? ?? 'Operations',
       missingData: j['missing_data'] as String?,
+      primaryField: j['primary_field'] as String?,
+      verticals: (j['verticals'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
     );
   }
 }
+
+/// A vertical-pack KPI with its computed value, for the dashboard's
+/// vertical-specific KPI strip (apparel sell-through, electronics attach-rate,
+/// optical Rx-renewal, salon service-revenue, …).
+class VerticalKpiCard {
+  final String name;
+  final String value;
+  const VerticalKpiCard({required this.name, required this.value});
+}
+
+String _formatKpiValue(num? v, String? primaryField) {
+  if (v == null) return '—';
+  final f = primaryField ?? '';
+  if (f.endsWith('_pct') || f.endsWith('_rate') || f == 'utilisation_pct') {
+    return '${v.toStringAsFixed(1)}%';
+  }
+  if (f.contains('revenue') || f.contains('value')) {
+    return v >= 1000
+        ? '₹${(v / 1000).toStringAsFixed(1)}K'
+        : '₹${v.toStringAsFixed(0)}';
+  }
+  if (f == 'gmroi') return '${v.toStringAsFixed(2)}x';
+  // counts (due_count, sizes_tracked, store_count, …)
+  return v % 1 == 0 ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+}
+
+/// Live vertical-pack KPIs for this store (with values), shown on the dashboard
+/// in addition to the common cards. Empty for grocery / general (no pack).
+final verticalKpiCardsProvider =
+    FutureProvider.autoDispose<List<VerticalKpiCard>>((ref) async {
+  ref.watch(storeScopeProvider);
+  final client = ref.read(apiClientProvider);
+  final prefs = await SharedPreferences.getInstance();
+  final storeId = prefs.getInt('store_id') ?? 1;
+
+  // The vertical's visible pack KPIs (backend resolves vertical + admin config).
+  final visible = await ref.watch(visibleKpisProvider.future);
+  final pack = visible.where((k) => k.isVerticalPack && k.isLive).toList();
+  if (pack.isEmpty) return const [];
+
+  // One summary call gives every KPI's computed value, keyed by id.
+  final summary = await client.get('/kirana/kpis/summary?store_id=$storeId');
+  final cards = (summary is Map ? summary['kpis'] : null) as List<dynamic>? ?? [];
+  final byId = <String, Map<String, dynamic>>{
+    for (final c in cards.whereType<Map>())
+      (c['kpi_id'] as String): c.cast<String, dynamic>(),
+  };
+
+  return pack.map((k) {
+    final value = (byId[k.kpiId]?['value'] as num?);
+    return VerticalKpiCard(
+      name: k.name,
+      value: _formatKpiValue(value, k.primaryField),
+    );
+  }).toList();
+});
 
 /// The KPIs this store should show, per its vertical + admin visibility config.
 final visibleKpisProvider = FutureProvider.autoDispose<List<VisibleKpi>>((ref) async {
