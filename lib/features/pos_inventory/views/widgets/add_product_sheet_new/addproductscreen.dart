@@ -1,106 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../core/locale/locale_provider.dart';
-import '../../../../core/services/api_client.dart';
-import '../../../../core/theme/brand_theme.dart';
-import '../../../../l10n/generated/app_localizations.dart';
-import '../../../../shared/widgets/action_widgets.dart';
-import '../../providers/inventory_provider.dart';
-import '../../providers/pos_provider.dart';
-import 'add_category_sheet.dart';
-import 'barcode_scanner_overlay.dart';
-
-const _units = ['pcs', 'kg', 'g', 'L', 'ml', 'dozen', 'pack', 'box', 'bundle'];
-
-// ── Entry point ───────────────────────────────────────────────────────────────
-
-Future<void> showAddProductSheet(
-  BuildContext context,
-  WidgetRef ref, {
-  String? initialBarcode,
-}) async {
-  await Navigator.push(
-    context,
-    MaterialPageRoute(
-      fullscreenDialog: true,
-      builder: (_) =>
-          _AddProductScreen(ref: ref, initialBarcode: initialBarcode),
-    ),
-  );
-}
-
-// ── Catalog search result ─────────────────────────────────────────────────────
-
-class _CatalogProduct {
-  final int productId;
-  final String name;
-  final String? brand;
-  final String? unit;
-  final double? weight;
-  final String? barcode;
-  final bool isPerishable;
-  final bool isLoose;
-  final String? imageUrl;
-  final int categoryId;
-  final String? categoryName;
-  final String? parentCategoryName;
-  // Most-recent pricing for THIS user's store, joined server-side.
-  // Null when the store has no pricing row for this product yet.
-  final double? price;
-  final double? mrp;
-
-  const _CatalogProduct({
-    required this.productId,
-    required this.name,
-    this.brand,
-    this.unit,
-    this.weight,
-    this.barcode,
-    required this.isPerishable,
-    required this.isLoose,
-    this.imageUrl,
-    required this.categoryId,
-    this.categoryName,
-    this.parentCategoryName,
-    this.price,
-    this.mrp,
-  });
-
-  factory _CatalogProduct.fromJson(Map<String, dynamic> j) => _CatalogProduct(
-    productId: j['product_id'] as int,
-    name: j['name'] as String,
-    brand: j['brand'] as String?,
-    unit: j['unit'] as String?,
-    weight: (j['weight'] as num?)?.toDouble(),
-    barcode: j['barcode'] as String?,
-    isPerishable: j['is_perishable'] as bool? ?? false,
-    isLoose: j['is_loose'] as bool? ?? false,
-    imageUrl: j['image_url'] as String?,
-    categoryId: j['category_id'] as int,
-    categoryName: j['category_name'] as String?,
-    parentCategoryName: j['parent_category_name'] as String?,
-    price: (j['price'] as num?)?.toDouble(),
-    mrp: (j['mrp'] as num?)?.toDouble(),
-  );
-
-  String get subtitle {
-    final parts = <String>[];
-    if (brand != null) parts.add(brand!);
-    if (parentCategoryName != null) parts.add(parentCategoryName!);
-    if (categoryName != null && categoryName != parentCategoryName) {
-      parts.add(categoryName!);
-    }
-    return parts.join(' · ');
-  }
-}
-
-// ── Main screen ───────────────────────────────────────────────────────────────
-
-enum _Stage { search, form }
+part of '../add_product_sheet_new.dart';
 
 class _AddProductScreen extends ConsumerStatefulWidget {
   final WidgetRef ref;
@@ -115,7 +13,6 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   _Stage _stage = _Stage.search;
   _CatalogProduct? _linked; // set when user picks from catalog
 
-  // ── Search state ──────────────────────────────────────────────────────────
   final _searchCtrl = TextEditingController();
   List<_CatalogProduct> _searchResults = [];
   bool _searching = false;
@@ -124,10 +21,11 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   String _lastQuery = '';
   Timer? _debounce;
 
-  // ── Form state ────────────────────────────────────────────────────────────
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _brandCtrl = TextEditingController();
+  final _gstCtrl = TextEditingController(); // F3 — GST %
+  final _hsnCtrl = TextEditingController(); // F3 — HSN code
 
   int? _selectedCategoryId;
   String? _selectedCategoryName;
@@ -163,13 +61,13 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     _searchCtrl.dispose();
     _nameCtrl.dispose();
     _brandCtrl.dispose();
+    _gstCtrl.dispose();
+    _hsnCtrl.dispose();
     for (final v in _variants) {
       v.dispose();
     }
     super.dispose();
   }
-
-  // ── Search logic ──────────────────────────────────────────────────────────
 
   static const _pageSize = 20;
 
@@ -289,8 +187,6 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     setState(() => _stage = _Stage.form);
   }
 
-  // ── Category picker ───────────────────────────────────────────────────────
-
   Future<void> _pickCategory() async {
     final inventoryAsync = ref.read(inventoryProvider);
     final allCats = inventoryAsync.value?.categories ?? [];
@@ -314,8 +210,6 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     final created = await showAddCategorySheet(context, ref);
     if (created && mounted) setState(() {});
   }
-
-  // ── Barcode scan ──────────────────────────────────────────────────────────
 
   Future<void> _scanBarcode({int variantIndex = 0}) async {
     final scanned = await Navigator.push<String>(
@@ -350,8 +244,6 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     }
   }
 
-  // ── Save ─────────────────────────────────────────────────────────────────
-
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategoryId == null) {
@@ -365,6 +257,20 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         return;
       }
     }
+    // F2 — each variant must have every axis set so it is uniquely identifiable.
+    if (verticalConfigOf(ref).has('variants')) {
+      final axes = (ref.read(attributeDefsProvider).asData?.value ?? [])
+          .where((a) => a.isVariantAxis)
+          .toList();
+      for (final v in _variants) {
+        for (final a in axes) {
+          if ((v.attributes[a.attrCode] ?? '').trim().isEmpty) {
+            setState(() => _error = _l10n.invVariantAxisRequired(a.label));
+            return;
+          }
+        }
+      }
+    }
     setState(() {
       _saving = true;
       _error = null;
@@ -375,48 +281,97 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     final brand = _brandCtrl.text.trim().isNotEmpty
         ? _brandCtrl.text.trim()
         : null;
+    // F3 — product-level GST (gated to non-grocery in the UI).
+    final gstRate = _gstCtrl.text.trim().isNotEmpty
+        ? double.tryParse(_gstCtrl.text.trim())
+        : null;
+    final hsnCode = _hsnCtrl.text.trim().isNotEmpty ? _hsnCtrl.text.trim() : null;
 
     String? firstError;
-    for (int i = 0; i < _variants.length; i++) {
-      final v = _variants[i];
-      // Only the first variant reuses the catalog product_id.
-      // Each additional variant must create its own product row so it gets
-      // a unique product_id and a separate inventory entry.
-      final err = await ref
-          .read(inventoryProvider.notifier)
-          .addProduct(
+    if (verticalConfigOf(ref).has('variants')) {
+      // F2 — one product carrying many real variants (size/colour/model).
+      final first = _variants.first;
+      double totalStock = 0;
+      final specs = <Map<String, dynamic>>[];
+      for (final v in _variants) {
+        final stock = double.tryParse(v.stockCtrl.text.trim()) ?? 0;
+        totalStock += stock;
+        specs.add({
+          'attributes': Map<String, String>.from(v.attributes),
+          'price': double.tryParse(v.priceCtrl.text.trim()),
+          'mrp': v.mrpCtrl.text.trim().isNotEmpty
+              ? double.tryParse(v.mrpCtrl.text.trim())
+              : null,
+          'cost': v.costCtrl.text.trim().isNotEmpty
+              ? double.tryParse(v.costCtrl.text.trim())
+              : null,
+          'stock': stock,
+          'barcode': v.barcodeCtrl.text.trim(),
+        });
+      }
+      firstError = await ref.read(inventoryProvider.notifier).addProduct(
             name: name,
             categoryId: _selectedCategoryId!,
-            sellingPrice: double.parse(v.priceCtrl.text),
-            initialStock: double.parse(
-              v.stockCtrl.text.isEmpty ? '0' : v.stockCtrl.text,
-            ),
+            sellingPrice: double.parse(first.priceCtrl.text),
+            initialStock: totalStock,
             brand: brand,
-            unit: v.selectedUnit,
-            weight: v.weightCtrl.text.trim().isNotEmpty
-                ? double.tryParse(v.weightCtrl.text.trim())
+            unit: 'pcs',
+            barcode: first.barcodeCtrl.text.trim().isNotEmpty
+                ? first.barcodeCtrl.text.trim()
                 : null,
-            barcode: v.barcodeCtrl.text.trim().isNotEmpty
-                ? v.barcodeCtrl.text.trim()
+            mrp: first.mrpCtrl.text.trim().isNotEmpty
+                ? double.tryParse(first.mrpCtrl.text.trim())
                 : null,
-            mrp: v.mrpCtrl.text.isNotEmpty
-                ? double.tryParse(v.mrpCtrl.text)
-                : null,
-            costPrice: v.costCtrl.text.isNotEmpty
-                ? double.tryParse(v.costCtrl.text)
-                : null,
-            isPerishable: _isPerishable,
-            isLoose: _isLoose,
-            expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty
-                ? v.expiryCtrl.text
-                : null,
-            existingProductId: i == 0 ? _linked?.productId : null,
-            // V2+ create new product rows — copy catalog image so they show the same photo
-            imageUrl: i == 0 ? null : _linked?.imageUrl,
+            existingProductId: _linked?.productId,
+            imageUrl: _linked?.imageUrl,
+            variants: specs,
+            gstRate: gstRate,
+            hsnCode: hsnCode,
           );
-      if (err != null) {
-        firstError = err;
-        break;
+    } else {
+      for (int i = 0; i < _variants.length; i++) {
+        final v = _variants[i];
+        // Only the first variant reuses the catalog product_id.
+        // Each additional variant must create its own product row so it gets
+        // a unique product_id and a separate inventory entry.
+        final err = await ref
+            .read(inventoryProvider.notifier)
+            .addProduct(
+              name: name,
+              categoryId: _selectedCategoryId!,
+              sellingPrice: double.parse(v.priceCtrl.text),
+              initialStock: double.parse(
+                v.stockCtrl.text.isEmpty ? '0' : v.stockCtrl.text,
+              ),
+              brand: brand,
+              unit: v.selectedUnit,
+              weight: v.weightCtrl.text.trim().isNotEmpty
+                  ? double.tryParse(v.weightCtrl.text.trim())
+                  : null,
+              barcode: v.barcodeCtrl.text.trim().isNotEmpty
+                  ? v.barcodeCtrl.text.trim()
+                  : null,
+              mrp: v.mrpCtrl.text.isNotEmpty
+                  ? double.tryParse(v.mrpCtrl.text)
+                  : null,
+              costPrice: v.costCtrl.text.isNotEmpty
+                  ? double.tryParse(v.costCtrl.text)
+                  : null,
+              isPerishable: _isPerishable,
+              isLoose: _isLoose,
+              expiryDate: _isPerishable && v.expiryCtrl.text.isNotEmpty
+                  ? v.expiryCtrl.text
+                  : null,
+              existingProductId: i == 0 ? _linked?.productId : null,
+              // V2+ create new product rows — copy catalog image so they show the same photo
+              imageUrl: i == 0 ? null : _linked?.imageUrl,
+              gstRate: gstRate,
+              hsnCode: hsnCode,
+            );
+        if (err != null) {
+          firstError = err;
+          break;
+        }
       }
     }
 
@@ -449,8 +404,6 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     }
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -462,7 +415,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         elevation: 0,
         title: Text(
           _stage == _Stage.search
-              ? l10n.invAddProduct
+              ? verticalConfigOf(ref).copy('add_title', l10n.invAddProduct)
               : (_linked != null ? l10n.invAddFromCatalog : l10n.invNewProduct),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
@@ -510,8 +463,6 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     );
   }
 
-  // ── Search stage ──────────────────────────────────────────────────────────
-
   Widget _buildSearch() {
     final l10n = AppLocalizations.of(context);
     return Column(
@@ -527,7 +478,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   controller: _searchCtrl,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: l10n.invSearchProductName,
+                    hintText:
+                        verticalConfigOf(ref).copy('search_hint', l10n.invSearchProductName),
                     prefixIcon: const Icon(
                       Icons.search_rounded,
                       color: BrandColors.muted,
@@ -738,8 +690,6 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     );
   }
 
-  // ── Form stage ────────────────────────────────────────────────────────────
-
   Widget _buildForm() {
     final l10n = AppLocalizations.of(context);
     return Form(
@@ -763,22 +713,25 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             const SizedBox(height: 20),
           ],
 
-          // Loose toggle
-          _ToggleRow(
-            label: l10n.invLooseItem,
-            sublabel: l10n.invLooseItemSub,
-            value: _isLoose,
-            enabled: !_saving && !_success,
-            onChanged: (v) => setState(() {
-              _isLoose = v;
-              if (v) {
-                for (final vt in _variants) {
-                  if (vt.selectedUnit == 'pcs') vt.selectedUnit = 'kg';
+          // Loose toggle — grocery-style loose/weight selling. Hidden for
+          // verticals that don't sell loose (vertical config feature flag).
+          if (verticalConfigOf(ref).has('loose')) ...[
+            _ToggleRow(
+              label: l10n.invLooseItem,
+              sublabel: l10n.invLooseItemSub,
+              value: _isLoose,
+              enabled: !_saving && !_success,
+              onChanged: (v) => setState(() {
+                _isLoose = v;
+                if (v) {
+                  for (final vt in _variants) {
+                    if (vt.selectedUnit == 'pcs') vt.selectedUnit = 'kg';
+                  }
                 }
-              }
-            }),
-          ),
-          const SizedBox(height: 20),
+              }),
+            ),
+            const SizedBox(height: 20),
+          ],
 
           _SectionHeader(l10n.invBasicDetails),
           const SizedBox(height: 12),
@@ -872,26 +825,63 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             ),
           const SizedBox(height: 24),
 
-          // ── Perishable toggle ──────────────────────────────────────────
-          _SectionHeader(l10n.invOther),
-          const SizedBox(height: 12),
-          _ToggleRow(
-            label: l10n.invPerishableItem,
-            sublabel: l10n.invPerishableItemSub,
-            value: _isPerishable,
-            enabled: !_saving && !_success,
-            onChanged: (v) => setState(() => _isPerishable = v),
-          ),
-          const SizedBox(height: 24),
+          // Expiry tracking is grocery-only; hidden where the vertical config
+          // has no 'expiry' feature (e.g. apparel, electronics).
+          if (verticalConfigOf(ref).has('expiry')) ...[
+            _SectionHeader(l10n.invOther),
+            const SizedBox(height: 12),
+            _ToggleRow(
+              label: l10n.invPerishableItem,
+              sublabel: l10n.invPerishableItemSub,
+              value: _isPerishable,
+              enabled: !_saving && !_success,
+              onChanged: (v) => setState(() => _isPerishable = v),
+            ),
+            const SizedBox(height: 24),
+          ],
 
-          // ── Variants ────────────────────────────────────────────────────
+          // F3 — GST / HSN for non-grocery (taxable) verticals.
+          if (verticalConfigOf(ref).verticalCode != 'grocery') ...[
+            _SectionHeader(l10n.invGstRate),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _gstCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                    ],
+                    decoration: InputDecoration(
+                      labelText: l10n.invGstRate,
+                      suffixText: '%',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _hsnCtrl,
+                    decoration: InputDecoration(labelText: l10n.invHsnCode),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _SectionHeader(
-                _variants.length == 1
-                    ? l10n.invSizePriceStock
-                    : l10n.invVariantsCount(_variants.length),
+                verticalConfigOf(ref).has('variants')
+                    ? l10n.invVariants
+                    : (_variants.length == 1
+                          ? l10n.invSizePriceStock
+                          : l10n.invVariantsCount(_variants.length)),
               ),
               if (!_saving && !_success)
                 TextButton.icon(
@@ -922,7 +912,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           const SizedBox(height: 12),
 
           for (int i = 0; i < _variants.length; i++) ...[
-            _buildVariantRow(i),
+            verticalConfigOf(ref).has('variants')
+                ? _buildF2VariantRow(i)
+                : _buildVariantRow(i),
             const SizedBox(height: 12),
           ],
 
@@ -930,9 +922,11 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           SizedBox(
             height: 56,
             child: LoadingButton(
-              label: _variants.length == 1
+              label: verticalConfigOf(ref).has('variants')
                   ? l10n.invSaveProduct
-                  : l10n.invSaveVariants(_variants.length),
+                  : (_variants.length == 1
+                        ? l10n.invSaveProduct
+                        : l10n.invSaveVariants(_variants.length)),
               isLoading: _saving,
               onPressed: _success ? null : _save,
             ),
@@ -943,9 +937,111 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     );
   }
 
+  /// F2 inline row: variant axes (size/colour/model) + price + stock. Used when
+  /// the store's vertical `has('variants')`; produces one product_variant.
+  Widget _buildF2VariantRow(int idx) {
+    final l10n = AppLocalizations.of(context);
+    final v = _variants[idx];
+    final axes = (ref.watch(attributeDefsProvider).asData?.value ?? [])
+        .where((a) => a.isVariantAxis)
+        .toList();
+    final canRemove = _variants.length > 1 && !_saving && !_success;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.invVariantNumber(idx + 1),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: BrandColors.muted,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              if (canRemove)
+                InkWell(
+                  onTap: () => setState(() {
+                    _variants[idx].dispose();
+                    _variants.removeAt(idx);
+                  }),
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: BrandColors.muted,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          for (final a in axes) ...[
+            _f2AxisField(v, a),
+            const SizedBox(height: 10),
+          ],
+          Row(
+            children: [
+              Expanded(child: _f2NumField(v.priceCtrl, l10n.invPrice, prefix: '₹ ')),
+              const SizedBox(width: 10),
+              Expanded(child: _f2NumField(v.stockCtrl, l10n.invStock)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _f2AxisField(_VariantData v, AttributeDef a) {
+    if (a.isEnum) {
+      return DropdownButtonFormField<String>(
+        initialValue: (v.attributes[a.attrCode]?.isNotEmpty ?? false)
+            ? v.attributes[a.attrCode]
+            : null,
+        isExpanded: true,
+        decoration: InputDecoration(labelText: a.label),
+        items: a.options
+            .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+            .toList(),
+        onChanged: (_saving || _success)
+            ? null
+            : (val) => setState(() => v.attributes[a.attrCode] = val ?? ''),
+      );
+    }
+    return TextFormField(
+      initialValue: v.attributes[a.attrCode],
+      enabled: !_saving && !_success,
+      decoration: InputDecoration(labelText: a.label),
+      onChanged: (val) => v.attributes[a.attrCode] = val.trim(),
+    );
+  }
+
+  Widget _f2NumField(TextEditingController c, String label, {String? prefix}) =>
+      TextField(
+        controller: c,
+        enabled: !_saving && !_success,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+        ],
+        decoration: InputDecoration(labelText: label, prefixText: prefix),
+      );
+
   Widget _buildVariantRow(int idx) {
     final l10n = AppLocalizations.of(context);
     final v = _variants[idx];
+    // Units come from the store's vertical config (grocery defaults otherwise).
+    // Always include the current selection so the dropdown value stays valid.
+    final units = <String>{...verticalConfigOf(ref).unitSet, v.selectedUnit}
+        .toList();
     final isFirst = idx == 0;
     final canRemove = _variants.length > 1 && !_saving && !_success;
 
@@ -1007,7 +1103,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                     isDense: true,
                   ),
                   isExpanded: true,
-                  items: _units
+                  items: units
                       .map((u) => DropdownMenuItem(value: u, child: Text(u)))
                       .toList(),
                   onChanged: (_saving || _success)
@@ -1220,436 +1316,3 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   }
 }
 
-// ── Variant data holder ───────────────────────────────────────────────────────
-
-class _VariantData {
-  final weightCtrl = TextEditingController(); // empty = no pack size
-  final barcodeCtrl = TextEditingController();
-  final priceCtrl = TextEditingController();
-  final mrpCtrl = TextEditingController();
-  final costCtrl = TextEditingController();
-  final stockCtrl = TextEditingController(text: '0');
-  final expiryCtrl = TextEditingController();
-  String selectedUnit = 'pcs';
-
-  void dispose() {
-    weightCtrl.dispose();
-    barcodeCtrl.dispose();
-    priceCtrl.dispose();
-    mrpCtrl.dispose();
-    costCtrl.dispose();
-    stockCtrl.dispose();
-    expiryCtrl.dispose();
-  }
-}
-
-// ── Catalog result tile ───────────────────────────────────────────────────────
-
-class _CatalogResultTile extends StatelessWidget {
-  final _CatalogProduct product;
-  final VoidCallback onTap;
-
-  const _CatalogResultTile({required this.product, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: BrandColors.border),
-        ),
-        child: Row(
-          children: [
-            // Product image / icon
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: product.imageUrl != null
-                  ? Image.network(
-                      product.imageUrl!,
-                      width: 48,
-                      height: 48,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => _iconFallback(),
-                    )
-                  : _iconFallback(),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (product.subtitle.isNotEmpty)
-                    Text(
-                      product.subtitle,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: BrandColors.muted,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  if (product.barcode != null)
-                    Text(
-                      product.barcode!,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: BrandColors.muted,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.add_circle_rounded,
-              color: BrandColors.primary,
-              size: 22,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _iconFallback() => Container(
-    width: 48,
-    height: 48,
-    color: BrandColors.surfaceTint,
-    child: const Icon(
-      Icons.inventory_2_rounded,
-      color: BrandColors.muted,
-      size: 22,
-    ),
-  );
-}
-
-// ── Linked chip ───────────────────────────────────────────────────────────────
-
-class _LinkedChip extends StatelessWidget {
-  final _CatalogProduct product;
-  const _LinkedChip({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: BrandColors.primary.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: BrandColors.primary.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        children: [
-          if (product.imageUrl != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                product.imageUrl!,
-                width: 44,
-                height: 44,
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
-              ),
-            ),
-          if (product.imageUrl != null) const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.link_rounded,
-                      size: 14,
-                      color: BrandColors.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      l10n.invLinkedFromCatalog,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: BrandColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  product.name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: BrandColors.ink,
-                  ),
-                ),
-                if (product.subtitle.isNotEmpty)
-                  Text(
-                    product.subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: BrandColors.muted,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Searchable category picker sheet ─────────────────────────────────────────
-
-/// Public entry point so other sheets can reuse the category picker.
-Future<Map<String, dynamic>?> showCategoryPicker(
-  BuildContext context,
-  List<Map<String, dynamic>> categories,
-) => showModalBottomSheet<Map<String, dynamic>>(
-  context: context,
-  isScrollControlled: true,
-  backgroundColor: Colors.transparent,
-  builder: (_) => _CategoryPickerSheet(categories: categories),
-);
-
-class _CategoryPickerSheet extends StatefulWidget {
-  final List<Map<String, dynamic>> categories;
-  const _CategoryPickerSheet({required this.categories});
-
-  @override
-  State<_CategoryPickerSheet> createState() => _CategoryPickerSheetState();
-}
-
-class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
-  final _ctrl = TextEditingController();
-  String _query = '';
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final filtered =
-        widget.categories.where((c) {
-          if (_query.isEmpty) return true;
-          final name = (c['name'] as String? ?? '').toLowerCase();
-          return name.contains(_query.toLowerCase());
-        }).toList()..sort(
-          (a, b) => (a['name'] as String).compareTo(b['name'] as String),
-        );
-
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.4,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (_, scrollCtrl) => Container(
-        decoration: const BoxDecoration(
-          color: BrandColors.background,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          children: [
-            // Handle
-            const SizedBox(height: 12),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: BrandColors.border,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Header + search
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.invSelectCategory,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _ctrl,
-                    autofocus: true,
-                    onChanged: (v) => setState(() => _query = v),
-                    decoration: InputDecoration(
-                      hintText: l10n.invSearchCategories,
-                      prefixIcon: const Icon(
-                        Icons.search_rounded,
-                        size: 20,
-                        color: BrandColors.muted,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      suffixIcon: _query.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 18),
-                              onPressed: () {
-                                _ctrl.clear();
-                                setState(() => _query = '');
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            // List
-            Expanded(
-              child: filtered.isEmpty
-                  ? Center(
-                      child: Text(
-                        l10n.invNoCategoriesFound,
-                        style: const TextStyle(color: BrandColors.muted),
-                      ),
-                    )
-                  : ListView.builder(
-                      controller: scrollCtrl,
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-                      itemCount: filtered.length,
-                      itemBuilder: (_, i) {
-                        final cat = filtered[i];
-                        return ListTile(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          title: Text(
-                            cat['name'] as String? ?? '',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          trailing: const Icon(
-                            Icons.check_rounded,
-                            color: BrandColors.primary,
-                            size: 18,
-                          ),
-                          onTap: () => Navigator.pop(context, cat),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Shared helpers ────────────────────────────────────────────────────────────
-
-String _toTitleCase(String s) => s
-    .split(RegExp(r'\s+'))
-    .where((w) => w.isNotEmpty)
-    .map((w) => w[0].toUpperCase() + w.substring(1))
-    .join(' ');
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  const _SectionHeader(this.title);
-
-  @override
-  Widget build(BuildContext context) => Text(
-    title.toUpperCase(),
-    style: const TextStyle(
-      fontWeight: FontWeight.w900,
-      fontSize: 11,
-      color: BrandColors.muted,
-      letterSpacing: 1.2,
-    ),
-  );
-}
-
-class _ToggleRow extends StatelessWidget {
-  final String label, sublabel;
-  final bool value, enabled;
-  final ValueChanged<bool> onChanged;
-
-  const _ToggleRow({
-    required this.label,
-    required this.sublabel,
-    required this.value,
-    this.enabled = true,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    decoration: BoxDecoration(
-      color: BrandColors.surfaceTint,
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: BrandColors.border),
-    ),
-    child: Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                sublabel,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: BrandColors.muted,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Switch(
-          value: value,
-          onChanged: enabled ? onChanged : null,
-          activeTrackColor: BrandColors.primary,
-        ),
-      ],
-    ),
-  );
-}

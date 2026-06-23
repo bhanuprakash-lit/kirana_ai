@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
 import '../../dashboard/providers/overview_provider.dart';
 import '../models/inventory_item.dart';
 import '../models/pending_inventory_item.dart';
@@ -170,10 +171,15 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
 
   Future<bool> addCategory(String name, {int? parentId}) async {
     final client = ref.read(apiClientProvider);
+    // Tag the new category with the store's vertical so it only shows for this
+    // vertical (a mobile store's category won't leak into a grocery store).
+    final vc =
+        ref.read(verticalConfigProvider).asData?.value.verticalCode ?? 'grocery';
     try {
       await client.postOltp('category', {
         'name': name,
         'parent_category_id': parentId,
+        'vertical_code': vc,
       });
       await refresh();
       return true;
@@ -200,6 +206,9 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     String? expiryDate,
     int? existingProductId,
     String? imageUrl,
+    List<Map<String, dynamic>>? variants,
+    double? gstRate,
+    String? hsnCode,
   }) async {
     final params = <String, dynamic>{
       'name': name,
@@ -217,6 +226,9 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       'expiryDate': expiryDate,
       'existingProductId': existingProductId,
       'imageUrl': imageUrl,
+      'variants': variants,
+      'gstRate': gstRate,
+      'hsnCode': hsnCode,
     };
 
     final categoryName = state.value?.categories
@@ -336,6 +348,36 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
             'cost_price': costPrice,
           });
         } catch (_) {}
+      }
+
+      // F3 — set GST rate / HSN on the product if supplied.
+      final gstRate = p['gstRate'] as double?;
+      final hsnCode = p['hsnCode'] as String?;
+      if (gstRate != null || (hsnCode != null && hsnCode.isNotEmpty)) {
+        try {
+          await client.post('/kirana/products/$productId/tax', {
+            'gst_rate': gstRate,
+            'hsn_code': (hsnCode != null && hsnCode.isNotEmpty) ? hsnCode : null,
+          });
+        } catch (_) {}
+      }
+
+      // F2 — create the product's variants (size/colour/model) if supplied.
+      final variants = p['variants'] as List<Map<String, dynamic>>?;
+      if (variants != null && variants.isNotEmpty) {
+        for (final v in variants) {
+          final vBarcode = (v['barcode'] as String?) ?? '';
+          try {
+            await client.post('/kirana/products/$productId/variants', {
+              'attributes': v['attributes'] ?? <String, String>{},
+              'price': v['price'],
+              'mrp': v['mrp'],
+              'cost': v['cost'],
+              'stock': v['stock'] ?? 0,
+              if (vBarcode.isNotEmpty) 'barcode': vBarcode,
+            });
+          } catch (_) {}
+        }
       }
 
       return null; // success

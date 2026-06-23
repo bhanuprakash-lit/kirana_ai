@@ -5,26 +5,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/locale/locale_provider.dart';
+import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../models/inventory_item.dart';
 import '../../providers/inventory_provider.dart';
-import 'add_product_sheet.dart' show showCategoryPicker;
+import '../../providers/variant_provider.dart';
+import 'variant_manager_sheet.dart';
+// import 'add_product_sheet.dart' show showCategoryPicker;
+import 'add_product_sheet_new.dart' show showCategoryPicker;
 import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
-
-const _editUnits = [
-  'pcs',
-  'kg',
-  'g',
-  'L',
-  'ml',
-  'dozen',
-  'pack',
-  'box',
-  'bundle',
-];
 
 Future<void> showEditProductSheet(
   BuildContext context,
@@ -70,6 +63,14 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
       widget.item.stockQuantity % 1 == 0 ? 0 : 2,
     ),
   );
+  late final _gstCtrl = TextEditingController(
+    text: widget.item.gstRate != null
+        ? widget.item.gstRate!.toStringAsFixed(
+            widget.item.gstRate! % 1 == 0 ? 0 : 2,
+          )
+        : '',
+  );
+  late final _hsnCtrl = TextEditingController(text: widget.item.hsnCode ?? '');
 
   late int _selectedCategoryId = widget.item.categoryId;
   late String? _selectedCategoryName = widget.item.categoryName;
@@ -93,6 +94,8 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
       _priceCtrl,
       _mrpCtrl,
       _stockCtrl,
+      _gstCtrl,
+      _hsnCtrl,
     ]) {
       c.dispose();
     }
@@ -157,6 +160,23 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
           isLoose: _isLoose,
         );
 
+    // F3 — persist GST rate / HSN for non-grocery verticals.
+    if (err == null && verticalConfigOf(ref).verticalCode != 'grocery') {
+      try {
+        await ref.read(apiClientProvider).post(
+          '/kirana/products/${widget.item.productId}/tax',
+          {
+            'gst_rate': _gstCtrl.text.trim().isNotEmpty
+                ? double.tryParse(_gstCtrl.text.trim())
+                : null,
+            'hsn_code': _hsnCtrl.text.trim().isNotEmpty
+                ? _hsnCtrl.text.trim()
+                : null,
+          },
+        );
+      } catch (_) {}
+    }
+
     if (!mounted) return;
     if (err == null) {
       setState(() {
@@ -181,6 +201,15 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // When a product carries real (non-implicit) variants, each variant tracks
+    // its own stock — so the product-level stock field here is meaningless.
+    final hasRealVariants = verticalConfigOf(ref).has('variants') &&
+        (ref
+                .watch(productVariantsProvider(widget.item.productId))
+                .asData
+                ?.value
+                .any((v) => !v.isImplicit && v.isActive) ??
+            false);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
@@ -366,7 +395,13 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     initialValue: _selectedUnit,
                     decoration: InputDecoration(labelText: l10n.invSellingUnit),
                     isExpanded: true,
-                    items: _editUnits
+                    // Units come from the store's vertical config (e.g. apparel
+                    // shows pcs/pair/set, not kg/ml). Always include the current
+                    // selection so the dropdown value stays valid for legacy items.
+                    items: (<String>{
+                      ...verticalConfigOf(ref).unitSet,
+                      ?_selectedUnit,
+                    })
                         .map((u) => DropdownMenuItem(value: u, child: Text(u)))
                         .toList(),
                     onChanged: (_saving || _success)
@@ -489,34 +524,53 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
 
             _SectionHeader(l10n.invStock),
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _stockCtrl,
-              enabled: !_saving && !_success,
-              decoration: InputDecoration(
-                labelText: _isLoose
-                    ? l10n.invStockInUnit(_selectedUnit ?? '')
-                    : l10n.invStockQuantityStar,
+            if (hasRealVariants)
+              // Variant products track stock per variant — show a note instead
+              // of an editable product-level field that would do nothing.
+              Row(
+                children: [
+                  const Icon(Icons.tune_rounded,
+                      size: 18, color: BrandColors.muted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.invStockPerVariantNote,
+                      style: const TextStyle(
+                          fontSize: 13, color: BrandColors.muted),
+                    ),
+                  ),
+                ],
+              )
+            else ...[
+              TextFormField(
+                controller: _stockCtrl,
+                enabled: !_saving && !_success,
+                decoration: InputDecoration(
+                  labelText: _isLoose
+                      ? l10n.invStockInUnit(_selectedUnit ?? '')
+                      : l10n.invStockQuantityStar,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? l10n.invRequired : null,
               ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-              ],
-              validator: (v) =>
-                  (v == null || v.isEmpty) ? l10n.invRequired : null,
-            ),
-            if (widget.item.isPerishable)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  l10n.invPerishableBatchNote,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: BrandColors.muted.withValues(alpha: 0.8),
+              if (widget.item.isPerishable)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    l10n.invPerishableBatchNote,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
-              ),
+            ],
             const SizedBox(height: 24),
 
             _SectionHeader(l10n.invOther),
@@ -528,6 +582,68 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               enabled: !_saving && !_success,
               onChanged: (v) => setState(() => _isPerishable = v),
             ),
+            // F3 — GST / HSN, only for non-grocery (taxable) verticals.
+            if (verticalConfigOf(ref).verticalCode != 'grocery') ...[
+              const SizedBox(height: 24),
+              _SectionHeader(l10n.invGstRate),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _gstCtrl,
+                      enabled: !_saving && !_success,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d{0,2}'),
+                        ),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: l10n.invGstRate,
+                        suffixText: '%',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _hsnCtrl,
+                      enabled: !_saving && !_success,
+                      decoration: InputDecoration(labelText: l10n.invHsnCode),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            // F2 — variants (size/colour/model…) only for variant verticals.
+            if (verticalConfigOf(ref).has('variants')) ...[
+              const SizedBox(height: 24),
+              _SectionHeader(l10n.invVariants),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: (_saving || _success)
+                    ? null
+                    : () => showVariantManagerSheet(
+                          context,
+                          ref,
+                          productId: widget.item.productId,
+                          productName: widget.item.name,
+                        ),
+                icon: const Icon(Icons.tune_rounded),
+                label: Text(l10n.invManageVariants),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 52),
+                  foregroundColor: BrandColors.primary,
+                  side: const BorderSide(color: BrandColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 40),
             SizedBox(
               height: 56,

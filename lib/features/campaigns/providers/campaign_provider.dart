@@ -1,11 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/campaign_model.dart';
 
 class CampaignNotifier extends AsyncNotifier<List<Campaign>> {
   @override
-  Future<List<Campaign>> build() => _fetch();
+  Future<List<Campaign>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<Campaign>> _fetch() async {
     final client = ref.read(apiClientProvider);

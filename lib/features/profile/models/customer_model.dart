@@ -16,6 +16,9 @@ class Customer {
   final int orders30d;
   final int orders90d;
   final int? associationId;
+  // M1 — loyalty/offers occasion dates
+  final DateTime? birthday;
+  final DateTime? anniversary;
 
   Customer({
     required this.customerId,
@@ -31,6 +34,8 @@ class Customer {
     this.orders30d = 0,
     this.orders90d = 0,
     this.associationId,
+    this.birthday,
+    this.anniversary,
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) {
@@ -52,6 +57,12 @@ class Customer {
       orders30d: (json['orders_30d'] as num?)?.toInt() ?? 0,
       orders90d: (json['orders_90d'] as num?)?.toInt() ?? 0,
       associationId: (json['association_id'] as num?)?.toInt(),
+      birthday: json['birthday'] != null
+          ? DateTime.tryParse(json['birthday'].toString())
+          : null,
+      anniversary: json['anniversary'] != null
+          ? DateTime.tryParse(json['anniversary'].toString())
+          : null,
     );
   }
 

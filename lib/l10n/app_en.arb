@@ -18,7 +18,7 @@
   "authErrWrongOtp": "Wrong OTP. Please check and try again.",
   "authErrOtpExpired": "OTP expired. Tap Resend to get a new code.",
   "authErrVerificationFailed": "Verification failed. Try again.",
-  "welcomeSlide1Title": "Welcome to\nKirana AI",
+  "welcomeSlide1Title": "Welcome to\nOutlet AI",
   "welcomeSlide1Subtitle": "Your smart business partner for managing your kirana store — built for South India.",
   "welcomeSlide2Title": "Smart Inventory\nManagement",
   "welcomeSlide2Subtitle": "Track stock levels, get low-stock alerts, and never run out of your bestselling products.",
@@ -28,7 +28,7 @@
   "welcomeHaveAccount": "Already have an account? ",
   "welcomeSignIn": "Sign In",
   "loginWelcomeBack": "Welcome back",
-  "loginSubtitle": "Sign in to your Kirana AI account.",
+  "loginSubtitle": "Sign in to your Outlet AI account.",
   "loginTabPhone": "Phone OTP",
   "loginTabUsername": "Username",
   "loginPhoneLabel": "Phone number",
@@ -129,12 +129,24 @@
   "businessBudgetHint": "e.g. 150000",
   "businessBudgetHelper": "Used to track daily progress. You can change it later.",
   "businessBudgetInvalid": "Enter a valid amount",
-  "businessTypeKirana": "Grocery Store (Kirana)",
+  "businessTypeKirana": "Kirana / General Stores",
   "businessTypeGeneral": "General Store",
   "businessTypeProvision": "Provision Store",
   "businessTypeFruitsVeg": "Fruits & Vegetables",
   "businessTypePharmacy": "Medical / Pharmacy",
   "businessTypeStationery": "Stationery & Books",
+  "businessTypeSupermarket": "Supermarket",
+  "businessTypeMiniSupermarket": "Mini Supermarket",
+  "businessTypeMonoBrand": "Mono Brand Store",
+  "businessTypeBoutique": "Boutique",
+  "businessTypeSalon": "Salon & Parlour",
+  "businessTypeFancyGift": "Fancy & Gift Store",
+  "businessTypeSportsFitness": "Sports & Fitness",
+  "businessTypeFootwear": "Footwear Shop",
+  "businessTypeOptical": "Optical Store",
+  "businessTypeBakery": "Bakery & Sweet Shop",
+  "businessTypeApparel": "Apparel & Clothing",
+  "businessTypeElectronics": "Mobile & Electronics",
   "businessTypeOthers": "Others",
   "locationTitle": "Where is your\nstore located?",
   "locationSubtitle": "We use this to show local insights and enable delivery zones.",
@@ -154,7 +166,7 @@
   "consentTitle": "Almost there!\nReview & agree",
   "consentSubtitle": "Please read and accept the following to complete your setup.",
   "consentTermsTitle": "Terms & Conditions",
-  "consentTermsSummary": "By using Kirana AI, you agree to use the service for legitimate business purposes only. LohiyaAI reserves the right to suspend accounts that violate these terms. Your data is used solely to provide and improve the service.",
+  "consentTermsSummary": "By using Outlet AI, you agree to use the service for legitimate business purposes only. LohiyaAI reserves the right to suspend accounts that violate these terms. Your data is used solely to provide and improve the service.",
   "consentPrivacyTitle": "Privacy Policy",
   "consentPrivacySummary": "We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on Firebase infrastructure.",
   "consentTermsCheckPrefix": "I have read and agree to the ",
@@ -175,7 +187,7 @@
   "dashNavHome": "Home",
   "dashNavKhata": "Khata",
   "dashNavBilling": "Billing",
-  "dashTrialWelcome": "Welcome to Kirana AI",
+  "dashTrialWelcome": "Welcome to Outlet AI",
   "dashTrialChoosePlan": "Choose a plan to trial free. Our team will activate it shortly.",
   "dashTrialSelectPlan": "SELECT YOUR TRIAL PLAN",
   "dashTrialRequestPro": "Request Pro Trial",
@@ -199,7 +211,7 @@
   "dashPendingNotifNote": "Make sure notifications are enabled so you don't miss the activation alert.",
   "dashPendingCheckStatus": "Check Status",
   "dashUpgradeTitle": "Free Trial Ended",
-  "dashUpgradeBody": "Your free trial has ended. Choose a plan to continue using Kirana AI and keep growing your store.",
+  "dashUpgradeBody": "Your free trial has ended. Choose a plan to continue using Outlet AI and keep growing your store.",
   "dashUpgradeBasic": "Basic",
   "dashUpgradePro": "Pro",
   "dashUpgradeBadgeBest": "BEST",
@@ -366,6 +378,16 @@
     }
   },
   "posQtyFallback": "Qty",
+  "posSelectVariant": "Select variant",
+  "posInclGst": "Incl. GST {amount}",
+  "@posInclGst": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "posOutOfStock": "Out of stock",
+  "posVariantStockLine": "{stock} in stock",
+  "@posVariantStockLine": {
+    "placeholders": { "stock": { "type": "String" } }
+  },
   "posPriceLabel": "Price: {price}",
   "@posPriceLabel": {
     "placeholders": {
@@ -962,6 +984,17 @@
     }
   },
   "invAddVariant": "Add Variant",
+  "invManageVariants": "Manage Variants",
+  "invVariants": "Variants",
+  "invEditVariant": "Edit Variant",
+  "invSaveVariant": "Save Variant",
+  "invNoVariantsYet": "No variants yet. Add sizes, colours or models.",
+  "invStockPerVariantNote": "Stock is tracked per variant. Use Manage Variants below.",
+  "invDefaultVariant": "Default",
+  "invVariantAxisRequired": "Please choose {label}",
+  "@invVariantAxisRequired": {
+    "placeholders": { "label": { "type": "String" } }
+  },
   "invSaveProduct": "Save Product",
   "invSaveVariants": "Save {count} Variants",
   "@invSaveVariants": {
@@ -1038,6 +1071,8 @@
   },
   "invMrpOptional": "MRP (optional)",
   "invStock": "Stock",
+  "invGstRate": "GST %",
+  "invHsnCode": "HSN code",
   "invStockInUnit": "Stock (in {unit}) *",
   "@invStockInUnit": {
     "placeholders": {
@@ -1498,6 +1533,28 @@
       }
     }
   },
+  "finClearingDuesProgress": "Clearing dues: {cleared}/{total}",
+  "@finClearingDuesProgress": {
+    "placeholders": {
+      "cleared": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "finDuesClearFailed": "Couldn't clear all dues ({cleared}/{total})",
+  "@finDuesClearFailed": {
+    "placeholders": {
+      "cleared": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "finSmartReminders": "Smart Reminders",
   "finCouldNotLoadReminders": "Could not load reminders",
   "finDaysPending": "{days} days pending",
@@ -1651,11 +1708,11 @@
   "procTryAgain": "Try Again",
   "procCaptureOrUploadInvoice": "Capture or upload a supplier invoice",
   "procUpgradeOrTopUp": "Upgrade to Pro or top up credits",
-  "procKiranaAiReadsInvoice": "Kirana AI reads items, totals & supplier details",
+  "procKiranaAiReadsInvoice": "Outlet AI reads items, totals & supplier details",
   "procCamera": "Camera",
   "procGallery": "Gallery",
   "procUploadPdfImageFile": "Upload PDF / Image File",
-  "procKiranaAiReadingInvoice": "Kirana AI is reading your invoice…",
+  "procKiranaAiReadingInvoice": "Outlet AI is reading your invoice…",
   "procExtractingItems": "Extracting items, quantities and totals",
   "procGrandTotal": "Grand Total",
   "procSupplierUpper": "SUPPLIER",
@@ -1741,7 +1798,7 @@
   "procVoiceLabel": "voice",
   "procTapMicToStart": "Tap mic to start recording",
   "procTapToStopAndProcess": "Tap to stop & process",
-  "procKiranaAiProcessing": "Kirana AI is processing…",
+  "procKiranaAiProcessing": "Outlet AI is processing…",
   "procHeard": "Heard",
   "procNoItemsDetectedTryAgain": "No items detected. Please try again.",
   "procRecordAgain": "Record Again",
@@ -1926,7 +1983,7 @@
   "subNeedHelp": "Need help?",
   "subReachWhatsApp": "Reach us on WhatsApp for plan queries or billing support.",
   "subWhatsAppSupport": "WhatsApp Support",
-  "subWhatsAppHelpMessage": "Hi! I need help with my Kirana AI subscription.",
+  "subWhatsAppHelpMessage": "Hi! I need help with my Outlet AI subscription.",
   "subCurrentPlanLabel": "Current: {plan}",
   "@subCurrentPlanLabel": {
     "placeholders": {
@@ -2354,8 +2411,18 @@
   "profKpiSubscriptions": "KPI Subscriptions",
   "profTransactionHistory": "Transaction History",
   "profMyBaskets": "My Baskets",
+  "profLoyalty": "Loyalty & Offers",
+  "profServices": "Services & Appointments",
+  "profStoreComparison": "Store Comparison",
+  "profStaff": "Staff",
+  "profEstimatesReturns": "Estimates & Returns",
+  "profStockRacks": "Stock Racks",
+  "profJobCards": "Job Cards",
+  "profWarranty": "Warranty & Serials",
+  "profGstReport": "GST Report",
   "profLanguage": "Language",
   "profStoreSettings": "Store Settings",
+  "profSwitchStore": "Switch / add store",
   "profConfiguration": "Configuration",
   "profPasswordSecurity": "Password & Security",
   "profSubscriptionPlans": "Subscription & Plans",
@@ -2442,6 +2509,8 @@
   "profPhoneNumber": "Phone Number",
   "profEmailAddressOptional": "Email Address (Optional)",
   "profHouseholdSize": "Household Size",
+  "profBirthdayOptional": "Birthday (optional)",
+  "profAnniversaryOptional": "Anniversary (optional)",
   "profSaveCustomer": "Save Customer",
   "profFillNameAndPhone": "Please fill name and phone",
   "profEnterValidPhone": "Enter a valid phone number (digits only)",
@@ -2524,6 +2593,8 @@
   "profLocationDetails": "Location Details",
   "profCityArea": "City / Area",
   "profStateRegion": "State / Region",
+  "profCity": "City",
+  "profBusinessVertical": "Business vertical",
   "profRequired": "Required",
   "profSettingsSaved": "Settings saved successfully!",
   "profFailedToSave": "Failed to save: {error}",
@@ -2539,9 +2610,9 @@
   "supBlockedStoreTitle": "Store Temporarily Unavailable",
   "supBlockedBody": "We are working to resolve this as soon as possible. If you need immediate help, tap the button below.",
   "supBlockedContactUs": "Contact Us",
-  "supBlockedEmailSubjectApp": "App Access Issue — Kirana AI",
-  "supBlockedEmailSubjectStore": "Store Access Issue — Kirana AI",
-  "supBlockedEmailBody": "Hello LohiyaAI Team,\n\nI am unable to access the Kirana AI app.\n\nDisplayed reason: {reason}\n\nPlease help me restore access.\n\n— Kirana Owner",
+  "supBlockedEmailSubjectApp": "App Access Issue — Outlet AI",
+  "supBlockedEmailSubjectStore": "Store Access Issue — Outlet AI",
+  "supBlockedEmailBody": "Hello LohiyaAI Team,\n\nI am unable to access the Outlet AI app.\n\nDisplayed reason: {reason}\n\nPlease help me restore access.\n\n— Kirana Owner",
   "@supBlockedEmailBody": {
     "placeholders": {
       "reason": {
@@ -2918,7 +2989,7 @@
   "widgetUnitOverdue": "overdue",
   "widgetUnitPending": "pending",
   "widgetUnitToPay": "to pay",
-  "widgetSignIn": "Open Kirana AI to sign in",
+  "widgetSignIn": "Open Outlet AI to sign in",
   "widgetNoData": "Open the app to load today's numbers",
   "visionComingSoon": "Vision AI is coming soon!",
   "mktTierBronze": "Bronze",

@@ -9,6 +9,7 @@ import '../../dashboard/providers/overview_provider.dart';
 import '../../profile/providers/customer_provider.dart';
 import '../../referral/models/referral_models.dart';
 import '../../referral/providers/referral_provider.dart';
+import 'variant_provider.dart';
 import '../models/cart_item.dart';
 import '../models/customer_price.dart';
 import '../models/pos_product.dart';
@@ -137,6 +138,9 @@ class PosState {
   );
 
   double get subtotal => cart.fold(0, (sum, item) => sum + item.lineTotal);
+
+  /// F3 — total GST included in the cart (0 = no taxable items).
+  double get cartTax => cart.fold(0.0, (sum, item) => sum + item.taxAmount);
 
   /// The customer-specific price for [productId], if one was suggested.
   CustomerPrice? customerPriceFor(int productId) {
@@ -320,15 +324,17 @@ class PosNotifier extends Notifier<PosState> {
     PosProduct product, {
     double qty = 1.0,
     double? unitPriceOverride,
+    int? variantId,
+    String? variantLabel,
   }) {
     // When the customer's prices are in effect, new items inherit their price
     // unless the caller passed an explicit override (e.g. basket/bundle deal).
     if (unitPriceOverride == null && state.customerPricesApplied) {
       unitPriceOverride = state.customerPriceFor(product.productId)?.price;
     }
-    final existing = state.cart.indexWhere(
-      (i) => i.product.productId == product.productId,
-    );
+    // A product can appear once per variant; grocery uses variantId == null.
+    final lineKey = '${product.productId}:${variantId ?? 0}';
+    final existing = state.cart.indexWhere((i) => i.lineKey == lineKey);
     if (existing >= 0) {
       final updated = List<CartItem>.from(state.cart);
       updated[existing] = updated[existing].copyWith(
@@ -344,6 +350,8 @@ class PosNotifier extends Notifier<PosState> {
             product: product,
             quantity: qty,
             unitPriceOverride: unitPriceOverride,
+            variantId: variantId,
+            variantLabel: variantLabel,
           ),
         ],
       );
@@ -351,23 +359,20 @@ class PosNotifier extends Notifier<PosState> {
     _schedulePing();
   }
 
-  void removeFromCart(int productId) {
+  void removeFromCart(String lineKey) {
     state = state.copyWith(
-      cart: state.cart.where((i) => i.product.productId != productId).toList(),
+      cart: state.cart.where((i) => i.lineKey != lineKey).toList(),
     );
     _schedulePing();
   }
 
-  void updateQty(int productId, double qty) {
+  void updateQty(String lineKey, double qty) {
     if (qty <= 0) {
-      removeFromCart(productId);
+      removeFromCart(lineKey);
       return;
     }
     final updated = state.cart
-        .map(
-          (i) =>
-              i.product.productId == productId ? i.copyWith(quantity: qty) : i,
-        )
+        .map((i) => i.lineKey == lineKey ? i.copyWith(quantity: qty) : i)
         .toList();
     state = state.copyWith(cart: updated);
     _schedulePing();
@@ -619,8 +624,19 @@ class PosNotifier extends Notifier<PosState> {
     int?
     customerId, // overrides the POS-selected customer (e.g. the udhaar customer)
     DateTime? udhaarDueDate, // repayment deadline for udhaar orders
+    // M1 — loyalty/offers applied at checkout (backend records them on the order)
+    int? couponId,
+    double couponDiscount = 0,
+    double redeemPoints = 0,
+    double redeemValue = 0, // ₹ value of the redeemed points
+    // POS deep-links — link module records to this sale (best-effort on backend).
+    List<String>? serials, // M7 serial/IMEI sold on this bill
+    int? membershipId, // M4 consume one membership session
+    int? appointmentId, // M4 complete + bill an appointment
+    int? jobCardId, // M9 bill a finished job card
+    double extraCharge = 0, // M4 — billed appointment's service price (O2)
   }) async {
-    if (state.cart.isEmpty) return null;
+    if (state.cart.isEmpty && extraCharge <= 0) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
 
     final client = ref.read(apiClientProvider);
@@ -636,19 +652,34 @@ class PosNotifier extends Notifier<PosState> {
     // If a referral QR was scanned, we may already have the new customer's ID
     // (pre-set from the scan sheet). Use it if not already overridden by a manual selection.
     final subtotal = state.subtotal;
-    final totalAmount = discountPct > 0
+    final baseTotal = discountPct > 0
         ? subtotal * (1 - discountPct / 100)
         : subtotal;
+    // M1 — apply coupon discount + redeemed-points value to the bill.
+    // M4/O2 — add any billed appointment's service charge on top.
+    final totalAmount =
+        (baseTotal - couponDiscount - redeemValue + extraCharge)
+            .clamp(0, double.infinity)
+            .toDouble();
 
     try {
       final body = <String, dynamic>{
         'total_amount': totalAmount,
         'payment_method': paymentMethod,
         'customer_id': orderCustomerId,
+        'coupon_id': ?couponId,
+        if (couponDiscount > 0) 'coupon_discount': couponDiscount,
+        if (redeemPoints > 0) 'redeem_points': redeemPoints,
+        // POS deep-links (M4/M7/M9)
+        if (serials != null && serials.isNotEmpty) 'serials': serials,
+        'membership_id': ?membershipId,
+        'appointment_id': ?appointmentId,
+        'job_card_id': ?jobCardId,
         'items': state.cart
             .map(
               (i) => {
                 'product_id': i.product.productId,
+                'variant_id': ?i.variantId,
                 'quantity': i.quantity,
                 'selling_price': i.unitPrice,
                 'unit_price': i.unitPrice,
@@ -720,10 +751,23 @@ class PosNotifier extends Notifier<PosState> {
           }
         }
 
+        // Product ids whose variant stock just changed — refresh their variant
+        // lists so the variant manager / picker show the decremented stock
+        // (the sale decrements product_variant.stock server-side).
+        final soldVariantProductIds = state.cart
+            .where((i) => i.variantId != null)
+            .map((i) => i.product.productId)
+            .toSet();
+
         clearCart();
         _doPing(converted: true);
         state = state.copyWith(isPlacingOrder: false);
         ref.read(overviewProvider.notifier).refresh();
+        // Refresh on-hand stock everywhere it's shown after the sale.
+        reloadProducts();
+        for (final pid in soldVariantProductIds) {
+          ref.invalidate(productVariantsProvider(pid));
+        }
         final mutable = Map<String, dynamic>.from(order);
         mutable['total_amount'] ??= totalAmount;
         return mutable;

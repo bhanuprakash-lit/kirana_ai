@@ -1,12 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/association_model.dart';
 
 // ── Associations list ─────────────────────────────────────────────────────────
 
 class AssociationNotifier extends AsyncNotifier<List<StoreAssociation>> {
   @override
-  Future<List<StoreAssociation>> build() => _fetch();
+  Future<List<StoreAssociation>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<StoreAssociation>> _fetch() async {
     final client = ref.read(apiClientProvider);
@@ -74,7 +78,10 @@ final associationProvider =
 
 class HeatmapNotifier extends AsyncNotifier<List<AssociationHeatmap>> {
   @override
-  Future<List<AssociationHeatmap>> build() => _fetch();
+  Future<List<AssociationHeatmap>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<AssociationHeatmap>> _fetch() async {
     final client = ref.read(apiClientProvider);

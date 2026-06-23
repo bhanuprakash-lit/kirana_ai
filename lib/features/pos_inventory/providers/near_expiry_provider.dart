@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import 'inventory_provider.dart';
 import 'pos_provider.dart';
 
@@ -68,7 +69,10 @@ class NearExpiryNotifier extends AsyncNotifier<List<NearExpiryBatch>> {
   int get days => _days;
 
   @override
-  Future<List<NearExpiryBatch>> build() => _fetch();
+  Future<List<NearExpiryBatch>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<NearExpiryBatch>> _fetch() async {
     final client = ref.read(apiClientProvider);

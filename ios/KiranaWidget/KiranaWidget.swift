@@ -65,7 +65,7 @@ private struct KiranaSnapshot {
         KiranaSnapshot(
             loggedIn: flag("logged_in"),
             updated: str("updated_at"),
-            emptyMsg: str("empty_msg", "Open Kirana AI"),
+            emptyMsg: str("empty_msg", "Open Outlet AI"),
             salesLabel: str("sales_label", "Today's Sales"),
             salesValue: str("sales_value", "—"),
             salesSub: str("sales_sub"),
@@ -127,7 +127,7 @@ private struct KiranaMediumView: View {
     private var content: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 0) {
-                Text("Kirana").foregroundColor(.white).bold()
+                Text("Outlet").foregroundColor(.white).bold()
                 Text("AI").foregroundColor(.kAmber).bold().padding(.leading, 3)
                 Spacer()
                 Text(snap.updated).font(.system(size: 10)).foregroundColor(.kStamp)

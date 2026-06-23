@@ -11,6 +11,9 @@ import '../../subscription/models/subscription_model.dart';
 import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../providers/store_settings_provider.dart';
+import '../../multistore/providers/rollup_provider.dart';
+import '../../stores/views/store_switcher_sheet.dart';
+import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/language_selector.dart';
 
@@ -195,12 +198,67 @@ class ProfileScreen extends ConsumerWidget {
                     label: l10n.profMyBaskets,
                     onTap: () => context.push('/profile/baskets'),
                   ),
+                  _CompactRow(
+                    icon: Icons.card_giftcard_rounded,
+                    label: l10n.profLoyalty,
+                    onTap: () => context.push('/profile/loyalty'),
+                  ),
+                  if (verticalConfigOf(ref).has('appointments'))
+                    _CompactRow(
+                      icon: Icons.event_note_rounded,
+                      label: l10n.profServices,
+                      onTap: () => context.push('/profile/services'),
+                    ),
+                  if (ref.watch(storeRollupProvider).asData?.value.isMultiStore ??
+                      false)
+                    _CompactRow(
+                      icon: Icons.compare_arrows_rounded,
+                      label: l10n.profStoreComparison,
+                      onTap: () => context.push('/profile/store-comparison'),
+                    ),
+                  _CompactRow(
+                    icon: Icons.badge_outlined,
+                    label: l10n.profStaff,
+                    onTap: () => context.push('/profile/staff'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.receipt_long_outlined,
+                    label: l10n.profEstimatesReturns,
+                    onTap: () => context.push('/profile/fulfilment'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.grid_view_rounded,
+                    label: l10n.profStockRacks,
+                    onTap: () => context.push('/profile/stock-racks'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.build_circle_outlined,
+                    label: l10n.profJobCards,
+                    onTap: () => context.push('/profile/job-cards'),
+                  ),
+                  if (verticalConfigOf(ref).has('warranty'))
+                    _CompactRow(
+                      icon: Icons.verified_user_outlined,
+                      label: l10n.profWarranty,
+                      onTap: () => context.push('/profile/warranty'),
+                    ),
+                  if (verticalConfigOf(ref).verticalCode != 'grocery')
+                    _CompactRow(
+                      icon: Icons.receipt_long_rounded,
+                      label: l10n.profGstReport,
+                      onTap: () => context.push('/profile/gst-report'),
+                    ),
                 ],
               ),
 
               _SectionLabel(l10n.profSectionStoreAccount),
               _GroupCard(
                 rows: [
+                  _CompactRow(
+                    icon: Icons.store_mall_directory_rounded,
+                    label: l10n.profSwitchStore,
+                    onTap: () => showStoreSwitcher(context, ref),
+                  ),
                   _CompactRow(
                     icon: Icons.language_rounded,
                     label: l10n.profLanguage,
@@ -382,7 +440,7 @@ class _ProfileFooter extends StatelessWidget {
               // Image.asset('assets/logos/foreground.png', width: 36, height: 36),
               const SizedBox(height: 6),
               const Text(
-                'Kirana AI by LohiyaAI',
+                'Outlet AI by LohiyaAI',
                 style: TextStyle(
                   fontSize: 12,
                   color: BrandColors.muted,

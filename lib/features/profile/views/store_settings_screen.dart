@@ -25,6 +25,13 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
   late TextEditingController _dailyBudgetCtrl;
   late TextEditingController _locationCtrl;
   late TextEditingController _regionCtrl;
+  late TextEditingController _cityCtrl;
+
+  // F1 — current vertical (switchable post-setup).
+  String _verticalCode = 'grocery';
+  static const _verticals = <String>[
+    'grocery', 'apparel', 'footwear', 'electronics', 'optical', 'services', 'general',
+  ];
 
   bool _isSaving = false;
 
@@ -41,6 +48,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
     _dailyBudgetCtrl = TextEditingController();
     _locationCtrl = TextEditingController();
     _regionCtrl = TextEditingController();
+    _cityCtrl = TextEditingController();
   }
 
   void _initFields(StoreProfile p) {
@@ -52,6 +60,10 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
       _dailyBudgetCtrl.text = p.dailyBudget.toStringAsFixed(0);
       _locationCtrl.text = p.location ?? '';
       _regionCtrl.text = p.region ?? '';
+      _cityCtrl.text = p.city ?? '';
+      if (p.verticalCode != null && _verticals.contains(p.verticalCode)) {
+        _verticalCode = p.verticalCode!;
+      }
     }
   }
 
@@ -116,6 +128,35 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                     l10n.profStoreType,
                     Icons.category_rounded,
                   ),
+                  // F1 — switch the coarse vertical (changes which features show).
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: DropdownButtonFormField<String>(
+                      initialValue: _verticalCode,
+                      decoration: InputDecoration(
+                        labelText: l10n.profBusinessVertical,
+                        prefixIcon: const Icon(Icons.dashboard_customize_rounded,
+                            size: 20, color: BrandColors.muted),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: BrandColors.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: BrandColors.border),
+                        ),
+                      ),
+                      items: _verticals
+                          .map((v) => DropdownMenuItem(
+                                value: v,
+                                child: Text(v[0].toUpperCase() + v.substring(1)),
+                              ))
+                          .toList(),
+                      onChanged: (v) => setState(() => _verticalCode = v ?? 'grocery'),
+                    ),
+                  ),
 
                   const SizedBox(height: 32),
                   _sectionHeader(l10n.profBusinessIntelligence),
@@ -162,6 +203,12 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                     Icons.location_on_rounded,
                   ),
                   _buildTextField(
+                    _cityCtrl,
+                    l10n.profCity,
+                    Icons.location_city_rounded,
+                    optional: true,
+                  ),
+                  _buildTextField(
                     _regionCtrl,
                     l10n.profStateRegion,
                     Icons.map_rounded,
@@ -195,6 +242,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
     TextInputType keyboardType = TextInputType.text,
     bool readOnly = false,
     String? helperText,
+    bool optional = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
@@ -217,7 +265,9 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
             borderSide: const BorderSide(color: BrandColors.border),
           ),
         ),
-        validator: (v) => (v == null || v.isEmpty) ? _l10n.profRequired : null,
+        validator: optional
+            ? null
+            : (v) => (v == null || v.isEmpty) ? _l10n.profRequired : null,
       ),
     );
   }
@@ -237,6 +287,8 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
         dailyBudget: double.tryParse(_dailyBudgetCtrl.text) ?? 0.0,
         location: _locationCtrl.text,
         region: _regionCtrl.text,
+        city: _cityCtrl.text.trim().isEmpty ? null : _cityCtrl.text.trim(),
+        verticalCode: _verticalCode,
       );
 
       await ref.read(storeSettingsProvider.notifier).updateStore(updated);
@@ -271,6 +323,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
     _dailyBudgetCtrl.dispose();
     _locationCtrl.dispose();
     _regionCtrl.dispose();
+    _cityCtrl.dispose();
     super.dispose();
   }
 }

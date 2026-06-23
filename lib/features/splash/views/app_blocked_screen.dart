@@ -148,7 +148,7 @@ class AppBlockedScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Kirana AI by LohiyaAI',
+                    'Outlet AI by LohiyaAI',
                     style: const TextStyle(
                       fontSize: 12,
                       color: BrandColors.muted,

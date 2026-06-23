@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_description">Today\'s sales, udhaar dues, low stock and supplier payments at a glance.</string>
-    <string name="widget_brand_kirana">Kirana</string>
+    <string name="widget_brand_kirana">Outlet</string>
     <string name="widget_brand_ai">AI</string>
     <string name="sales_qr_widget_description">Start a new sale — opens the item scanner.</string>
     <string name="vision_ai_widget_description">Vision AI — scan and recognise products (coming soon).</string>

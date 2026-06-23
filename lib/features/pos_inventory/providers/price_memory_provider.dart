@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import 'inventory_provider.dart';
 import 'pos_provider.dart';
 
@@ -37,7 +38,10 @@ class MissingPrice {
 
 class PriceMemoryNotifier extends AsyncNotifier<List<MissingPrice>> {
   @override
-  Future<List<MissingPrice>> build() => _fetch();
+  Future<List<MissingPrice>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<MissingPrice>> _fetch() async {
     final client = ref.read(apiClientProvider);

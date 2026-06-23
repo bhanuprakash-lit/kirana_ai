@@ -6,6 +6,11 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
+import '../../loyalty/providers/loyalty_provider.dart';
+import '../../customer360/customer360_provider.dart';
+import '../../../../core/vertical/vertical_config_provider.dart';
+import '../../pos_inventory/providers/pos_provider.dart';
+import '../../pos_inventory/views/widgets/add_product_sheet_new.dart';
 import 'customer_management_screen.dart';
 import '../../associations/providers/association_provider.dart';
 import '../../associations/models/association_model.dart';
@@ -127,6 +132,10 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> {
             ),
 
             const SizedBox(height: 16),
+
+            _CustomerLoyaltyCard(customerId: widget.customerId),
+
+            _Customer360Card(customerId: widget.customerId),
 
             // Stats Row
             Padding(
@@ -633,6 +642,383 @@ class _OrderListItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// M1 — customer loyalty points / tier card. Only shown when the store has
+/// loyalty enabled; nothing rendered otherwise.
+class _CustomerLoyaltyCard extends ConsumerWidget {
+  final int customerId;
+  const _CustomerLoyaltyCard({required this.customerId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final active =
+        ref.watch(loyaltyConfigProvider).asData?.value.isActive ?? false;
+    if (!active) return const SizedBox.shrink();
+    final async = ref.watch(customerLoyaltyProvider(customerId));
+    return async.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (l) {
+        final tierColor = l.tier == 'gold'
+            ? const Color(0xFFD4AF37)
+            : l.tier == 'silver'
+                ? const Color(0xFF9CA3AF)
+                : const Color(0xFFB87333);
+        return Container(
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: BrandColors.border),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.card_giftcard_rounded, color: tierColor, size: 28),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${l.points.toStringAsFixed(0)} points',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                            color: BrandColors.ink)),
+                    Text(
+                      '${l.tier[0].toUpperCase()}${l.tier.substring(1)} tier · worth ₹${l.redeemValue.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                          fontSize: 12, color: BrandColors.muted),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: tierColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  l.tier.toUpperCase(),
+                  style: TextStyle(
+                      color: tierColor,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// M8 — Customer 360+: prescription/style/size profile + wishlist.
+class _Customer360Card extends ConsumerWidget {
+  final int customerId;
+  const _Customer360Card({required this.customerId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(customerProfileProvider(customerId)).asData?.value;
+    final wishes = ref.watch(wishlistProvider(customerId)).asData?.value ?? [];
+    // Only show the profile fields that make sense for this store's vertical:
+    // optical → prescription (+ renewal date), fashion → style & size.
+    final vcode = verticalConfigOf(ref).verticalCode;
+    final isOptical = vcode == 'optical';
+    final isFashion = vcode == 'apparel' || vcode == 'footwear';
+    final showProfile = isOptical || isFashion;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (showProfile) ...[
+          Row(children: [
+            const Expanded(
+              child: Text('Customer profile',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+            ),
+            TextButton(
+              onPressed: () =>
+                  _editProfile(context, ref, profile, isOptical, isFashion),
+              child: const Text('Edit'),
+            ),
+          ]),
+          if (isOptical && (profile?.prescription ?? '').isNotEmpty)
+            _line('Prescription', profile!.prescription!),
+          if (isOptical && (profile?.prescriptionDate ?? '').isNotEmpty)
+            _line('Rx date', profile!.prescriptionDate!),
+          if (isFashion && (profile?.styleProfile ?? '').isNotEmpty)
+            _line('Style', profile!.styleProfile!),
+          if (isFashion && (profile?.sizeProfile ?? '').isNotEmpty)
+            _line('Size', profile!.sizeProfile!),
+          if (profile == null || profile.isEmpty)
+            const Padding(
+              padding: EdgeInsets.only(top: 4),
+              child: Text('No profile details yet.',
+                  style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+            ),
+          const Divider(height: 18),
+        ],
+        Row(children: [
+          Expanded(
+            child: Text('Wishlist (${wishes.length})',
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_rounded, size: 20),
+            onPressed: () => _pickWish(context, ref),
+          ),
+        ]),
+        if (wishes.isEmpty)
+          const Padding(
+            padding: EdgeInsets.only(top: 2, bottom: 4),
+            child: Text('No items wishlisted yet.',
+                style: TextStyle(fontSize: 12, color: BrandColors.muted)),
+          ),
+        ...wishes.map((w) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(children: [
+                const Icon(Icons.favorite_border_rounded,
+                    size: 14, color: BrandColors.muted),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: Text(
+                        (w['product_name'] ?? w['note'] ?? 'Item').toString(),
+                        style: const TextStyle(fontSize: 13))),
+                InkWell(
+                  onTap: () => ref
+                      .read(customer360ActionsProvider)
+                      .removeWish(customerId, (w['id'] as num).toInt()),
+                  child: const Icon(Icons.close_rounded,
+                      size: 14, color: BrandColors.muted),
+                ),
+              ]),
+            )),
+      ]),
+    );
+  }
+
+  Widget _line(String k, String v) => Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: RichText(
+          text: TextSpan(
+            style: const TextStyle(fontSize: 12, color: BrandColors.ink),
+            children: [
+              TextSpan(
+                  text: '$k: ',
+                  style: const TextStyle(color: BrandColors.muted)),
+              TextSpan(text: v),
+            ],
+          ),
+        ),
+      );
+
+  void _pickWish(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _WishProductPicker(customerId: customerId),
+    );
+  }
+
+  void _editProfile(BuildContext context, WidgetRef ref, CustomerProfile? p,
+      bool isOptical, bool isFashion) {
+    final rx = TextEditingController(text: p?.prescription ?? '');
+    final style = TextEditingController(text: p?.styleProfile ?? '');
+    final size = TextEditingController(text: p?.sizeProfile ?? '');
+    DateTime? rxDate = (p?.prescriptionDate != null && p!.prescriptionDate!.isNotEmpty)
+        ? DateTime.tryParse(p.prescriptionDate!)
+        : null;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              left: 20,
+              right: 20,
+              top: 16),
+          child: Container(
+            decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+            padding: const EdgeInsets.all(20),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Text('Customer profile',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 16),
+              if (isOptical) ...[
+                TextField(
+                    controller: rx,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                        labelText: 'Prescription (power / notes)')),
+                const SizedBox(height: 12),
+                // Structured Rx date feeds the prescription-renewal KPI.
+                InkWell(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: rxDate ?? DateTime.now(),
+                      firstDate: DateTime(2018),
+                      lastDate: DateTime.now(),
+                    );
+                    if (picked != null) setSheet(() => rxDate = picked);
+                  },
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                        labelText: 'Prescription date',
+                        suffixIcon: Icon(Icons.calendar_today_rounded, size: 18)),
+                    child: Text(rxDate == null
+                        ? 'Not set'
+                        : '${rxDate!.year}-${rxDate!.month.toString().padLeft(2, '0')}-${rxDate!.day.toString().padLeft(2, '0')}'),
+                  ),
+                ),
+              ],
+              if (isFashion) ...[
+                TextField(
+                    controller: style,
+                    decoration:
+                        const InputDecoration(labelText: 'Style preferences')),
+                const SizedBox(height: 12),
+                TextField(
+                    controller: size,
+                    decoration: const InputDecoration(
+                        labelText: 'Sizes (e.g. shirt M, shoe 9)')),
+              ],
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: FilledButton(
+                  onPressed: () async {
+                    final body = <String, dynamic>{};
+                    if (isOptical) {
+                      body['prescription'] = rx.text.trim();
+                      if (rxDate != null) {
+                        body['prescription_date'] =
+                            '${rxDate!.year}-${rxDate!.month.toString().padLeft(2, '0')}-${rxDate!.day.toString().padLeft(2, '0')}';
+                      }
+                    }
+                    if (isFashion) {
+                      body['style_profile'] = style.text.trim();
+                      body['size_profile'] = size.text.trim();
+                    }
+                    await ref
+                        .read(customer360ActionsProvider)
+                        .saveProfile(customerId, body);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  child: const Text('Save'),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Wishlist picker — choose from the store's products; if it's not stocked yet,
+/// jump straight to the Add Product flow.
+class _WishProductPicker extends ConsumerStatefulWidget {
+  final int customerId;
+  const _WishProductPicker({required this.customerId});
+  @override
+  ConsumerState<_WishProductPicker> createState() => _WishProductPickerState();
+}
+
+class _WishProductPickerState extends ConsumerState<_WishProductPicker> {
+  String _q = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final products = ref.watch(posProvider).products;
+    final filtered = _q.isEmpty
+        ? products
+        : products
+            .where((p) => p.name.toLowerCase().contains(_q.toLowerCase()))
+            .toList();
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      maxChildSize: 0.92,
+      expand: false,
+      builder: (_, sc) => Container(
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+        child: Column(children: [
+          const Text('Add to wishlist',
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 12),
+          TextField(
+            autofocus: true,
+            onChanged: (v) => setState(() => _q = v),
+            decoration: const InputDecoration(
+              hintText: 'Search products',
+              prefixIcon: Icon(Icons.search_rounded, size: 20),
+              isDense: true,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: filtered.isEmpty
+                ? Center(
+                    child: Text(
+                        products.isEmpty
+                            ? 'No products in this store yet.'
+                            : 'No match for "$_q".',
+                        style: const TextStyle(color: BrandColors.muted)),
+                  )
+                : ListView.builder(
+                    controller: sc,
+                    itemCount: filtered.length,
+                    itemBuilder: (_, i) {
+                      final p = filtered[i];
+                      return ListTile(
+                        dense: true,
+                        title: Text(p.name),
+                        trailing: const Icon(Icons.add_circle_outline_rounded,
+                            size: 20, color: BrandColors.primary),
+                        onTap: () async {
+                          await ref
+                              .read(customer360ActionsProvider)
+                              .addWishProduct(widget.customerId, p.productId);
+                          if (context.mounted) Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+          ),
+          // Not stocked? Take the owner to add it to inventory.
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+              showAddProductSheet(context, ref);
+            },
+            icon: const Icon(Icons.add_box_outlined, size: 18),
+            label: const Text("Item not in inventory? Add product"),
+            style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
+          ),
+        ]),
       ),
     );
   }

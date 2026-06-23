@@ -14,6 +14,10 @@ class PosProduct {
   final double stockQuantity;
   final String? imageUrl;
 
+  /// F3 — GST % (null/0 = no tax, e.g. grocery). Bill prices are GST-inclusive.
+  final double? gstRate;
+  final String? hsnCode;
+
   const PosProduct({
     required this.productId,
     required this.name,
@@ -29,6 +33,8 @@ class PosProduct {
     this.mrp,
     required this.stockQuantity,
     this.imageUrl,
+    this.gstRate,
+    this.hsnCode,
   });
 
   factory PosProduct.fromJson(Map<String, dynamic> j) {
@@ -56,6 +62,8 @@ class PosProduct {
       mrp: mrp > 0 ? mrp : null,
       stockQuantity: extract(j['stock_quantity']),
       imageUrl: j['image_url'] as String?,
+      gstRate: (j['gst_rate'] as num?)?.toDouble(),
+      hsnCode: j['hsn_code'] as String?,
     );
   }
 
@@ -75,6 +83,8 @@ class PosProduct {
         mrp: mrp ?? this.mrp,
         stockQuantity: stockQuantity ?? this.stockQuantity,
         imageUrl: imageUrl,
+        gstRate: gstRate,
+        hsnCode: hsnCode,
       );
 
   String get displayName {

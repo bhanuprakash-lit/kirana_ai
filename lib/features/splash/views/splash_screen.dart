@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/services/app_update_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../auth/providers/auth_provider.dart';
 import 'app_blocked_screen.dart';
@@ -25,6 +26,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   Future<void> _navigate() async {
     await Future.delayed(const Duration(milliseconds: 1600));
+    if (!mounted) return;
+
+    // Check for app updates silently in the background
+    try {
+      await AppUpdateService.checkForUpdates();
+    } catch (_) {}
+
     if (!mounted) return;
 
     // ── App-level block check ─────────────────────────────────────────────────
@@ -189,7 +197,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   ),
                   const SizedBox(height: 28),
                   Text(
-                        'Kirana AI',
+                        'Outlet AI',
                         style: Theme.of(context).textTheme.headlineLarge
                             ?.copyWith(
                               color: Colors.white,

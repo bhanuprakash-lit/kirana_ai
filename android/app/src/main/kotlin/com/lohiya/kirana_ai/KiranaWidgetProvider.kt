@@ -32,7 +32,7 @@ class KiranaWidgetProvider : HomeWidgetProvider() {
                 views.setViewVisibility(R.id.empty, View.VISIBLE)
                 views.setTextViewText(
                     R.id.empty,
-                    widgetData.getString("empty_msg", "Open Kirana AI")
+                    widgetData.getString("empty_msg", "Open Outlet AI")
                 )
                 views.setOnClickPendingIntent(R.id.empty, launch(context, "kiranaai://w"))
                 appWidgetManager.updateAppWidget(id, views)

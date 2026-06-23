@@ -6,7 +6,8 @@ import '../../../features/dashboard/views/dashboard_screen.dart'
     show financeSubTabProvider;
 import '../models/finance_models.dart';
 import '../providers/finance_provider.dart';
-import 'tabs/udhaar_tab.dart';
+// import 'tabs/udhaar_tab.dart';
+import 'tabs/udhaar_tab_new.dart';
 import 'tabs/cashflow_tab.dart';
 import 'tabs/distributor_tab.dart';
 import '../../../shared/widgets/notification_bell.dart';

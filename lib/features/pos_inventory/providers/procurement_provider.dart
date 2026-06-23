@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../models/procurement_models.dart';
 
 class ProcurementData {
@@ -46,7 +47,10 @@ final purchasePrefillProvider =
 
 class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   @override
-  Future<ProcurementData> build() => _fetch();
+  Future<ProcurementData> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<void> refresh() async {
     state = const AsyncLoading();

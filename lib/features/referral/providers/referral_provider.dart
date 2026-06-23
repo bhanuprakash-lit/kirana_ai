@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/store/store_scope.dart';
 import '../../auth/repositories/auth_repository.dart';
 import '../models/referral_models.dart';
 
@@ -17,7 +18,10 @@ final referralCampaignsProvider =
 
 class ReferralCampaignNotifier extends AsyncNotifier<List<ReferralCampaign>> {
   @override
-  Future<List<ReferralCampaign>> build() => _fetch();
+  Future<List<ReferralCampaign>> build() {
+    ref.watch(storeScopeProvider); // rebuild when the active store changes
+    return _fetch();
+  }
 
   Future<List<ReferralCampaign>> _fetch() async {
     final prefs = await SharedPreferences.getInstance();

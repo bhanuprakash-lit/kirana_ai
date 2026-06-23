@@ -158,12 +158,16 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             fullName: state.data.ownerName,
             storeName: state.data.storeName,
             storeType: _mapStoreType(state.data.businessType),
+            verticalCode: _mapVertical(state.data.businessType),
             footfall: state.data.footfall,
             budget: state.data.budget,
             location: state.data.location.isNotEmpty
                 ? state.data.location
                 : state.data.address,
             region: state.data.region,
+            // M2 — the reverse-geocode stores the detected city in `region`,
+            // so seed store.city from it for the zone/city rollup.
+            city: state.data.region,
             email: state.data.email.isNotEmpty ? state.data.email : null,
             phoneNumber: state.data.phoneNumber.isNotEmpty
                 ? state.data.phoneNumber
@@ -212,14 +216,52 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   /// guards against unexpected values.
   String _mapStoreType(String code) {
     const valid = {
-      'kirana',
-      'general',
-      'provision',
-      'fruits_vegetables',
-      'pharmacy',
-      'stationery',
+      // grocery-family
+      'kirana', 'general', 'supermarket', 'mini_supermarket',
+      'provision', 'fruits_vegetables', 'pharmacy', 'bakery',
+      // fashion
+      'apparel', 'boutique', 'mono_brand', 'footwear',
+      // electronics / optical
+      'electronics', 'optical',
+      // services
+      'salon', 'sports_fitness',
+      // general retail
+      'fancy_gift', 'stationery',
     };
     return valid.contains(code) ? code : 'other';
+  }
+
+  /// Maps the granular business type (store_type) to the coarse vertical switch
+  /// (F1 `vertical_code`). Many store types collapse onto one behaviour profile;
+  /// anything unknown falls back to grocery (the safe everything-on default).
+  String _mapVertical(String code) {
+    switch (code) {
+      // Size×colour catalogues → apparel profile
+      case 'apparel':
+      case 'boutique':
+      case 'mono_brand':
+        return 'apparel';
+      case 'footwear':
+        return 'footwear';
+      // Serial + warranty
+      case 'electronics':
+        return 'electronics';
+      // Frames/lenses: variants + warranty + appointments
+      case 'optical':
+        return 'optical';
+      // Appointment-driven (Services pack lands later)
+      case 'salon':
+      case 'sports_fitness':
+        return 'services';
+      // Plain retail, no expiry/loose/variants
+      case 'fancy_gift':
+      case 'stationery':
+        return 'general';
+      // kirana, general, supermarket, mini_supermarket, provision,
+      // fruits_vegetables, pharmacy, bakery, other
+      default:
+        return 'grocery';
+    }
   }
 
   String _apiError(ApiException e) {

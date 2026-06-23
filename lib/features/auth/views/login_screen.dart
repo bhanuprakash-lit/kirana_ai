@@ -315,7 +315,8 @@ class _PhoneLoginFormState extends ConsumerState<_PhoneLoginForm> {
 
       await ref.read(notificationServiceProvider).requestPermission();
       ref.invalidate(subscriptionProvider);
-      if (mounted) context.go('/home');
+      // Multi-store: land on the picker (auto-proceeds to /home if only 1 store).
+      if (mounted) context.go('/select-store');
     } on FirebaseAuthException catch (e) {
       setState(() {
         _loading = false;
@@ -516,7 +517,8 @@ class _EmailLoginFormState extends ConsumerState<_EmailLoginForm> {
           );
       await ref.read(notificationServiceProvider).requestPermission();
       ref.invalidate(subscriptionProvider);
-      if (mounted) context.go('/home');
+      // Multi-store: land on the picker (auto-proceeds to /home if only 1 store).
+      if (mounted) context.go('/select-store');
     } on ApiException catch (e) {
       setState(() {
         _error = e.statusCode == 401

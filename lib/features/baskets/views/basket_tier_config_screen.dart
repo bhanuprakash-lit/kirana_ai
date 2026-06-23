@@ -8,7 +8,8 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/basket_tier_config.dart';
 import '../providers/basket_provider.dart';
-import 'baskets_screen.dart' show tierLabel;
+// import 'baskets_screen.dart' show tierLabel;
+import 'baskets_screen_new.dart' show tierLabel;
 
 class BasketTierConfigScreen extends ConsumerStatefulWidget {
   const BasketTierConfigScreen({super.key});

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
@@ -56,6 +57,10 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen>
     with WidgetsBindingObserver {
   DateTime? _foregroundStart;
+  // Lazy tabs: only build a tab once it's been opened, then keep it alive. Avoids
+  // every tab's providers (Finance/POS/Vision) firing their network calls on the
+  // initial home load — they fetch only when the user actually opens them.
+  final Set<int> _visitedTabs = {0};
 
   @override
   void initState() {
@@ -207,18 +212,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   Widget _buildDashboard(int currentTab) {
     final l10n = AppLocalizations.of(context);
+    // F4 — Vision is grocery-tuned; verticals can opt out (vision:false). Absent
+    // flag (legacy/grocery) keeps it on. Drop the tab + nav entry when off.
+    final showVision = !verticalConfigOf(ref).isOff('vision');
+    final tabs = <Widget>[
+      const OverviewTab(),
+      const FinanceScreen(),
+      const PosInventoryScreen(),
+      if (showVision) const VisionScreen(),
+    ];
+    final safeIndex = currentTab.clamp(0, tabs.length - 1);
+    _visitedTabs.add(safeIndex);
+    // Unvisited tabs render as an empty box (not mounted) so their providers
+    // don't fetch until first opened; visited tabs stay alive in the stack.
+    final lazyTabs = [
+      for (var i = 0; i < tabs.length; i++)
+        _visitedTabs.contains(i) ? tabs[i] : const SizedBox.shrink(),
+    ];
     return Scaffold(
       body: IndexedStack(
-        index: currentTab,
-        children: const [
-          OverviewTab(),
-          FinanceScreen(),
-          PosInventoryScreen(),
-          VisionScreen(),
-        ],
+        index: safeIndex,
+        children: lazyTabs,
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: currentTab,
+        selectedIndex: safeIndex,
         onDestinationSelected: (i) =>
             ref.read(dashboardTabProvider.notifier).switchTab(i),
         destinations: [
@@ -237,11 +254,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             selectedIcon: const Icon(Icons.storefront_rounded),
             label: l10n.dashNavBilling,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.center_focus_weak_outlined),
-            selectedIcon: const Icon(Icons.center_focus_strong_rounded),
-            label: l10n.visionNavLabel,
-          ),
+          if (showVision)
+            NavigationDestination(
+              icon: const Icon(Icons.center_focus_weak_outlined),
+              selectedIcon: const Icon(Icons.center_focus_strong_rounded),
+              label: l10n.visionNavLabel,
+            ),
         ],
       ),
     );

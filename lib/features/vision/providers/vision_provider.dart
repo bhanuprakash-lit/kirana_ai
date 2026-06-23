@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/store/store_scope.dart';
 import '../../auth/repositories/auth_repository.dart' show ApiException;
 import '../models/vision_models.dart';
 
@@ -71,6 +72,7 @@ class VisionNotifier extends Notifier<VisionState> {
 
   @override
   VisionState build() {
+    ref.watch(storeScopeProvider); // reset + reload sessions on store switch
     Future.microtask(loadToday);
     return const VisionState();
   }

@@ -813,6 +813,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.8+1"
+  in_app_update_flutter:
+    dependency: "direct main"
+    description:
+      name: in_app_update_flutter
+      sha256: "48827c323525daac6b10b2f4e693c109fd72d45a2ac9e05ec4b11740d492e9a0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   intl:
     dependency: "direct main"
     description:

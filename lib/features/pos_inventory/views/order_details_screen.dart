@@ -361,6 +361,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
 
           const SizedBox(height: 32),
 
+          // ── GST breakup (only when the bill has taxable items) ────────────
+          _GstBreakupCard(order: widget.order, total: total),
+
           // ── Total / payment breakdown card ────────────────────────────────
           _PaymentSummaryCard(
             order: widget.order,
@@ -513,6 +516,110 @@ class _InfoTile extends StatelessWidget {
             fontWeight: FontWeight.w800,
             fontSize: 15,
             color: valueColor ?? BrandColors.ink,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── GST breakup card ──────────────────────────────────────────────────────────
+
+/// F3 — shows the tax component of the bill (GST is inclusive in retail prices,
+/// so this is informational and does not change the total). Renders nothing for
+/// non-taxable bills (e.g. grocery). CGST/SGST split assumes intra-state supply,
+/// matching the GST Report.
+class _GstBreakupCard extends StatelessWidget {
+  final Map<String, dynamic> order;
+  final double total;
+
+  const _GstBreakupCard({required this.order, required this.total});
+
+  String _fmt(double v) => '₹${v.toStringAsFixed(2)}';
+
+  @override
+  Widget build(BuildContext context) {
+    final tax = (order['tax_amount'] as num?)?.toDouble() ?? 0;
+    if (tax <= 0) return const SizedBox.shrink();
+    final taxable =
+        (order['taxable_amount'] as num?)?.toDouble() ?? (total - tax);
+    final half = tax / 2;
+
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: BrandColors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.receipt_long_rounded,
+                      size: 18, color: BrandColors.primary),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'GST breakup',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: BrandColors.ink,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    'incl. in price',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: BrandColors.muted.withValues(alpha: 0.9),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Divider(height: 1),
+              const SizedBox(height: 14),
+              _row('Taxable value', _fmt(taxable)),
+              const SizedBox(height: 10),
+              _row('CGST', _fmt(half)),
+              const SizedBox(height: 10),
+              _row('SGST', _fmt(half)),
+              const SizedBox(height: 12),
+              const Divider(height: 1),
+              const SizedBox(height: 12),
+              _row('Total GST', _fmt(tax), bold: true),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _row(String label, String value, {bool bold = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
+            color: bold ? BrandColors.ink : BrandColors.muted,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: bold ? FontWeight.w900 : FontWeight.w700,
+            color: BrandColors.ink,
           ),
         ),
       ],

@@ -61,7 +61,7 @@ class AppLocalizationsMr extends AppLocalizations {
       'पडताळणी अयशस्वी. पुन्हा प्रयत्न करा.';
 
   @override
-  String get welcomeSlide1Title => 'Kirana AI मध्ये\nआपले स्वागत आहे';
+  String get welcomeSlide1Title => 'Outlet AI मध्ये\nआपले स्वागत आहे';
 
   @override
   String get welcomeSlide1Subtitle =>
@@ -94,7 +94,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get loginWelcomeBack => 'पुन्हा स्वागत आहे';
 
   @override
-  String get loginSubtitle => 'तुमच्या Kirana AI खात्यात साइन इन करा.';
+  String get loginSubtitle => 'तुमच्या Outlet AI खात्यात साइन इन करा.';
 
   @override
   String get loginTabPhone => 'फोन OTP';
@@ -311,7 +311,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get businessBudgetInvalid => 'वैध रक्कम टाका';
 
   @override
-  String get businessTypeKirana => 'किराणा दुकान (Kirana)';
+  String get businessTypeKirana => 'किराणा / जनरल स्टोअर';
 
   @override
   String get businessTypeGeneral => 'जनरल स्टोअर';
@@ -327,6 +327,42 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get businessTypeStationery => 'स्टेशनरी आणि पुस्तके';
+
+  @override
+  String get businessTypeSupermarket => 'सुपरमार्केट';
+
+  @override
+  String get businessTypeMiniSupermarket => 'मिनी सुपरमार्केट';
+
+  @override
+  String get businessTypeMonoBrand => 'मोनो ब्रँड स्टोअर';
+
+  @override
+  String get businessTypeBoutique => 'बुटीक';
+
+  @override
+  String get businessTypeSalon => 'सलून व पार्लर';
+
+  @override
+  String get businessTypeFancyGift => 'फॅन्सी व गिफ्ट स्टोअर';
+
+  @override
+  String get businessTypeSportsFitness => 'स्पोर्ट्स व फिटनेस';
+
+  @override
+  String get businessTypeFootwear => 'पादत्राणे दुकान';
+
+  @override
+  String get businessTypeOptical => 'ऑप्टिकल स्टोअर';
+
+  @override
+  String get businessTypeBakery => 'बेकरी व मिठाई दुकान';
+
+  @override
+  String get businessTypeApparel => 'कपडे व पोशाख';
+
+  @override
+  String get businessTypeElectronics => 'मोबाइल व इलेक्ट्रॉनिक्स';
 
   @override
   String get businessTypeOthers => 'इतर';
@@ -392,7 +428,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get consentTermsSummary =>
-      'Kirana AI वापरून, तुम्ही सेवा फक्त कायदेशीर व्यवसाय हेतूंसाठी वापरण्यास सहमत आहात. या अटींचे उल्लंघन करणारी खाती निलंबित करण्याचा अधिकार LohiyaAI राखून ठेवते. तुमचा डेटा फक्त सेवा प्रदान करण्यासाठी आणि सुधारण्यासाठी वापरला जातो.';
+      'Outlet AI वापरून, तुम्ही सेवा फक्त कायदेशीर व्यवसाय हेतूंसाठी वापरण्यास सहमत आहात. या अटींचे उल्लंघन करणारी खाती निलंबित करण्याचा अधिकार LohiyaAI राखून ठेवते. तुमचा डेटा फक्त सेवा प्रदान करण्यासाठी आणि सुधारण्यासाठी वापरला जातो.';
 
   @override
   String get consentPrivacyTitle => 'गोपनीयता धोरण';
@@ -441,7 +477,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get dashNavBilling => 'बिलिंग';
 
   @override
-  String get dashTrialWelcome => 'Kirana AI मध्ये आपले स्वागत आहे';
+  String get dashTrialWelcome => 'Outlet AI मध्ये आपले स्वागत आहे';
 
   @override
   String get dashTrialChoosePlan =>
@@ -517,7 +553,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get dashUpgradeBody =>
-      'तुमची मोफत चाचणी संपली आहे. Kirana AI वापरणे सुरू ठेवण्यासाठी आणि तुमचे दुकान वाढवत राहण्यासाठी एक योजना निवडा.';
+      'तुमची मोफत चाचणी संपली आहे. Outlet AI वापरणे सुरू ठेवण्यासाठी आणि तुमचे दुकान वाढवत राहण्यासाठी एक योजना निवडा.';
 
   @override
   String get dashUpgradeBasic => 'Basic';
@@ -771,6 +807,22 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get posQtyFallback => 'प्रमाण';
+
+  @override
+  String get posSelectVariant => 'व्हेरियंट निवडा';
+
+  @override
+  String posInclGst(String amount) {
+    return 'GST सह $amount';
+  }
+
+  @override
+  String get posOutOfStock => 'स्टॉक संपला';
+
+  @override
+  String posVariantStockLine(String stock) {
+    return '$stock स्टॉकमध्ये';
+  }
 
   @override
   String posPriceLabel(String price) {
@@ -1592,6 +1644,34 @@ class AppLocalizationsMr extends AppLocalizations {
   String get invAddVariant => 'व्हेरियंट जोडा';
 
   @override
+  String get invManageVariants => 'व्हेरियंट व्यवस्थापित करा';
+
+  @override
+  String get invVariants => 'व्हेरियंट';
+
+  @override
+  String get invEditVariant => 'व्हेरियंट संपादित करा';
+
+  @override
+  String get invSaveVariant => 'व्हेरियंट जतन करा';
+
+  @override
+  String get invNoVariantsYet =>
+      'अद्याप व्हेरियंट नाहीत. साइज, रंग किंवा मॉडेल जोडा.';
+
+  @override
+  String get invStockPerVariantNote =>
+      'स्टॉक प्रत्येक व्हेरियंटसाठी वेगळा ट्रॅक केला जातो. खालील \'व्हेरियंट व्यवस्थापित करा\' वापरा.';
+
+  @override
+  String get invDefaultVariant => 'डीफॉल्ट';
+
+  @override
+  String invVariantAxisRequired(String label) {
+    return 'कृपया $label निवडा';
+  }
+
+  @override
   String get invSaveProduct => 'उत्पादन जतन करा';
 
   @override
@@ -1704,6 +1784,12 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get invStock => 'स्टॉक';
+
+  @override
+  String get invGstRate => 'GST %';
+
+  @override
+  String get invHsnCode => 'HSN कोड';
 
   @override
   String invStockInUnit(String unit) {
@@ -2351,6 +2437,16 @@ class AppLocalizationsMr extends AppLocalizations {
   }
 
   @override
+  String finClearingDuesProgress(int cleared, int total) {
+    return 'उधारी फेडली जात आहे: $cleared/$total';
+  }
+
+  @override
+  String finDuesClearFailed(int cleared, int total) {
+    return 'सर्व उधारी फेडता आली नाही ($cleared/$total)';
+  }
+
+  @override
   String get finSmartReminders => 'स्मार्ट स्मरणपत्रे';
 
   @override
@@ -2599,7 +2695,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get procKiranaAiReadsInvoice =>
-      'Kirana AI वस्तू, एकूण आणि पुरवठादार तपशील वाचते';
+      'Outlet AI वस्तू, एकूण आणि पुरवठादार तपशील वाचते';
 
   @override
   String get procCamera => 'कॅमेरा';
@@ -2612,7 +2708,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get procKiranaAiReadingInvoice =>
-      'Kirana AI तुमचे इन्व्हॉइस वाचत आहे…';
+      'Outlet AI तुमचे इन्व्हॉइस वाचत आहे…';
 
   @override
   String get procExtractingItems => 'वस्तू, प्रमाण आणि एकूण काढत आहे';
@@ -2745,7 +2841,7 @@ class AppLocalizationsMr extends AppLocalizations {
       'थांबवण्यासाठी आणि प्रक्रिया करण्यासाठी टॅप करा';
 
   @override
-  String get procKiranaAiProcessing => 'Kirana AI प्रक्रिया करत आहे…';
+  String get procKiranaAiProcessing => 'Outlet AI प्रक्रिया करत आहे…';
 
   @override
   String get procHeard => 'ऐकले';
@@ -3071,7 +3167,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get subWhatsAppHelpMessage =>
-      'नमस्कार! मला माझ्या Kirana AI सदस्यतेबाबत मदत हवी आहे.';
+      'नमस्कार! मला माझ्या Outlet AI सदस्यतेबाबत मदत हवी आहे.';
 
   @override
   String subCurrentPlanLabel(String plan) {
@@ -3717,10 +3813,40 @@ class AppLocalizationsMr extends AppLocalizations {
   String get profMyBaskets => 'माझ्या बास्केट';
 
   @override
+  String get profLoyalty => 'लॉयल्टी व ऑफर';
+
+  @override
+  String get profServices => 'सेवा व अपॉइंटमेंट';
+
+  @override
+  String get profStoreComparison => 'दुकान तुलना';
+
+  @override
+  String get profStaff => 'कर्मचारी';
+
+  @override
+  String get profEstimatesReturns => 'अंदाज व परतावा';
+
+  @override
+  String get profStockRacks => 'स्टॉक रॅक';
+
+  @override
+  String get profJobCards => 'जॉब कार्ड';
+
+  @override
+  String get profWarranty => 'वॉरंटी व सीरियल';
+
+  @override
+  String get profGstReport => 'जीएसटी अहवाल';
+
+  @override
   String get profLanguage => 'भाषा';
 
   @override
   String get profStoreSettings => 'दुकान सेटिंग्ज';
+
+  @override
+  String get profSwitchStore => 'दुकान बदला / जोडा';
 
   @override
   String get profConfiguration => 'कॉन्फिगरेशन';
@@ -3859,6 +3985,12 @@ class AppLocalizationsMr extends AppLocalizations {
   String get profHouseholdSize => 'कुटुंब आकार';
 
   @override
+  String get profBirthdayOptional => 'वाढदिवस (पर्यायी)';
+
+  @override
+  String get profAnniversaryOptional => 'वर्धापनदिन (पर्यायी)';
+
+  @override
   String get profSaveCustomer => 'ग्राहक जतन करा';
 
   @override
@@ -3995,6 +4127,12 @@ class AppLocalizationsMr extends AppLocalizations {
   String get profStateRegion => 'राज्य / प्रदेश';
 
   @override
+  String get profCity => 'शहर';
+
+  @override
+  String get profBusinessVertical => 'व्यवसाय प्रकार';
+
+  @override
   String get profRequired => 'आवश्यक';
 
   @override
@@ -4022,14 +4160,14 @@ class AppLocalizationsMr extends AppLocalizations {
   String get supBlockedContactUs => 'आमच्याशी संपर्क साधा';
 
   @override
-  String get supBlockedEmailSubjectApp => 'अ‍ॅप प्रवेश समस्या — Kirana AI';
+  String get supBlockedEmailSubjectApp => 'अ‍ॅप प्रवेश समस्या — Outlet AI';
 
   @override
-  String get supBlockedEmailSubjectStore => 'दुकान प्रवेश समस्या — Kirana AI';
+  String get supBlockedEmailSubjectStore => 'दुकान प्रवेश समस्या — Outlet AI';
 
   @override
   String supBlockedEmailBody(String reason) {
-    return 'नमस्कार LohiyaAI टीम,\n\nमी Kirana AI अ‍ॅप वापरण्यास अक्षम आहे.\n\nप्रदर्शित कारण: $reason\n\nकृपया मला प्रवेश पुनर्संचयित करण्यात मदत करा.\n\n— Kirana मालक';
+    return 'नमस्कार LohiyaAI टीम,\n\nमी Outlet AI अ‍ॅप वापरण्यास अक्षम आहे.\n\nप्रदर्शित कारण: $reason\n\nकृपया मला प्रवेश पुनर्संचयित करण्यात मदत करा.\n\n— Kirana मालक';
   }
 
   @override
@@ -4699,7 +4837,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get widgetUnitToPay => 'द्यायचे';
 
   @override
-  String get widgetSignIn => 'साइन इन करण्यासाठी Kirana AI उघडा';
+  String get widgetSignIn => 'साइन इन करण्यासाठी Outlet AI उघडा';
 
   @override
   String get widgetNoData => 'आजचे आकडे लोड करण्यासाठी अॅप उघडा';
