@@ -50,12 +50,20 @@ class StoreActions {
     required String storeType,
     required String verticalCode,
     String? city,
+    String? location,
+    String? region,
+    int? footfall,
+    double? budget,
   }) async {
     final res = await _c.post('/kirana/stores/add', {
       'store_name': storeName,
       'store_type': storeType,
       'vertical_code': verticalCode,
       'city': city,
+      'location': location,
+      'region': region,
+      'footfall': ?footfall,
+      'budget': ?budget,
       'make_active': true,
     });
     final sid = ((res is Map ? res['store_id'] : null) as num).toInt();
