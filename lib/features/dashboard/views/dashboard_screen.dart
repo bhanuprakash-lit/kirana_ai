@@ -57,6 +57,10 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen>
     with WidgetsBindingObserver {
   DateTime? _foregroundStart;
+  // Lazy tabs: only build a tab once it's been opened, then keep it alive. Avoids
+  // every tab's providers (Finance/POS/Vision) firing their network calls on the
+  // initial home load — they fetch only when the user actually opens them.
+  final Set<int> _visitedTabs = {0};
 
   @override
   void initState() {
@@ -218,10 +222,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       if (showVision) const VisionScreen(),
     ];
     final safeIndex = currentTab.clamp(0, tabs.length - 1);
+    _visitedTabs.add(safeIndex);
+    // Unvisited tabs render as an empty box (not mounted) so their providers
+    // don't fetch until first opened; visited tabs stay alive in the stack.
+    final lazyTabs = [
+      for (var i = 0; i < tabs.length; i++)
+        _visitedTabs.contains(i) ? tabs[i] : const SizedBox.shrink(),
+    ];
     return Scaffold(
       body: IndexedStack(
         index: safeIndex,
-        children: tabs,
+        children: lazyTabs,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: safeIndex,
