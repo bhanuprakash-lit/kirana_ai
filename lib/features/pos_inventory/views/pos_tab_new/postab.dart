@@ -708,7 +708,8 @@ class _PosTabState extends ConsumerState<PosTab> {
         qty: qty,
         variantId: choice.variantId,
         variantLabel: choice.variantLabel,
-        unitPriceOverride: choice.price ?? (factor != null ? product.price * factor : null),
+        unitPriceOverride:
+            choice.price ?? (factor != null ? product.price * factor : null),
       );
     }
 
@@ -801,7 +802,10 @@ class _PosTabState extends ConsumerState<PosTab> {
           ? '$added item${added > 1 ? 's' : ''} added to cart'
           : '$added added · $skipped skipped';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), duration: const Duration(milliseconds: 800)),
+        SnackBar(
+          content: Text(msg),
+          duration: const Duration(milliseconds: 800),
+        ),
       );
     }
   }

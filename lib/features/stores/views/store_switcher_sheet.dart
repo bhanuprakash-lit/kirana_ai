@@ -30,7 +30,8 @@ Future<void> showStoreSwitcher(BuildContext context, WidgetRef ref) async {
       reverseTransitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (_, _, _) => _StoreSwitchTransition(
         storeName: selected.storeName,
-        action: () => ref.read(storeActionsProvider).switchStore(selected.storeId),
+        action: () =>
+            ref.read(storeActionsProvider).switchStore(selected.storeId),
       ),
       transitionsBuilder: (_, animation, _, child) =>
           FadeTransition(opacity: animation, child: child),

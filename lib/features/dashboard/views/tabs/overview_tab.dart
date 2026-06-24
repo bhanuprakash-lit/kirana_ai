@@ -760,10 +760,9 @@ class _StoreOverviewCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     // Only worth showing when the owner actually has somewhere else to switch to.
-    final hasMultipleStores = ref.watch(myStoresProvider).maybeWhen(
-      data: (stores) => stores.length > 1,
-      orElse: () => false,
-    );
+    final hasMultipleStores = ref
+        .watch(myStoresProvider)
+        .maybeWhen(data: (stores) => stores.length > 1, orElse: () => false);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22),
       child: Column(

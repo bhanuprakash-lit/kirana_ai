@@ -11,7 +11,8 @@ import '../../providers/onboarding_provider.dart';
 import '../../../support/providers/notification_provider.dart';
 
 const _kPrivacyPolicyUrl = 'https://lohiyaai.com/outlet/privacy';
-const _kTermsAndConditionsUrl = 'https://lohiyaai.com/outlet/terms-and-conditions';
+const _kTermsAndConditionsUrl =
+    'https://lohiyaai.com/outlet/terms-and-conditions';
 
 Future<void> _openLink(String url) async {
   final uri = Uri.parse(url);
@@ -236,7 +237,8 @@ class _ConsentCheckbox extends StatelessWidget {
                     decoration: TextDecoration.underline,
                     decorationColor: BrandColors.primary,
                   ),
-                  recognizer: TapGestureRecognizer()..onTap = () => _openLink(url),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () => _openLink(url),
                 ),
               ],
             ),
