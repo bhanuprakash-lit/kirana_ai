@@ -24,13 +24,13 @@ class ServiceItem {
   });
 
   factory ServiceItem.fromJson(Map<String, dynamic> j) => ServiceItem(
-        serviceId: _i(j['service_id']),
-        name: (j['name'] ?? '').toString(),
-        price: _d(j['price']),
-        durationMin: _i(j['duration_min'], 30),
-        category: j['category'] as String?,
-        isActive: j['is_active'] != false,
-      );
+    serviceId: _i(j['service_id']),
+    name: (j['name'] ?? '').toString(),
+    price: _d(j['price']),
+    durationMin: _i(j['duration_min'], 30),
+    category: j['category'] as String?,
+    isActive: j['is_active'] != false,
+  );
 }
 
 class Appointment {
@@ -61,20 +61,21 @@ class Appointment {
   });
 
   factory Appointment.fromJson(Map<String, dynamic> j) => Appointment(
-        appointmentId: _i(j['appointment_id']),
-        customerId: j['customer_id'] == null ? null : _i(j['customer_id']),
-        serviceId: j['service_id'] == null ? null : _i(j['service_id']),
-        displayName:
-            (j['display_name'] ?? j['customer_name'] ?? 'Walk-in').toString(),
-        customerPhone: j['customer_phone'] as String?,
-        serviceName: j['service_name'] as String?,
-        startsAt: DateTime.tryParse(j['starts_at'].toString())?.toLocal() ??
-            DateTime.now(),
-        durationMin: _i(j['duration_min'], 30),
-        status: (j['status'] ?? 'booked').toString(),
-        price: j['price'] == null ? null : _d(j['price']),
-        notes: j['notes'] as String?,
-      );
+    appointmentId: _i(j['appointment_id']),
+    customerId: j['customer_id'] == null ? null : _i(j['customer_id']),
+    serviceId: j['service_id'] == null ? null : _i(j['service_id']),
+    displayName: (j['display_name'] ?? j['customer_name'] ?? 'Walk-in')
+        .toString(),
+    customerPhone: j['customer_phone'] as String?,
+    serviceName: j['service_name'] as String?,
+    startsAt:
+        DateTime.tryParse(j['starts_at'].toString())?.toLocal() ??
+        DateTime.now(),
+    durationMin: _i(j['duration_min'], 30),
+    status: (j['status'] ?? 'booked').toString(),
+    price: j['price'] == null ? null : _d(j['price']),
+    notes: j['notes'] as String?,
+  );
 }
 
 class Membership {
@@ -98,17 +99,18 @@ class Membership {
     this.isActive = true,
   });
 
-  int get remaining =>
-      totalSessions > 0 ? (totalSessions - usedSessions).clamp(0, totalSessions) : -1;
+  int get remaining => totalSessions > 0
+      ? (totalSessions - usedSessions).clamp(0, totalSessions)
+      : -1;
 
   factory Membership.fromJson(Map<String, dynamic> j) => Membership(
-        membershipId: _i(j['membership_id']),
-        customerId: _i(j['customer_id']),
-        customerName: j['customer_name'] as String?,
-        name: (j['name'] ?? '').toString(),
-        totalSessions: _i(j['total_sessions']),
-        usedSessions: _i(j['used_sessions']),
-        price: _d(j['price']),
-        isActive: j['is_active'] != false,
-      );
+    membershipId: _i(j['membership_id']),
+    customerId: _i(j['customer_id']),
+    customerName: j['customer_name'] as String?,
+    name: (j['name'] ?? '').toString(),
+    totalSessions: _i(j['total_sessions']),
+    usedSessions: _i(j['used_sessions']),
+    price: _d(j['price']),
+    isActive: j['is_active'] != false,
+  );
 }

@@ -129,6 +129,15 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
     }
   }
 
+  bool get _hasRealVariants =>
+      verticalConfigOf(ref).has('variants') &&
+      (ref
+              .read(productVariantsProvider(widget.item.productId))
+              .asData
+              ?.value
+              .any((v) => !v.isImplicit && v.isActive) ??
+          false);
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() {
@@ -137,6 +146,11 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
       _success = false;
     });
 
+    // Variant-tracked products manage stock per-variant (Manage Variants) —
+    // (store_id, product_id) no longer identifies a single inventory row, so
+    // skip the product-level stock write entirely instead of sending a stale
+    // value that the backend would reject as ambiguous.
+    final hasRealVariants = _hasRealVariants;
     final err = await ref
         .read(inventoryProvider.notifier)
         .updateProduct(
@@ -144,7 +158,7 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
           name: _toTitleCase(_nameCtrl.text.trim()),
           categoryId: _selectedCategoryId,
           sellingPrice: double.parse(_priceCtrl.text),
-          stockQuantity: double.parse(_stockCtrl.text),
+          stockQuantity: hasRealVariants ? null : double.parse(_stockCtrl.text),
           brand: _brandCtrl.text.trim().isNotEmpty
               ? _brandCtrl.text.trim()
               : null,
@@ -163,17 +177,16 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
     // F3 — persist GST rate / HSN for non-grocery verticals.
     if (err == null && verticalConfigOf(ref).verticalCode != 'grocery') {
       try {
-        await ref.read(apiClientProvider).post(
-          '/kirana/products/${widget.item.productId}/tax',
-          {
-            'gst_rate': _gstCtrl.text.trim().isNotEmpty
-                ? double.tryParse(_gstCtrl.text.trim())
-                : null,
-            'hsn_code': _hsnCtrl.text.trim().isNotEmpty
-                ? _hsnCtrl.text.trim()
-                : null,
-          },
-        );
+        await ref
+            .read(apiClientProvider)
+            .post('/kirana/products/${widget.item.productId}/tax', {
+              'gst_rate': _gstCtrl.text.trim().isNotEmpty
+                  ? double.tryParse(_gstCtrl.text.trim())
+                  : null,
+              'hsn_code': _hsnCtrl.text.trim().isNotEmpty
+                  ? _hsnCtrl.text.trim()
+                  : null,
+            });
       } catch (_) {}
     }
 
@@ -203,13 +216,9 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
     final l10n = AppLocalizations.of(context);
     // When a product carries real (non-implicit) variants, each variant tracks
     // its own stock — so the product-level stock field here is meaningless.
-    final hasRealVariants = verticalConfigOf(ref).has('variants') &&
-        (ref
-                .watch(productVariantsProvider(widget.item.productId))
-                .asData
-                ?.value
-                .any((v) => !v.isImplicit && v.isActive) ??
-            false);
+    // `watch` (not `read`) so the note/field swap once the fetch resolves.
+    ref.watch(productVariantsProvider(widget.item.productId));
+    final hasRealVariants = _hasRealVariants;
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
@@ -292,17 +301,22 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                 ),
               ),
 
-            _ToggleRow(
-              label: l10n.invLooseItem,
-              sublabel: l10n.invLooseItemSub,
-              value: _isLoose,
-              enabled: !_saving && !_success,
-              onChanged: (v) => setState(() {
-                _isLoose = v;
-                if (v && _selectedUnit == 'pcs') _selectedUnit = 'kg';
-              }),
-            ),
-            const SizedBox(height: 20),
+            // "Loose" (sold by weight from an open sack/box) only makes sense
+            // for grocery — apparel/electronics/etc. never sell that way, so
+            // the vertical config gates this feature off for them.
+            if (verticalConfigOf(ref).has('loose')) ...[
+              _ToggleRow(
+                label: l10n.invLooseItem,
+                sublabel: l10n.invLooseItemSub,
+                value: _isLoose,
+                enabled: !_saving && !_success,
+                onChanged: (v) => setState(() {
+                  _isLoose = v;
+                  if (v && _selectedUnit == 'pcs') _selectedUnit = 'kg';
+                }),
+              ),
+              const SizedBox(height: 20),
+            ],
 
             _SectionHeader(l10n.invBasicDetails),
             const SizedBox(height: 12),
@@ -398,12 +412,15 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                     // Units come from the store's vertical config (e.g. apparel
                     // shows pcs/pair/set, not kg/ml). Always include the current
                     // selection so the dropdown value stays valid for legacy items.
-                    items: (<String>{
-                      ...verticalConfigOf(ref).unitSet,
-                      ?_selectedUnit,
-                    })
-                        .map((u) => DropdownMenuItem(value: u, child: Text(u)))
-                        .toList(),
+                    items:
+                        (<String>{
+                              ...verticalConfigOf(ref).unitSet,
+                              ?_selectedUnit,
+                            })
+                            .map(
+                              (u) => DropdownMenuItem(value: u, child: Text(u)),
+                            )
+                            .toList(),
                     onChanged: (_saving || _success)
                         ? null
                         : (v) => setState(() => _selectedUnit = v),
@@ -529,14 +546,19 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
               // of an editable product-level field that would do nothing.
               Row(
                 children: [
-                  const Icon(Icons.tune_rounded,
-                      size: 18, color: BrandColors.muted),
+                  const Icon(
+                    Icons.tune_rounded,
+                    size: 18,
+                    color: BrandColors.muted,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       l10n.invStockPerVariantNote,
                       style: const TextStyle(
-                          fontSize: 13, color: BrandColors.muted),
+                        fontSize: 13,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ),
                 ],
@@ -573,15 +595,20 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
             ],
             const SizedBox(height: 24),
 
-            _SectionHeader(l10n.invOther),
-            const SizedBox(height: 12),
-            _ToggleRow(
-              label: l10n.invPerishableItem,
-              sublabel: l10n.invPerishableItemSub,
-              value: _isPerishable,
-              enabled: !_saving && !_success,
-              onChanged: (v) => setState(() => _isPerishable = v),
-            ),
+            // "Perishable" (expiry-date / batch tracking) only makes sense
+            // where expiry actually matters — same vertical gate as "Loose"
+            // above, since both are grocery-only concerns in vertical_config.
+            if (verticalConfigOf(ref).has('expiry')) ...[
+              _SectionHeader(l10n.invOther),
+              const SizedBox(height: 12),
+              _ToggleRow(
+                label: l10n.invPerishableItem,
+                sublabel: l10n.invPerishableItemSub,
+                value: _isPerishable,
+                enabled: !_saving && !_success,
+                onChanged: (v) => setState(() => _isPerishable = v),
+              ),
+            ],
             // F3 — GST / HSN, only for non-grocery (taxable) verticals.
             if (verticalConfigOf(ref).verticalCode != 'grocery') ...[
               const SizedBox(height: 24),
@@ -627,11 +654,12 @@ class _EditProductScreenState extends ConsumerState<_EditProductScreen> {
                 onPressed: (_saving || _success)
                     ? null
                     : () => showVariantManagerSheet(
-                          context,
-                          ref,
-                          productId: widget.item.productId,
-                          productName: widget.item.name,
-                        ),
+                        context,
+                        ref,
+                        productId: widget.item.productId,
+                        productName: widget.item.name,
+                        categoryName: widget.item.categoryName,
+                      ),
                 icon: const Icon(Icons.tune_rounded),
                 label: Text(l10n.invManageVariants),
                 style: OutlinedButton.styleFrom(

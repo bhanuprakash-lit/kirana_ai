@@ -435,7 +435,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get consentPrivacySummary =>
-      'तुमचा अनुभव वैयक्तिकृत करण्यासाठी आम्ही तुमचे दुकान तपशील, स्थान आणि व्यवहार डेटा गोळा करतो. आम्ही तुमचा वैयक्तिक डेटा तृतीय पक्षांना कधीही विकत नाही. सर्व डेटा एनक्रिप्ट केलेला आहे आणि Firebase पायाभूत सुविधेवर सुरक्षितपणे साठवला जातो.';
+      'तुमचा अनुभव वैयक्तिकृत करण्यासाठी आम्ही तुमचे दुकान तपशील, स्थान आणि व्यवहार डेटा गोळा करतो. आम्ही तुमचा वैयक्तिक डेटा तृतीय पक्षांना कधीही विकत नाही. सर्व डेटा एनक्रिप्ट केलेला आहे आणि आमच्या क्लाउड इन्फ्रास्ट्रक्चरवर सुरक्षितपणे साठवला जातो.';
 
   @override
   String get consentTermsCheckPrefix => 'मी वाचले आहे आणि सहमत आहे ';
@@ -1790,6 +1790,19 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get invHsnCode => 'HSN कोड';
+
+  @override
+  String get invWarranty => 'वॉरंटी';
+
+  @override
+  String get invWarrantyCovered => 'वॉरंटीमध्ये समाविष्ट';
+
+  @override
+  String get invWarrantyCoveredSub =>
+      'किती काळ ते सेट करा — खरेदीच्या तारखेपासून मोजले जाते';
+
+  @override
+  String get invWarrantyPeriod => 'वॉरंटी कालावधी';
 
   @override
   String invStockInUnit(String unit) {

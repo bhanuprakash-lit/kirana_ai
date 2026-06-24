@@ -168,7 +168,7 @@
   "consentTermsTitle": "Terms & Conditions",
   "consentTermsSummary": "By using Outlet AI, you agree to use the service for legitimate business purposes only. LohiyaAI reserves the right to suspend accounts that violate these terms. Your data is used solely to provide and improve the service.",
   "consentPrivacyTitle": "Privacy Policy",
-  "consentPrivacySummary": "We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on Firebase infrastructure.",
+  "consentPrivacySummary": "We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on our cloud infrastructure.",
   "consentTermsCheckPrefix": "I have read and agree to the ",
   "consentPrivacyCheckPrefix": "I agree to the ",
   "consentAcceptBoth": "Please accept both agreements to continue.",
@@ -1073,6 +1073,10 @@
   "invStock": "Stock",
   "invGstRate": "GST %",
   "invHsnCode": "HSN code",
+  "invWarranty": "Warranty",
+  "invWarrantyCovered": "Covered under warranty",
+  "invWarrantyCoveredSub": "Set how long — counted from the purchase date",
+  "invWarrantyPeriod": "Warranty period",
   "invStockInUnit": "Stock (in {unit}) *",
   "@invStockInUnit": {
     "placeholders": {

@@ -32,4 +32,3 @@ class _TierBadge extends StatelessWidget {
     );
   }
 }
-

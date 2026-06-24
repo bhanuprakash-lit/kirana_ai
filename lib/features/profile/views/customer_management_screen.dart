@@ -660,7 +660,8 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: (birthday ? _birthday : _anniversary) ?? DateTime(now.year - 25),
+      initialDate:
+          (birthday ? _birthday : _anniversary) ?? DateTime(now.year - 25),
       firstDate: DateTime(1920),
       lastDate: now,
     );

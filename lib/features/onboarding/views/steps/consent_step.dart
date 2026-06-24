@@ -2,12 +2,21 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../../providers/onboarding_provider.dart';
 import '../../../support/providers/notification_provider.dart';
+
+const _kPrivacyPolicyUrl = 'https://lohiyaai.com/outlet/privacy';
+const _kTermsAndConditionsUrl = 'https://lohiyaai.com/outlet/terms-and-conditions';
+
+Future<void> _openLink(String url) async {
+  final uri = Uri.parse(url);
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
 
 class ConsentStep extends ConsumerStatefulWidget {
   const ConsentStep({super.key});
@@ -83,6 +92,7 @@ class _ConsentStepState extends ConsumerState<ConsentStep> {
             onChanged: (v) => setState(() => _termsAccepted = v ?? false),
             prefix: l10n.consentTermsCheckPrefix,
             linkLabel: l10n.consentTermsTitle,
+            url: _kTermsAndConditionsUrl,
           ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
           const SizedBox(height: 12),
           _ConsentCheckbox(
@@ -90,6 +100,7 @@ class _ConsentStepState extends ConsumerState<ConsentStep> {
             onChanged: (v) => setState(() => _privacyAccepted = v ?? false),
             prefix: l10n.consentPrivacyCheckPrefix,
             linkLabel: l10n.consentPrivacyTitle,
+            url: _kPrivacyPolicyUrl,
           ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
           if (state.errorMessage != null) ...[
             const SizedBox(height: 16),
@@ -190,12 +201,14 @@ class _ConsentCheckbox extends StatelessWidget {
   final ValueChanged<bool?> onChanged;
   final String prefix;
   final String linkLabel;
+  final String url;
 
   const _ConsentCheckbox({
     required this.value,
     required this.onChanged,
     required this.prefix,
     required this.linkLabel,
+    required this.url,
   });
 
   @override
@@ -223,7 +236,7 @@ class _ConsentCheckbox extends StatelessWidget {
                     decoration: TextDecoration.underline,
                     decorationColor: BrandColors.primary,
                   ),
-                  recognizer: TapGestureRecognizer()..onTap = () {},
+                  recognizer: TapGestureRecognizer()..onTap = () => _openLink(url),
                 ),
               ],
             ),

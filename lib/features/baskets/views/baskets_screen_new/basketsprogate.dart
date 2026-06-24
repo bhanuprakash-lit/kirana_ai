@@ -86,4 +86,3 @@ class _BasketsProGate extends StatelessWidget {
     );
   }
 }
-

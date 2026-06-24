@@ -162,4 +162,3 @@ class _ProductPickerSheetState extends State<_ProductPickerSheet> {
     );
   }
 }
-

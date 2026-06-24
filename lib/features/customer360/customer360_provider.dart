@@ -19,12 +19,12 @@ class CustomerProfile {
     this.sizeProfile,
   });
   factory CustomerProfile.fromJson(Map<String, dynamic> j) => CustomerProfile(
-        prescription: j['prescription'] as String?,
-        prescriptionDate: j['prescription_date']?.toString(),
-        prescriptionValidMonths: (j['prescription_valid_months'] as num?)?.toInt(),
-        styleProfile: j['style_profile'] as String?,
-        sizeProfile: j['size_profile'] as String?,
-      );
+    prescription: j['prescription'] as String?,
+    prescriptionDate: j['prescription_date']?.toString(),
+    prescriptionValidMonths: (j['prescription_valid_months'] as num?)?.toInt(),
+    styleProfile: j['style_profile'] as String?,
+    sizeProfile: j['size_profile'] as String?,
+  );
   bool get isEmpty =>
       (prescription ?? '').isEmpty &&
       (prescriptionDate ?? '').isEmpty &&
@@ -32,20 +32,27 @@ class CustomerProfile {
       (sizeProfile ?? '').isEmpty;
 }
 
-final customerProfileProvider =
-    FutureProvider.family<CustomerProfile, int>((ref, cid) async {
+final customerProfileProvider = FutureProvider.family<CustomerProfile, int>((
+  ref,
+  cid,
+) async {
   ref.watch(storeScopeProvider); // refetch when the active store changes
-  final d = await ref.read(apiClientProvider).get('/kirana/customers/$cid/profile');
+  final d = await ref
+      .read(apiClientProvider)
+      .get('/kirana/customers/$cid/profile');
   return CustomerProfile.fromJson((d as Map).cast<String, dynamic>());
 });
 
-final wishlistProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, int>((ref, cid) async {
-  ref.watch(storeScopeProvider); // refetch when the active store changes
-  final d = await ref.read(apiClientProvider).get('/kirana/customers/$cid/wishlist');
-  final l = (d is Map ? d['wishlist'] : null) as List<dynamic>? ?? [];
-  return l.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
-});
+final wishlistProvider = FutureProvider.family<List<Map<String, dynamic>>, int>(
+  (ref, cid) async {
+    ref.watch(storeScopeProvider); // refetch when the active store changes
+    final d = await ref
+        .read(apiClientProvider)
+        .get('/kirana/customers/$cid/wishlist');
+    final l = (d is Map ? d['wishlist'] : null) as List<dynamic>? ?? [];
+    return l.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList();
+  },
+);
 
 class Customer360Actions {
   Customer360Actions(this.ref);
@@ -64,8 +71,10 @@ class Customer360Actions {
 
   /// Wishlist a real product from the store's catalogue (preferred over free text).
   Future<void> addWishProduct(int cid, int productId, {String? note}) async {
-    await _c.post('/kirana/customers/$cid/wishlist',
-        {'product_id': productId, 'note': ?note});
+    await _c.post('/kirana/customers/$cid/wishlist', {
+      'product_id': productId,
+      'note': ?note,
+    });
     ref.invalidate(wishlistProvider(cid));
   }
 
@@ -75,5 +84,6 @@ class Customer360Actions {
   }
 }
 
-final customer360ActionsProvider =
-    Provider<Customer360Actions>(Customer360Actions.new);
+final customer360ActionsProvider = Provider<Customer360Actions>(
+  Customer360Actions.new,
+);

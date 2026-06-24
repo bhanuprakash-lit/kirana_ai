@@ -16,18 +16,19 @@ class LoyaltyConfig {
     required this.goldThreshold,
   });
 
-  static double _d(dynamic v, [double def = 0]) =>
-      v == null ? def : (v is num ? v.toDouble() : double.tryParse('$v') ?? def);
+  static double _d(dynamic v, [double def = 0]) => v == null
+      ? def
+      : (v is num ? v.toDouble() : double.tryParse('$v') ?? def);
   static int _i(dynamic v, [int def = 0]) =>
       v == null ? def : (v is num ? v.toInt() : int.tryParse('$v') ?? def);
 
   factory LoyaltyConfig.fromJson(Map<String, dynamic> j) => LoyaltyConfig(
-        isActive: j['is_active'] == true,
-        pointsPer100: _d(j['points_per_100'], 1),
-        redeemPaisePerPoint: _i(j['redeem_paise_per_point'], 100),
-        silverThreshold: _i(j['silver_threshold'], 500),
-        goldThreshold: _i(j['gold_threshold'], 2000),
-      );
+    isActive: j['is_active'] == true,
+    pointsPer100: _d(j['points_per_100'], 1),
+    redeemPaisePerPoint: _i(j['redeem_paise_per_point'], 100),
+    silverThreshold: _i(j['silver_threshold'], 500),
+    goldThreshold: _i(j['gold_threshold'], 2000),
+  );
 
   static const fallback = LoyaltyConfig(
     isActive: false,
@@ -43,22 +44,21 @@ class LoyaltyConfig {
     int? redeemPaisePerPoint,
     int? silverThreshold,
     int? goldThreshold,
-  }) =>
-      LoyaltyConfig(
-        isActive: isActive ?? this.isActive,
-        pointsPer100: pointsPer100 ?? this.pointsPer100,
-        redeemPaisePerPoint: redeemPaisePerPoint ?? this.redeemPaisePerPoint,
-        silverThreshold: silverThreshold ?? this.silverThreshold,
-        goldThreshold: goldThreshold ?? this.goldThreshold,
-      );
+  }) => LoyaltyConfig(
+    isActive: isActive ?? this.isActive,
+    pointsPer100: pointsPer100 ?? this.pointsPer100,
+    redeemPaisePerPoint: redeemPaisePerPoint ?? this.redeemPaisePerPoint,
+    silverThreshold: silverThreshold ?? this.silverThreshold,
+    goldThreshold: goldThreshold ?? this.goldThreshold,
+  );
 
   Map<String, dynamic> toJson() => {
-        'is_active': isActive,
-        'points_per_100': pointsPer100,
-        'redeem_paise_per_point': redeemPaisePerPoint,
-        'silver_threshold': silverThreshold,
-        'gold_threshold': goldThreshold,
-      };
+    'is_active': isActive,
+    'points_per_100': pointsPer100,
+    'redeem_paise_per_point': redeemPaisePerPoint,
+    'silver_threshold': silverThreshold,
+    'gold_threshold': goldThreshold,
+  };
 }
 
 class LoyaltyTxn {
@@ -67,16 +67,21 @@ class LoyaltyTxn {
   final String? note;
   final DateTime? at;
 
-  const LoyaltyTxn({required this.points, required this.kind, this.note, this.at});
+  const LoyaltyTxn({
+    required this.points,
+    required this.kind,
+    this.note,
+    this.at,
+  });
 
   factory LoyaltyTxn.fromJson(Map<String, dynamic> j) => LoyaltyTxn(
-        points: LoyaltyConfig._d(j['points']),
-        kind: (j['kind'] ?? '').toString(),
-        note: j['note'] as String?,
-        at: j['created_at'] != null
-            ? DateTime.tryParse(j['created_at'].toString())
-            : null,
-      );
+    points: LoyaltyConfig._d(j['points']),
+    kind: (j['kind'] ?? '').toString(),
+    note: j['note'] as String?,
+    at: j['created_at'] != null
+        ? DateTime.tryParse(j['created_at'].toString())
+        : null,
+  );
 }
 
 class CustomerLoyalty {
@@ -95,15 +100,15 @@ class CustomerLoyalty {
   });
 
   factory CustomerLoyalty.fromJson(Map<String, dynamic> j) => CustomerLoyalty(
-        customerId: LoyaltyConfig._i(j['customer_id']),
-        points: LoyaltyConfig._d(j['points']),
-        tier: (j['tier'] ?? 'bronze').toString(),
-        redeemValue: LoyaltyConfig._d(j['redeem_value']),
-        history: ((j['history'] as List?) ?? [])
-            .whereType<Map>()
-            .map((e) => LoyaltyTxn.fromJson(e.cast<String, dynamic>()))
-            .toList(),
-      );
+    customerId: LoyaltyConfig._i(j['customer_id']),
+    points: LoyaltyConfig._d(j['points']),
+    tier: (j['tier'] ?? 'bronze').toString(),
+    redeemValue: LoyaltyConfig._d(j['redeem_value']),
+    history: ((j['history'] as List?) ?? [])
+        .whereType<Map>()
+        .map((e) => LoyaltyTxn.fromJson(e.cast<String, dynamic>()))
+        .toList(),
+  );
 }
 
 class Coupon {
@@ -130,20 +135,20 @@ class Coupon {
   });
 
   factory Coupon.fromJson(Map<String, dynamic> j) => Coupon(
-        couponId: LoyaltyConfig._i(j['coupon_id']),
-        code: (j['code'] ?? '').toString(),
-        discountType: (j['discount_type'] ?? 'flat').toString(),
-        value: LoyaltyConfig._d(j['value']),
-        minOrder: LoyaltyConfig._d(j['min_order']),
-        maxDiscount: j['max_discount'] == null
-            ? null
-            : LoyaltyConfig._d(j['max_discount']),
-        usageLimit: j['usage_limit'] == null
-            ? null
-            : LoyaltyConfig._i(j['usage_limit']),
-        usedCount: LoyaltyConfig._i(j['used_count']),
-        isActive: j['is_active'] != false,
-      );
+    couponId: LoyaltyConfig._i(j['coupon_id']),
+    code: (j['code'] ?? '').toString(),
+    discountType: (j['discount_type'] ?? 'flat').toString(),
+    value: LoyaltyConfig._d(j['value']),
+    minOrder: LoyaltyConfig._d(j['min_order']),
+    maxDiscount: j['max_discount'] == null
+        ? null
+        : LoyaltyConfig._d(j['max_discount']),
+    usageLimit: j['usage_limit'] == null
+        ? null
+        : LoyaltyConfig._i(j['usage_limit']),
+    usedCount: LoyaltyConfig._i(j['used_count']),
+    isActive: j['is_active'] != false,
+  );
 
   String get label => discountType == 'percent'
       ? '$code · ${value.toStringAsFixed(0)}% off'

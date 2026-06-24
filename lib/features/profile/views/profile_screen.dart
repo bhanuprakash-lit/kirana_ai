@@ -209,7 +209,11 @@ class ProfileScreen extends ConsumerWidget {
                       label: l10n.profServices,
                       onTap: () => context.push('/profile/services'),
                     ),
-                  if (ref.watch(storeRollupProvider).asData?.value.isMultiStore ??
+                  if (ref
+                          .watch(storeRollupProvider)
+                          .asData
+                          ?.value
+                          .isMultiStore ??
                       false)
                     _CompactRow(
                       icon: Icons.compare_arrows_rounded,

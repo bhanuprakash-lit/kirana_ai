@@ -21,5 +21,6 @@ class StoreScopeNotifier extends Notifier<int> {
   void bump() => state++;
 }
 
-final storeScopeProvider =
-    NotifierProvider<StoreScopeNotifier, int>(StoreScopeNotifier.new);
+final storeScopeProvider = NotifierProvider<StoreScopeNotifier, int>(
+  StoreScopeNotifier.new,
+);

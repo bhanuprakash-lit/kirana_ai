@@ -89,4 +89,3 @@ class _DebtRow extends StatelessWidget {
     );
   }
 }
-

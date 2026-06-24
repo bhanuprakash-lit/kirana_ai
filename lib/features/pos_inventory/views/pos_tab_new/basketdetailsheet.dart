@@ -208,4 +208,3 @@ class _BasketDetailSheet extends StatelessWidget {
     );
   }
 }
-

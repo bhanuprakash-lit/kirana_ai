@@ -24,4 +24,3 @@ class _VariantData {
     expiryCtrl.dispose();
   }
 }
-

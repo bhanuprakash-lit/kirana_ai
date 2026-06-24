@@ -443,7 +443,7 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get consentPrivacySummary =>
-      'உங்கள் அனுபவத்தைத் தனிப்பயனாக்க உங்கள் கடை விவரங்கள், இருப்பிடம் மற்றும் பரிவர்த்தனை தரவைச் சேகரிக்கிறோம். உங்கள் தனிப்பட்ட தரவை மூன்றாம் தரப்பினருக்கு ஒருபோதும் விற்க மாட்டோம். அனைத்து தரவும் குறியாக்கம் செய்யப்பட்டு Firebase உள்கட்டமைப்பில் பாதுகாப்பாக சேமிக்கப்படுகிறது.';
+      'உங்கள் அனுபவத்தைத் தனிப்பயனாக்க உங்கள் கடை விவரங்கள், இருப்பிடம் மற்றும் பரிவர்த்தனை தரவைச் சேகரிக்கிறோம். உங்கள் தனிப்பட்ட தரவை மூன்றாம் தரப்பினருக்கு ஒருபோதும் விற்க மாட்டோம். அனைத்து தரவும் குறியாக்கம் செய்யப்பட்டு எங்கள் கிளவுட் உள்கட்டமைப்பில் பாதுகாப்பாக சேமிக்கப்படுகிறது.';
 
   @override
   String get consentTermsCheckPrefix => 'நான் படித்து ஒப்புக்கொள்கிறேன் ';
@@ -1812,6 +1812,19 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get invHsnCode => 'HSN குறியீடு';
+
+  @override
+  String get invWarranty => 'உத்தரவாதம்';
+
+  @override
+  String get invWarrantyCovered => 'உத்தரவாதத்தில் அடங்கும்';
+
+  @override
+  String get invWarrantyCoveredSub =>
+      'எவ்வளவு காலம் என அமைக்கவும் — வாங்கிய தேதியிலிருந்து கணக்கிடப்படும்';
+
+  @override
+  String get invWarrantyPeriod => 'உத்தரவாத காலம்';
 
   @override
   String invStockInUnit(String unit) {

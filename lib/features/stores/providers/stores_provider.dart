@@ -36,11 +36,21 @@ class StoreActions {
   ApiClient get _c => ref.read(apiClientProvider);
 
   /// Switch the active store: backend pointer + local store_id + drop caches.
+  ///
+  /// /kirana/stores/switch mints the new POS JWT inline (it bakes in
+  /// store_id and the backend already knows the new one), so this used to
+  /// need a second sequential round trip to /pos/token-from-kirana — that
+  /// doubled how long the switch felt. Fall back to the old round trip only
+  /// if an older backend build doesn't return the token yet.
   Future<void> switchStore(int storeId) async {
-    await _c.post('/kirana/stores/switch', {'store_id': storeId});
+    final res = await _c.post('/kirana/stores/switch', {'store_id': storeId});
     await _setActiveLocal(storeId);
-    // POS JWT has a baked-in store_id → re-mint it for the new active store.
-    await ref.read(authRepositoryProvider).refreshPosToken();
+    final posToken = (res is Map ? res['pos_access_token'] : null) as String?;
+    if (posToken != null && posToken.isNotEmpty) {
+      await ref.read(authRepositoryProvider).setPosToken(posToken);
+    } else {
+      await ref.read(authRepositoryProvider).refreshPosToken();
+    }
     _refreshStoreScope();
   }
 
@@ -68,7 +78,12 @@ class StoreActions {
     });
     final sid = ((res is Map ? res['store_id'] : null) as num).toInt();
     await _setActiveLocal(sid);
-    await ref.read(authRepositoryProvider).refreshPosToken();
+    final posToken = (res is Map ? res['pos_access_token'] : null) as String?;
+    if (posToken != null && posToken.isNotEmpty) {
+      await ref.read(authRepositoryProvider).setPosToken(posToken);
+    } else {
+      await ref.read(authRepositoryProvider).refreshPosToken();
+    }
     _refreshStoreScope();
     return sid;
   }

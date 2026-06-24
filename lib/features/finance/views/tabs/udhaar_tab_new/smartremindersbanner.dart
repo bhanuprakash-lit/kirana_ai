@@ -43,4 +43,3 @@ class _SmartRemindersBanner extends StatelessWidget {
     );
   }
 }
-

@@ -16,7 +16,6 @@ import '../models/basket_tier_config.dart';
 import '../providers/basket_provider.dart';
 import 'basket_tier_config_screen.dart';
 
-
 part 'baskets_screen_new/basketsscreen.dart';
 part 'baskets_screen_new/basketcard.dart';
 part 'baskets_screen_new/priceblock.dart';
@@ -29,8 +28,6 @@ part 'baskets_screen_new/tierpreview.dart';
 part 'baskets_screen_new/datefield.dart';
 part 'baskets_screen_new/basketsprogate.dart';
 part 'baskets_screen_new/productpickersheet.dart';
-
-
 
 /// Localized tier name (Bronze/Silver/Gold/Platinum kept as proper nouns).
 String tierLabel(AppLocalizations l10n, String? tier) {

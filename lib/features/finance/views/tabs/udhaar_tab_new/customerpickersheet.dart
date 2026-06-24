@@ -160,4 +160,3 @@ class _CustomerPickerSheetState extends State<_CustomerPickerSheet> {
     );
   }
 }
-

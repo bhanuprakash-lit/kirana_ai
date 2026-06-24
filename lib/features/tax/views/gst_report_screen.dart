@@ -33,7 +33,20 @@ class _GstReportScreenState extends ConsumerState<GstReportScreen> {
   }
 
   String _monthLabel(DateTime d) {
-    const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const m = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${m[d.month - 1]} ${d.year}';
   }
 
@@ -64,17 +77,28 @@ class _GstReportScreenState extends ConsumerState<GstReportScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.chevron_left_rounded),
-                  onPressed: () => setState(() =>
-                      _month = DateTime(_month.year, _month.month - 1, 1)),
+                  onPressed: () => setState(
+                    () => _month = DateTime(_month.year, _month.month - 1, 1),
+                  ),
                 ),
-                Text(_monthLabel(_month),
-                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                Text(
+                  _monthLabel(_month),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                  ),
+                ),
                 IconButton(
                   icon: const Icon(Icons.chevron_right_rounded),
                   onPressed: atCurrentMonth
                       ? null
-                      : () => setState(() =>
-                          _month = DateTime(_month.year, _month.month + 1, 1)),
+                      : () => setState(
+                          () => _month = DateTime(
+                            _month.year,
+                            _month.month + 1,
+                            1,
+                          ),
+                        ),
                 ),
               ],
             ),
@@ -85,9 +109,11 @@ class _GstReportScreenState extends ConsumerState<GstReportScreen> {
               error: (e, _) => Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
-                  child: Text('Could not load report\n$e',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: BrandColors.muted)),
+                  child: Text(
+                    'Could not load report\n$e',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: BrandColors.muted),
+                  ),
                 ),
               ),
               data: (s) => _report(s),
@@ -133,16 +159,20 @@ class _GstReportScreenState extends ConsumerState<GstReportScreen> {
                 padding: EdgeInsets.fromLTRB(16, 14, 16, 6),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('By GST rate',
-                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                  child: Text(
+                    'By GST rate',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                  ),
                 ),
               ),
               const _SlabHeader(),
               if (s.byRate.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(24),
-                  child: Text('No taxable sales this month',
-                      style: TextStyle(color: BrandColors.muted)),
+                  child: Text(
+                    'No taxable sales this month',
+                    style: TextStyle(color: BrandColors.muted),
+                  ),
                 )
               else
                 ...s.byRate.map((r) => _slabRow(r)),
@@ -160,54 +190,93 @@ class _GstReportScreenState extends ConsumerState<GstReportScreen> {
   }
 
   Widget _stat(String label, String value) => Expanded(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: BrandColors.border),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: BrandColors.muted,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: const TextStyle(fontSize: 12, color: BrandColors.muted, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 6),
-              Text(value,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: BrandColors.ink)),
-            ],
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.ink,
+            ),
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 
   Widget _slabRow(GstSlab r) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Row(
-          children: [
-            Expanded(flex: 2, child: Text('${r.rate.toStringAsFixed(r.rate % 1 == 0 ? 0 : 1)}%',
-                style: const TextStyle(fontWeight: FontWeight.w700))),
-            Expanded(flex: 3, child: Text(_money(r.taxable), textAlign: TextAlign.right)),
-            Expanded(flex: 3, child: Text(_money(r.cgst), textAlign: TextAlign.right)),
-            Expanded(flex: 3, child: Text(_money(r.sgst), textAlign: TextAlign.right)),
-          ],
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    child: Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            '${r.rate.toStringAsFixed(r.rate % 1 == 0 ? 0 : 1)}%',
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
         ),
-      );
+        Expanded(
+          flex: 3,
+          child: Text(_money(r.taxable), textAlign: TextAlign.right),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(_money(r.cgst), textAlign: TextAlign.right),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(_money(r.sgst), textAlign: TextAlign.right),
+        ),
+      ],
+    ),
+  );
 }
 
 class _SlabHeader extends StatelessWidget {
   const _SlabHeader();
   @override
   Widget build(BuildContext context) {
-    const st = TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: BrandColors.muted);
+    const st = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      color: BrandColors.muted,
+    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: BrandColors.surfaceTint,
       child: const Row(
         children: [
           Expanded(flex: 2, child: Text('Rate', style: st)),
-          Expanded(flex: 3, child: Text('Taxable', style: st, textAlign: TextAlign.right)),
-          Expanded(flex: 3, child: Text('CGST', style: st, textAlign: TextAlign.right)),
-          Expanded(flex: 3, child: Text('SGST', style: st, textAlign: TextAlign.right)),
+          Expanded(
+            flex: 3,
+            child: Text('Taxable', style: st, textAlign: TextAlign.right),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text('CGST', style: st, textAlign: TextAlign.right),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text('SGST', style: st, textAlign: TextAlign.right),
+          ),
         ],
       ),
     );

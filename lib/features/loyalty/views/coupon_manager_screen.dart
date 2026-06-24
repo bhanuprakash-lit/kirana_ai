@@ -27,9 +27,11 @@ class CouponManagerScreen extends ConsumerWidget {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
-                child: Text('No coupons yet. Create one to offer discounts.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: BrandColors.muted)),
+                child: Text(
+                  'No coupons yet. Create one to offer discounts.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: BrandColors.muted),
+                ),
               ),
             );
           }
@@ -46,18 +48,24 @@ class CouponManagerScreen extends ConsumerWidget {
                   border: Border.all(color: BrandColors.border),
                 ),
                 child: ListTile(
-                  title: Text(c.code,
-                      style: const TextStyle(fontWeight: FontWeight.w800)),
+                  title: Text(
+                    c.code,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
                   subtitle: Text(
                     '${c.discountType == "percent" ? "${c.value.toStringAsFixed(0)}% off" : "₹${c.value.toStringAsFixed(0)} off"}'
                     '${c.minOrder > 0 ? " · min ₹${c.minOrder.toStringAsFixed(0)}" : ""}'
                     '${c.usageLimit != null ? " · used ${c.usedCount}/${c.usageLimit}" : " · used ${c.usedCount}"}',
-                    style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
                   ),
                   trailing: Switch(
                     value: c.isActive,
-                    onChanged: (v) =>
-                        ref.read(loyaltyActionsProvider).toggleCoupon(c.couponId, v),
+                    onChanged: (v) => ref
+                        .read(loyaltyActionsProvider)
+                        .toggleCoupon(c.couponId, v),
                   ),
                 ),
               );
@@ -155,13 +163,17 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('New coupon',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+          const Text(
+            'New coupon',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 16),
           TextField(
             controller: _codeCtrl,
             textCapitalization: TextCapitalization.characters,
-            decoration: const InputDecoration(labelText: 'Coupon code (e.g. SAVE10)'),
+            decoration: const InputDecoration(
+              labelText: 'Coupon code (e.g. SAVE10)',
+            ),
           ),
           const SizedBox(height: 12),
           SegmentedButton<String>(
@@ -176,7 +188,10 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
           Row(
             children: [
               Expanded(
-                child: _num(_valueCtrl, _type == 'percent' ? 'Percent' : 'Amount ₹'),
+                child: _num(
+                  _valueCtrl,
+                  _type == 'percent' ? 'Percent' : 'Amount ₹',
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(child: _num(_minCtrl, 'Min order ₹')),
@@ -206,7 +221,10 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Create coupon'),
             ),
           ),
@@ -223,7 +241,8 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
             : const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
           FilteringTextInputFormatter.allow(
-              RegExp(intOnly ? r'^\d+' : r'^\d+\.?\d{0,2}')),
+            RegExp(intOnly ? r'^\d+' : r'^\d+\.?\d{0,2}'),
+          ),
         ],
         decoration: InputDecoration(labelText: label),
       );

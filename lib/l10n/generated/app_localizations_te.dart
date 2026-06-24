@@ -439,7 +439,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get consentPrivacySummary =>
-      'మీ అనుభవాన్ని వ్యక్తిగతీకరించడానికి మేము మీ దుకాణ వివరాలు, స్థానం మరియు లావాదేవీ డేటాను సేకరిస్తాము. మేము మీ వ్యక్తిగత డేటాను థర్డ్-పార్టీలకు ఎప్పుడూ విక్రయించము. మొత్తం డేటా ఎన్‌క్రిప్ట్ చేయబడి Firebase మౌలిక సదుపాయంలో సురక్షితంగా నిల్వ చేయబడుతుంది.';
+      'మీ అనుభవాన్ని వ్యక్తిగతీకరించడానికి మేము మీ దుకాణ వివరాలు, స్థానం మరియు లావాదేవీ డేటాను సేకరిస్తాము. మేము మీ వ్యక్తిగత డేటాను థర్డ్-పార్టీలకు ఎప్పుడూ విక్రయించము. మొత్తం డేటా ఎన్‌క్రిప్ట్ చేయబడి మా క్లౌడ్ మౌలిక సదుపాయంలో సురక్షితంగా నిల్వ చేయబడుతుంది.';
 
   @override
   String get consentTermsCheckPrefix => 'నేను చదివి అంగీకరిస్తున్నాను: ';
@@ -1765,6 +1765,19 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get invHsnCode => 'HSN కోడ్';
+
+  @override
+  String get invWarranty => 'వారంటీ';
+
+  @override
+  String get invWarrantyCovered => 'వారంటీలో కవర్';
+
+  @override
+  String get invWarrantyCoveredSub =>
+      'ఎంత కాలమో సెట్ చేయండి — కొనుగోలు తేదీ నుండి లెక్కిస్తారు';
+
+  @override
+  String get invWarrantyPeriod => 'వారంటీ వ్యవధి';
 
   @override
   String invStockInUnit(String unit) {

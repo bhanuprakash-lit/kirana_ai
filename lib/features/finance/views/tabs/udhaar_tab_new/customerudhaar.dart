@@ -37,4 +37,3 @@ class _CustomerUdhaar {
   int? get oldestOpenKhataId =>
       openOldestFirst.isEmpty ? null : openOldestFirst.first.khataId;
 }
-

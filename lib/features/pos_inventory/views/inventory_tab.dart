@@ -1005,10 +1005,7 @@ class _EmptyInventory extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text(title, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Text(
               l10n.invNoInventoryHint,

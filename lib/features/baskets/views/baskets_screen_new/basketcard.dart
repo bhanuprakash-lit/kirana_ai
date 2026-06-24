@@ -280,4 +280,3 @@ class _BasketCard extends StatelessWidget {
     );
   }
 }
-

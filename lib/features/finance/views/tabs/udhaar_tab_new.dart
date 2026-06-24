@@ -58,4 +58,3 @@ Color _urgencyColor(int oldestDays) {
   if (oldestDays >= 14) return const Color(0xFFD97706);
   return BrandColors.primary;
 }
-

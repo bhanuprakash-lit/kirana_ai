@@ -341,4 +341,3 @@ class BasketsScreen extends ConsumerWidget {
     }
   }
 }
-

@@ -204,4 +204,3 @@ class _CartTile extends ConsumerWidget {
     ).animate().fadeIn(duration: 250.ms).slideY(begin: 0.05, end: 0);
   }
 }
-

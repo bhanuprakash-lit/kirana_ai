@@ -5,29 +5,43 @@ import '../../../core/store/store_scope.dart';
 import '../models/product_variant.dart';
 
 /// F2 — the variant axes the caller's vertical exposes (refetched per store).
-final attributeDefsProvider = FutureProvider<List<AttributeDef>>((ref) async {
-  ref.watch(storeScopeProvider); // vertical-specific axes — refetch on switch
-  final data = await ref.read(apiClientProvider).get('/kirana/attribute-defs');
-  final list = (data is Map ? data['attributes'] : null) as List<dynamic>? ?? [];
-  return list
-      .whereType<Map>()
-      .map((e) => AttributeDef.fromJson(e.cast<String, dynamic>()))
-      .toList();
-});
+///
+/// The family key is the selected category name (tester #1): axes can be
+/// category-scoped (electronics asks Storage for phones, Capacity for power
+/// banks, …). Pass `null` for the vertical-wide set only.
+final attributeDefsProvider =
+    FutureProvider.family<List<AttributeDef>, String?>((ref, category) async {
+      ref.watch(
+        storeScopeProvider,
+      ); // vertical-specific axes — refetch on switch
+      final q = (category != null && category.trim().isNotEmpty)
+          ? '?category=${Uri.encodeQueryComponent(category.trim())}'
+          : '';
+      final data = await ref
+          .read(apiClientProvider)
+          .get('/kirana/attribute-defs$q');
+      final list =
+          (data is Map ? data['attributes'] : null) as List<dynamic>? ?? [];
+      return list
+          .whereType<Map>()
+          .map((e) => AttributeDef.fromJson(e.cast<String, dynamic>()))
+          .toList();
+    });
 
 /// Active variants for one product (the implicit one is always first).
 final productVariantsProvider =
     FutureProvider.family<List<ProductVariant>, int>((ref, productId) async {
-  ref.watch(storeScopeProvider); // refetch when the active store changes
-  final data = await ref
-      .read(apiClientProvider)
-      .get('/kirana/products/$productId/variants');
-  final list = (data is Map ? data['variants'] : null) as List<dynamic>? ?? [];
-  return list
-      .whereType<Map>()
-      .map((e) => ProductVariant.fromJson(e.cast<String, dynamic>()))
-      .toList();
-});
+      ref.watch(storeScopeProvider); // refetch when the active store changes
+      final data = await ref
+          .read(apiClientProvider)
+          .get('/kirana/products/$productId/variants');
+      final list =
+          (data is Map ? data['variants'] : null) as List<dynamic>? ?? [];
+      return list
+          .whereType<Map>()
+          .map((e) => ProductVariant.fromJson(e.cast<String, dynamic>()))
+          .toList();
+    });
 
 /// Create/update/deactivate variants, refreshing the product's list after each.
 class VariantActions {

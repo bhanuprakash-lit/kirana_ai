@@ -57,18 +57,21 @@ Future<Map<String, String>> _reverseGeocode(double lat, double lon) async {
     if (res.statusCode == 200) {
       final json = jsonDecode(res.body) as Map<String, dynamic>;
       final addr = json['address'] as Map<String, dynamic>? ?? {};
-      final suburb = addr['suburb'] as String? ??
+      final suburb =
+          addr['suburb'] as String? ??
           addr['quarter'] as String? ??
           addr['neighbourhood'] as String? ??
           addr['village'] as String? ??
           '';
-      final city = addr['city'] as String? ??
+      final city =
+          addr['city'] as String? ??
           addr['town'] as String? ??
           addr['state_district'] as String? ??
           addr['state'] as String? ??
           '';
-      final location =
-          suburb.isNotEmpty && city.isNotEmpty ? '$suburb, $city' : city;
+      final location = suburb.isNotEmpty && city.isNotEmpty
+          ? '$suburb, $city'
+          : city;
       final full = json['display_name'] as String? ?? '';
       return {
         'address': full,

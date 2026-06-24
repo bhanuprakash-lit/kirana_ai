@@ -143,4 +143,3 @@ class _EmptyCartWithCampaigns extends ConsumerWidget {
     );
   }
 }
-

@@ -430,7 +430,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get consentPrivacySummary =>
-      'We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on Firebase infrastructure.';
+      'We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on our cloud infrastructure.';
 
   @override
   String get consentTermsCheckPrefix => 'I have read and agree to the ';
@@ -1782,6 +1782,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invHsnCode => 'HSN code';
+
+  @override
+  String get invWarranty => 'Warranty';
+
+  @override
+  String get invWarrantyCovered => 'Covered under warranty';
+
+  @override
+  String get invWarrantyCoveredSub =>
+      'Set how long — counted from the purchase date';
+
+  @override
+  String get invWarrantyPeriod => 'Warranty period';
 
   @override
   String invStockInUnit(String unit) {

@@ -37,7 +37,10 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
         title: const Text('Services & Appointments'),
         bottom: TabBar(
           controller: _tabs,
-          tabs: const [Tab(text: 'Appointments'), Tab(text: 'Services')],
+          tabs: const [
+            Tab(text: 'Appointments'),
+            Tab(text: 'Services'),
+          ],
         ),
       ),
       body: TabBarView(
@@ -64,8 +67,10 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
                     return const Center(
                       child: Padding(
                         padding: EdgeInsets.all(32),
-                        child: Text('No appointments for this day.',
-                            style: TextStyle(color: BrandColors.muted)),
+                        child: Text(
+                          'No appointments for this day.',
+                          style: TextStyle(color: BrandColors.muted),
+                        ),
                       ),
                     );
                   }
@@ -73,10 +78,8 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
                     itemCount: list.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) => _AppointmentCard(
-                      appt: list[i],
-                      day: _dayKey,
-                    ),
+                    itemBuilder: (_, i) =>
+                        _AppointmentCard(appt: list[i], day: _dayKey),
                   );
                 },
               ),
@@ -121,7 +124,9 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
           Expanded(
             child: Center(
               child: Text(
-                isToday ? 'Today · ${_day.day}/${_day.month}' : '${_day.day}/${_day.month}/${_day.year}',
+                isToday
+                    ? 'Today · ${_day.day}/${_day.month}'
+                    : '${_day.day}/${_day.month}/${_day.year}',
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
@@ -149,9 +154,11 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
               return const Center(
                 child: Padding(
                   padding: EdgeInsets.all(32),
-                  child: Text('No services yet. Add the services you offer.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: BrandColors.muted)),
+                  child: Text(
+                    'No services yet. Add the services you offer.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: BrandColors.muted),
+                  ),
                 ),
               );
             }
@@ -168,13 +175,17 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
                     border: Border.all(color: BrandColors.border),
                   ),
                   child: ListTile(
-                    title: Text(s.name,
-                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                    title: Text(
+                      s.name,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
                     subtitle: Text(
                       '₹${s.price.toStringAsFixed(0)} · ${s.durationMin} min'
                       '${s.category != null ? " · ${s.category}" : ""}',
                       style: const TextStyle(
-                          fontSize: 12, color: BrandColors.muted),
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
                     ),
                     trailing: Switch(
                       value: s.isActive,
@@ -240,38 +251,47 @@ class _AppointmentCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Text(time,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w900, fontSize: 16)),
+              Text(
+                time,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(appt.displayName,
-                        style:
-                            const TextStyle(fontWeight: FontWeight.w700)),
+                    Text(
+                      appt.displayName,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
                     Text(
                       '${appt.serviceName ?? "Service"}'
                       '${appt.price != null ? " · ₹${appt.price!.toStringAsFixed(0)}" : ""}',
                       style: const TextStyle(
-                          fontSize: 12, color: BrandColors.muted),
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(appt.status,
-                    style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 11)),
+                child: Text(
+                  appt.status,
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                  ),
+                ),
               ),
             ],
           ),
@@ -284,15 +304,19 @@ class _AppointmentCard extends ConsumerWidget {
                   onPressed: () => ref
                       .read(serviceActionsProvider)
                       .setStatus(appt.appointmentId, 'no_show', day),
-                  child: const Text('No-show',
-                      style: TextStyle(color: BrandColors.error)),
+                  child: const Text(
+                    'No-show',
+                    style: TextStyle(color: BrandColors.error),
+                  ),
                 ),
                 TextButton(
                   onPressed: () => ref
                       .read(serviceActionsProvider)
                       .setStatus(appt.appointmentId, 'cancelled', day),
-                  child: const Text('Cancel',
-                      style: TextStyle(color: BrandColors.muted)),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: BrandColors.muted),
+                  ),
                 ),
                 FilledButton(
                   onPressed: () => ref
@@ -379,8 +403,10 @@ class _ServiceEditorState extends ConsumerState<_ServiceEditor> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('New service',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+          const Text(
+            'New service',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 16),
           TextField(
             controller: _nameCtrl,
@@ -414,7 +440,10 @@ class _ServiceEditorState extends ConsumerState<_ServiceEditor> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Create service'),
             ),
           ),
@@ -431,7 +460,8 @@ class _ServiceEditorState extends ConsumerState<_ServiceEditor> {
             : const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
           FilteringTextInputFormatter.allow(
-              RegExp(intOnly ? r'^\d+' : r'^\d+\.?\d{0,2}')),
+            RegExp(intOnly ? r'^\d+' : r'^\d+\.?\d{0,2}'),
+          ),
         ],
         decoration: InputDecoration(labelText: label),
       );
@@ -506,8 +536,10 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Book appointment',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+          const Text(
+            'Book appointment',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+          ),
           const SizedBox(height: 16),
           // Pick the customer from the store list (captures their phone too).
           InkWell(
@@ -526,8 +558,9 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
                     ? 'Select customer'
                     : '${_customer!.name}${_customer!.phone.isNotEmpty ? " · ${_customer!.phone}" : ""}',
                 style: TextStyle(
-                  color:
-                      _customer == null ? BrandColors.muted : BrandColors.ink,
+                  color: _customer == null
+                      ? BrandColors.muted
+                      : BrandColors.ink,
                 ),
               ),
             ),
@@ -558,18 +591,22 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
             isExpanded: true,
             decoration: const InputDecoration(labelText: 'Service'),
             items: services
-                .map((s) => DropdownMenuItem(
-                      value: s.serviceId,
-                      child: Text('${s.name} · ₹${s.price.toStringAsFixed(0)}'),
-                    ))
+                .map(
+                  (s) => DropdownMenuItem(
+                    value: s.serviceId,
+                    child: Text('${s.name} · ₹${s.price.toStringAsFixed(0)}'),
+                  ),
+                )
                 .toList(),
             onChanged: (v) => setState(() => _serviceId = v),
           ),
           const SizedBox(height: 12),
           InkWell(
             onTap: () async {
-              final t =
-                  await showTimePicker(context: context, initialTime: _time);
+              final t = await showTimePicker(
+                context: context,
+                initialTime: _time,
+              );
               if (t != null) setState(() => _time = t);
             },
             child: InputDecorator(
@@ -595,7 +632,10 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Book'),
             ),
           ),

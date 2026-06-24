@@ -19,6 +19,8 @@ import '../../../../shared/widgets/notification_bell.dart';
 import '../../../subscription/models/subscription_model.dart';
 import '../../../subscription/providers/subscription_provider.dart';
 import '../../../subscription/widgets/trial_countdown_widget.dart';
+import '../../../stores/providers/stores_provider.dart';
+import '../../../stores/views/store_switcher_sheet.dart';
 import '../../models/overview_models.dart';
 import '../../providers/kpi_provider.dart';
 import '../../providers/overview_provider.dart';
@@ -141,7 +143,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                       _TodaySalesCard(sales: data.dailySales),
                       const SizedBox(height: 16),
                       const _KpiSummaryRow(),
-                      const _VerticalKpiSection(),
+                      // const _VerticalKpiSection(),
                       const SizedBox(height: 16),
                       _StoreOverviewCard(store: data.store),
                       const SizedBox(height: 100),
@@ -174,7 +176,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                         _TodaySalesCard(sales: data.dailySales),
                         const SizedBox(height: 16),
                         const _KpiSummaryRow(),
-                        const _VerticalKpiSection(),
+                        // const _VerticalKpiSection(),
                         const SizedBox(height: 16),
                         _StoreOverviewCard(store: data.store),
                         const SizedBox(height: 100),
@@ -750,13 +752,18 @@ class _VerticalDivider extends StatelessWidget {
       Container(height: 48, width: 1, color: BrandColors.border);
 }
 
-class _StoreOverviewCard extends StatelessWidget {
+class _StoreOverviewCard extends ConsumerWidget {
   final StoreInfo store;
   const _StoreOverviewCard({required this.store});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    // Only worth showing when the owner actually has somewhere else to switch to.
+    final hasMultipleStores = ref.watch(myStoresProvider).maybeWhen(
+      data: (stores) => stores.length > 1,
+      orElse: () => false,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22),
       child: Column(
@@ -810,11 +817,33 @@ class _StoreOverviewCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                store.storeName,
-                                style: Theme.of(context).textTheme.titleMedium,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      store.storeName,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (hasMultipleStores)
+                                    InkWell(
+                                      onTap: () =>
+                                          showStoreSwitcher(context, ref),
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(4),
+                                        child: Icon(
+                                          Icons.swap_horiz_rounded,
+                                          size: 18,
+                                          color: BrandColors.primary,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                               const SizedBox(height: 2),
                               Container(
@@ -1339,93 +1368,101 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
 /// Vertical-specific KPI cards (apparel sell-through, electronics attach-rate,
 /// optical Rx-renewal, salon service-revenue, …). Renders nothing for grocery /
 /// general, which have no pack.
-class _VerticalKpiSection extends ConsumerWidget {
-  const _VerticalKpiSection();
+// class _VerticalKpiSection extends ConsumerWidget {
+//   const _VerticalKpiSection();
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(verticalKpiCardsProvider);
-    return async.maybeWhen(
-      data: (cards) {
-        if (cards.isEmpty) return const SizedBox.shrink();
-        return Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(22, 0, 22, 10),
-                child: Row(
-                  children: [
-                    Icon(Icons.insights_rounded,
-                        size: 16, color: BrandColors.primary),
-                    SizedBox(width: 6),
-                    Text('For your store',
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: BrandColors.ink)),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: cards
-                      .map((c) => _VerticalKpiCardTile(card: c))
-                      .toList(),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      orElse: () => const SizedBox.shrink(),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final async = ref.watch(verticalKpiCardsProvider);
+//     return async.maybeWhen(
+//       data: (cards) {
+//         if (cards.isEmpty) return const SizedBox.shrink();
+//         return Padding(
+//           padding: const EdgeInsets.only(top: 16),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               const Padding(
+//                 padding: EdgeInsets.fromLTRB(22, 0, 22, 10),
+//                 child: Row(
+//                   children: [
+//                     Icon(
+//                       Icons.insights_rounded,
+//                       size: 16,
+//                       color: BrandColors.primary,
+//                     ),
+//                     SizedBox(width: 6),
+//                     Text(
+//                       'For your store',
+//                       style: TextStyle(
+//                         fontSize: 14,
+//                         fontWeight: FontWeight.w800,
+//                         color: BrandColors.ink,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(horizontal: 22),
+//                 child: Wrap(
+//                   spacing: 10,
+//                   runSpacing: 10,
+//                   children: cards
+//                       .map((c) => _VerticalKpiCardTile(card: c))
+//                       .toList(),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         );
+//       },
+//       orElse: () => const SizedBox.shrink(),
+//     );
+//   }
+// }
 
-class _VerticalKpiCardTile extends StatelessWidget {
-  final VerticalKpiCard card;
-  const _VerticalKpiCardTile({required this.card});
+// class _VerticalKpiCardTile extends StatelessWidget {
+//   final VerticalKpiCard card;
+//   const _VerticalKpiCardTile({required this.card});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 150,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: BrandColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            card.value,
-            style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: BrandColors.ink),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            card.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: BrandColors.muted),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: 150,
+//       padding: const EdgeInsets.all(14),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(16),
+//         border: Border.all(color: BrandColors.border),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             card.value,
+//             style: const TextStyle(
+//               fontSize: 20,
+//               fontWeight: FontWeight.w900,
+//               color: BrandColors.ink,
+//             ),
+//           ),
+//           const SizedBox(height: 2),
+//           Text(
+//             card.name,
+//             maxLines: 2,
+//             overflow: TextOverflow.ellipsis,
+//             style: const TextStyle(
+//               fontSize: 11,
+//               fontWeight: FontWeight.w600,
+//               color: BrandColors.muted,
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class _KpiMiniCard extends StatelessWidget {
   final KpiCard card;

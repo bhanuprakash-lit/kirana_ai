@@ -110,4 +110,3 @@ class _SettledSectionState extends State<_SettledSection> {
     );
   }
 }
-

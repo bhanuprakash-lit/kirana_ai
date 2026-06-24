@@ -343,8 +343,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
     if (code.isEmpty) return;
     final base = ref.read(posProvider).discountedSubtotal - _redeemValue;
     try {
-      final res =
-          await ref.read(loyaltyActionsProvider).validateCoupon(code, base);
+      final res = await ref
+          .read(loyaltyActionsProvider)
+          .validateCoupon(code, base);
       if (!mounted) return;
       setState(() {
         if (res['valid'] == true) {
@@ -404,15 +405,20 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   Widget _pointsRedeemTile(int customerId, PosState state) {
     return Consumer(
       builder: (context, ref, _) {
-        final loyalty = ref.watch(customerLoyaltyProvider(customerId)).asData?.value;
+        final loyalty = ref
+            .watch(customerLoyaltyProvider(customerId))
+            .asData
+            ?.value;
         final cfg = ref.watch(loyaltyConfigProvider).asData?.value;
         if (loyalty == null || cfg == null || loyalty.points <= 0) {
           return const SizedBox.shrink();
         }
-        final billBeforePoints =
-            (state.discountedSubtotal - _couponDiscount).clamp(0, double.infinity).toDouble();
-        final maxValue =
-            loyalty.redeemValue < billBeforePoints ? loyalty.redeemValue : billBeforePoints;
+        final billBeforePoints = (state.discountedSubtotal - _couponDiscount)
+            .clamp(0, double.infinity)
+            .toDouble();
+        final maxValue = loyalty.redeemValue < billBeforePoints
+            ? loyalty.redeemValue
+            : billBeforePoints;
         final maxPoints = cfg.redeemPaisePerPoint > 0
             ? maxValue * 100 / cfg.redeemPaisePerPoint
             : 0.0;
@@ -423,17 +429,17 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           onChanged: maxPoints <= 0
               ? null
               : (v) => setState(() {
-                    if (v == true) {
-                      _redeemPoints =
-                          double.parse(maxPoints.toStringAsFixed(0));
-                      _redeemValue = double.parse(
-                          (_redeemPoints * cfg.redeemPaisePerPoint / 100)
-                              .toStringAsFixed(2));
-                    } else {
-                      _redeemPoints = 0;
-                      _redeemValue = 0;
-                    }
-                  }),
+                  if (v == true) {
+                    _redeemPoints = double.parse(maxPoints.toStringAsFixed(0));
+                    _redeemValue = double.parse(
+                      (_redeemPoints * cfg.redeemPaisePerPoint / 100)
+                          .toStringAsFixed(2),
+                    );
+                  } else {
+                    _redeemPoints = 0;
+                    _redeemValue = 0;
+                  }
+                }),
           title: Text(
             'Redeem ${loyalty.points.toStringAsFixed(0)} points (${_fmt(maxValue)})',
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
@@ -502,6 +508,21 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         ? _udhaarAmount.roundToDouble()
         : null;
 
+    // Tester #4 — flatten the per-line serials into {serial_no, product_id,
+    // variant_id} so each IMEI links to the exact phone it was billed against.
+    final cart = ref.read(posProvider).cart;
+    final serialItems = <Map<String, dynamic>>[];
+    for (final line in cart) {
+      for (final sn in (_deepLinks.serialsByLine[line.lineKey] ?? const [])) {
+        if (sn.trim().isEmpty) continue;
+        serialItems.add({
+          'serial_no': sn.trim(),
+          'product_id': line.product.productId,
+          if (line.variantId != null) 'variant_id': line.variantId,
+        });
+      }
+    }
+
     final result = await ref
         .read(posProvider.notifier)
         .placeOrder(
@@ -518,7 +539,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           redeemPoints: _redeemPoints,
           redeemValue: _redeemValue,
           // POS deep-links (M4/M7/M9)
-          serials: _deepLinks.serials.isEmpty ? null : _deepLinks.serials,
+          serialItems: serialItems.isEmpty ? null : serialItems,
           membershipId: _deepLinks.membershipId,
           appointmentId: _deepLinks.appointmentId,
           jobCardId: _deepLinks.jobCardId,
@@ -736,7 +757,11 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                     ],
 
                     // ── M1: Coupon & points redeem (loyalty active only) ──────────────
-                    if (ref.watch(loyaltyConfigProvider).asData?.value.isActive ??
+                    if (ref
+                            .watch(loyaltyConfigProvider)
+                            .asData
+                            ?.value
+                            .isActive ??
                         false) ...[
                       _buildLoyaltySection(state),
                       const SizedBox(height: 10),
@@ -756,8 +781,11 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                         children: [
                           const Row(
                             children: [
-                              Icon(Icons.event_available_rounded,
-                                  size: 14, color: BrandColors.primary),
+                              Icon(
+                                Icons.event_available_rounded,
+                                size: 14,
+                                color: BrandColors.primary,
+                              ),
                               SizedBox(width: 4),
                               Text(
                                 'Appointment',

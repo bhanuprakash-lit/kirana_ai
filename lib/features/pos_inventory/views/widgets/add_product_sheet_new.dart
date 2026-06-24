@@ -17,7 +17,6 @@ import '../../models/product_variant.dart';
 import 'add_category_sheet.dart';
 import 'barcode_scanner_overlay.dart';
 
-
 part 'add_product_sheet_new/catalogproduct.dart';
 part 'add_product_sheet_new/stage.dart';
 part 'add_product_sheet_new/addproductscreen.dart';
@@ -27,8 +26,6 @@ part 'add_product_sheet_new/linkedchip.dart';
 part 'add_product_sheet_new/categorypickersheet.dart';
 part 'add_product_sheet_new/sectionheader.dart';
 part 'add_product_sheet_new/togglerow.dart';
-
-
 
 Future<void> showAddProductSheet(
   BuildContext context,
@@ -61,4 +58,3 @@ String _toTitleCase(String s) => s
     .where((w) => w.isNotEmpty)
     .map((w) => w[0].toUpperCase() + w.substring(1))
     .join(' ');
-

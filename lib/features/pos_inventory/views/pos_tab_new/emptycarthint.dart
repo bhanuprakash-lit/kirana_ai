@@ -35,4 +35,3 @@ class _EmptyCartHint extends StatelessWidget {
     );
   }
 }
-

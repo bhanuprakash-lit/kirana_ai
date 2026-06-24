@@ -16,6 +16,86 @@ import 'widgets/return_sheet.dart';
 import '../../profile/providers/customer_provider.dart';
 import '../../profile/providers/store_settings_provider.dart';
 
+/// Tester #4 — serials/IMEIs registered against this order, shown on the bill.
+final _orderSerialsProvider = FutureProvider.autoDispose
+    .family<List<Map<String, dynamic>>, int>((ref, orderId) async {
+      final data = await ref
+          .read(apiClientProvider)
+          .get('/kirana/serials?order_id=$orderId');
+      final list =
+          (data is Map ? data['serials'] : null) as List<dynamic>? ?? [];
+      return list
+          .whereType<Map>()
+          .map((e) => e.cast<String, dynamic>())
+          .toList();
+    });
+
+/// Bill section listing each serial/IMEI sold on the order, its product and
+/// warranty-until date. Renders nothing when the order has no serials.
+class _OrderSerialsCard extends ConsumerWidget {
+  final int orderId;
+  const _OrderSerialsCard({required this.orderId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(_orderSerialsProvider(orderId));
+    final serials = async.asData?.value ?? const [];
+    if (serials.isEmpty) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.qr_code_2_rounded,
+                size: 18,
+                color: BrandColors.primary,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Serials / IMEI',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          for (final s in serials)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    s['serial_no']?.toString() ?? '—',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    '${s['product_name'] ?? 'Product'}'
+                    '${s['warranty_until'] != null ? '  ·  warranty till ${s['warranty_until']}' : ''}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class OrderDetailsScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> order;
 
@@ -239,6 +319,14 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
               widget.order['order_id'] != null) ...[
             const SizedBox(height: 16),
             _ConsentCard(orderId: (widget.order['order_id'] as num).toInt()),
+          ],
+
+          // ── Serials / IMEI billed on this order (tester #4) ───────────────
+          if (widget.order['order_id'] != null) ...[
+            const SizedBox(height: 16),
+            _OrderSerialsCard(
+              orderId: (widget.order['order_id'] as num).toInt(),
+            ),
           ],
 
           const SizedBox(height: 28),
@@ -560,8 +648,11 @@ class _GstBreakupCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.receipt_long_rounded,
-                      size: 18, color: BrandColors.primary),
+                  const Icon(
+                    Icons.receipt_long_rounded,
+                    size: 18,
+                    color: BrandColors.primary,
+                  ),
                   const SizedBox(width: 8),
                   const Text(
                     'GST breakup',

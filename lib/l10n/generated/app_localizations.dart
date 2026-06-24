@@ -891,7 +891,7 @@ abstract class AppLocalizations {
   /// No description provided for @consentPrivacySummary.
   ///
   /// In en, this message translates to:
-  /// **'We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on Firebase infrastructure.'**
+  /// **'We collect your store details, location, and transaction data to personalise your experience. We never sell your personal data to third parties. All data is encrypted and stored securely on our cloud infrastructure.'**
   String get consentPrivacySummary;
 
   /// No description provided for @consentTermsCheckPrefix.
@@ -3161,6 +3161,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'HSN code'**
   String get invHsnCode;
+
+  /// No description provided for @invWarranty.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty'**
+  String get invWarranty;
+
+  /// No description provided for @invWarrantyCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Covered under warranty'**
+  String get invWarrantyCovered;
+
+  /// No description provided for @invWarrantyCoveredSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Set how long — counted from the purchase date'**
+  String get invWarrantyCoveredSub;
+
+  /// No description provided for @invWarrantyPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty period'**
+  String get invWarrantyPeriod;
 
   /// No description provided for @invStockInUnit.
   ///

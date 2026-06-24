@@ -6,4 +6,3 @@ class _CustomerPriceEditAction {
   const _CustomerPriceEditAction.remove() : price = null;
   const _CustomerPriceEditAction.set(this.price);
 }
-

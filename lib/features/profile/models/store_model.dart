@@ -7,8 +7,8 @@ class StoreProfile {
   final double dailyBudget;
   final String? location;
   final String? region;
-  final String? city;          // M2 — zone/city rollup
-  final String? verticalCode;  // F1 — current vertical (switchable)
+  final String? city; // M2 — zone/city rollup
+  final String? verticalCode; // F1 — current vertical (switchable)
 
   const StoreProfile({
     required this.storeId,

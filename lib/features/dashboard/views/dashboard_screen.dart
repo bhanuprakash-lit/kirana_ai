@@ -230,10 +230,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         _visitedTabs.contains(i) ? tabs[i] : const SizedBox.shrink(),
     ];
     return Scaffold(
-      body: IndexedStack(
-        index: safeIndex,
-        children: lazyTabs,
-      ),
+      body: IndexedStack(index: safeIndex, children: lazyTabs),
       bottomNavigationBar: NavigationBar(
         selectedIndex: safeIndex,
         onDestinationSelected: (i) =>
