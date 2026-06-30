@@ -133,7 +133,6 @@
   "businessTypeGeneral": "General Store",
   "businessTypeProvision": "Provision Store",
   "businessTypeFruitsVeg": "Fruits & Vegetables",
-  "businessTypePharmacy": "Medical / Pharmacy",
   "businessTypeStationery": "Stationery & Books",
   "businessTypeSupermarket": "Supermarket",
   "businessTypeMiniSupermarket": "Mini Supermarket",
@@ -3150,5 +3149,43 @@
   "visionAddPhotosHint": "Take 3 to 10 photos covering your shelves.",
   "visionMinPhotosHint": "Add at least 3 photos",
   "visionMaxReached": "Maximum 10 photos",
-  "visionAnalyze": "Analyze"
+  "visionAnalyze": "Analyze",
+
+  "forecastSectionLabel": "SALES FORECAST",
+  "forecastStripCount": "{count} items may sell tomorrow",
+  "@forecastStripCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "forecastStripEst": "Est. {amount}",
+  "@forecastStripEst": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "forecastStripViewAll": "See full list",
+  "forecastScreenTitle": "Sales Forecast",
+  "forecastHorizonTomorrow": "Tomorrow",
+  "forecastHorizon3d": "3 Days",
+  "forecastHorizon5d": "5 Days",
+  "forecastHorizon7d": "7 Days",
+  "forecastHorizon14d": "14 Days",
+  "forecastHorizon30d": "30 Days",
+  "forecastRevLabel": "Est. revenue",
+  "forecastOosWarning": "May run out",
+  "forecastWhyTitle": "Why this item?",
+  "forecastWhyAvgDaily": "Avg daily sales",
+  "forecastWhyStockDays": "Stock left",
+  "forecastWhyOosRisk": "Chance of running out",
+  "forecastWhyExplain": "This item sells about {avg} units every day. In {days} days, we expect about {units} units to sell from your store.",
+  "@forecastWhyExplain": {
+    "placeholders": {
+      "avg": { "type": "String" },
+      "days": { "type": "String" },
+      "units": { "type": "String" }
+    }
+  },
+  "forecastNoData": "Forecast not ready yet. Please try again later.",
+  "forecastDataStale": "Data may be outdated"
 }

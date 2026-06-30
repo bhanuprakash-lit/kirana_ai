@@ -330,9 +330,6 @@ class AppLocalizationsTa extends AppLocalizations {
   String get businessTypeFruitsVeg => 'பழங்கள் & காய்கறிகள்';
 
   @override
-  String get businessTypePharmacy => 'மருத்துவம் / மருந்தகம்';
-
-  @override
   String get businessTypeStationery => 'எழுதுபொருள் & புத்தகங்கள்';
 
   @override
@@ -5199,4 +5196,71 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get visionAnalyze => 'பகுப்பாய்வு செய்';
+
+  @override
+  String get forecastSectionLabel => 'விற்பனை கணிப்பு';
+
+  @override
+  String forecastStripCount(int count) {
+    return 'நாளை $count பொருட்கள் விற்கப்படலாம்';
+  }
+
+  @override
+  String forecastStripEst(String amount) {
+    return 'மதிப்பீடு $amount';
+  }
+
+  @override
+  String get forecastStripViewAll => 'முழு பட்டியல் பார்க்க';
+
+  @override
+  String get forecastScreenTitle => 'விற்பனை கணிப்பு';
+
+  @override
+  String get forecastHorizonTomorrow => 'நாளை';
+
+  @override
+  String get forecastHorizon3d => '3 நாட்கள்';
+
+  @override
+  String get forecastHorizon5d => '5 நாட்கள்';
+
+  @override
+  String get forecastHorizon7d => '7 நாட்கள்';
+
+  @override
+  String get forecastHorizon14d => '14 நாட்கள்';
+
+  @override
+  String get forecastHorizon30d => '30 நாட்கள்';
+
+  @override
+  String get forecastRevLabel => 'மதிப்பிட்ட வருமானம்';
+
+  @override
+  String get forecastOosWarning => 'தொக்கு தீர்ந்துவிடலாம்';
+
+  @override
+  String get forecastWhyTitle => 'இது ஏன் இங்கே?';
+
+  @override
+  String get forecastWhyAvgDaily => 'தினசரி சராசரி விற்பனை';
+
+  @override
+  String get forecastWhyStockDays => 'மீதமுள்ள தொக்கு';
+
+  @override
+  String get forecastWhyOosRisk => 'தீர்ந்துவிடும் வாய்ப்பு';
+
+  @override
+  String forecastWhyExplain(String avg, String days, String units) {
+    return 'இந்தப் பொருள் தினமும் சராசரியாக $avg தொகுதிகள் விற்கிறது. $days நாட்களில், உங்கள் கடையில் இருந்து சுமார் $units தொகுதிகள் விற்கும் என எதிர்பார்க்கப்படுகிறது.';
+  }
+
+  @override
+  String get forecastNoData =>
+      'கணிப்பு இன்னும் தயாரில்லை. பிறகு முயற்சிக்கவும்.';
+
+  @override
+  String get forecastDataStale => 'தரவு பழையதாக இருக்கலாம்';
 }

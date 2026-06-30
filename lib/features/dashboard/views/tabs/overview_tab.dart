@@ -25,6 +25,7 @@ import '../../models/overview_models.dart';
 import '../../providers/kpi_provider.dart';
 import '../../providers/overview_provider.dart';
 import '../dashboard_screen.dart';
+import '../widgets/forecast_strip.dart';
 
 class OverviewTab extends ConsumerStatefulWidget {
   const OverviewTab({super.key});
@@ -137,6 +138,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                   data: (data) => SliverList(
                     delegate: SliverChildListDelegate([
                       _MorningBriefingRibbon(reco: data.recommendations),
+                      ForecastStrip(storeId: data.store.storeId),
                       const _ProAlertsStrip(),
                       _IntelligenceStrip(reco: data.recommendations),
                       const SizedBox(height: 24),
@@ -170,6 +172,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                     data: (data) => SliverList(
                       delegate: SliverChildListDelegate([
                         _MorningBriefingRibbon(reco: data.recommendations),
+                        ForecastStrip(storeId: data.store.storeId),
                         const _ProAlertsStrip(),
                         _IntelligenceStrip(reco: data.recommendations),
                         const SizedBox(height: 24),

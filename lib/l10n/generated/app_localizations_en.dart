@@ -319,9 +319,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get businessTypeFruitsVeg => 'Fruits & Vegetables';
 
   @override
-  String get businessTypePharmacy => 'Medical / Pharmacy';
-
-  @override
   String get businessTypeStationery => 'Stationery & Books';
 
   @override
@@ -5136,4 +5133,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get visionAnalyze => 'Analyze';
+
+  @override
+  String get forecastSectionLabel => 'SALES FORECAST';
+
+  @override
+  String forecastStripCount(int count) {
+    return '$count items may sell tomorrow';
+  }
+
+  @override
+  String forecastStripEst(String amount) {
+    return 'Est. $amount';
+  }
+
+  @override
+  String get forecastStripViewAll => 'See full list';
+
+  @override
+  String get forecastScreenTitle => 'Sales Forecast';
+
+  @override
+  String get forecastHorizonTomorrow => 'Tomorrow';
+
+  @override
+  String get forecastHorizon3d => '3 Days';
+
+  @override
+  String get forecastHorizon5d => '5 Days';
+
+  @override
+  String get forecastHorizon7d => '7 Days';
+
+  @override
+  String get forecastHorizon14d => '14 Days';
+
+  @override
+  String get forecastHorizon30d => '30 Days';
+
+  @override
+  String get forecastRevLabel => 'Est. revenue';
+
+  @override
+  String get forecastOosWarning => 'May run out';
+
+  @override
+  String get forecastWhyTitle => 'Why this item?';
+
+  @override
+  String get forecastWhyAvgDaily => 'Avg daily sales';
+
+  @override
+  String get forecastWhyStockDays => 'Stock left';
+
+  @override
+  String get forecastWhyOosRisk => 'Chance of running out';
+
+  @override
+  String forecastWhyExplain(String avg, String days, String units) {
+    return 'This item sells about $avg units every day. In $days days, we expect about $units units to sell from your store.';
+  }
+
+  @override
+  String get forecastNoData =>
+      'Forecast not ready yet. Please try again later.';
+
+  @override
+  String get forecastDataStale => 'Data may be outdated';
 }

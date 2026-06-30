@@ -323,9 +323,6 @@ class AppLocalizationsMr extends AppLocalizations {
   String get businessTypeFruitsVeg => 'फळे आणि भाजीपाला';
 
   @override
-  String get businessTypePharmacy => 'मेडिकल / फार्मसी';
-
-  @override
   String get businessTypeStationery => 'स्टेशनरी आणि पुस्तके';
 
   @override
@@ -5144,4 +5141,70 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get visionAnalyze => 'विश्लेषण करा';
+
+  @override
+  String get forecastSectionLabel => 'विक्री अंदाज';
+
+  @override
+  String forecastStripCount(int count) {
+    return 'उद्या $count वस्तू विकल्या जाऊ शकतात';
+  }
+
+  @override
+  String forecastStripEst(String amount) {
+    return 'अंदाजे $amount';
+  }
+
+  @override
+  String get forecastStripViewAll => 'पूर्ण यादी पहा';
+
+  @override
+  String get forecastScreenTitle => 'विक्री अंदाज';
+
+  @override
+  String get forecastHorizonTomorrow => 'उद्या';
+
+  @override
+  String get forecastHorizon3d => '3 दिवस';
+
+  @override
+  String get forecastHorizon5d => '5 दिवस';
+
+  @override
+  String get forecastHorizon7d => '7 दिवस';
+
+  @override
+  String get forecastHorizon14d => '14 दिवस';
+
+  @override
+  String get forecastHorizon30d => '30 दिवस';
+
+  @override
+  String get forecastRevLabel => 'अंदाजे कमाई';
+
+  @override
+  String get forecastOosWarning => 'स्टॉक संपू शकतो';
+
+  @override
+  String get forecastWhyTitle => 'हे इथे का आहे?';
+
+  @override
+  String get forecastWhyAvgDaily => 'रोजची सरासरी विक्री';
+
+  @override
+  String get forecastWhyStockDays => 'उरलेला स्टॉक';
+
+  @override
+  String get forecastWhyOosRisk => 'संपण्याची शक्यता';
+
+  @override
+  String forecastWhyExplain(String avg, String days, String units) {
+    return 'हा माल दररोज सरासरी $avg नग विकला जातो. $days दिवसांत, आपल्या दुकानातून सुमारे $units नग विकले जातील असा अंदाज आहे.';
+  }
+
+  @override
+  String get forecastNoData => 'अंदाज अजून तयार नाही. कृपया नंतर तपासा.';
+
+  @override
+  String get forecastDataStale => 'डेटा जुना असू शकतो';
 }

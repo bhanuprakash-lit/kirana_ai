@@ -327,9 +327,6 @@ class AppLocalizationsTe extends AppLocalizations {
   String get businessTypeFruitsVeg => 'పండ్లు & కూరగాయలు';
 
   @override
-  String get businessTypePharmacy => 'మెడికల్ / ఫార్మసీ';
-
-  @override
   String get businessTypeStationery => 'స్టేషనరీ & పుస్తకాలు';
 
   @override
@@ -5131,4 +5128,70 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get visionAnalyze => 'విశ్లేషించు';
+
+  @override
+  String get forecastSectionLabel => 'అమ్మకాల అంచనా';
+
+  @override
+  String forecastStripCount(int count) {
+    return 'రేపు $count వస్తువులు అమ్ముడుపోవచ్చు';
+  }
+
+  @override
+  String forecastStripEst(String amount) {
+    return 'అంచనా $amount';
+  }
+
+  @override
+  String get forecastStripViewAll => 'పూర్తి జాబితా చూడండి';
+
+  @override
+  String get forecastScreenTitle => 'అమ్మకాల అంచనా';
+
+  @override
+  String get forecastHorizonTomorrow => 'రేపు';
+
+  @override
+  String get forecastHorizon3d => '3 రోజులు';
+
+  @override
+  String get forecastHorizon5d => '5 రోజులు';
+
+  @override
+  String get forecastHorizon7d => '7 రోజులు';
+
+  @override
+  String get forecastHorizon14d => '14 రోజులు';
+
+  @override
+  String get forecastHorizon30d => '30 రోజులు';
+
+  @override
+  String get forecastRevLabel => 'అంచనా ఆదాయం';
+
+  @override
+  String get forecastOosWarning => 'స్టాక్ అయిపోవచ్చు';
+
+  @override
+  String get forecastWhyTitle => 'ఇది ఇక్కడ ఎందుకు?';
+
+  @override
+  String get forecastWhyAvgDaily => 'రోజువారీ సగటు అమ్మకాలు';
+
+  @override
+  String get forecastWhyStockDays => 'మిగిలిన స్టాక్';
+
+  @override
+  String get forecastWhyOosRisk => 'అయిపోయే అవకాశం';
+
+  @override
+  String forecastWhyExplain(String avg, String days, String units) {
+    return 'ఈ వస్తువు రోజూ సగటున $avg నగలు అమ్ముడవుతుంది. $days రోజుల్లో, మీ దుకాణం నుండి దాదాపు $units నగలు అమ్ముడవుతాయని అంచనా.';
+  }
+
+  @override
+  String get forecastNoData => 'అంచనా ఇంకా తయారుకాలేదు. దయచేసి తర్వాత చూడండి.';
+
+  @override
+  String get forecastDataStale => 'డేటా పాతది కావచ్చు';
 }

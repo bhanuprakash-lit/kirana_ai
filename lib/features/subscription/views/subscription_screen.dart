@@ -159,9 +159,9 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
 
             _PlanCard(
               name: 'Basic',
-              price: '₹200',
+              price: '₹${(info.basicPrice ?? 200).toStringAsFixed(0)}',
               period: l10n.subPerMonth,
-              dailyPrice: '₹7',
+              dailyPrice: '₹${((info.basicPrice ?? 200) / 30).round()}',
               color: BrandColors.primary,
               icon: Icons.star_rounded,
               isCurrentPlan: info.tier == SubTier.basic,
@@ -174,9 +174,9 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
             const SizedBox(height: 12),
             _PlanCard(
               name: 'Pro',
-              price: '₹500',
+              price: '₹${(info.proPrice ?? 500).toStringAsFixed(0)}',
               period: l10n.subPerMonth,
-              dailyPrice: '₹17',
+              dailyPrice: '₹${((info.proPrice ?? 500) / 30).round()}',
               color: const Color(0xFF7C3AED),
               icon: Icons.workspace_premium_rounded,
               isCurrentPlan: info.tier == SubTier.pro,
@@ -340,7 +340,7 @@ class _CurrentPlanCard extends StatelessWidget {
           if (info.tier.isPaid) ...[
             const SizedBox(height: 8),
             Text(
-              info.tier.priceLabel,
+              info.displayPriceLabel,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 26,

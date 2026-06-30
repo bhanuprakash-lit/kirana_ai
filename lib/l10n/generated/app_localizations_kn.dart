@@ -325,9 +325,6 @@ class AppLocalizationsKn extends AppLocalizations {
   String get businessTypeFruitsVeg => 'ಹಣ್ಣುಗಳು & ತರಕಾರಿಗಳು';
 
   @override
-  String get businessTypePharmacy => 'ಮೆಡಿಕಲ್ / ಫಾರ್ಮಸಿ';
-
-  @override
   String get businessTypeStationery => 'ಸ್ಟೇಷನರಿ & ಪುಸ್ತಕಗಳು';
 
   @override
@@ -5160,4 +5157,71 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get visionAnalyze => 'ವಿಶ್ಲೇಷಿಸಿ';
+
+  @override
+  String get forecastSectionLabel => 'ಮಾರಾಟ ಅಂದಾಜು';
+
+  @override
+  String forecastStripCount(int count) {
+    return 'ನಾಳೆ $count ವಸ್ತುಗಳು ಮಾರಾಟವಾಗಬಹುದು';
+  }
+
+  @override
+  String forecastStripEst(String amount) {
+    return 'ಅಂದಾಜು $amount';
+  }
+
+  @override
+  String get forecastStripViewAll => 'ಪೂರ್ಣ ಪಟ್ಟಿ ನೋಡಿ';
+
+  @override
+  String get forecastScreenTitle => 'ಮಾರಾಟ ಅಂದಾಜು';
+
+  @override
+  String get forecastHorizonTomorrow => 'ನಾಳೆ';
+
+  @override
+  String get forecastHorizon3d => '3 ದಿನಗಳು';
+
+  @override
+  String get forecastHorizon5d => '5 ದಿನಗಳು';
+
+  @override
+  String get forecastHorizon7d => '7 ದಿನಗಳು';
+
+  @override
+  String get forecastHorizon14d => '14 ದಿನಗಳು';
+
+  @override
+  String get forecastHorizon30d => '30 ದಿನಗಳು';
+
+  @override
+  String get forecastRevLabel => 'ಅಂದಾಜು ಗಳಿಕೆ';
+
+  @override
+  String get forecastOosWarning => 'ಸ್ಟಾಕ್ ಖಾಲಿಯಾಗಬಹುದು';
+
+  @override
+  String get forecastWhyTitle => 'ಇದು ಇಲ್ಲಿ ಏಕೆ?';
+
+  @override
+  String get forecastWhyAvgDaily => 'ದೈನಂದಿನ ಸರಾಸರಿ ಮಾರಾಟ';
+
+  @override
+  String get forecastWhyStockDays => 'ಉಳಿದ ಸ್ಟಾಕ್';
+
+  @override
+  String get forecastWhyOosRisk => 'ಮುಗಿಯುವ ಸಾಧ್ಯತೆ';
+
+  @override
+  String forecastWhyExplain(String avg, String days, String units) {
+    return 'ಈ ವಸ್ತು ಪ್ರತಿದಿನ ಸರಾಸರಿ $avg ಪಿಸ್ ಮಾರಾಟವಾಗುತ್ತದೆ. $days ದಿನಗಳಲ್ಲಿ, ನಿಮ್ಮ ಅಂಗಡಿಯಿಂದ ಸುಮಾರು $units ಪಿಸ್ ಮಾರಾಟವಾಗುತ್ತದೆ ಎಂದು ಅಂದಾಜಿಸಲಾಗಿದೆ.';
+  }
+
+  @override
+  String get forecastNoData =>
+      'ಅಂದಾಜು ಇನ್ನೂ ತಯಾರಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get forecastDataStale => 'ಡೇಟಾ ಹಳೆಯದಾಗಿರಬಹುದು';
 }

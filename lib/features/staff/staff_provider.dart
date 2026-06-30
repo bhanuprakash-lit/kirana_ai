@@ -106,7 +106,7 @@ class StaffActions {
   Future<void> addTask(String title, {int? staffId}) async {
     await _c.post('/kirana/staff/tasks', {
       'title': title,
-      if (staffId != null) 'staff_id': staffId,
+      'staff_id': ?staffId,
     });
     ref.invalidate(staffTasksProvider);
   }

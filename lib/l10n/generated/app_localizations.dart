@@ -678,12 +678,6 @@ abstract class AppLocalizations {
   /// **'Fruits & Vegetables'**
   String get businessTypeFruitsVeg;
 
-  /// No description provided for @businessTypePharmacy.
-  ///
-  /// In en, this message translates to:
-  /// **'Medical / Pharmacy'**
-  String get businessTypePharmacy;
-
   /// No description provided for @businessTypeStationery.
   ///
   /// In en, this message translates to:
@@ -8980,6 +8974,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Analyze'**
   String get visionAnalyze;
+
+  /// No description provided for @forecastSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SALES FORECAST'**
+  String get forecastSectionLabel;
+
+  /// No description provided for @forecastStripCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items may sell tomorrow'**
+  String forecastStripCount(int count);
+
+  /// No description provided for @forecastStripEst.
+  ///
+  /// In en, this message translates to:
+  /// **'Est. {amount}'**
+  String forecastStripEst(String amount);
+
+  /// No description provided for @forecastStripViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See full list'**
+  String get forecastStripViewAll;
+
+  /// No description provided for @forecastScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Forecast'**
+  String get forecastScreenTitle;
+
+  /// No description provided for @forecastHorizonTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get forecastHorizonTomorrow;
+
+  /// No description provided for @forecastHorizon3d.
+  ///
+  /// In en, this message translates to:
+  /// **'3 Days'**
+  String get forecastHorizon3d;
+
+  /// No description provided for @forecastHorizon5d.
+  ///
+  /// In en, this message translates to:
+  /// **'5 Days'**
+  String get forecastHorizon5d;
+
+  /// No description provided for @forecastHorizon7d.
+  ///
+  /// In en, this message translates to:
+  /// **'7 Days'**
+  String get forecastHorizon7d;
+
+  /// No description provided for @forecastHorizon14d.
+  ///
+  /// In en, this message translates to:
+  /// **'14 Days'**
+  String get forecastHorizon14d;
+
+  /// No description provided for @forecastHorizon30d.
+  ///
+  /// In en, this message translates to:
+  /// **'30 Days'**
+  String get forecastHorizon30d;
+
+  /// No description provided for @forecastRevLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Est. revenue'**
+  String get forecastRevLabel;
+
+  /// No description provided for @forecastOosWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'May run out'**
+  String get forecastOosWarning;
+
+  /// No description provided for @forecastWhyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this item?'**
+  String get forecastWhyTitle;
+
+  /// No description provided for @forecastWhyAvgDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg daily sales'**
+  String get forecastWhyAvgDaily;
+
+  /// No description provided for @forecastWhyStockDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock left'**
+  String get forecastWhyStockDays;
+
+  /// No description provided for @forecastWhyOosRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Chance of running out'**
+  String get forecastWhyOosRisk;
+
+  /// No description provided for @forecastWhyExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'This item sells about {avg} units every day. In {days} days, we expect about {units} units to sell from your store.'**
+  String forecastWhyExplain(String avg, String days, String units);
+
+  /// No description provided for @forecastNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast not ready yet. Please try again later.'**
+  String get forecastNoData;
+
+  /// No description provided for @forecastDataStale.
+  ///
+  /// In en, this message translates to:
+  /// **'Data may be outdated'**
+  String get forecastDataStale;
 }
 
 class _AppLocalizationsDelegate
