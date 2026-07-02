@@ -11,6 +11,7 @@ import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../models/vision_models.dart';
 import '../providers/vision_provider.dart';
+import 'counter_screen.dart';
 
 /// 4th dashboard tab. Pro-gated as a whole (like Procurement). Hosts three
 /// sub-tabs: Shelf Scan (morning/evening capture), Results (what sold), and the
@@ -69,7 +70,7 @@ class _VisionScreenState extends ConsumerState<VisionScreen>
       ),
       body: TabBarView(
         controller: _tab,
-        children: const [_ShelfTab(), _ResultsTab(), _CounterComingSoon()],
+        children: const [_ShelfTab(), _ResultsTab(), CounterScreen()],
       ),
     );
   }
@@ -913,29 +914,12 @@ class _CorrectionSheetState extends ConsumerState<_CorrectionSheet> {
   }
 }
 
-// ── Counter (coming soon) ───────────────────────────────────────────────────
-
-class _CounterComingSoon extends StatelessWidget {
-  const _CounterComingSoon();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return _EmptyState(
-      icon: Icons.videocam_rounded,
-      title: l10n.visionCounterSoonTitle,
-      message: l10n.visionCounterSoonDesc,
-    );
-  }
-}
-
 // ── Shared bits ─────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
   final IconData icon;
-  final String? title;
   final String message;
-  const _EmptyState({required this.icon, this.title, required this.message});
+  const _EmptyState({required this.icon, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -951,18 +935,6 @@ class _EmptyState extends StatelessWidget {
               color: BrandColors.muted.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 14),
-            if (title != null) ...[
-              Text(
-                title!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: BrandColors.ink,
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
             Text(
               message,
               textAlign: TextAlign.center,

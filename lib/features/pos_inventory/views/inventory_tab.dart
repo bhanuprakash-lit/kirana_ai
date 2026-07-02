@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../vision/views/onboarding_stockin_screen.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/inventory_item.dart';
 import '../models/pending_inventory_item.dart';
@@ -89,6 +90,17 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
           if (data.items.isEmpty) {
             return _EmptyInventory(
               onAdd: () => showAddProductSheet(context, ref),
+              onSnapShelves: () async {
+                final added = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const OnboardingStockInScreen(),
+                  ),
+                );
+                if (added == true) {
+                  await ref.read(inventoryProvider.notifier).refresh();
+                }
+              },
               title: verticalConfigOf(ref).copy(
                 'empty_inventory',
                 AppLocalizations.of(context).invNoInventoryYet,
@@ -979,8 +991,13 @@ class _PendingTile extends StatelessWidget {
 
 class _EmptyInventory extends StatelessWidget {
   final VoidCallback onAdd;
+  final VoidCallback onSnapShelves;
   final String title;
-  const _EmptyInventory({required this.onAdd, required this.title});
+  const _EmptyInventory({
+    required this.onAdd,
+    required this.onSnapShelves,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1019,6 +1036,52 @@ class _EmptyInventory extends StatelessWidget {
               onPressed: onAdd,
               icon: const Icon(Icons.add_rounded),
               label: Text(l10n.invAddFirstProduct),
+            ),
+            const SizedBox(height: 20),
+            // Bulk stock-in: photograph shelves instead of adding items one by one.
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: BrandColors.purple.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: BrandColors.purple.withValues(alpha: 0.2)),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    l10n.onbCtaTitle,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: BrandColors.ink,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.onbCtaSubtitle,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: onSnapShelves,
+                      icon: const Icon(Icons.photo_camera_rounded),
+                      label: Text(l10n.onbCtaButton),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: BrandColors.purple,
+                        side: const BorderSide(color: BrandColors.purple),
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

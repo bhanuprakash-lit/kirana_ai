@@ -10,6 +10,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
 import '../../vision/providers/vision_provider.dart';
+import '../../vision/views/onboarding_stockin_screen.dart';
 import '../../vision/views/vision_screen.dart';
 import '../../finance/views/finance_screen.dart';
 import '../../auth/providers/user_provider.dart';
@@ -175,6 +176,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     // 5) Vision AI widget / notification — open the Vision tab.
     if (action == 'vision' || action == 'open_vision') {
       ref.read(dashboardTabProvider.notifier).switchTab(3);
+    }
+
+    // 6) Bulk stock-in results ready — open the onboarding review for that session.
+    if (action == 'open_onboarding_review') {
+      final sessionId = int.tryParse(nav['session_id'] ?? '');
+      ref.read(dashboardTabProvider.notifier).switchTab(2); // POS/Inventory
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => OnboardingStockInScreen(resumeSessionId: sessionId),
+        ));
+      });
     }
   }
 

@@ -34,7 +34,9 @@ android {
 
     defaultConfig {
         applicationId = "com.lohiya.kirana_ai"
-        minSdk = flutter.minSdkVersion
+        // ultralytics_yolo (on-device counter) requires API 24+; floor to it so the
+        // camera/TFLite path builds. 24 = Android 7.0 (2016), negligible reach loss.
+        minSdk = maxOf(flutter.minSdkVersion, 24)
         targetSdk = 36  // Android 15 — required for 16 KB page size compliance (Google Play Nov 2025)
         versionCode = flutter.versionCode
         versionName = flutter.versionName

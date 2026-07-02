@@ -8945,6 +8945,354 @@ abstract class AppLocalizations {
   /// **'Point your phone at the billing counter to auto-count sales as items pass. We\'re putting the finishing touches on it.'**
   String get visionCounterSoonDesc;
 
+  /// No description provided for @visionCounterStartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Sale Counter'**
+  String get visionCounterStartTitle;
+
+  /// No description provided for @visionCounterStartDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Point your phone at the billing counter. Items passing across the line are counted automatically — no barcode scanning.'**
+  String get visionCounterStartDesc;
+
+  /// No description provided for @visionCounterStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start counting'**
+  String get visionCounterStart;
+
+  /// No description provided for @visionCounterFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get visionCounterFinish;
+
+  /// No description provided for @visionCounterPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get visionCounterPause;
+
+  /// No description provided for @visionCounterResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get visionCounterResume;
+
+  /// No description provided for @visionCounterUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get visionCounterUndo;
+
+  /// No description provided for @visionCounterFlip.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip side'**
+  String get visionCounterFlip;
+
+  /// No description provided for @visionCounterCounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted'**
+  String get visionCounterCounted;
+
+  /// No description provided for @visionCounterNothingYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Move items across the line to count them.'**
+  String get visionCounterNothingYet;
+
+  /// No description provided for @visionCounterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Items crossing into the green zone are counted as sold.'**
+  String get visionCounterHint;
+
+  /// No description provided for @visionCounterZoneStore.
+  ///
+  /// In en, this message translates to:
+  /// **'In store'**
+  String get visionCounterZoneStore;
+
+  /// No description provided for @visionCounterZoneSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get visionCounterZoneSold;
+
+  /// No description provided for @visionCounterModelMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter model not installed'**
+  String get visionCounterModelMissingTitle;
+
+  /// No description provided for @visionCounterModelMissingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The on-device counting model isn\'t bundled in this build yet. It\'s coming in an update — shelf scanning still works.'**
+  String get visionCounterModelMissingDesc;
+
+  /// No description provided for @visionCounterPermTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access needed'**
+  String get visionCounterPermTitle;
+
+  /// No description provided for @visionCounterPermDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow camera access to count items at the billing counter.'**
+  String get visionCounterPermDesc;
+
+  /// No description provided for @visionCounterGrant.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow camera'**
+  String get visionCounterGrant;
+
+  /// No description provided for @visionCounterOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get visionCounterOpenSettings;
+
+  /// No description provided for @visionCounterFinishConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish counting?'**
+  String get visionCounterFinishConfirmTitle;
+
+  /// No description provided for @visionCounterFinishConfirmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll save today\'s tally and add it to your counter summary.'**
+  String get visionCounterFinishConfirmDesc;
+
+  /// No description provided for @visionCounterSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save count'**
+  String get visionCounterSave;
+
+  /// No description provided for @visionCounterDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get visionCounterDiscard;
+
+  /// No description provided for @visionCounterKeepCounting.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep counting'**
+  String get visionCounterKeepCounting;
+
+  /// No description provided for @visionCounterSavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Counting saved'**
+  String get visionCounterSavedTitle;
+
+  /// No description provided for @visionCounterSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {count} items across {skus} products.'**
+  String visionCounterSaved(int count, int skus);
+
+  /// No description provided for @visionCounterOfflineNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on your phone. It\'ll sync when the counter service is available.'**
+  String get visionCounterOfflineNote;
+
+  /// No description provided for @visionCounterPending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} not synced yet'**
+  String visionCounterPending(int count);
+
+  /// No description provided for @visionCounterSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s counter tally'**
+  String get visionCounterSummaryTitle;
+
+  /// No description provided for @visionCounterSummaryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No items counted today. Tap Start counting to begin.'**
+  String get visionCounterSummaryEmpty;
+
+  /// No description provided for @visionCounterSummaryTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total counted today'**
+  String get visionCounterSummaryTotal;
+
+  /// No description provided for @visionCounterUnknownItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised product'**
+  String get visionCounterUnknownItem;
+
+  /// No description provided for @onbCtaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Have hundreds of items?'**
+  String get onbCtaTitle;
+
+  /// No description provided for @onbCtaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photograph your shelves and we\'ll identify the products and add them to your inventory — no scanning each one.'**
+  String get onbCtaSubtitle;
+
+  /// No description provided for @onbCtaButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Snap your shelves'**
+  String get onbCtaButton;
+
+  /// No description provided for @onbCaptureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photograph your shelves'**
+  String get onbCaptureTitle;
+
+  /// No description provided for @onbCaptureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Take 3 to 10 clear photos covering all your shelves. Good lighting helps us identify more products.'**
+  String get onbCaptureHint;
+
+  /// No description provided for @onbTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get onbTakePhoto;
+
+  /// No description provided for @onbPhotosProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of 10 photos'**
+  String onbPhotosProgress(int count);
+
+  /// No description provided for @onbMinPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least 3 photos'**
+  String get onbMinPhotos;
+
+  /// No description provided for @onbAnalyze.
+  ///
+  /// In en, this message translates to:
+  /// **'Identify products'**
+  String get onbAnalyze;
+
+  /// No description provided for @onbProcessingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re reviewing your shelf photos'**
+  String get onbProcessingTitle;
+
+  /// No description provided for @onbProcessingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Our system is identifying the products on your shelves. This usually takes under a minute. Please keep this screen open — we\'ll show the results here shortly.'**
+  String get onbProcessingDesc;
+
+  /// No description provided for @onbReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your stock'**
+  String get onbReviewTitle;
+
+  /// No description provided for @onbReviewDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'These are the products we identified from your photos. We may occasionally miss or misread an item, so please cross-check and adjust the quantities. We\'re continually improving our accuracy.'**
+  String get onbReviewDisclaimer;
+
+  /// No description provided for @onbReviewSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{mapped} ready · {unmapped} need a product'**
+  String onbReviewSummary(int mapped, int unmapped);
+
+  /// No description provided for @onbUnrecognised.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recognised — choose a product'**
+  String get onbUnrecognised;
+
+  /// No description provided for @onbChooseProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose product'**
+  String get onbChooseProduct;
+
+  /// No description provided for @onbQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get onbQuantity;
+
+  /// No description provided for @onbCommit.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my inventory'**
+  String get onbCommit;
+
+  /// No description provided for @onbCommitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding to your inventory…'**
+  String get onbCommitting;
+
+  /// No description provided for @onbDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock added'**
+  String get onbDoneTitle;
+
+  /// No description provided for @onbDoneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'{products} products ({units} units) added to your inventory. You can set prices anytime from the Inventory tab.'**
+  String onbDoneDesc(int products, int units);
+
+  /// No description provided for @onbEmptyDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t identify products in these photos. Please retake them in better light, showing the packaging clearly.'**
+  String get onbEmptyDetected;
+
+  /// No description provided for @onbRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake photos'**
+  String get onbRetake;
+
+  /// No description provided for @onbFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t finish'**
+  String get onbFailedTitle;
+
+  /// No description provided for @onbDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get onbDone;
+
+  /// No description provided for @onbRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get onbRemove;
+
   /// No description provided for @visionAddPhotosTitle.
   ///
   /// In en, this message translates to:

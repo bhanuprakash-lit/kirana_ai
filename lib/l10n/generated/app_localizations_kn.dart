@@ -5143,6 +5143,203 @@ class AppLocalizationsKn extends AppLocalizations {
       'ಬಿಲ್ಲಿಂಗ್ ಕೌಂಟರ್ ಕಡೆಗೆ ನಿಮ್ಮ ಫೋನ್ ತೋರಿಸಿ, ವಸ್ತುಗಳು ದಾಟುತ್ತಿದ್ದಂತೆ ಮಾರಾಟ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಎಣಿಕೆಯಾಗುತ್ತದೆ. ನಾವು ಇದಕ್ಕೆ ಅಂತಿಮ ಸ್ಪರ್ಶ ನೀಡುತ್ತಿದ್ದೇವೆ.';
 
   @override
+  String get visionCounterStartTitle => 'Live Sale Counter';
+
+  @override
+  String get visionCounterStartDesc =>
+      'Point your phone at the billing counter. Items passing across the line are counted automatically — no barcode scanning.';
+
+  @override
+  String get visionCounterStart => 'Start counting';
+
+  @override
+  String get visionCounterFinish => 'Finish';
+
+  @override
+  String get visionCounterPause => 'Pause';
+
+  @override
+  String get visionCounterResume => 'Resume';
+
+  @override
+  String get visionCounterUndo => 'Undo';
+
+  @override
+  String get visionCounterFlip => 'Flip side';
+
+  @override
+  String get visionCounterCounted => 'Counted';
+
+  @override
+  String get visionCounterNothingYet =>
+      'Move items across the line to count them.';
+
+  @override
+  String get visionCounterHint =>
+      'Items crossing into the green zone are counted as sold.';
+
+  @override
+  String get visionCounterZoneStore => 'In store';
+
+  @override
+  String get visionCounterZoneSold => 'Sold';
+
+  @override
+  String get visionCounterModelMissingTitle => 'Counter model not installed';
+
+  @override
+  String get visionCounterModelMissingDesc =>
+      'The on-device counting model isn\'t bundled in this build yet. It\'s coming in an update — shelf scanning still works.';
+
+  @override
+  String get visionCounterPermTitle => 'Camera access needed';
+
+  @override
+  String get visionCounterPermDesc =>
+      'Allow camera access to count items at the billing counter.';
+
+  @override
+  String get visionCounterGrant => 'Allow camera';
+
+  @override
+  String get visionCounterOpenSettings => 'Open settings';
+
+  @override
+  String get visionCounterFinishConfirmTitle => 'Finish counting?';
+
+  @override
+  String get visionCounterFinishConfirmDesc =>
+      'We\'ll save today\'s tally and add it to your counter summary.';
+
+  @override
+  String get visionCounterSave => 'Save count';
+
+  @override
+  String get visionCounterDiscard => 'Discard';
+
+  @override
+  String get visionCounterKeepCounting => 'Keep counting';
+
+  @override
+  String get visionCounterSavedTitle => 'Counting saved';
+
+  @override
+  String visionCounterSaved(int count, int skus) {
+    return 'Saved $count items across $skus products.';
+  }
+
+  @override
+  String get visionCounterOfflineNote =>
+      'Saved on your phone. It\'ll sync when the counter service is available.';
+
+  @override
+  String visionCounterPending(int count) {
+    return '$count not synced yet';
+  }
+
+  @override
+  String get visionCounterSummaryTitle => 'Today\'s counter tally';
+
+  @override
+  String get visionCounterSummaryEmpty =>
+      'No items counted today. Tap Start counting to begin.';
+
+  @override
+  String get visionCounterSummaryTotal => 'Total counted today';
+
+  @override
+  String get visionCounterUnknownItem => 'Unrecognised product';
+
+  @override
+  String get onbCtaTitle => 'Have hundreds of items?';
+
+  @override
+  String get onbCtaSubtitle =>
+      'Photograph your shelves and we\'ll identify the products and add them to your inventory — no scanning each one.';
+
+  @override
+  String get onbCtaButton => 'Snap your shelves';
+
+  @override
+  String get onbCaptureTitle => 'Photograph your shelves';
+
+  @override
+  String get onbCaptureHint =>
+      'Take 3 to 10 clear photos covering all your shelves. Good lighting helps us identify more products.';
+
+  @override
+  String get onbTakePhoto => 'Take a photo';
+
+  @override
+  String onbPhotosProgress(int count) {
+    return '$count of 10 photos';
+  }
+
+  @override
+  String get onbMinPhotos => 'Add at least 3 photos';
+
+  @override
+  String get onbAnalyze => 'Identify products';
+
+  @override
+  String get onbProcessingTitle => 'We\'re reviewing your shelf photos';
+
+  @override
+  String get onbProcessingDesc =>
+      'Our system is identifying the products on your shelves. This usually takes under a minute. Please keep this screen open — we\'ll show the results here shortly.';
+
+  @override
+  String get onbReviewTitle => 'Confirm your stock';
+
+  @override
+  String get onbReviewDisclaimer =>
+      'These are the products we identified from your photos. We may occasionally miss or misread an item, so please cross-check and adjust the quantities. We\'re continually improving our accuracy.';
+
+  @override
+  String onbReviewSummary(int mapped, int unmapped) {
+    return '$mapped ready · $unmapped need a product';
+  }
+
+  @override
+  String get onbUnrecognised => 'Not recognised — choose a product';
+
+  @override
+  String get onbChooseProduct => 'Choose product';
+
+  @override
+  String get onbQuantity => 'Qty';
+
+  @override
+  String get onbCommit => 'Add to my inventory';
+
+  @override
+  String get onbCommitting => 'Adding to your inventory…';
+
+  @override
+  String get onbDoneTitle => 'Stock added';
+
+  @override
+  String onbDoneDesc(int products, int units) {
+    return '$products products ($units units) added to your inventory. You can set prices anytime from the Inventory tab.';
+  }
+
+  @override
+  String get onbEmptyDetected =>
+      'We couldn\'t identify products in these photos. Please retake them in better light, showing the packaging clearly.';
+
+  @override
+  String get onbRetake => 'Retake photos';
+
+  @override
+  String get onbFailedTitle => 'We couldn\'t finish';
+
+  @override
+  String get onbDone => 'Done';
+
+  @override
+  String get onbRemove => 'Remove';
+
+  @override
   String get visionAddPhotosTitle => 'ಶೆಲ್ಫ್ ಫೋಟೋಗಳನ್ನು ಸೇರಿಸಿ';
 
   @override

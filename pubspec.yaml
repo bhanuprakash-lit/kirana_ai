@@ -69,6 +69,10 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   in_app_update_flutter: ^2.0.3
 
+  # On-device YOLO for the sale-area counter (real-time detection + tracking).
+  # Consumes an Ultralytics-exported .tflite bundled under assets/models/.
+  ultralytics_yolo: ^0.6.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -83,6 +87,8 @@ flutter:
   generate: true
   assets:
     - assets/logos/
+    # On-device counter model + labels (Ultralytics-exported YOLO).
+    - assets/models/
 
   # Bundled fonts (offline, no runtime google_fonts fetch). GoogleSans is the
   # Latin/default brand face; the Noto Sans families cover the Indic scripts so
