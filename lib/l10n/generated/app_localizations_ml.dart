@@ -495,6 +495,10 @@ class AppLocalizationsMl extends AppLocalizations {
   String get dashTrialRequestBasic => 'Basic ട്രയൽ അഭ്യർത്ഥിക്കുക';
 
   @override
+  String get dashTrialRequestError =>
+      'Couldn\'t start your trial just now. Please check your connection and try again.';
+
+  @override
   String get dashTrialSignInDifferent =>
       'മറ്റൊരു അക്കൗണ്ടിലേക്ക് സൈൻ ഇൻ ചെയ്യുക';
 

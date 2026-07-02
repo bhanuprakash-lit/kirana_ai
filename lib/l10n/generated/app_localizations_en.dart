@@ -484,6 +484,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashTrialRequestBasic => 'Request Basic Trial';
 
   @override
+  String get dashTrialRequestError =>
+      'Couldn\'t start your trial just now. Please check your connection and try again.';
+
+  @override
   String get dashTrialSignInDifferent => 'Sign in to a different account';
 
   @override

@@ -191,6 +191,7 @@
   "dashTrialSelectPlan": "SELECT YOUR TRIAL PLAN",
   "dashTrialRequestPro": "Request Pro Trial",
   "dashTrialRequestBasic": "Request Basic Trial",
+  "dashTrialRequestError": "Couldn't start your trial just now. Please check your connection and try again.",
   "dashTrialSignInDifferent": "Sign in to a different account",
   "dashPlanBadgeAllFeatures": "ALL FEATURES",
   "dashPlanBasicName": "Basic Plan",

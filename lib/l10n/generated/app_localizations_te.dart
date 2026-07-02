@@ -494,6 +494,10 @@ class AppLocalizationsTe extends AppLocalizations {
   String get dashTrialRequestBasic => 'Basic ట్రయల్ అభ్యర్థించండి';
 
   @override
+  String get dashTrialRequestError =>
+      'Couldn\'t start your trial just now. Please check your connection and try again.';
+
+  @override
   String get dashTrialSignInDifferent => 'వేరే ఖాతాలోకి సైన్ ఇన్ చేయండి';
 
   @override

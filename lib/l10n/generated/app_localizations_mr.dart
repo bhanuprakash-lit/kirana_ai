@@ -490,6 +490,10 @@ class AppLocalizationsMr extends AppLocalizations {
   String get dashTrialRequestBasic => 'Basic चाचणीची विनंती करा';
 
   @override
+  String get dashTrialRequestError =>
+      'Couldn\'t start your trial just now. Please check your connection and try again.';
+
+  @override
   String get dashTrialSignInDifferent => 'वेगळ्या खात्यात साइन इन करा';
 
   @override

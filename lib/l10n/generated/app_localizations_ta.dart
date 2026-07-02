@@ -499,6 +499,10 @@ class AppLocalizationsTa extends AppLocalizations {
   String get dashTrialRequestBasic => 'Basic சோதனையைக் கோரவும்';
 
   @override
+  String get dashTrialRequestError =>
+      'Couldn\'t start your trial just now. Please check your connection and try again.';
+
+  @override
   String get dashTrialSignInDifferent => 'வேறு கணக்கில் உள்நுழையவும்';
 
   @override

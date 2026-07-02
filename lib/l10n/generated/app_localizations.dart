@@ -984,6 +984,12 @@ abstract class AppLocalizations {
   /// **'Request Basic Trial'**
   String get dashTrialRequestBasic;
 
+  /// No description provided for @dashTrialRequestError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t start your trial just now. Please check your connection and try again.'**
+  String get dashTrialRequestError;
+
   /// No description provided for @dashTrialSignInDifferent.
   ///
   /// In en, this message translates to:

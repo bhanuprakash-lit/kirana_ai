@@ -491,6 +491,10 @@ class AppLocalizationsKn extends AppLocalizations {
   String get dashTrialRequestBasic => 'Basic ಟ್ರಯಲ್ ವಿನಂತಿಸಿ';
 
   @override
+  String get dashTrialRequestError =>
+      'Couldn\'t start your trial just now. Please check your connection and try again.';
+
+  @override
   String get dashTrialSignInDifferent => 'ಬೇರೆ ಖಾತೆಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ';
 
   @override

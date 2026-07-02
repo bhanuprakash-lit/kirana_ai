@@ -292,13 +292,30 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
 
   Future<void> _request() async {
     setState(() => _loading = true);
+    var failed = false;
     try {
       await ref
           .read(subscriptionProvider.notifier)
           .requestTrial(tier: _selectedTier);
     } catch (_) {
+      failed = true;
+      // The trial is often granted server-side (approval commits) even when the
+      // response fails, which previously left the owner stuck on this screen with
+      // the error silently swallowed. Re-fetch the authoritative state so the gate
+      // can move them to their dashboard / pending screen.
+      await ref.read(subscriptionProvider.notifier).refresh();
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+    if (!mounted) return;
+    // Only surface an error if we genuinely didn't move on (no access and not
+    // pending); otherwise the reactive gate has already navigated away.
+    final sub = ref.read(subscriptionProvider).asData?.value;
+    final movedOn = sub != null && (sub.hasAppAccess || sub.isPending);
+    if (failed && !movedOn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).dashTrialRequestError)),
+      );
     }
   }
 
