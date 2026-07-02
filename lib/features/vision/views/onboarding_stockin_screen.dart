@@ -16,7 +16,15 @@ class OnboardingStockInScreen extends ConsumerStatefulWidget {
   /// When set (e.g. opened from the "results ready" notification), resume that
   /// session straight into review instead of starting a fresh capture.
   final int? resumeSessionId;
-  const OnboardingStockInScreen({super.key, this.resumeSessionId});
+
+  /// true = existing store restocking (detected quantities ADD to current stock);
+  /// false = onboarding an empty store (quantities SET the opening stock).
+  final bool addToExisting;
+  const OnboardingStockInScreen({
+    super.key,
+    this.resumeSessionId,
+    this.addToExisting = false,
+  });
 
   @override
   ConsumerState<OnboardingStockInScreen> createState() =>
@@ -75,7 +83,10 @@ class _OnboardingStockInScreenState
           OnboardingStatus.uploading ||
           OnboardingStatus.processing => const _ProcessingBody(),
           OnboardingStatus.ready ||
-          OnboardingStatus.committing => _ReviewBody(committing: state.status == OnboardingStatus.committing),
+          OnboardingStatus.committing => _ReviewBody(
+            committing: state.status == OnboardingStatus.committing,
+            addToExisting: widget.addToExisting,
+          ),
           OnboardingStatus.done => _DoneBody(
             products: state.committedProducts,
             units: state.committedQuantity,
@@ -287,7 +298,8 @@ class _ProcessingBody extends StatelessWidget {
 
 class _ReviewBody extends ConsumerWidget {
   final bool committing;
-  const _ReviewBody({required this.committing});
+  final bool addToExisting;
+  const _ReviewBody({required this.committing, required this.addToExisting});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -342,7 +354,7 @@ class _ReviewBody extends ConsumerWidget {
                     onPressed: committing || state.committable.isEmpty
                         ? null
                         : () async {
-                            final ok = await notifier.commit();
+                            final ok = await notifier.commit(addToExisting: addToExisting);
                             if (!ok && context.mounted && state.error != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(ref.read(onboardingProvider).error ?? '')),

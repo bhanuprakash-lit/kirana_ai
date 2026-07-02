@@ -60,6 +60,18 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
     }
   }
 
+  void _restockByCamera() async {
+    final added = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const OnboardingStockInScreen(addToExisting: true),
+      ),
+    );
+    if (added == true && mounted) {
+      await ref.read(inventoryProvider.notifier).refresh();
+    }
+  }
+
   void _showEditProduct(InventoryItem item) {
     showEditProductSheet(context, ref, item);
   }
@@ -221,6 +233,28 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                             child: const Icon(
                               Icons.qr_code_scanner_rounded,
                               color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Restock by camera: photograph shelves to add stock in bulk
+                        // (detected quantities ADD onto current stock).
+                        GestureDetector(
+                          onTap: _restockByCamera,
+                          child: Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: BrandColors.purple.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: BrandColors.purple.withValues(alpha: 0.4),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.add_a_photo_rounded,
+                              color: BrandColors.purple,
                               size: 20,
                             ),
                           ),

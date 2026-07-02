@@ -171,7 +171,8 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   // ── Commit ───────────────────────────────────────────────────────────────────
 
   /// Write reviewed quantities to inventory. Returns true on success.
-  Future<bool> commit() async {
+  /// [addToExisting] true = restock (add onto current stock); false = onboarding (set).
+  Future<bool> commit({bool addToExisting = false}) async {
     final sessionId = state.sessionId;
     if (sessionId == null) return false;
     final payload = state.committable;
@@ -185,6 +186,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         'items': [
           for (final i in payload) {'product_id': i.productId, 'quantity': i.quantity},
         ],
+        'add_to_existing': addToExisting,
       }) as Map<String, dynamic>;
       state = state.copyWith(
         status: OnboardingStatus.done,
