@@ -234,12 +234,18 @@ class AppLocalizationsTe extends AppLocalizations {
   String get accountErrUsernameMin3 => 'యూజర్‌నేమ్ కనీసం 3 అక్షరాలు ఉండాలి';
 
   @override
+  String get accountErrUsernameMax30 => 'Username can be at most 30 characters';
+
+  @override
   String get accountErrUsernameChars =>
       'అక్షరాలు, సంఖ్యలు మరియు అండర్‌స్కోర్‌లు మాత్రమే అనుమతించబడతాయి';
 
   @override
   String get accountErrUsernameTakenTry =>
       'ఆ యూజర్‌నేమ్ తీసుకోబడింది. మరొకటి ప్రయత్నించండి.';
+
+  @override
+  String get accountUsernameAvailable => 'Username is available';
 
   @override
   String get businessTitle => 'మీ దుకాణం గురించి\nమాకు చెప్పండి';

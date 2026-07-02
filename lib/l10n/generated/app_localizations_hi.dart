@@ -233,12 +233,18 @@ class AppLocalizationsHi extends AppLocalizations {
       'यूज़रनेम कम से कम 3 अक्षरों का होना चाहिए';
 
   @override
+  String get accountErrUsernameMax30 => 'Username can be at most 30 characters';
+
+  @override
   String get accountErrUsernameChars =>
       'केवल अक्षर, संख्याएँ और अंडरस्कोर की अनुमति है';
 
   @override
   String get accountErrUsernameTakenTry =>
       'वह यूज़रनेम लिया जा चुका है। दूसरा आज़माएँ।';
+
+  @override
+  String get accountUsernameAvailable => 'Username is available';
 
   @override
   String get businessTitle => 'अपनी दुकान के बारे में\nहमें बताएँ';

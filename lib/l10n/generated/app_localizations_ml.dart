@@ -237,12 +237,18 @@ class AppLocalizationsMl extends AppLocalizations {
       'ഉപയോക്തൃനാമം കുറഞ്ഞത് 3 പ്രതീകങ്ങൾ ഉണ്ടായിരിക്കണം';
 
   @override
+  String get accountErrUsernameMax30 => 'Username can be at most 30 characters';
+
+  @override
   String get accountErrUsernameChars =>
       'അക്ഷരങ്ങൾ, അക്കങ്ങൾ, അണ്ടർസ്കോറുകൾ മാത്രമേ അനുവദിക്കൂ';
 
   @override
   String get accountErrUsernameTakenTry =>
       'ആ ഉപയോക്തൃനാമം എടുത്തിട്ടുണ്ട്. മറ്റൊന്ന് ശ്രമിക്കുക.';
+
+  @override
+  String get accountUsernameAvailable => 'Username is available';
 
   @override
   String get businessTitle => 'നിങ്ങളുടെ കടയെക്കുറിച്ച്\nഞങ്ങളോട് പറയുക';

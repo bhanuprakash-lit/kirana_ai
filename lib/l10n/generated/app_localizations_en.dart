@@ -219,7 +219,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountUsernameRules =>
-      'Letters, numbers, underscores only • min 3 chars';
+      '3–30 characters • letters, numbers and underscores only';
 
   @override
   String get accountErrChooseUsername =>
@@ -229,12 +229,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountErrUsernameMin3 => 'Username must be at least 3 characters';
 
   @override
+  String get accountErrUsernameMax30 => 'Username can be at most 30 characters';
+
+  @override
   String get accountErrUsernameChars =>
       'Only letters, numbers, and underscores allowed';
 
   @override
   String get accountErrUsernameTakenTry =>
       'That username is taken. Try another.';
+
+  @override
+  String get accountUsernameAvailable => 'Username is available';
 
   @override
   String get businessTitle => 'Tell us about\nyour store';

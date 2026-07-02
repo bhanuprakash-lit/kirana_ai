@@ -489,7 +489,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountUsernameRules.
   ///
   /// In en, this message translates to:
-  /// **'Letters, numbers, underscores only • min 3 chars'**
+  /// **'3–30 characters • letters, numbers and underscores only'**
   String get accountUsernameRules;
 
   /// No description provided for @accountErrChooseUsername.
@@ -504,6 +504,12 @@ abstract class AppLocalizations {
   /// **'Username must be at least 3 characters'**
   String get accountErrUsernameMin3;
 
+  /// No description provided for @accountErrUsernameMax30.
+  ///
+  /// In en, this message translates to:
+  /// **'Username can be at most 30 characters'**
+  String get accountErrUsernameMax30;
+
   /// No description provided for @accountErrUsernameChars.
   ///
   /// In en, this message translates to:
@@ -515,6 +521,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That username is taken. Try another.'**
   String get accountErrUsernameTakenTry;
+
+  /// No description provided for @accountUsernameAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Username is available'**
+  String get accountUsernameAvailable;
 
   /// No description provided for @businessTitle.
   ///

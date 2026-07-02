@@ -238,12 +238,18 @@ class AppLocalizationsTa extends AppLocalizations {
       'பயனர்பெயர் குறைந்தபட்சம் 3 எழுத்துகள் இருக்க வேண்டும்';
 
   @override
+  String get accountErrUsernameMax30 => 'Username can be at most 30 characters';
+
+  @override
   String get accountErrUsernameChars =>
       'எழுத்துகள், எண்கள் மற்றும் அடிக்கோடுகள் மட்டுமே அனுமதிக்கப்படும்';
 
   @override
   String get accountErrUsernameTakenTry =>
       'அந்த பயனர்பெயர் எடுக்கப்பட்டது. வேறொன்றை முயற்சிக்கவும்.';
+
+  @override
+  String get accountUsernameAvailable => 'Username is available';
 
   @override
   String get businessTitle => 'உங்கள் கடையைப் பற்றி\nஎங்களிடம் கூறுங்கள்';

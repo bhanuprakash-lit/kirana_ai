@@ -234,12 +234,18 @@ class AppLocalizationsKn extends AppLocalizations {
   String get accountErrUsernameMin3 => 'ಬಳಕೆದಾರಹೆಸರು ಕನಿಷ್ಠ 3 ಅಕ್ಷರಗಳಾಗಿರಬೇಕು';
 
   @override
+  String get accountErrUsernameMax30 => 'Username can be at most 30 characters';
+
+  @override
   String get accountErrUsernameChars =>
       'ಅಕ್ಷರಗಳು, ಸಂಖ್ಯೆಗಳು ಮತ್ತು ಅಂಡರ್‌ಸ್ಕೋರ್‌ಗಳು ಮಾತ್ರ ಅನುಮತಿ';
 
   @override
   String get accountErrUsernameTakenTry =>
       'ಆ ಬಳಕೆದಾರಹೆಸರು ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ. ಬೇರೆಯದನ್ನು ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get accountUsernameAvailable => 'Username is available';
 
   @override
   String get businessTitle => 'ನಿಮ್ಮ ಅಂಗಡಿಯ ಬಗ್ಗೆ\nನಮಗೆ ತಿಳಿಸಿ';

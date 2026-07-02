@@ -13,6 +13,7 @@ import '../../../../shared/widgets/primary_button.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../../support/providers/notification_provider.dart';
 import '../../providers/onboarding_provider.dart';
+import '../../utils/username_validator.dart';
 
 enum _AccountStep { enterPhone, enterOtp, chooseUsername }
 
@@ -48,6 +49,9 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   // Username availability check
   bool? _usernameAvailable;
   bool _checkingUsername = false;
+  // Local (format) validity, updated live so the user gets instant feedback
+  // before we ever hit the availability endpoint.
+  UsernameStatus _usernameStatus = UsernameStatus.empty;
 
   /// Locale-resolved strings for use in async callbacks where reaching for
   /// BuildContext after an await would be unsafe.
@@ -204,10 +208,82 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   // ── Username ───────────────────────────────────────────────────────────────
 
   void _onUsernameChanged() {
-    setState(() => _usernameAvailable = null);
-    final uname = _usernameCtrl.text.trim();
-    if (uname.length < 3) return;
-    _debounceCheck(uname);
+    final status = UsernameRules.evaluate(_usernameCtrl.text);
+    setState(() {
+      _usernameStatus = status;
+      _usernameAvailable = null; // availability only matters once format is valid
+      _error = null;
+    });
+    // Only spend a network round-trip once the username is well-formed.
+    if (status == UsernameStatus.valid) {
+      _debounceCheck(_usernameCtrl.text.trim());
+    }
+  }
+
+  /// Message for a local (format) problem, or null when the username is well-formed.
+  String? _usernameFormatError(UsernameStatus s) {
+    switch (s) {
+      case UsernameStatus.empty:
+        return _l10n.accountErrChooseUsername;
+      case UsernameStatus.tooShort:
+        return _l10n.accountErrUsernameMin3;
+      case UsernameStatus.tooLong:
+        return _l10n.accountErrUsernameMax30;
+      case UsernameStatus.invalidChars:
+        return _l10n.accountErrUsernameChars;
+      case UsernameStatus.valid:
+        return null;
+    }
+  }
+
+  /// Trailing icon: spinner while checking, green tick when available, red cross
+  /// when taken OR locally malformed (bad chars / too long).
+  Widget? _usernameSuffix() {
+    if (_checkingUsername) {
+      return const SizedBox(
+        width: 18,
+        height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+    if (_usernameAvailable == true) {
+      return const Icon(Icons.check_circle_rounded,
+          color: BrandColors.success, size: 20);
+    }
+    if (_usernameAvailable == false ||
+        _usernameStatus == UsernameStatus.invalidChars ||
+        _usernameStatus == UsernameStatus.tooLong) {
+      return const Icon(Icons.cancel_rounded, color: BrandColors.error, size: 20);
+    }
+    return null;
+  }
+
+  /// Inline helper line under the field — instant format feedback as the owner
+  /// types, before/independent of the availability round-trip.
+  List<Widget> _usernameInlineHint(AppLocalizations l10n) {
+    String? text;
+    Color color = BrandColors.error;
+    if (_usernameAvailable == true) {
+      text = l10n.accountUsernameAvailable;
+      color = BrandColors.success;
+    } else if (_usernameAvailable == false) {
+      text = l10n.accountUsernameTaken;
+    } else if (_usernameStatus == UsernameStatus.invalidChars) {
+      text = l10n.accountErrUsernameChars;
+    } else if (_usernameStatus == UsernameStatus.tooLong) {
+      text = l10n.accountErrUsernameMax30;
+    } else if (_usernameStatus == UsernameStatus.tooShort) {
+      // Gentle nudge mid-typing rather than a hard error.
+      text = l10n.accountErrUsernameMin3;
+      color = BrandColors.muted;
+    }
+    if (text == null) return const [];
+    return [
+      Padding(
+        padding: const EdgeInsets.only(top: 6, left: 4),
+        child: Text(text, style: TextStyle(fontSize: 12, color: color)),
+      ),
+    ];
   }
 
   DateTime _lastCheck = DateTime(0);
@@ -230,16 +306,9 @@ class _AccountStepState extends ConsumerState<AccountStep> {
   void _submitUsername() {
     FocusScope.of(context).unfocus();
     final uname = _usernameCtrl.text.trim();
-    if (uname.isEmpty) {
-      setState(() => _error = _l10n.accountErrChooseUsername);
-      return;
-    }
-    if (uname.length < 3) {
-      setState(() => _error = _l10n.accountErrUsernameMin3);
-      return;
-    }
-    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(uname)) {
-      setState(() => _error = _l10n.accountErrUsernameChars);
+    final formatError = _usernameFormatError(UsernameRules.evaluate(uname));
+    if (formatError != null) {
+      setState(() => _error = formatError);
       return;
     }
     if (_usernameAvailable == false) {
@@ -476,35 +545,10 @@ class _AccountStepState extends ConsumerState<AccountStep> {
             FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]')),
             LengthLimitingTextInputFormatter(30),
           ],
-          suffix: _checkingUsername
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : _usernameAvailable == true
-              ? const Icon(
-                  Icons.check_circle_rounded,
-                  color: BrandColors.success,
-                  size: 20,
-                )
-              : _usernameAvailable == false
-              ? const Icon(
-                  Icons.cancel_rounded,
-                  color: BrandColors.error,
-                  size: 20,
-                )
-              : null,
+          suffix: _usernameSuffix(),
         ).animate(delay: 100.ms).fadeIn().slideY(begin: 0.1, end: 0),
 
-        if (_usernameAvailable == false)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 4),
-            child: Text(
-              l10n.accountUsernameTaken,
-              style: const TextStyle(fontSize: 12, color: BrandColors.error),
-            ),
-          ),
+        ..._usernameInlineHint(l10n),
 
         if (_error != null) ...[
           const SizedBox(height: 10),
