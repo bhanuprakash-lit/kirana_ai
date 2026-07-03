@@ -27,7 +27,9 @@ class AttributeDef {
 
   factory AttributeDef.fromJson(Map<String, dynamic> j) {
     final raw = j['options'];
-    final opts = raw is List ? raw.map((e) => e.toString()).toList() : const <String>[];
+    final opts = raw is List
+        ? raw.map((e) => e.toString()).toList()
+        : const <String>[];
     return AttributeDef(
       attrCode: (j['attr_code'] ?? '').toString(),
       label: (j['label'] ?? j['attr_code'] ?? '').toString(),
@@ -69,8 +71,9 @@ class ProductVariant {
   /// Human label, e.g. "M · Blue". Empty for the implicit variant.
   String get label => attributes.values.where((v) => v.isNotEmpty).join(' · ');
 
-  static double? _num(dynamic v) =>
-      v == null ? null : (v is num ? v.toDouble() : double.tryParse(v.toString()));
+  static double? _num(dynamic v) => v == null
+      ? null
+      : (v is num ? v.toDouble() : double.tryParse(v.toString()));
 
   factory ProductVariant.fromJson(Map<String, dynamic> j) {
     final rawAttrs = j['attributes'];

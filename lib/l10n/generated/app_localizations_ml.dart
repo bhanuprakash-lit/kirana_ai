@@ -237,12 +237,19 @@ class AppLocalizationsMl extends AppLocalizations {
       'ഉപയോക്തൃനാമം കുറഞ്ഞത് 3 പ്രതീകങ്ങൾ ഉണ്ടായിരിക്കണം';
 
   @override
+  String get accountErrUsernameMax30 =>
+      'ഉപയോക്തൃനാമം പരമാവധി 30 അക്ഷരങ്ങൾ വരെയാകാം';
+
+  @override
   String get accountErrUsernameChars =>
       'അക്ഷരങ്ങൾ, അക്കങ്ങൾ, അണ്ടർസ്കോറുകൾ മാത്രമേ അനുവദിക്കൂ';
 
   @override
   String get accountErrUsernameTakenTry =>
       'ആ ഉപയോക്തൃനാമം എടുത്തിട്ടുണ്ട്. മറ്റൊന്ന് ശ്രമിക്കുക.';
+
+  @override
+  String get accountUsernameAvailable => 'ഉപയോക്തൃനാമം ലഭ്യമാണ്';
 
   @override
   String get businessTitle => 'നിങ്ങളുടെ കടയെക്കുറിച്ച്\nഞങ്ങളോട് പറയുക';
@@ -327,9 +334,6 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get businessTypeFruitsVeg => 'പഴങ്ങൾ & പച്ചക്കറികൾ';
-
-  @override
-  String get businessTypePharmacy => 'മെഡിക്കൽ / ഫാർമസി';
 
   @override
   String get businessTypeStationery => 'സ്റ്റേഷനറി & പുസ്തകങ്ങൾ';
@@ -441,7 +445,7 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get consentPrivacySummary =>
-      'നിങ്ങളുടെ അനുഭവം വ്യക്തിഗതമാക്കാൻ ഞങ്ങൾ നിങ്ങളുടെ സ്റ്റോർ വിശദാംശങ്ങൾ, ലൊക്കേഷൻ, ഇടപാട് ഡാറ്റ എന്നിവ ശേഖരിക്കുന്നു. നിങ്ങളുടെ വ്യക്തിഗത ഡാറ്റ ഞങ്ങൾ ഒരിക്കലും മൂന്നാം കക്ഷികൾക്ക് വിൽക്കില്ല. എല്ലാ ഡാറ്റയും എൻക്രിപ്റ്റ് ചെയ്ത് Firebase ഇൻഫ്രാസ്ട്രക്ചറിൽ സുരക്ഷിതമായി സംഭരിക്കുന്നു.';
+      'നിങ്ങളുടെ അനുഭവം വ്യക്തിഗതമാക്കാൻ ഞങ്ങൾ നിങ്ങളുടെ സ്റ്റോർ വിശദാംശങ്ങൾ, ലൊക്കേഷൻ, ഇടപാട് ഡാറ്റ എന്നിവ ശേഖരിക്കുന്നു. നിങ്ങളുടെ വ്യക്തിഗത ഡാറ്റ ഞങ്ങൾ ഒരിക്കലും മൂന്നാം കക്ഷികൾക്ക് വിൽക്കില്ല. എല്ലാ ഡാറ്റയും എൻക്രിപ്റ്റ് ചെയ്ത് ഞങ്ങളുടെ ക്ലൗഡ് ഇൻഫ്രാസ്ട്രക്ചറിൽ സുരക്ഷിതമായി സംഭരിക്കുന്നു.';
 
   @override
   String get consentTermsCheckPrefix => 'ഞാൻ വായിച്ച് സമ്മതിക്കുന്നു ';
@@ -496,6 +500,10 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get dashTrialRequestBasic => 'Basic ട്രയൽ അഭ്യർത്ഥിക്കുക';
+
+  @override
+  String get dashTrialRequestError =>
+      'ഇപ്പോൾ നിങ്ങളുടെ ട്രയൽ ആരംഭിക്കാനായില്ല. ദയവായി നിങ്ങളുടെ കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.';
 
   @override
   String get dashTrialSignInDifferent =>
@@ -1812,6 +1820,19 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get invHsnCode => 'HSN കോഡ്';
+
+  @override
+  String get invWarranty => 'വാറന്റി';
+
+  @override
+  String get invWarrantyCovered => 'വാറന്റിയിൽ ഉൾപ്പെടുന്നു';
+
+  @override
+  String get invWarrantyCoveredSub =>
+      'എത്ര കാലം എന്ന് സജ്ജമാക്കുക — വാങ്ങിയ തീയതി മുതൽ കണക്കാക്കുന്നു';
+
+  @override
+  String get invWarrantyPeriod => 'വാറന്റി കാലയളവ്';
 
   @override
   String invStockInUnit(String unit) {
@@ -5110,6 +5131,13 @@ class AppLocalizationsMl extends AppLocalizations {
       'സ്കാൻ പരാജയപ്പെട്ടു. ദയവായി വീണ്ടും ഫോട്ടോ എടുക്കുക.';
 
   @override
+  String get visionStillProcessing =>
+      'നിങ്ങളുടെ ഫോട്ടോകൾ വിശകലനം ചെയ്യുന്നു — ഇതിന് കുറച്ച് മിനിറ്റ് എടുത്തേക്കാം. തയ്യാറാകുമ്പോൾ ഫലം ഇവിടെ കാണിക്കും.';
+
+  @override
+  String get visionCheckAgain => 'വീണ്ടും പരിശോധിക്കുക';
+
+  @override
   String get visionNoPhotoYet => 'ഇതുവരെ ഫോട്ടോ എടുത്തിട്ടില്ല.';
 
   @override
@@ -5171,6 +5199,206 @@ class AppLocalizationsMl extends AppLocalizations {
       'ബില്ലിംഗ് കൗണ്ടറിലേക്ക് നിങ്ങളുടെ ഫോൺ ചൂണ്ടൂ, സാധനങ്ങൾ കടന്നുപോകുമ്പോൾ വിൽപ്പന സ്വയമേവ എണ്ണപ്പെടും. ഞങ്ങൾ ഇതിന് അവസാന മിനുക്കുപണികൾ നടത്തുകയാണ്.';
 
   @override
+  String get visionCounterStartTitle => 'ലൈവ് സെയിൽ കൗണ്ടർ';
+
+  @override
+  String get visionCounterStartDesc =>
+      'നിങ്ങളുടെ ഫോൺ ബില്ലിംഗ് കൗണ്ടറിന് നേരെ പിടിക്കുക. ലൈൻ കടക്കുന്ന വസ്തുക്കൾ സ്വയമേവ എണ്ണപ്പെടും — ബാർകോഡ് സ്കാനിംഗ് ഇല്ല.';
+
+  @override
+  String get visionCounterStart => 'എണ്ണം ആരംഭിക്കുക';
+
+  @override
+  String get visionCounterFinish => 'പൂർത്തിയാക്കുക';
+
+  @override
+  String get visionCounterPause => 'താൽക്കാലികമായി നിർത്തുക';
+
+  @override
+  String get visionCounterResume => 'തുടരുക';
+
+  @override
+  String get visionCounterUndo => 'പഴയപടിയാക്കുക';
+
+  @override
+  String get visionCounterFlip => 'വശം മാറ്റുക';
+
+  @override
+  String get visionCounterCounted => 'എണ്ണി';
+
+  @override
+  String get visionCounterNothingYet =>
+      'വസ്തുക്കൾ എണ്ണാൻ അവയെ ലൈനിന് കുറുകെ നീക്കുക.';
+
+  @override
+  String get visionCounterHint =>
+      'പച്ച മേഖലയിലേക്ക് കടക്കുന്ന വസ്തുക്കൾ വിറ്റതായി എണ്ണപ്പെടും.';
+
+  @override
+  String get visionCounterZoneStore => 'സ്റ്റോറിൽ';
+
+  @override
+  String get visionCounterZoneSold => 'വിറ്റു';
+
+  @override
+  String get visionCounterModelMissingTitle =>
+      'കൗണ്ടർ മോഡൽ ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ല';
+
+  @override
+  String get visionCounterModelMissingDesc =>
+      'ഓൺ-ഡിവൈസ് എണ്ണൽ മോഡൽ ഈ ബിൽഡിൽ ഇതുവരെ ഉൾപ്പെടുത്തിയിട്ടില്ല. ഇത് ഒരു അപ്ഡേറ്റിൽ വരുന്നു — ഷെൽഫ് സ്കാനിംഗ് ഇപ്പോഴും പ്രവർത്തിക്കുന്നു.';
+
+  @override
+  String get visionCounterPermTitle => 'ക്യാമറ ആക്സസ് ആവശ്യമാണ്';
+
+  @override
+  String get visionCounterPermDesc =>
+      'ബില്ലിംഗ് കൗണ്ടറിൽ വസ്തുക്കൾ എണ്ണാൻ ക്യാമറ ആക്സസ് അനുവദിക്കുക.';
+
+  @override
+  String get visionCounterGrant => 'ക്യാമറ അനുവദിക്കുക';
+
+  @override
+  String get visionCounterOpenSettings => 'ക്രമീകരണങ്ങൾ തുറക്കുക';
+
+  @override
+  String get visionCounterFinishConfirmTitle => 'എണ്ണം പൂർത്തിയാക്കണോ?';
+
+  @override
+  String get visionCounterFinishConfirmDesc =>
+      'ഞങ്ങൾ ഇന്നത്തെ എണ്ണം സംരക്ഷിച്ച് നിങ്ങളുടെ കൗണ്ടർ സംഗ്രഹത്തിലേക്ക് ചേർക്കും.';
+
+  @override
+  String get visionCounterSave => 'എണ്ണം സംരക്ഷിക്കുക';
+
+  @override
+  String get visionCounterDiscard => 'ഉപേക്ഷിക്കുക';
+
+  @override
+  String get visionCounterKeepCounting => 'എണ്ണം തുടരുക';
+
+  @override
+  String get visionCounterSavedTitle => 'എണ്ണം സംരക്ഷിച്ചു';
+
+  @override
+  String visionCounterSaved(int count, int skus) {
+    return '$skus ഉൽപ്പന്നങ്ങളിലായി $count വസ്തുക്കൾ സംരക്ഷിച്ചു.';
+  }
+
+  @override
+  String get visionCounterOfflineNote =>
+      'നിങ്ങളുടെ ഫോണിൽ സംരക്ഷിച്ചു. കൗണ്ടർ സേവനം ലഭ്യമാകുമ്പോൾ ഇത് സിങ്ക് ചെയ്യും.';
+
+  @override
+  String visionCounterPending(int count) {
+    return '$count ഇതുവരെ സിങ്ക് ചെയ്തിട്ടില്ല';
+  }
+
+  @override
+  String get visionCounterSummaryTitle => 'ഇന്നത്തെ കൗണ്ടർ എണ്ണം';
+
+  @override
+  String get visionCounterSummaryEmpty =>
+      'ഇന്ന് ഒരു വസ്തുവും എണ്ണിയിട്ടില്ല. ആരംഭിക്കാൻ \'എണ്ണം ആരംഭിക്കുക\' ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get visionCounterSummaryTotal => 'ഇന്ന് ആകെ എണ്ണിയത്';
+
+  @override
+  String get visionCounterUnknownItem => 'തിരിച്ചറിയാത്ത ഉൽപ്പന്നം';
+
+  @override
+  String get onbCtaTitle => 'നൂറുകണക്കിന് വസ്തുക്കൾ ഉണ്ടോ?';
+
+  @override
+  String get onbCtaSubtitle =>
+      'നിങ്ങളുടെ ഷെൽഫുകൾ ഫോട്ടോ എടുക്കുക, ഞങ്ങൾ ഉൽപ്പന്നങ്ങൾ തിരിച്ചറിഞ്ഞ് നിങ്ങളുടെ ഇൻവെന്ററിയിലേക്ക് ചേർക്കും — ഓരോന്നും സ്കാൻ ചെയ്യേണ്ട ആവശ്യമില്ല.';
+
+  @override
+  String get onbCtaButton => 'നിങ്ങളുടെ ഷെൽഫുകൾ ഫോട്ടോ എടുക്കുക';
+
+  @override
+  String get onbCaptureTitle => 'നിങ്ങളുടെ ഷെൽഫുകൾ ഫോട്ടോ എടുക്കുക';
+
+  @override
+  String get onbCaptureHint =>
+      'നിങ്ങളുടെ എല്ലാ ഷെൽഫുകളും ഉൾക്കൊള്ളുന്ന 3 മുതൽ 10 വരെ വ്യക്തമായ ഫോട്ടോകൾ എടുക്കുക. നല്ല വെളിച്ചം കൂടുതൽ ഉൽപ്പന്നങ്ങൾ തിരിച്ചറിയാൻ സഹായിക്കുന്നു.';
+
+  @override
+  String get onbTakePhoto => 'ഫോട്ടോ എടുക്കുക';
+
+  @override
+  String onbPhotosProgress(int count) {
+    return '10-ൽ $count ഫോട്ടോകൾ';
+  }
+
+  @override
+  String get onbMinPhotos => 'കുറഞ്ഞത് 3 ഫോട്ടോകൾ ചേർക്കുക';
+
+  @override
+  String get onbAnalyze => 'ഉൽപ്പന്നങ്ങൾ തിരിച്ചറിയുക';
+
+  @override
+  String get onbProcessingTitle =>
+      'ഞങ്ങൾ നിങ്ങളുടെ ഷെൽഫ് ഫോട്ടോകൾ അവലോകനം ചെയ്യുന്നു';
+
+  @override
+  String get onbProcessingDesc =>
+      'ഞങ്ങളുടെ സിസ്റ്റം നിങ്ങളുടെ ഷെൽഫിലെ ഉൽപ്പന്നങ്ങൾ തിരിച്ചറിയുന്നു. ഇതിന് സാധാരണയായി ഒരു മിനിറ്റിൽ താഴെ സമയമെടുക്കും. ദയവായി ഈ സ്ക്രീൻ തുറന്നിടുക — ഞങ്ങൾ ഫലങ്ങൾ ഉടൻ ഇവിടെ കാണിക്കും.';
+
+  @override
+  String get onbReviewTitle => 'നിങ്ങളുടെ സ്റ്റോക്ക് സ്ഥിരീകരിക്കുക';
+
+  @override
+  String get onbReviewDisclaimer =>
+      'ഇവ നിങ്ങളുടെ ഫോട്ടോകളിൽ നിന്ന് ഞങ്ങൾ തിരിച്ചറിഞ്ഞ ഉൽപ്പന്നങ്ങളാണ്. ഞങ്ങൾ ചിലപ്പോൾ ഒരു വസ്തു നഷ്ടപ്പെടുത്തുകയോ തെറ്റായി വായിക്കുകയോ ചെയ്യാം, അതിനാൽ ദയവായി അളവുകൾ ക്രോസ്-ചെക്ക് ചെയ്ത് ക്രമീകരിക്കുക. ഞങ്ങൾ തുടർച്ചയായി ഞങ്ങളുടെ കൃത്യത മെച്ചപ്പെടുത്തുന്നു.';
+
+  @override
+  String onbReviewSummary(int mapped, int unmapped) {
+    return '$mapped തയ്യാർ · $unmapped എണ്ണത്തിന് ഉൽപ്പന്നം വേണം';
+  }
+
+  @override
+  String get onbUnrecognised =>
+      'തിരിച്ചറിഞ്ഞില്ല — ഒരു ഉൽപ്പന്നം തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get onbChooseProduct => 'ഉൽപ്പന്നം തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get onbQuantity => 'എണ്ണം';
+
+  @override
+  String get onbCommit => 'എന്റെ ഇൻവെന്ററിയിലേക്ക് ചേർക്കുക';
+
+  @override
+  String get onbCommitting => 'നിങ്ങളുടെ ഇൻവെന്ററിയിലേക്ക് ചേർക്കുന്നു…';
+
+  @override
+  String get onbDoneTitle => 'സ്റ്റോക്ക് ചേർത്തു';
+
+  @override
+  String onbDoneDesc(int products, int units) {
+    return '$products ഉൽപ്പന്നങ്ങൾ ($units വസ്തുക്കൾ) നിങ്ങളുടെ ഇൻവെന്ററിയിലേക്ക് ചേർത്തു. ഇൻവെന്ററി ടാബിൽ നിന്ന് എപ്പോൾ വേണമെങ്കിലും വിലകൾ സജ്ജമാക്കാം.';
+  }
+
+  @override
+  String get onbEmptyDetected =>
+      'ഈ ഫോട്ടോകളിൽ ഞങ്ങൾക്ക് ഉൽപ്പന്നങ്ങൾ തിരിച്ചറിയാനായില്ല. ദയവായി നല്ല വെളിച്ചത്തിൽ, പാക്കേജിംഗ് വ്യക്തമായി കാണിച്ച് വീണ്ടും ഫോട്ടോ എടുക്കുക.';
+
+  @override
+  String get onbRetake => 'ഫോട്ടോകൾ വീണ്ടും എടുക്കുക';
+
+  @override
+  String get onbFailedTitle => 'ഞങ്ങൾക്ക് പൂർത്തിയാക്കാനായില്ല';
+
+  @override
+  String get onbDone => 'പൂർത്തിയായി';
+
+  @override
+  String get onbRemove => 'നീക്കം ചെയ്യുക';
+
+  @override
   String get visionAddPhotosTitle => 'ഷെൽഫ് ഫോട്ടോകൾ ചേർക്കുക';
 
   @override
@@ -5185,4 +5413,71 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get visionAnalyze => 'വിശകലനം ചെയ്യുക';
+
+  @override
+  String get forecastSectionLabel => 'വിൽപ്പന പ്രവചനം';
+
+  @override
+  String forecastStripCount(int count) {
+    return 'നാളെ $count സാധനങ്ങൾ വിൽക്കപ്പെടാം';
+  }
+
+  @override
+  String forecastStripEst(String amount) {
+    return 'ഏകദേശം $amount';
+  }
+
+  @override
+  String get forecastStripViewAll => 'മുഴുവൻ ലിസ്റ്റ് കാണുക';
+
+  @override
+  String get forecastScreenTitle => 'വിൽപ്പന പ്രവചനം';
+
+  @override
+  String get forecastHorizonTomorrow => 'നാളെ';
+
+  @override
+  String get forecastHorizon3d => '3 ദിവസം';
+
+  @override
+  String get forecastHorizon5d => '5 ദിവസം';
+
+  @override
+  String get forecastHorizon7d => '7 ദിവസം';
+
+  @override
+  String get forecastHorizon14d => '14 ദിവസം';
+
+  @override
+  String get forecastHorizon30d => '30 ദിവസം';
+
+  @override
+  String get forecastRevLabel => 'ഏകദേശ വരുമാനം';
+
+  @override
+  String get forecastOosWarning => 'സ്റ്റോക്ക് തീർന്നേക്കാം';
+
+  @override
+  String get forecastWhyTitle => 'ഇത് ഇവിടെ ഉള്ളത് എന്തുകൊണ്ട്?';
+
+  @override
+  String get forecastWhyAvgDaily => 'ദൈനംദിന ശരാശരി വിൽപ്പന';
+
+  @override
+  String get forecastWhyStockDays => 'ബാക്കി സ്റ്റോക്ക്';
+
+  @override
+  String get forecastWhyOosRisk => 'തീർന്നു പോകാൻ ഉള്ള സാധ്യത';
+
+  @override
+  String forecastWhyExplain(String avg, String days, String units) {
+    return 'ഈ സാധനം ദിവസവും ശരാശരി $avg പീസ് വിൽക്കുന്നു. $days ദിവസത്തിൽ, നിങ്ങളുടെ കടയിൽ നിന്ന് ഏകദേശം $units പീസ് വിൽക്കപ്പെടും എന്ന് പ്രതീക്ഷിക്കുന്നു.';
+  }
+
+  @override
+  String get forecastNoData =>
+      'പ്രവചനം ഇനിയും തയ്യാറായിട്ടില്ല. ദയവായി പിന്നീട് നോക്കുക.';
+
+  @override
+  String get forecastDataStale => 'ഡേറ്റ പഴകിയിരിക്കാം';
 }

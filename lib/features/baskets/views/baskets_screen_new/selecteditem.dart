@@ -22,4 +22,3 @@ class _SelectedItem {
 
   void dispose() => qtyCtrl.dispose();
 }
-

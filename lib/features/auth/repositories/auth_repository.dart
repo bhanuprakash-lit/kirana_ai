@@ -91,11 +91,21 @@ class AuthRepository {
   /// baked-in store_id (POS rejects mismatched store_id), so after switching the
   /// active store we must refresh it — otherwise billing/stock 403 or show the
   /// old store. Safe no-op if there's no kirana token.
+  ///
+  /// Prefer [setPosToken] when the caller already has a fresh token (e.g.
+  /// /kirana/stores/switch now mints one inline) — this method exists for
+  /// callers that don't, and costs an extra round trip to /pos/token-from-kirana.
   Future<void> refreshPosToken() async {
     final kiranaToken = await _storage.read(key: _tokenKey);
     if (kiranaToken == null || kiranaToken.isEmpty) return;
     await _obtainPosTokenFromKirana(kiranaToken);
   }
+
+  /// Store a POS JWT the caller already obtained (e.g. returned inline by
+  /// /kirana/stores/switch or /stores/add) — avoids the extra round trip
+  /// that [refreshPosToken] would otherwise make to mint the same token.
+  Future<void> setPosToken(String token) =>
+      _storage.write(key: _posTokenKey, value: token);
 
   Future<void> _obtainPosTokenFromKirana(String kiranaToken) async {
     try {

@@ -174,7 +174,8 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     // Tag the new category with the store's vertical so it only shows for this
     // vertical (a mobile store's category won't leak into a grocery store).
     final vc =
-        ref.read(verticalConfigProvider).asData?.value.verticalCode ?? 'grocery';
+        ref.read(verticalConfigProvider).asData?.value.verticalCode ??
+        'grocery';
     try {
       await client.postOltp('category', {
         'name': name,
@@ -209,6 +210,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     List<Map<String, dynamic>>? variants,
     double? gstRate,
     String? hsnCode,
+    int? warrantyMonths,
   }) async {
     final params = <String, dynamic>{
       'name': name,
@@ -229,6 +231,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       'variants': variants,
       'gstRate': gstRate,
       'hsnCode': hsnCode,
+      'warrantyMonths': warrantyMonths,
     };
 
     final categoryName = state.value?.categories
@@ -357,7 +360,20 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
         try {
           await client.post('/kirana/products/$productId/tax', {
             'gst_rate': gstRate,
-            'hsn_code': (hsnCode != null && hsnCode.isNotEmpty) ? hsnCode : null,
+            'hsn_code': (hsnCode != null && hsnCode.isNotEmpty)
+                ? hsnCode
+                : null,
+          });
+        } catch (_) {}
+      }
+
+      // Tester #11 — per-product warranty length (months). Drives the
+      // warranty-until derivation at sale time.
+      final warrantyMonths = p['warrantyMonths'] as int?;
+      if (warrantyMonths != null && warrantyMonths > 0) {
+        try {
+          await client.post('/kirana/products/$productId/warranty', {
+            'warranty_months': warrantyMonths,
           });
         } catch (_) {}
       }
@@ -432,7 +448,11 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
     required String name,
     required int categoryId,
     required double sellingPrice,
-    required double stockQuantity,
+    // Null for products with real (non-implicit) variants — their stock is
+    // tracked per-variant, and (store_id, product_id) alone no longer
+    // identifies a single inventory row, so writing here would either hit
+    // the backend's 409 ambiguous-row guard or clobber the wrong variant.
+    double? stockQuantity,
     String? brand,
     String? unit,
     double? weight,
@@ -480,14 +500,15 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
             'product_id': productId.toString(),
           },
         ),
-        client.patchOltp(
-          'inventory',
-          {'quantity': stockQuantity},
-          filters: {
-            'store_id': storeId.toString(),
-            'product_id': productId.toString(),
-          },
-        ),
+        if (stockQuantity != null)
+          client.patchOltp(
+            'inventory',
+            {'quantity': stockQuantity},
+            filters: {
+              'store_id': storeId.toString(),
+              'product_id': productId.toString(),
+            },
+          ),
       ]);
       // Refresh in the background — don't block the UI dismiss. If the device
       // is on a flaky network, awaiting refresh() could hang one of the 5

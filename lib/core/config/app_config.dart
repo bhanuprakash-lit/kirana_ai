@@ -10,7 +10,19 @@ class AppConfig {
 
   static Stream<int> get changes => _urlChanges.stream;
 
-  /// Platform-appropriate fallback used when Remote Config has no value.
+  /// Which environment this build targets, set via `--dart-define=ENV=...`.
+  /// Determines which Remote Config key is fetched (`backend_url_<env>`).
+  /// One of: local, dev, prod. Defaults to local for plain `flutter run`.
+  static const String env = String.fromEnvironment(
+    'ENV',
+    defaultValue: 'dev',
+  );
+
+  /// Remote Config parameter name this build reads its backend URL from.
+  static String get remoteConfigKey => 'backend_url_$env';
+
+  /// Platform-appropriate fallback when running locally with no Remote
+  /// Config reachable yet (e.g. first launch, offline).
   static String get devBaseUrl {
     if (kIsWeb) return 'http://127.0.0.1:9000';
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -19,9 +31,22 @@ class AppConfig {
     return 'http://127.0.0.1:9000';
   }
 
+  /// Hardcoded fallback per env, used as the Remote Config default value
+  /// until the real value is fetched from Firebase (source of truth).
+  static String get defaultBaseUrl {
+    switch (env) {
+      case 'dev':
+        return 'https://ca-lohiya-outlet.purpleglacier-c71fadea.centralindia.azurecontainerapps.io';
+      case 'prod':
+        return 'https://ca-lohiya-outlet-uat.ambitiouspond-d8177a23.centralindia.azurecontainerapps.io';
+      default:
+        return devBaseUrl;
+    }
+  }
+
   static String get baseUrl {
     final remote = _sanitize(_remoteUrl);
-    return remote ?? devBaseUrl;
+    return remote ?? defaultBaseUrl;
   }
 
   static String get apiBaseUrl => baseUrl;

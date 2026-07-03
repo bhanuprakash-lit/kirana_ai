@@ -160,7 +160,7 @@ void setPendingNavigation(Map<String, String> nav) {
 
 Map<String, String> _navFromData(Map<String, dynamic> data) {
   final out = <String, String>{};
-  for (final key in const ['route', 'tab', 'subtab', 'action']) {
+  for (final key in const ['route', 'tab', 'subtab', 'action', 'session_id']) {
     final v = data[key];
     if (v != null && '$v'.isNotEmpty) out[key] = '$v';
   }

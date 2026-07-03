@@ -55,4 +55,3 @@ class _ToggleRow extends StatelessWidget {
     ),
   );
 }
-

@@ -7,6 +7,16 @@ class PosTab extends ConsumerStatefulWidget {
   ConsumerState<PosTab> createState() => _PosTabState();
 }
 
+class _VariantChoice {
+  final int? variantId;
+  final String? variantLabel;
+  final double? price;
+
+  const _VariantChoice({this.variantId, this.variantLabel, this.price});
+
+  static const none = _VariantChoice();
+}
+
 class _PosTabState extends ConsumerState<PosTab> {
   final _searchCtrl = TextEditingController();
   String _query = '';
@@ -34,31 +44,77 @@ class _PosTabState extends ConsumerState<PosTab> {
         .toList();
   }
 
+  // F2 — variant verticals: resolve the size/colour/model (its price + stock)
+  // before a variant-tracked product is added anywhere in the POS (manual
+  // add, basket, barcode scan). A product with real variants only carries
+  // per-variant inventory rows server-side — adding it with no variant_id
+  // passes client-side checks but then 500s at checkout ("Inventory row
+  // missing"), so every add path must go through this resolver instead of
+  // calling addToCart directly.
+  //
+  // Returns `_VariantChoice.none` when the product isn't variant-tracked,
+  // a populated choice when the user picked one, or null when the user
+  // cancelled the picker or gave up after a fetch failure — callers must
+  // skip adding the product in that case.
+  Future<_VariantChoice?> _resolveVariant(PosProduct p) async {
+    if (!verticalConfigOf(ref).has('variants')) return _VariantChoice.none;
+    List<ProductVariant> variants;
+    try {
+      final all = await ref.read(productVariantsProvider(p.productId).future);
+      variants = all.where((v) => !v.isImplicit && v.isActive).toList();
+    } catch (_) {
+      if (!mounted) return null;
+      final retry = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Could not load variants'),
+          content: Text(
+            "Couldn't fetch sizes/variants for ${p.name}. Adding it without "
+            'a variant would fail at checkout.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(_l10n.posCommonCancel),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+      if (retry == true) return _resolveVariant(p);
+      return null;
+    }
+    if (variants.isEmpty) return _VariantChoice.none;
+    if (!mounted) return null;
+    final chosen = await showVariantPickerSheet(
+      context,
+      variants: variants,
+      productName: p.name,
+    );
+    if (chosen == null) return null;
+    return _VariantChoice(
+      variantId: chosen.variantId,
+      variantLabel: chosen.label,
+      price: chosen.price,
+    );
+  }
+
   Future<void> _handleProductAdd(PosProduct p) async {
-    // F2 — variant verticals: pick the size/colour/model (its price + stock)
-    // before adding. Grocery and products without real variants are unaffected.
-    if (verticalConfigOf(ref).has('variants')) {
-      List<ProductVariant> variants = const [];
-      try {
-        final all = await ref.read(productVariantsProvider(p.productId).future);
-        variants = all.where((v) => !v.isImplicit && v.isActive).toList();
-      } catch (_) {}
-      if (variants.isNotEmpty) {
-        if (!mounted) return;
-        final chosen = await showVariantPickerSheet(
-          context,
-          variants: variants,
-          productName: p.name,
-        );
-        if (chosen == null) return;
-        ref.read(posProvider.notifier).addToCart(
-              p,
-              variantId: chosen.variantId,
-              variantLabel: chosen.label,
-              unitPriceOverride: chosen.price,
-            );
-        return;
-      }
+    final choice = await _resolveVariant(p);
+    if (choice == null) return;
+    if (choice.variantId != null) {
+      ref
+          .read(posProvider.notifier)
+          .addToCart(
+            p,
+            variantId: choice.variantId,
+            variantLabel: choice.variantLabel,
+            unitPriceOverride: choice.price,
+          );
+      return;
     }
     if (p.isLoose) {
       final qty = await _showWeightDialog(p);
@@ -400,6 +456,180 @@ class _PosTabState extends ConsumerState<PosTab> {
   Future<void> _showHandwritingSheet() =>
       showHandwritingOrderSheet(context, ref);
 
+  /// Optical / services bar action: show today's booked appointments up-front
+  /// (instead of only at checkout). Picking one attributes the sale to that
+  /// customer so the appointment surfaces in the order sheet ready to bill.
+  Future<void> _showAppointmentsSheet() async {
+    final now = DateTime.now();
+    final day =
+        '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Consumer(
+        builder: (ctx, ref, _) {
+          final appts = ref.watch(appointmentsProvider(day));
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.7,
+            ),
+            padding: EdgeInsets.fromLTRB(
+              20,
+              12,
+              20,
+              16 + MediaQuery.of(ctx).padding.bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: BrandColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        "Today's appointments",
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _showCustomerSearchSheet();
+                      },
+                      icon: const Icon(Icons.person_add_alt_rounded, size: 18),
+                      label: Text(_l10n.posNew),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Flexible(
+                  child: appts.when(
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    error: (e, _) => Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text('$e'),
+                    ),
+                    data: (list) {
+                      final booked =
+                          list.where((a) => a.status == 'booked').toList()
+                            ..sort((a, b) => a.startsAt.compareTo(b.startsAt));
+                      if (booked.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 28),
+                          child: Text(
+                            'No appointments booked for today.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: BrandColors.muted),
+                          ),
+                        );
+                      }
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: booked.length,
+                        separatorBuilder: (_, _) => const Divider(height: 1),
+                        itemBuilder: (_, i) => _appointmentTile(ctx, booked[i]),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _appointmentTile(BuildContext sheetCtx, Appointment a) {
+    final t = TimeOfDay.fromDateTime(a.startsAt);
+    final h12 = t.hourOfPeriod == 0 ? 12 : t.hourOfPeriod;
+    final ampm = t.period == DayPeriod.am ? 'am' : 'pm';
+    final time = '$h12:${t.minute.toString().padLeft(2, '0')} $ampm';
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
+        child: const Icon(
+          Icons.event_available_rounded,
+          color: BrandColors.primary,
+          size: 20,
+        ),
+      ),
+      title: Text(
+        a.displayName,
+        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+      ),
+      subtitle: Text(
+        '$time · ${a.serviceName ?? 'Service'}'
+        '${a.price != null ? ' · ₹${a.price!.toStringAsFixed(0)}' : ''}',
+        style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+      ),
+      trailing: const Icon(Icons.chevron_right_rounded),
+      onTap: () {
+        if (a.customerId != null) {
+          ref
+              .read(posProvider.notifier)
+              .setCustomer(a.customerId!, a.displayName);
+        }
+        Navigator.pop(sheetCtx);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              a.customerId != null
+                  ? '${a.displayName} selected — bill the appointment at checkout'
+                  : 'Walk-in appointment — add items, then bill it at checkout',
+            ),
+            duration: const Duration(milliseconds: 2200),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Optical bar action: capture/update the selected customer's prescription.
+  /// Reuses the Customer 360 detail screen (which owns the Rx editor). Requires
+  /// a customer to be selected first.
+  void _openPrescription() {
+    final state = ref.read(posProvider);
+    final id = state.selectedCustomerId;
+    if (id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Select a customer first to add their prescription'),
+          duration: Duration(milliseconds: 2000),
+        ),
+      );
+      _showCustomerSearchSheet();
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CustomerDetailScreen(customerId: id)),
+    );
+  }
+
   // Adds basket products to cart — only those that are in stock locally.
   // Quantities are clamped to available stock so /pos/orders won't reject
   // the cart with an "insufficient stock" error.
@@ -409,12 +639,12 @@ class _PosTabState extends ConsumerState<PosTab> {
   // advertised deal price — not the sum of individual prices. The bundle price
   // is only honored when the FULL basket is in stock; a deal applies to the
   // complete set, so a partial basket falls back to regular per-item prices.
-  void _addBasketToCart(Basket basket) {
+  Future<void> _addBasketToCart(Basket basket) async {
     final notifier = ref.read(posProvider.notifier);
     final products = ref.read(posProvider).products;
 
     // Resolve in-stock products + clamped quantities first.
-    final resolved = <MapEntry<PosProduct, double>>[];
+    final candidates = <MapEntry<PosProduct, double>>[];
     int skipped = 0;
     for (final item in basket.items) {
       final product = products
@@ -429,7 +659,20 @@ class _PosTabState extends ConsumerState<PosTab> {
         skipped++;
         continue;
       }
-      resolved.add(MapEntry(product, qty));
+      candidates.add(MapEntry(product, qty));
+    }
+
+    // Variant-tracked products (e.g. apparel sizes) need a variant picked
+    // before they can be added — otherwise the order 500s at checkout with
+    // "Inventory row missing" since stock only exists per-variant.
+    final resolved = <(PosProduct, double, _VariantChoice)>[];
+    for (final entry in candidates) {
+      final choice = await _resolveVariant(entry.key);
+      if (choice == null) {
+        skipped++;
+        continue;
+      }
+      resolved.add((entry.key, entry.value, choice));
     }
 
     if (!mounted) return;
@@ -445,7 +688,7 @@ class _PosTabState extends ConsumerState<PosTab> {
     // without the tier system) so the order can show real value + savings.
     final resolvedGross = resolved.fold<double>(
       0,
-      (s, r) => s + r.key.price * r.value,
+      (s, r) => s + r.$1.price * r.$2,
     );
 
     // The bundle deal price applies only when the COMPLETE basket is in stock.
@@ -459,11 +702,14 @@ class _PosTabState extends ConsumerState<PosTab> {
       factor = bundlePrice / resolvedGross;
     }
 
-    for (final r in resolved) {
+    for (final (product, qty, choice) in resolved) {
       notifier.addToCart(
-        r.key,
-        qty: r.value,
-        unitPriceOverride: factor != null ? r.key.price * factor : null,
+        product,
+        qty: qty,
+        variantId: choice.variantId,
+        variantLabel: choice.variantLabel,
+        unitPriceOverride:
+            choice.price ?? (factor != null ? product.price * factor : null),
       );
     }
 
@@ -509,27 +755,55 @@ class _PosTabState extends ConsumerState<PosTab> {
     if (items == null || items.isEmpty || !mounted) return;
 
     // For loose items we need a weight dialog; all others are added directly.
+    // Variant-tracked products (e.g. apparel sizes) need a variant picked
+    // first — scanning the same barcode for every size means the size must
+    // be chosen here, same as a manual add.
+    int added = 0;
+    int skipped = 0;
     for (final ScanSessionItem item in items) {
+      final choice = await _resolveVariant(item.product);
+      if (choice == null) {
+        skipped++;
+        continue;
+      }
       if (item.product.isLoose) {
         final qty = await _showWeightDialog(
           item.product,
           initialValue: item.qty.toDouble(),
         );
         if (qty != null && qty > 0) {
-          ref.read(posProvider.notifier).addToCart(item.product, qty: qty);
+          ref
+              .read(posProvider.notifier)
+              .addToCart(
+                item.product,
+                qty: qty,
+                variantId: choice.variantId,
+                variantLabel: choice.variantLabel,
+                unitPriceOverride: choice.price,
+              );
+          added++;
         }
       } else {
         ref
             .read(posProvider.notifier)
-            .addToCart(item.product, qty: item.qty.toDouble());
+            .addToCart(
+              item.product,
+              qty: item.qty.toDouble(),
+              variantId: choice.variantId,
+              variantLabel: choice.variantLabel,
+              unitPriceOverride: choice.price,
+            );
+        added++;
       }
     }
 
     if (mounted) {
-      final count = items.fold<int>(0, (s, i) => s + i.qty);
+      final msg = skipped == 0
+          ? '$added item${added > 1 ? 's' : ''} added to cart'
+          : '$added added · $skipped skipped';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$count item${count > 1 ? 's' : ''} added to cart'),
+          content: Text(msg),
           duration: const Duration(milliseconds: 800),
         ),
       );
@@ -1068,6 +1342,8 @@ class _PosTabState extends ConsumerState<PosTab> {
               onScan: _openScanner,
               onVoice: _showVoiceOrderSheet,
               onHandwrite: _showHandwritingSheet,
+              onAppointments: _showAppointmentsSheet,
+              onPrescription: _openPrescription,
             ),
 
           if (cart.isNotEmpty)
@@ -1090,4 +1366,3 @@ class _PosTabState extends ConsumerState<PosTab> {
     );
   }
 }
-

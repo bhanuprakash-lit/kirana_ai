@@ -62,4 +62,3 @@ class _CatalogProduct {
     return parts.join(' · ');
   }
 }
-

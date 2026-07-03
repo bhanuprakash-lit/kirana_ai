@@ -147,4 +147,3 @@ class _SetCustomerPriceSheetState extends State<_SetCustomerPriceSheet> {
     );
   }
 }
-

@@ -17,11 +17,11 @@ class UserStore {
   });
 
   factory UserStore.fromJson(Map<String, dynamic> j) => UserStore(
-        storeId: (j['store_id'] as num).toInt(),
-        storeName: (j['store_name'] ?? 'My Store').toString(),
-        storeType: (j['store_type'] ?? 'kirana').toString(),
-        verticalCode: (j['vertical_code'] ?? 'grocery').toString(),
-        city: j['city'] as String?,
-        isActive: j['is_active'] == true,
-      );
+    storeId: (j['store_id'] as num).toInt(),
+    storeName: (j['store_name'] ?? 'My Store').toString(),
+    storeType: (j['store_type'] ?? 'kirana').toString(),
+    verticalCode: (j['vertical_code'] ?? 'grocery').toString(),
+    city: j['city'] as String?,
+    isActive: j['is_active'] == true,
+  );
 }

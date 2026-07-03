@@ -48,6 +48,7 @@ class VisionItem {
   final int count;
   final double matchScore;
   final bool isUnknown;
+  final int imageIndex;
   final int? correctedProductId;
 
   const VisionItem({
@@ -59,6 +60,7 @@ class VisionItem {
     required this.count,
     required this.matchScore,
     required this.isUnknown,
+    required this.imageIndex,
     required this.correctedProductId,
   });
 
@@ -80,6 +82,7 @@ class VisionItem {
     count: (j['count'] as num?)?.toInt() ?? 1,
     matchScore: (j['match_score'] as num?)?.toDouble() ?? 0.0,
     isUnknown: j['is_unknown'] as bool? ?? true,
+    imageIndex: (j['image_index'] as num?)?.toInt() ?? 0,
     correctedProductId: (j['corrected_product_id'] as num?)?.toInt(),
   );
 }

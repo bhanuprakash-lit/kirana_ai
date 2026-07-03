@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -36,44 +37,62 @@ class ApiClient {
     return _cachedPosToken;
   }
 
-  /// Optional: Provide a way to clear or update the cache when logging in/out
   static void clearTokenCache() {
     _cachedAuthToken = null;
     _cachedPosToken = null;
   }
+
+  /// Bearer token for authenticated media loads (e.g. `Image.network` of a
+  /// backend-served image, which can't go through the JSON helpers below).
+  static Future<String?> mediaAuthToken() => _getAuthToken();
 
   static void updateTokenCache({String? authToken, String? posToken}) {
     if (authToken != null) _cachedAuthToken = authToken;
     if (posToken != null) _cachedPosToken = posToken;
   }
 
+  // ── Correlation ID ─────────────────────────────────────────────────────────
+  // A unique ID stamped on every outgoing request and echoed back by the
+  // backend in X-Correlation-ID. Searching this ID in Azure Log Analytics
+  // shows the exact backend log lines produced by that one call.
+  static final _rng = math.Random.secure();
+
+  static String _newCid() {
+    final ts = DateTime.now().millisecondsSinceEpoch.toRadixString(16);
+    final rnd = _rng.nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0');
+    return '$ts$rnd';
+  }
+
+  /// Base headers for all JSON endpoints. Generates a fresh correlation ID
+  /// per call so every request is individually traceable in backend logs.
+  static Map<String, String> _h(String? token) => {
+    if (token != null) 'Authorization': 'Bearer $token',
+    'Content-Type': 'application/json',
+    'X-Correlation-ID': _newCid(),
+  };
+
   // ── Kirana AI endpoints (Bearer kirana token) ──────────────────────────────
 
   Future<dynamic> get(String path) async {
+    final token = await _getAuthToken();
+    final res = await _client
+        .get(Uri.parse('${AppConfig.apiBaseUrl}$path'), headers: _h(token))
+        .timeout(_timeout);
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    throw ApiException(res.statusCode, _extractError(res.body));
+  }
+
+  /// Authed GET that returns raw bytes — used for binary blobs like udhaar
+  /// voice-consent clips.
+  Future<List<int>> getBytes(String path) async {
     final token = await _getAuthToken();
     final res = await _client
         .get(
           Uri.parse('${AppConfig.apiBaseUrl}$path'),
           headers: {
             'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
+            'X-Correlation-ID': _newCid(),
           },
-        )
-        .timeout(_timeout);
-    if (res.statusCode == 200) {
-      return jsonDecode(res.body);
-    }
-    throw ApiException(res.statusCode, _extractError(res.body));
-  }
-
-  /// Authed GET that returns the raw response bytes (not JSON) — used to fetch
-  /// binary blobs like the udhaar voice-consent clip from the proxy endpoint.
-  Future<List<int>> getBytes(String path) async {
-    final token = await _getAuthToken();
-    final res = await _client
-        .get(
-          Uri.parse('${AppConfig.apiBaseUrl}$path'),
-          headers: {'Authorization': 'Bearer $token'},
         )
         .timeout(const Duration(seconds: 60));
     if (res.statusCode == 200) return res.bodyBytes;
@@ -84,10 +103,7 @@ class ApiClient {
     final token = await _getAuthToken();
     final res = await _client.post(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: _h(token),
       body: jsonEncode(body),
     );
     if (res.statusCode == 200 || res.statusCode == 201) {
@@ -100,10 +116,7 @@ class ApiClient {
     final token = await _getAuthToken();
     final res = await _client.put(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: _h(token),
       body: jsonEncode(body),
     );
     if (res.statusCode == 200 ||
@@ -119,10 +132,7 @@ class ApiClient {
     final token = await _getAuthToken();
     final res = await _client.patch(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: _h(token),
       body: jsonEncode(body),
     );
     if (res.statusCode == 200 || res.statusCode == 204) {
@@ -136,10 +146,7 @@ class ApiClient {
     final token = await _getAuthToken();
     final res = await _client.delete(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: _h(token),
     );
     if (res.statusCode == 200 || res.statusCode == 204) {
       if (res.body.isEmpty) return {};
@@ -149,10 +156,6 @@ class ApiClient {
   }
 
   /// Multipart upload on the Kirana (Bearer) token — used by Vision shelf scans.
-  /// All [filePaths] are uploaded under the same field name [fileField] (so the
-  /// backend reads them as a list); extra string [fields] are added as form
-  /// fields. Accepts 200/201/202 (the vision analyze endpoint returns 202
-  /// Accepted while it processes in the background).
   Future<dynamic> postMultipart(
     String path, {
     required List<String> filePaths,
@@ -165,11 +168,11 @@ class ApiClient {
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
     );
     req.headers['Authorization'] = 'Bearer $token';
+    req.headers['X-Correlation-ID'] = _newCid();
     if (fields != null) req.fields.addAll(fields);
     for (final p in filePaths) {
       req.files.add(await http.MultipartFile.fromPath(fileField, p));
     }
-
     final streamed = await _client
         .send(req)
         .timeout(const Duration(seconds: 120));
@@ -189,10 +192,7 @@ class ApiClient {
     final token = await _getPosToken();
     if (token == null) return null;
     final res = await _client
-        .get(
-          Uri.parse('${AppConfig.apiBaseUrl}$path'),
-          headers: {'Authorization': 'Bearer $token'},
-        )
+        .get(Uri.parse('${AppConfig.apiBaseUrl}$path'), headers: _h(token))
         .timeout(_timeout);
     if (res.statusCode == 200) {
       return jsonDecode(res.body) as Map<String, dynamic>;
@@ -203,19 +203,13 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
-  // POS endpoints that return a bare JSON array (e.g. /pos/products, /pos/categories)
   Future<List<dynamic>?> posGetList(String path) async {
     final token = await _getPosToken();
     if (token == null) return null;
     final res = await _client
-        .get(
-          Uri.parse('${AppConfig.apiBaseUrl}$path'),
-          headers: {'Authorization': 'Bearer $token'},
-        )
+        .get(Uri.parse('${AppConfig.apiBaseUrl}$path'), headers: _h(token))
         .timeout(_timeout);
-    if (res.statusCode == 200) {
-      return jsonDecode(res.body) as List<dynamic>;
-    }
+    if (res.statusCode == 200) return jsonDecode(res.body) as List<dynamic>;
     if (res.statusCode == 401) {
       throw const ApiException(401, 'POS session expired. Please re-login.');
     }
@@ -231,10 +225,7 @@ class ApiClient {
     try {
       final res = await _client.post(
         Uri.parse('${AppConfig.apiBaseUrl}$path'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
+        headers: _h(token),
         body: jsonEncode(body),
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
@@ -246,7 +237,8 @@ class ApiClient {
     }
   }
 
-  // Kirana token but returns a bare list (e.g. /oltp/category when listing)
+  // ── OLTP endpoints (Kirana Bearer token) ──────────────────────────────────
+
   Future<Map<String, dynamic>> getOltp(
     String table, {
     Map<String, String>? filters,
@@ -258,13 +250,7 @@ class ApiClient {
       path = '$path?$q';
     }
     final res = await _client
-        .get(
-          Uri.parse('${AppConfig.apiBaseUrl}$path'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        )
+        .get(Uri.parse('${AppConfig.apiBaseUrl}$path'), headers: _h(token))
         .timeout(_timeout);
     if (res.statusCode == 200) {
       return jsonDecode(res.body) as Map<String, dynamic>;
@@ -279,10 +265,7 @@ class ApiClient {
     final token = await _getAuthToken();
     final res = await _client.post(
       Uri.parse('${AppConfig.apiBaseUrl}/oltp/$table'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: _h(token),
       body: jsonEncode(body),
     );
     if (res.statusCode == 200 || res.statusCode == 201) {
@@ -304,10 +287,7 @@ class ApiClient {
     }
     final res = await _client.patch(
       Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      headers: _h(token),
       body: jsonEncode(body),
     );
     if (res.statusCode == 200 || res.statusCode == 204) {
@@ -323,14 +303,9 @@ class ApiClient {
   }) async {
     final token = await _getAuthToken();
     final q = filters.entries.map((e) => '${e.key}=${e.value}').join('&');
-    final path = '/oltp/$table?$q';
-
     final res = await _client.delete(
-      Uri.parse('${AppConfig.apiBaseUrl}$path'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
+      Uri.parse('${AppConfig.apiBaseUrl}/oltp/$table?$q'),
+      headers: _h(token),
     );
     if (res.statusCode == 200 || res.statusCode == 204) {
       if (res.body.isEmpty) return {};

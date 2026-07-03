@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,39 +12,38 @@ import '../providers/stores_provider.dart';
 import '../store_types.dart';
 
 /// Bottom sheet: list the owner's stores, switch between them, or add a new one.
+/// Picking a different store closes the sheet, then runs the switch behind a
+/// full-screen transition (instead of leaving the caller staring at a static
+/// dashboard while the new store's data loads silently).
 Future<void> showStoreSwitcher(BuildContext context, WidgetRef ref) async {
-  await showModalBottomSheet<void>(
+  final selected = await showModalBottomSheet<UserStore>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) => const _StoreSwitcherSheet(),
   );
+  if (selected == null || !context.mounted) return;
+  await Navigator.of(context).push(
+    PageRouteBuilder<void>(
+      opaque: true,
+      transitionDuration: const Duration(milliseconds: 350),
+      reverseTransitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (_, _, _) => _StoreSwitchTransition(
+        storeName: selected.storeName,
+        action: () =>
+            ref.read(storeActionsProvider).switchStore(selected.storeId),
+      ),
+      transitionsBuilder: (_, animation, _, child) =>
+          FadeTransition(opacity: animation, child: child),
+    ),
+  );
 }
 
-String _verticalLabel(String v) => v.isEmpty ? '' : v[0].toUpperCase() + v.substring(1);
+String _verticalLabel(String v) =>
+    v.isEmpty ? '' : v[0].toUpperCase() + v.substring(1);
 
 class _StoreSwitcherSheet extends ConsumerWidget {
   const _StoreSwitcherSheet();
-
-  Future<void> _switch(BuildContext context, WidgetRef ref, UserStore s) async {
-    if (s.isActive) {
-      Navigator.pop(context);
-      return;
-    }
-    try {
-      await ref.read(storeActionsProvider).switchStore(s.storeId);
-      if (context.mounted) {
-        Navigator.pop(context);
-        context.go('/home');
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not switch: $e'), backgroundColor: BrandColors.error),
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -60,44 +60,74 @@ class _StoreSwitcherSheet extends ConsumerWidget {
         children: [
           Center(
             child: Container(
-              width: 44, height: 5,
+              width: 44,
+              height: 5,
               decoration: BoxDecoration(
-                color: BrandColors.border, borderRadius: BorderRadius.circular(3)),
+                color: BrandColors.border,
+                borderRadius: BorderRadius.circular(3),
+              ),
             ),
           ),
           const SizedBox(height: 16),
-          const Text('Your stores',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink)),
+          const Text(
+            'Your stores',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.ink,
+            ),
+          ),
           const SizedBox(height: 12),
           stores.when(
             loading: () => const Padding(
-              padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator())),
+              padding: EdgeInsets.all(24),
+              child: Center(child: CircularProgressIndicator()),
+            ),
             error: (e, _) => Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('Could not load stores\n$e',
-                  style: const TextStyle(color: BrandColors.muted))),
+              child: Text(
+                'Could not load stores\n$e',
+                style: const TextStyle(color: BrandColors.muted),
+              ),
+            ),
             data: (list) => Column(
               children: [
-                ...list.map((s) => _StoreTile(
-                      store: s,
-                      onTap: () => _switch(context, ref, s),
-                    )),
+                ...list.map(
+                  (s) => _StoreTile(
+                    store: s,
+                    onTap: () => Navigator.pop(context, s.isActive ? null : s),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 InkWell(
                   onTap: () => showAddStoreSheet(context, ref),
                   borderRadius: BorderRadius.circular(14),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: BrandColors.primary.withValues(alpha: 0.4)),
+                      border: Border.all(
+                        color: BrandColors.primary.withValues(alpha: 0.4),
+                      ),
                     ),
                     child: const Row(
                       children: [
-                        Icon(Icons.add_business_rounded, color: BrandColors.primary, size: 20),
+                        Icon(
+                          Icons.add_business_rounded,
+                          color: BrandColors.primary,
+                          size: 20,
+                        ),
                         SizedBox(width: 10),
-                        Text('Add a store',
-                            style: TextStyle(fontWeight: FontWeight.w700, color: BrandColors.primary)),
+                        Text(
+                          'Add a store',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: BrandColors.primary,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -125,7 +155,9 @@ class _StoreTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: store.isActive ? BrandColors.primary.withValues(alpha: 0.06) : BrandColors.surfaceTint,
+          color: store.isActive
+              ? BrandColors.primary.withValues(alpha: 0.06)
+              : BrandColors.surfaceTint,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: store.isActive ? BrandColors.primary : BrandColors.border,
@@ -138,8 +170,13 @@ class _StoreTile extends StatelessWidget {
               radius: 18,
               backgroundColor: BrandColors.primary.withValues(alpha: 0.12),
               child: Text(
-                store.storeName.isNotEmpty ? store.storeName[0].toUpperCase() : '?',
-                style: const TextStyle(color: BrandColors.primary, fontWeight: FontWeight.bold),
+                store.storeName.isNotEmpty
+                    ? store.storeName[0].toUpperCase()
+                    : '?',
+                style: const TextStyle(
+                  color: BrandColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -147,22 +184,225 @@ class _StoreTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(store.storeName,
-                      maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: BrandColors.ink)),
+                  Text(
+                    store.storeName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: BrandColors.ink,
+                    ),
+                  ),
                   Text(
                     '${_verticalLabel(store.verticalCode)}${store.city != null && store.city!.isNotEmpty ? ' · ${store.city}' : ''}',
-                    style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
                   ),
                 ],
               ),
             ),
             if (store.isActive)
-              const Icon(Icons.check_circle_rounded, color: BrandColors.primary, size: 20)
+              const Icon(
+                Icons.check_circle_rounded,
+                color: BrandColors.primary,
+                size: 20,
+              )
             else
-              const Icon(Icons.chevron_right_rounded, color: BrandColors.muted, size: 20),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: BrandColors.muted,
+                size: 20,
+              ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Full-screen cover shown while the active store is being switched — runs
+/// [action] on entry, then hands off to /home on success. Kept self-contained
+/// (no WidgetRef) so the caller can close over whatever it needs.
+class _StoreSwitchTransition extends StatefulWidget {
+  final String storeName;
+  final Future<void> Function() action;
+  const _StoreSwitchTransition({required this.storeName, required this.action});
+
+  @override
+  State<_StoreSwitchTransition> createState() => _StoreSwitchTransitionState();
+}
+
+class _StoreSwitchTransitionState extends State<_StoreSwitchTransition> {
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _run();
+  }
+
+  Future<void> _run() async {
+    setState(() => _error = null);
+    try {
+      await widget.action();
+      if (!mounted) return;
+      // This screen was pushed imperatively on top of go_router's Navigator
+      // (via Navigator.push), so it isn't part of go_router's own stack —
+      // context.go('/home') alone updates the route underneath but never
+      // dismisses this overlay. Pop it explicitly first.
+      Navigator.of(context).pop();
+      context.go('/home');
+    } catch (e) {
+      if (mounted) setState(() => _error = '$e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [BrandColors.primary, Color(0xFF1E3A5F)],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: _error != null ? _errorContent() : _loadingContent(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _loadingContent() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.storefront_rounded,
+                color: Colors.white,
+                size: 36,
+              ),
+            )
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .scale(
+              begin: const Offset(1, 1),
+              end: const Offset(1.12, 1.12),
+              duration: 700.ms,
+              curve: Curves.easeInOut,
+            ),
+        const SizedBox(height: 28),
+        Text(
+          'Switching to ${widget.storeName}',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+          ),
+        ).animate().fadeIn(duration: 300.ms),
+        const SizedBox(height: 8),
+        Text(
+          'Loading your dashboard…',
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 13,
+          ),
+        ).animate(delay: 100.ms).fadeIn(duration: 300.ms),
+        const SizedBox(height: 32),
+        SizedBox(
+          width: 140,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              backgroundColor: Colors.white.withValues(alpha: 0.15),
+              color: Colors.white,
+              minHeight: 4,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _errorContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white,
+              size: 32,
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Could not switch store',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.75),
+              fontSize: 12,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white),
+                ),
+                child: const Text('Cancel'),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                onPressed: _run,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: BrandColors.primary,
+                ),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -249,7 +489,9 @@ class _AddStoreSheetState extends ConsumerState<_AddStoreSheet> {
     }
     setState(() => _saving = true);
     try {
-      await ref.read(storeActionsProvider).addStore(
+      await ref
+          .read(storeActionsProvider)
+          .addStore(
             storeName: _name.text.trim(),
             storeType: _type.code,
             verticalCode: _type.vertical,
@@ -275,13 +517,15 @@ class _AddStoreSheetState extends ConsumerState<_AddStoreSheet> {
   }
 
   void _snack(String msg) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: BrandColors.error),
-      );
+    SnackBar(content: Text(msg), backgroundColor: BrandColors.error),
+  );
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -302,9 +546,16 @@ class _AddStoreSheetState extends ConsumerState<_AddStoreSheet> {
                     onPressed: () => setState(() => _step = 0),
                   ),
                 if (_step == 1) const SizedBox(width: 8),
-                Text(_step == 0 ? 'Add a store · Details' : 'Add a store · Location',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w900, color: BrandColors.ink)),
+                Text(
+                  _step == 0
+                      ? 'Add a store · Details'
+                      : 'Add a store · Location',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: BrandColors.ink,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -316,102 +567,137 @@ class _AddStoreSheetState extends ConsumerState<_AddStoreSheet> {
   }
 
   List<Widget> _detailsStep() => [
-        if (_ownerName.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Row(children: [
-              const Icon(Icons.person_outline_rounded, size: 18, color: BrandColors.muted),
-              const SizedBox(width: 8),
-              Text('Owner: $_ownerName',
-                  style: const TextStyle(fontSize: 13, color: BrandColors.muted)),
-            ]),
-          ),
-        TextField(
-          controller: _name,
-          textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(labelText: 'Store name', isDense: true),
+    if (_ownerName.isNotEmpty)
+      Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.person_outline_rounded,
+              size: 18,
+              color: BrandColors.muted,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Owner: $_ownerName',
+              style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+            ),
+          ],
         ),
-        const SizedBox(height: 14),
-        DropdownButtonFormField<StoreTypeOption>(
-          initialValue: _type,
-          isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Store type', isDense: true),
-          items: kStoreTypeOptions
-              .map((o) => DropdownMenuItem(value: o, child: Text(o.label)))
-              .toList(),
-          onChanged: (v) => setState(() => _type = v ?? kStoreTypeOptions.first),
-        ),
-        const SizedBox(height: 14),
-        Row(children: [
-          Expanded(
-            child: TextField(
-              controller: _footfall,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(labelText: 'Daily footfall', isDense: true),
+      ),
+    TextField(
+      controller: _name,
+      textCapitalization: TextCapitalization.words,
+      decoration: const InputDecoration(labelText: 'Store name', isDense: true),
+    ),
+    const SizedBox(height: 14),
+    DropdownButtonFormField<StoreTypeOption>(
+      initialValue: _type,
+      isExpanded: true,
+      decoration: const InputDecoration(labelText: 'Store type', isDense: true),
+      items: kStoreTypeOptions
+          .map((o) => DropdownMenuItem(value: o, child: Text(o.label)))
+          .toList(),
+      onChanged: (v) => setState(() => _type = v ?? kStoreTypeOptions.first),
+    ),
+    const SizedBox(height: 14),
+    Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _footfall,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: const InputDecoration(
+              labelText: 'Daily footfall',
+              isDense: true,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: _budget,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
-              decoration: const InputDecoration(labelText: 'Monthly budget ₹ (optional)', isDense: true),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: TextField(
+            controller: _budget,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+            ],
+            decoration: const InputDecoration(
+              labelText: 'Monthly budget ₹ (optional)',
+              isDense: true,
             ),
           ),
-        ]),
-        const SizedBox(height: 20),
-        _primaryButton('Continue', _saving ? null : _toLocation),
-      ];
+        ),
+      ],
+    ),
+    const SizedBox(height: 20),
+    _primaryButton('Continue', _saving ? null : _toLocation),
+  ];
 
   List<Widget> _locationStep() => [
-        OutlinedButton.icon(
-          onPressed: _detecting ? null : _detect,
-          icon: _detecting
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Icon(Icons.my_location_rounded),
-          label: Text(_detecting ? 'Detecting…' : 'Use my location'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: BrandColors.primary,
-            side: const BorderSide(color: BrandColors.primary),
-            minimumSize: const Size.fromHeight(48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-        ),
-        const SizedBox(height: 14),
-        TextField(
-          controller: _address,
-          maxLines: 2,
-          decoration: const InputDecoration(labelText: 'Address', isDense: true),
-        ),
-        const SizedBox(height: 14),
-        TextField(
-          controller: _city,
-          decoration: const InputDecoration(labelText: 'City', isDense: true),
-        ),
-        const SizedBox(height: 20),
-        _primaryButton(
-          _saving ? 'Creating…' : 'Create & switch',
-          _saving ? null : _save,
-          loading: _saving,
-        ),
-      ];
+    OutlinedButton.icon(
+      onPressed: _detecting ? null : _detect,
+      icon: _detecting
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.my_location_rounded),
+      label: Text(_detecting ? 'Detecting…' : 'Use my location'),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: BrandColors.primary,
+        side: const BorderSide(color: BrandColors.primary),
+        minimumSize: const Size.fromHeight(48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+    ),
+    const SizedBox(height: 14),
+    TextField(
+      controller: _address,
+      maxLines: 2,
+      decoration: const InputDecoration(labelText: 'Address', isDense: true),
+    ),
+    const SizedBox(height: 14),
+    TextField(
+      controller: _city,
+      decoration: const InputDecoration(labelText: 'City', isDense: true),
+    ),
+    const SizedBox(height: 20),
+    _primaryButton(
+      _saving ? 'Creating…' : 'Create & switch',
+      _saving ? null : _save,
+      loading: _saving,
+    ),
+  ];
 
-  Widget _primaryButton(String label, VoidCallback? onTap, {bool loading = false}) =>
-      SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: ElevatedButton(
-          onPressed: onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: BrandColors.primary,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          ),
-          child: loading
-              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : Text(label, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-        ),
-      );
+  Widget _primaryButton(
+    String label,
+    VoidCallback? onTap, {
+    bool loading = false,
+  }) => SizedBox(
+    width: double.infinity,
+    height: 52,
+    child: ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: BrandColors.primary,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      child: loading
+          ? const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+            ),
+    ),
+  );
 }

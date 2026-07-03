@@ -5,25 +5,27 @@ class StoreTypeOption {
   final String code;
   final String label;
   final String vertical;
+
   const StoreTypeOption(this.code, this.label, this.vertical);
 }
 
 const List<StoreTypeOption> kStoreTypeOptions = [
-  StoreTypeOption('kirana', 'Kirana / grocery', 'grocery'),
+  StoreTypeOption('kirana', 'Kirana / General Stores', 'grocery'),
+  StoreTypeOption('general', 'General Store', 'general'),
+  StoreTypeOption('provision', 'Provision Store', 'grocery'),
+  StoreTypeOption('fruits_vegetables', 'Fruits & Vegetables', 'grocery'),
+  StoreTypeOption('stationery', 'Stationery & Books', 'general'),
   StoreTypeOption('supermarket', 'Supermarket', 'grocery'),
-  StoreTypeOption('mini_supermarket', 'Mini supermarket', 'grocery'),
-  StoreTypeOption('provision', 'Provision store', 'grocery'),
-  StoreTypeOption('fruits_vegetables', 'Fruits & vegetables', 'grocery'),
-  StoreTypeOption('bakery', 'Bakery', 'grocery'),
-  StoreTypeOption('apparel', 'Apparel / clothing', 'apparel'),
+  StoreTypeOption('mini_supermarket', 'Mini Supermarket', 'grocery'),
+  StoreTypeOption('mono_brand', 'Mono Brand Store', 'apparel'),
   StoreTypeOption('boutique', 'Boutique', 'apparel'),
-  StoreTypeOption('mono_brand', 'Mono-brand outlet', 'apparel'),
-  StoreTypeOption('footwear', 'Footwear', 'footwear'),
-  StoreTypeOption('electronics', 'Mobile & electronics', 'electronics'),
-  StoreTypeOption('optical', 'Optical', 'optical'),
-  StoreTypeOption('salon', 'Salon', 'services'),
-  StoreTypeOption('sports_fitness', 'Sports & fitness', 'services'),
-  StoreTypeOption('fancy_gift', 'Fancy / gift', 'general'),
-  StoreTypeOption('stationery', 'Stationery', 'general'),
-  StoreTypeOption('general', 'General store', 'general'),
+  StoreTypeOption('salon', 'Salon & Parlour', 'services'),
+  StoreTypeOption('fancy_gift', 'Fancy & Gift Store', 'general'),
+  StoreTypeOption('sports_fitness', 'Sports & Fitness', 'services'),
+  StoreTypeOption('footwear', 'Footwear Shop', 'footwear'),
+  StoreTypeOption('optical', 'Optical Store', 'optical'),
+  StoreTypeOption('bakery', 'Bakery & Sweet Shop', 'grocery'),
+  StoreTypeOption('apparel', 'Apparel & Clothing', 'apparel'),
+  StoreTypeOption('electronics', 'Mobile & Electronics', 'electronics'),
+  StoreTypeOption('others', 'Others', 'general'),
 ];

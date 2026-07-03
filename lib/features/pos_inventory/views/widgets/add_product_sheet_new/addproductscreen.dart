@@ -31,6 +31,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   String? _selectedCategoryName;
   bool _isPerishable = false;
   bool _isLoose = false;
+  // Tester #11 — per-product warranty (warranty verticals only).
+  bool _hasWarranty = false;
+  int _warrantyMonths = 12;
   bool _saving = false;
   bool _success = false;
   String? _error;
@@ -259,9 +262,14 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     }
     // F2 — each variant must have every axis set so it is uniquely identifiable.
     if (verticalConfigOf(ref).has('variants')) {
-      final axes = (ref.read(attributeDefsProvider).asData?.value ?? [])
-          .where((a) => a.isVariantAxis)
-          .toList();
+      final axes =
+          (ref
+                      .read(attributeDefsProvider(_selectedCategoryName))
+                      .asData
+                      ?.value ??
+                  [])
+              .where((a) => a.isVariantAxis)
+              .toList();
       for (final v in _variants) {
         for (final a in axes) {
           if ((v.attributes[a.attrCode] ?? '').trim().isEmpty) {
@@ -285,17 +293,21 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     final gstRate = _gstCtrl.text.trim().isNotEmpty
         ? double.tryParse(_gstCtrl.text.trim())
         : null;
-    final hsnCode = _hsnCtrl.text.trim().isNotEmpty ? _hsnCtrl.text.trim() : null;
+    final hsnCode = _hsnCtrl.text.trim().isNotEmpty
+        ? _hsnCtrl.text.trim()
+        : null;
 
     String? firstError;
     if (verticalConfigOf(ref).has('variants')) {
       // F2 — one product carrying many real variants (size/colour/model).
+      // The variants ARE the stock: each is created with its own quantity
+      // below. The base product must NOT also carry the summed stock, or the
+      // units get double-counted and the product surfaces as a phantom stocked
+      // row alongside its variants (tester #7). So base inventory opens at 0.
       final first = _variants.first;
-      double totalStock = 0;
       final specs = <Map<String, dynamic>>[];
       for (final v in _variants) {
         final stock = double.tryParse(v.stockCtrl.text.trim()) ?? 0;
-        totalStock += stock;
         specs.add({
           'attributes': Map<String, String>.from(v.attributes),
           'price': double.tryParse(v.priceCtrl.text.trim()),
@@ -309,11 +321,13 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           'barcode': v.barcodeCtrl.text.trim(),
         });
       }
-      firstError = await ref.read(inventoryProvider.notifier).addProduct(
+      firstError = await ref
+          .read(inventoryProvider.notifier)
+          .addProduct(
             name: name,
             categoryId: _selectedCategoryId!,
             sellingPrice: double.parse(first.priceCtrl.text),
-            initialStock: totalStock,
+            initialStock: 0, // variants carry the stock — see comment above
             brand: brand,
             unit: 'pcs',
             barcode: first.barcodeCtrl.text.trim().isNotEmpty
@@ -327,6 +341,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             variants: specs,
             gstRate: gstRate,
             hsnCode: hsnCode,
+            warrantyMonths: _hasWarranty ? _warrantyMonths : null,
           );
     } else {
       for (int i = 0; i < _variants.length; i++) {
@@ -367,6 +382,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
               imageUrl: i == 0 ? null : _linked?.imageUrl,
               gstRate: gstRate,
               hsnCode: hsnCode,
+              warrantyMonths: _hasWarranty ? _warrantyMonths : null,
             );
         if (err != null) {
           firstError = err;
@@ -478,8 +494,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   controller: _searchCtrl,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText:
-                        verticalConfigOf(ref).copy('search_hint', l10n.invSearchProductName),
+                    hintText: verticalConfigOf(
+                      ref,
+                    ).copy('search_hint', l10n.invSearchProductName),
                     prefixIcon: const Icon(
                       Icons.search_rounded,
                       color: BrandColors.muted,
@@ -853,7 +870,9 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                       decimal: true,
                     ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
                     ],
                     decoration: InputDecoration(
                       labelText: l10n.invGstRate,
@@ -870,6 +889,38 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+          ],
+
+          // Tester #11 — warranty toggle + period (warranty verticals only).
+          // The warranty end date is derived at sale from the purchase date.
+          if (verticalConfigOf(ref).has('warranty')) ...[
+            _SectionHeader(l10n.invWarranty),
+            const SizedBox(height: 12),
+            _ToggleRow(
+              label: l10n.invWarrantyCovered,
+              sublabel: l10n.invWarrantyCoveredSub,
+              value: _hasWarranty,
+              enabled: !_saving && !_success,
+              onChanged: (v) => setState(() => _hasWarranty = v),
+            ),
+            if (_hasWarranty) ...[
+              const SizedBox(height: 12),
+              DropdownButtonFormField<int>(
+                initialValue: _warrantyMonths,
+                decoration: InputDecoration(labelText: l10n.invWarrantyPeriod),
+                items: const [
+                  DropdownMenuItem(value: 6, child: Text('6 months')),
+                  DropdownMenuItem(value: 12, child: Text('1 year')),
+                  DropdownMenuItem(value: 24, child: Text('2 years')),
+                  DropdownMenuItem(value: 36, child: Text('3 years')),
+                  DropdownMenuItem(value: 60, child: Text('5 years')),
+                ],
+                onChanged: (_saving || _success)
+                    ? null
+                    : (v) => setState(() => _warrantyMonths = v ?? 12),
+              ),
+            ],
             const SizedBox(height: 24),
           ],
 
@@ -942,9 +993,16 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
   Widget _buildF2VariantRow(int idx) {
     final l10n = AppLocalizations.of(context);
     final v = _variants[idx];
-    final axes = (ref.watch(attributeDefsProvider).asData?.value ?? [])
-        .where((a) => a.isVariantAxis)
-        .toList();
+    // Axes react to the chosen category (tester #1): pick a category and the
+    // grid swaps in e.g. Storage vs Capacity (mAh).
+    final axes =
+        (ref
+                    .watch(attributeDefsProvider(_selectedCategoryName))
+                    .asData
+                    ?.value ??
+                [])
+            .where((a) => a.isVariantAxis)
+            .toList();
     final canRemove = _variants.length > 1 && !_saving && !_success;
 
     return Container(
@@ -990,14 +1048,67 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           ],
           Row(
             children: [
-              Expanded(child: _f2NumField(v.priceCtrl, l10n.invPrice, prefix: '₹ ')),
+              Expanded(
+                child: _f2NumField(v.priceCtrl, l10n.invPrice, prefix: '₹ '),
+              ),
               const SizedBox(width: 10),
               Expanded(child: _f2NumField(v.stockCtrl, l10n.invStock)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Per-variant barcode/IMEI with scanner — variants are individually
+          // scannable at the counter (size/colour, or a phone's box barcode).
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: v.barcodeCtrl,
+                  enabled: !_saving && !_success,
+                  decoration: InputDecoration(
+                    labelText: l10n.invBarcode,
+                    hintText: l10n.invOptional,
+                    isDense: true,
+                  ),
+                  keyboardType: TextInputType.text,
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: (_saving || _success)
+                    ? null
+                    : () => _scanVariantBarcode(idx),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: (_saving || _success)
+                        ? BrandColors.border
+                        : BrandColors.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  /// Scan a barcode/IMEI straight into a variant row (no catalog lookup — the
+  /// product already exists in this form; we only want the code on the variant).
+  Future<void> _scanVariantBarcode(int idx) async {
+    final scanned = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScannerOverlay()),
+    );
+    if (scanned == null || !mounted) return;
+    setState(() => _variants[idx].barcodeCtrl.text = scanned.trim());
   }
 
   Widget _f2AxisField(_VariantData v, AttributeDef a) {
@@ -1040,8 +1151,10 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     final v = _variants[idx];
     // Units come from the store's vertical config (grocery defaults otherwise).
     // Always include the current selection so the dropdown value stays valid.
-    final units = <String>{...verticalConfigOf(ref).unitSet, v.selectedUnit}
-        .toList();
+    final units = <String>{
+      ...verticalConfigOf(ref).unitSet,
+      v.selectedUnit,
+    }.toList();
     final isFirst = idx == 0;
     final canRemove = _variants.length > 1 && !_saving && !_success;
 
@@ -1315,4 +1428,3 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     );
   }
 }
-

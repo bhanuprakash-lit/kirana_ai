@@ -16,11 +16,14 @@ final servicesProvider = FutureProvider<List<ServiceItem>>((ref) async {
 });
 
 /// Appointments for a given day (yyyy-mm-dd).
-final appointmentsProvider =
-    FutureProvider.family<List<Appointment>, String>((ref, day) async {
+final appointmentsProvider = FutureProvider.family<List<Appointment>, String>((
+  ref,
+  day,
+) async {
   ref.watch(storeScopeProvider); // refetch when the active store changes
-  final data =
-      await ref.read(apiClientProvider).get('/kirana/appointments?day=$day');
+  final data = await ref
+      .read(apiClientProvider)
+      .get('/kirana/appointments?day=$day');
   final list =
       (data is Map ? data['appointments'] : null) as List<dynamic>? ?? [];
   return list

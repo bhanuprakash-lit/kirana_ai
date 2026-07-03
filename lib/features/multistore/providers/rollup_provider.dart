@@ -81,20 +81,20 @@ class StoreRollup {
   });
 
   factory StoreRollup.fromJson(Map<String, dynamic> j) => StoreRollup(
-        groupName: j['group_name'] as String?,
-        storeCount: (j['store_count'] as num?)?.toInt() ?? 1,
-        isMultiStore: j['is_multi_store'] == true,
-        totalRevenue: (j['total_revenue'] as num?)?.toDouble() ?? 0,
-        days: (j['days'] as num?)?.toInt() ?? 30,
-        byStore: ((j['by_store'] as List?) ?? [])
-            .whereType<Map>()
-            .map((e) => StoreRow.fromJson(e.cast<String, dynamic>()))
-            .toList(),
-        byArea: ((j['by_area'] as List?) ?? [])
-            .whereType<Map>()
-            .map((e) => AreaRow.fromJson(e.cast<String, dynamic>()))
-            .toList(),
-      );
+    groupName: j['group_name'] as String?,
+    storeCount: (j['store_count'] as num?)?.toInt() ?? 1,
+    isMultiStore: j['is_multi_store'] == true,
+    totalRevenue: (j['total_revenue'] as num?)?.toDouble() ?? 0,
+    days: (j['days'] as num?)?.toInt() ?? 30,
+    byStore: ((j['by_store'] as List?) ?? [])
+        .whereType<Map>()
+        .map((e) => StoreRow.fromJson(e.cast<String, dynamic>()))
+        .toList(),
+    byArea: ((j['by_area'] as List?) ?? [])
+        .whereType<Map>()
+        .map((e) => AreaRow.fromJson(e.cast<String, dynamic>()))
+        .toList(),
+  );
 
   static const empty = StoreRollup(
     storeCount: 1,

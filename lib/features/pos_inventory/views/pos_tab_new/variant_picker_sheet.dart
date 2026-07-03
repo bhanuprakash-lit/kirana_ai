@@ -16,10 +16,8 @@ Future<ProductVariant?> showVariantPickerSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _VariantPickerSheet(
-      variants: variants,
-      productName: productName,
-    ),
+    builder: (_) =>
+        _VariantPickerSheet(variants: variants, productName: productName),
   );
 }
 

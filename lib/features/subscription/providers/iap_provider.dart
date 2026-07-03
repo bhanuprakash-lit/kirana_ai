@@ -80,7 +80,8 @@ class IapNotifier extends Notifier<IapState> {
 
     state = state.copyWith(isProcessing: true, clearError: true);
 
-    final product = await service.queryProduct(tier);
+    final storeType = ref.read(subscriptionProvider).value?.storeType;
+    final product = await service.queryProduct(tier, storeType);
     if (product == null) {
       state = state.copyWith(
         isProcessing: false,
@@ -107,7 +108,7 @@ class IapNotifier extends Notifier<IapState> {
   // ── Internal handlers ────────────────────────────────────────────────────────
 
   Future<void> _onPurchase(PurchaseDetails purchase) async {
-    final tier = kProductIdToTier[purchase.productID];
+    final tier = tierFromProductId(purchase.productID);
     if (tier == null) return;
 
     final token = purchase.verificationData.serverVerificationData;

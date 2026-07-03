@@ -20,13 +20,13 @@ class GstSlab {
     required this.lineCount,
   });
   factory GstSlab.fromJson(Map<String, dynamic> j) => GstSlab(
-        rate: (j['rate'] as num?)?.toDouble() ?? 0,
-        taxable: (j['taxable'] as num?)?.toDouble() ?? 0,
-        cgst: (j['cgst'] as num?)?.toDouble() ?? 0,
-        sgst: (j['sgst'] as num?)?.toDouble() ?? 0,
-        totalTax: (j['total_tax'] as num?)?.toDouble() ?? 0,
-        lineCount: (j['line_count'] as num?)?.toInt() ?? 0,
-      );
+    rate: (j['rate'] as num?)?.toDouble() ?? 0,
+    taxable: (j['taxable'] as num?)?.toDouble() ?? 0,
+    cgst: (j['cgst'] as num?)?.toDouble() ?? 0,
+    sgst: (j['sgst'] as num?)?.toDouble() ?? 0,
+    totalTax: (j['total_tax'] as num?)?.toDouble() ?? 0,
+    lineCount: (j['line_count'] as num?)?.toInt() ?? 0,
+  );
 }
 
 /// Filing-grade GST summary for a period.
@@ -54,31 +54,31 @@ class GstSummary {
     required this.byRate,
   });
   factory GstSummary.fromJson(Map<String, dynamic> j) => GstSummary(
-        dateFrom: (j['date_from'] ?? '').toString(),
-        dateTo: (j['date_to'] ?? '').toString(),
-        grossSales: (j['gross_sales'] as num?)?.toDouble() ?? 0,
-        taxableSales: (j['taxable_sales'] as num?)?.toDouble() ?? 0,
-        totalTax: (j['total_tax'] as num?)?.toDouble() ?? 0,
-        cgst: (j['cgst'] as num?)?.toDouble() ?? 0,
-        sgst: (j['sgst'] as num?)?.toDouble() ?? 0,
-        taxableOrders: (j['taxable_orders'] as num?)?.toInt() ?? 0,
-        totalOrders: (j['total_orders'] as num?)?.toInt() ?? 0,
-        byRate: ((j['by_rate'] as List<dynamic>?) ?? [])
-            .whereType<Map>()
-            .map((e) => GstSlab.fromJson(e.cast<String, dynamic>()))
-            .toList(),
-      );
+    dateFrom: (j['date_from'] ?? '').toString(),
+    dateTo: (j['date_to'] ?? '').toString(),
+    grossSales: (j['gross_sales'] as num?)?.toDouble() ?? 0,
+    taxableSales: (j['taxable_sales'] as num?)?.toDouble() ?? 0,
+    totalTax: (j['total_tax'] as num?)?.toDouble() ?? 0,
+    cgst: (j['cgst'] as num?)?.toDouble() ?? 0,
+    sgst: (j['sgst'] as num?)?.toDouble() ?? 0,
+    taxableOrders: (j['taxable_orders'] as num?)?.toInt() ?? 0,
+    totalOrders: (j['total_orders'] as num?)?.toInt() ?? 0,
+    byRate: ((j['by_rate'] as List<dynamic>?) ?? [])
+        .whereType<Map>()
+        .map((e) => GstSlab.fromJson(e.cast<String, dynamic>()))
+        .toList(),
+  );
 }
 
 /// GST summary for a period. Family key is "yyyy-mm-dd|yyyy-mm-dd".
-final gstSummaryProvider =
-    FutureProvider.family.autoDispose<GstSummary, String>((ref, range) async {
-  ref.watch(storeScopeProvider); // refetch when the active store changes
-  final parts = range.split('|');
-  final from = parts[0];
-  final to = parts.length > 1 ? parts[1] : parts[0];
-  final data = await ref
-      .read(apiClientProvider)
-      .get('/kirana/tax/gst-summary?date_from=$from&date_to=$to');
-  return GstSummary.fromJson((data as Map).cast<String, dynamic>());
-});
+final gstSummaryProvider = FutureProvider.family
+    .autoDispose<GstSummary, String>((ref, range) async {
+      ref.watch(storeScopeProvider); // refetch when the active store changes
+      final parts = range.split('|');
+      final from = parts[0];
+      final to = parts.length > 1 ? parts[1] : parts[0];
+      final data = await ref
+          .read(apiClientProvider)
+          .get('/kirana/tax/gst-summary?date_from=$from&date_to=$to');
+      return GstSummary.fromJson((data as Map).cast<String, dynamic>());
+    });

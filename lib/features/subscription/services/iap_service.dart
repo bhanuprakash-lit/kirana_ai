@@ -4,18 +4,51 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ── Product IDs — must match exactly what's in Play Console ──────────────────
+//
+// Pricing is segment-wise (varies by store.store_type — see
+// SubscriptionInfo.basicPrice/proPrice). Play Billing has no API to charge a
+// different price for the same product, so each priced segment gets its own
+// product per tier: `kirana_ai_<tier>_<store_type>`. Segments NOT in
+// [kPricedSegments] (kirana, fruits_vegetables, other, and any future
+// store_type) reuse the original flat-rate products below.
 const kIapBasicId = 'kirana_ai_basic_monthly';
 const kIapProId = 'kirana_ai_pro_monthly';
 
-const kTierToProductId = <String, String>{
-  'basic': kIapBasicId,
-  'pro': kIapProId,
+/// store_types with their own Play Console product per tier. Keep in sync
+/// with the `segment_pricing` seed in the backend (kirana/repositories/base.py).
+const kPricedSegments = <String>{
+  'supermarket',
+  'mini_supermarket',
+  'mono_brand',
+  'apparel',
+  'boutique',
+  'salon',
+  'fancy_gift',
+  'sports_fitness',
+  'electronics',
+  'footwear',
+  'optical',
+  'bakery',
+  'stationery',
 };
 
-const kProductIdToTier = <String, String>{
-  kIapBasicId: 'basic',
-  kIapProId: 'pro',
-};
+/// Resolves the Play Console product id for [tier] ('basic'/'pro') given the
+/// store's [storeType]. Unpriced/unknown segments fall back to the default
+/// flat-rate product.
+String productIdFor(String tier, String? storeType) {
+  if (storeType != null && kPricedSegments.contains(storeType)) {
+    return 'kirana_ai_${tier}_$storeType';
+  }
+  return tier == 'pro' ? kIapProId : kIapBasicId;
+}
+
+/// Recovers the tier ('basic'/'pro') from any product id this app can mint,
+/// segment-specific or the default flat-rate ones.
+String? tierFromProductId(String productId) {
+  if (productId.startsWith('kirana_ai_basic_')) return 'basic';
+  if (productId.startsWith('kirana_ai_pro_')) return 'pro';
+  return null;
+}
 
 // ── IapService ────────────────────────────────────────────────────────────────
 
@@ -68,9 +101,8 @@ class IapService {
 
   // ── Product query ───────────────────────────────────────────────────────────
 
-  Future<ProductDetails?> queryProduct(String tier) async {
-    final id = kTierToProductId[tier];
-    if (id == null) return null;
+  Future<ProductDetails?> queryProduct(String tier, [String? storeType]) async {
+    final id = productIdFor(tier, storeType);
 
     final resp = await _iap.queryProductDetails({id});
     if (resp.error != null) {

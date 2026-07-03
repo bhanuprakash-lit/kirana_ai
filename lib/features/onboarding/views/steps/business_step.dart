@@ -26,7 +26,6 @@ List<({String code, String label})> _businessTypes(AppLocalizations l10n) => [
   (code: 'optical', label: l10n.businessTypeOptical),
   (code: 'bakery', label: l10n.businessTypeBakery),
   (code: 'stationery', label: l10n.businessTypeStationery),
-  (code: 'pharmacy', label: l10n.businessTypePharmacy),
   (code: 'fruits_vegetables', label: l10n.businessTypeFruitsVeg),
   (code: 'other', label: l10n.businessTypeOthers),
 ];

@@ -58,14 +58,15 @@ class _LoyaltySettingsScreenState extends ConsumerState<LoyaltySettingsScreen> {
     try {
       await ref.read(loyaltyActionsProvider).saveConfig(cfg);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Loyalty settings saved')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Loyalty settings saved')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Save failed: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Save failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -95,8 +96,10 @@ class _LoyaltySettingsScreenState extends ConsumerState<LoyaltySettingsScreen> {
                 child: SwitchListTile(
                   value: _active,
                   onChanged: (v) => setState(() => _active = v),
-                  title: const Text('Enable loyalty programme',
-                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  title: const Text(
+                    'Enable loyalty programme',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
                   subtitle: const Text(
                     'Customers earn points on every billed sale.',
                     style: TextStyle(fontSize: 12, color: BrandColors.muted),
@@ -104,24 +107,44 @@ class _LoyaltySettingsScreenState extends ConsumerState<LoyaltySettingsScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              _numField(_earnCtrl, 'Points earned per ₹100 spent',
-                  helper: 'e.g. 1 → ₹500 bill earns 5 points'),
+              _numField(
+                _earnCtrl,
+                'Points earned per ₹100 spent',
+                helper: 'e.g. 1 → ₹500 bill earns 5 points',
+              ),
               const SizedBox(height: 16),
-              _numField(_redeemCtrl, 'Value of 1 point (₹)',
-                  helper: 'e.g. 1 → 100 points = ₹100 off'),
+              _numField(
+                _redeemCtrl,
+                'Value of 1 point (₹)',
+                helper: 'e.g. 1 → 100 points = ₹100 off',
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _numField(_silverCtrl, 'Silver tier at (points)', intOnly: true)),
+                  Expanded(
+                    child: _numField(
+                      _silverCtrl,
+                      'Silver tier at (points)',
+                      intOnly: true,
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _numField(_goldCtrl, 'Gold tier at (points)', intOnly: true)),
+                  Expanded(
+                    child: _numField(
+                      _goldCtrl,
+                      'Gold tier at (points)',
+                      intOnly: true,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const CouponManagerScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const CouponManagerScreen(),
+                  ),
                 ),
                 icon: const Icon(Icons.local_offer_outlined),
                 label: const Text('Manage discount coupons'),
@@ -141,7 +164,9 @@ class _LoyaltySettingsScreenState extends ConsumerState<LoyaltySettingsScreen> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Text('Save settings'),
                 ),
@@ -153,17 +178,21 @@ class _LoyaltySettingsScreenState extends ConsumerState<LoyaltySettingsScreen> {
     );
   }
 
-  Widget _numField(TextEditingController c, String label,
-          {String? helper, bool intOnly = false}) =>
-      TextField(
-        controller: c,
-        keyboardType: intOnly
-            ? TextInputType.number
-            : const TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(
-              RegExp(intOnly ? r'^\d+' : r'^\d+\.?\d{0,2}')),
-        ],
-        decoration: InputDecoration(labelText: label, helperText: helper),
-      );
+  Widget _numField(
+    TextEditingController c,
+    String label, {
+    String? helper,
+    bool intOnly = false,
+  }) => TextField(
+    controller: c,
+    keyboardType: intOnly
+        ? TextInputType.number
+        : const TextInputType.numberWithOptions(decimal: true),
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(
+        RegExp(intOnly ? r'^\d+' : r'^\d+\.?\d{0,2}'),
+      ),
+    ],
+    decoration: InputDecoration(labelText: label, helperText: helper),
+  );
 }

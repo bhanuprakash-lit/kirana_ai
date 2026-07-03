@@ -210,4 +210,3 @@ class _SmartAssortmentHintsState extends ConsumerState<_SmartAssortmentHints> {
     );
   }
 }
-

@@ -49,8 +49,9 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
     final phone = _phoneCtrl.text.trim();
     if (name.isEmpty) return;
     setState(() => _saving = true);
-    final created =
-        await ref.read(customerProvider.notifier).createAndReturn(name, phone);
+    final created = await ref
+        .read(customerProvider.notifier)
+        .createAndReturn(name, phone);
     if (!mounted) return;
     setState(() => _saving = false);
     if (created != null) Navigator.pop(context, created);
@@ -64,12 +65,15 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
     final filtered = q.isEmpty
         ? all
         : all
-            .where((c) =>
-                c.name.toLowerCase().contains(q) || c.phone.contains(q))
-            .toList();
+              .where(
+                (c) => c.name.toLowerCase().contains(q) || c.phone.contains(q),
+              )
+              .toList();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: DraggableScrollableSheet(
         initialChildSize: 0.7,
         minChildSize: 0.4,
@@ -134,8 +138,11 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       hintText: l10n.finSearchByNameOrPhone,
-                      prefixIcon: const Icon(Icons.search_rounded,
-                          size: 20, color: BrandColors.muted),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        size: 20,
+                        color: BrandColors.muted,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -143,7 +150,9 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                     ),
                   ),
                 ),
@@ -167,8 +176,9 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             leading: CircleAvatar(
-                              backgroundColor:
-                                  BrandColors.primary.withValues(alpha: 0.1),
+                              backgroundColor: BrandColors.primary.withValues(
+                                alpha: 0.1,
+                              ),
                               child: Text(
                                 c.name.isNotEmpty
                                     ? c.name[0].toUpperCase()
@@ -182,13 +192,17 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
                             title: Text(
                               c.name,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 14),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
                             ),
                             subtitle: c.phone.isNotEmpty
                                 ? Text(
                                     c.phone,
                                     style: const TextStyle(
-                                        fontSize: 12, color: BrandColors.muted),
+                                      fontSize: 12,
+                                      color: BrandColors.muted,
+                                    ),
                                   )
                                 : null,
                             onTap: () => Navigator.pop(context, c),
@@ -263,7 +277,9 @@ class _AddForm extends StatelessWidget {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : Text(l10n.posSaveAndSelect),
             ),

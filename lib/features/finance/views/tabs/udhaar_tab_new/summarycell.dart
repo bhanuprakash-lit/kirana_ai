@@ -39,4 +39,3 @@ class _SummaryCell extends StatelessWidget {
     );
   }
 }
-

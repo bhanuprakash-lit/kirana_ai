@@ -20,4 +20,3 @@ class _DeleteButton extends StatelessWidget {
     );
   }
 }
-

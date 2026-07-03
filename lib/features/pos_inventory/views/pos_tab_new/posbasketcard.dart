@@ -258,4 +258,3 @@ class _PosBasketCard extends StatelessWidget {
     );
   }
 }
-

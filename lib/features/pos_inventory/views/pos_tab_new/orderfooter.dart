@@ -205,4 +205,3 @@ class _OrderFooter extends StatelessWidget {
     );
   }
 }
-

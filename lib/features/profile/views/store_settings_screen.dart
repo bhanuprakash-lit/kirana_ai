@@ -30,7 +30,13 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
   // F1 — current vertical (switchable post-setup).
   String _verticalCode = 'grocery';
   static const _verticals = <String>[
-    'grocery', 'apparel', 'footwear', 'electronics', 'optical', 'services', 'general',
+    'grocery',
+    'apparel',
+    'footwear',
+    'electronics',
+    'optical',
+    'services',
+    'general',
   ];
 
   bool _isSaving = false;
@@ -135,26 +141,36 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                       initialValue: _verticalCode,
                       decoration: InputDecoration(
                         labelText: l10n.profBusinessVertical,
-                        prefixIcon: const Icon(Icons.dashboard_customize_rounded,
-                            size: 20, color: BrandColors.muted),
+                        prefixIcon: const Icon(
+                          Icons.dashboard_customize_rounded,
+                          size: 20,
+                          color: BrandColors.muted,
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: BrandColors.border),
+                          borderSide: const BorderSide(
+                            color: BrandColors.border,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: BrandColors.border),
+                          borderSide: const BorderSide(
+                            color: BrandColors.border,
+                          ),
                         ),
                       ),
                       items: _verticals
-                          .map((v) => DropdownMenuItem(
-                                value: v,
-                                child: Text(v[0].toUpperCase() + v.substring(1)),
-                              ))
+                          .map(
+                            (v) => DropdownMenuItem(
+                              value: v,
+                              child: Text(v[0].toUpperCase() + v.substring(1)),
+                            ),
+                          )
                           .toList(),
-                      onChanged: (v) => setState(() => _verticalCode = v ?? 'grocery'),
+                      onChanged: (v) =>
+                          setState(() => _verticalCode = v ?? 'grocery'),
                     ),
                   ),
 

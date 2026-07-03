@@ -21,7 +21,10 @@ extension SubTierX on SubTier {
   // Keep a no-arg getter for places that don't need trial differentiation
   String get displayNameSimple => displayName();
 
-  String get priceLabel {
+  /// [basicPrice]/[proPrice] are the store's segment-wise monthly prices
+  /// (from the server / Play Store), falling back to the original flat
+  /// ₹200/₹500 when not yet known (e.g. before the subscription fetch).
+  String priceLabel({num basicPrice = 200, num proPrice = 500}) {
     switch (this) {
       case SubTier.none:
         return '';
@@ -30,9 +33,9 @@ extension SubTierX on SubTier {
       case SubTier.trial:
         return 'Free';
       case SubTier.basic:
-        return '₹200/mo · just ₹7/day';
+        return '₹${basicPrice.toStringAsFixed(0)}/mo · just ₹${(basicPrice / 30).round()}/day';
       case SubTier.pro:
-        return '₹500/mo · just ₹17/day';
+        return '₹${proPrice.toStringAsFixed(0)}/mo · just ₹${(proPrice / 30).round()}/day';
     }
   }
 
@@ -49,6 +52,16 @@ class SubscriptionInfo {
   final int daysRemaining;
   final int secondsRemaining;
 
+  /// Segment-wise monthly prices for this store (from `store.store_type`),
+  /// e.g. ₹1300/₹1700 for a supermarket vs ₹200/₹500 for a kirana store.
+  /// Null until the subscription has been fetched at least once.
+  final num? basicPrice;
+  final num? proPrice;
+
+  /// This store's store_type (e.g. 'supermarket', 'boutique') — used to pick
+  /// the right Play Console product per segment. Null until fetched.
+  final String? storeType;
+
   /// When this info was fetched from the server (device clock). Used to anchor
   /// the server's `seconds_remaining` countdown so we never depend on parsing
   /// the naive `trial_ends_at` timestamp against the device timezone.
@@ -64,8 +77,15 @@ class SubscriptionInfo {
     this.daysRemaining = 0,
     this.secondsRemaining = 0,
     this.serverExpired = false,
+    this.basicPrice,
+    this.proPrice,
+    this.storeType,
     this.fetchedAt,
   });
+
+  /// [priceLabel] convenience that fills in this store's segment prices.
+  String get displayPriceLabel =>
+      tier.priceLabel(basicPrice: basicPrice ?? 200, proPrice: proPrice ?? 500);
 
   static const none = SubscriptionInfo(tier: SubTier.none);
 
@@ -155,6 +175,9 @@ class SubscriptionInfo {
       daysRemaining: json['days_remaining'] as int? ?? 0,
       secondsRemaining: json['seconds_remaining'] as int? ?? 0,
       serverExpired: json['is_expired'] as bool? ?? false,
+      basicPrice: json['basic_price'] as num?,
+      proPrice: json['pro_price'] as num?,
+      storeType: json['store_type'] as String?,
       fetchedAt: DateTime.now(),
     );
   }

@@ -9,6 +9,7 @@ import '../../dashboard/providers/overview_provider.dart';
 import '../../profile/providers/customer_provider.dart';
 import '../../referral/models/referral_models.dart';
 import '../../referral/providers/referral_provider.dart';
+import 'inventory_provider.dart';
 import 'variant_provider.dart';
 import '../models/cart_item.dart';
 import '../models/customer_price.dart';
@@ -630,7 +631,10 @@ class PosNotifier extends Notifier<PosState> {
     double redeemPoints = 0,
     double redeemValue = 0, // ₹ value of the redeemed points
     // POS deep-links — link module records to this sale (best-effort on backend).
-    List<String>? serials, // M7 serial/IMEI sold on this bill
+    List<String>?
+    serials, // M7 serial/IMEI sold on this bill (legacy flat list)
+    List<Map<String, dynamic>>?
+    serialItems, // tester #4 — per-line serials {serial_no, product_id, variant_id}
     int? membershipId, // M4 consume one membership session
     int? appointmentId, // M4 complete + bill an appointment
     int? jobCardId, // M9 bill a finished job card
@@ -657,10 +661,9 @@ class PosNotifier extends Notifier<PosState> {
         : subtotal;
     // M1 — apply coupon discount + redeemed-points value to the bill.
     // M4/O2 — add any billed appointment's service charge on top.
-    final totalAmount =
-        (baseTotal - couponDiscount - redeemValue + extraCharge)
-            .clamp(0, double.infinity)
-            .toDouble();
+    final totalAmount = (baseTotal - couponDiscount - redeemValue + extraCharge)
+        .clamp(0, double.infinity)
+        .toDouble();
 
     try {
       final body = <String, dynamic>{
@@ -672,6 +675,8 @@ class PosNotifier extends Notifier<PosState> {
         if (redeemPoints > 0) 'redeem_points': redeemPoints,
         // POS deep-links (M4/M7/M9)
         if (serials != null && serials.isNotEmpty) 'serials': serials,
+        if (serialItems != null && serialItems.isNotEmpty)
+          'serial_items': serialItems,
         'membership_id': ?membershipId,
         'appointment_id': ?appointmentId,
         'job_card_id': ?jobCardId,
@@ -765,6 +770,10 @@ class PosNotifier extends Notifier<PosState> {
         ref.read(overviewProvider.notifier).refresh();
         // Refresh on-hand stock everywhere it's shown after the sale.
         reloadProducts();
+        // Stock/Inventory tab uses its own AsyncNotifier (inventoryProvider) —
+        // invalidate it too so it refetches instead of showing stale counts
+        // until the user pulls to refresh.
+        unawaited(ref.read(inventoryProvider.notifier).refresh());
         for (final pid in soldVariantProductIds) {
           ref.invalidate(productVariantsProvider(pid));
         }

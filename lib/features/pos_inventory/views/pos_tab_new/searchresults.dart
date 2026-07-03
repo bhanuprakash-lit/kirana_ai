@@ -98,4 +98,3 @@ class _SearchResults extends StatelessWidget {
     );
   }
 }
-

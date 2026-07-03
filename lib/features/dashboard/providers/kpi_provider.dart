@@ -106,7 +106,8 @@ class VisibleKpi {
       category: j['category'] as String? ?? 'Operations',
       missingData: j['missing_data'] as String?,
       primaryField: j['primary_field'] as String?,
-      verticals: (j['verticals'] as List?)?.map((e) => e.toString()).toList() ??
+      verticals:
+          (j['verticals'] as List?)?.map((e) => e.toString()).toList() ??
           const [],
     );
   }
@@ -139,8 +140,9 @@ String _formatKpiValue(num? v, String? primaryField) {
 
 /// Live vertical-pack KPIs for this store (with values), shown on the dashboard
 /// in addition to the common cards. Empty for grocery / general (no pack).
-final verticalKpiCardsProvider =
-    FutureProvider.autoDispose<List<VerticalKpiCard>>((ref) async {
+final verticalKpiCardsProvider = FutureProvider.autoDispose<List<VerticalKpiCard>>((
+  ref,
+) async {
   ref.watch(storeScopeProvider);
   final client = ref.read(apiClientProvider);
   final prefs = await SharedPreferences.getInstance();
@@ -153,7 +155,8 @@ final verticalKpiCardsProvider =
 
   // One summary call gives every KPI's computed value, keyed by id.
   final summary = await client.get('/kirana/kpis/summary?store_id=$storeId');
-  final cards = (summary is Map ? summary['kpis'] : null) as List<dynamic>? ?? [];
+  final cards =
+      (summary is Map ? summary['kpis'] : null) as List<dynamic>? ?? [];
   final byId = <String, Map<String, dynamic>>{
     for (final c in cards.whereType<Map>())
       (c['kpi_id'] as String): c.cast<String, dynamic>(),
@@ -169,7 +172,9 @@ final verticalKpiCardsProvider =
 });
 
 /// The KPIs this store should show, per its vertical + admin visibility config.
-final visibleKpisProvider = FutureProvider.autoDispose<List<VisibleKpi>>((ref) async {
+final visibleKpisProvider = FutureProvider.autoDispose<List<VisibleKpi>>((
+  ref,
+) async {
   final client = ref.read(apiClientProvider);
   final data = await client.get('/kirana/kpis/visible');
   final list = (data is Map ? data['kpis'] : null) as List<dynamic>? ?? [];

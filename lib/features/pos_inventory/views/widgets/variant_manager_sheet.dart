@@ -6,6 +6,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../models/product_variant.dart';
 import '../../providers/variant_provider.dart';
+import 'barcode_scanner_overlay.dart';
 
 /// F2 — manage a product's variants (size×colour, model/storage, …). Shown only
 /// for verticals whose config `has('variants')`. The implicit grocery variant is
@@ -15,6 +16,7 @@ Future<void> showVariantManagerSheet(
   WidgetRef ref, {
   required int productId,
   required String productName,
+  String? categoryName,
 }) {
   return showModalBottomSheet(
     context: context,
@@ -23,6 +25,7 @@ Future<void> showVariantManagerSheet(
     builder: (_) => _VariantManagerSheet(
       productId: productId,
       productName: productName,
+      categoryName: categoryName,
     ),
   );
 }
@@ -30,17 +33,22 @@ Future<void> showVariantManagerSheet(
 class _VariantManagerSheet extends ConsumerWidget {
   final int productId;
   final String productName;
+  final String? categoryName;
   const _VariantManagerSheet({
     required this.productId,
     required this.productName,
+    this.categoryName,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final axes = (ref.watch(attributeDefsProvider).asData?.value ?? [])
-        .where((a) => a.isVariantAxis)
-        .toList();
+    // Category-scoped axes (tester #1) — pass the product's category so e.g. a
+    // power bank's editor asks Capacity (mAh), not Storage.
+    final axes =
+        (ref.watch(attributeDefsProvider(categoryName)).asData?.value ?? [])
+            .where((a) => a.isVariantAxis)
+            .toList();
     final variantsAsync = ref.watch(productVariantsProvider(productId));
 
     return Container(
@@ -154,11 +162,8 @@ class _VariantManagerSheet extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _VariantEditor(
-        productId: productId,
-        axes: axes,
-        existing: existing,
-      ),
+      builder: (_) =>
+          _VariantEditor(productId: productId, axes: axes, existing: existing),
     );
   }
 }
@@ -272,12 +277,26 @@ class _VariantEditorState extends ConsumerState<_VariantEditor> {
   double? _parse(TextEditingController c) =>
       c.text.trim().isEmpty ? null : double.tryParse(c.text.trim());
 
+  /// Scan a barcode/IMEI into the new variant's barcode field.
+  Future<void> _scanBarcode() async {
+    final scanned = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const BarcodeScannerOverlay()),
+    );
+    if (scanned == null || !mounted) return;
+    setState(() => _barcodeCtrl.text = scanned.trim());
+  }
+
   Future<void> _save() async {
     // On create, every axis must have a value so the variant is identifiable.
     if (!_isEdit) {
       for (final a in widget.axes) {
         if ((_attrs[a.attrCode] ?? '').trim().isEmpty) {
-          setState(() => _error = AppLocalizations.of(context).invVariantAxisRequired(a.label));
+          setState(
+            () => _error = AppLocalizations.of(
+              context,
+            ).invVariantAxisRequired(a.label),
+          );
           return;
         }
       }
@@ -366,9 +385,13 @@ class _VariantEditorState extends ConsumerState<_VariantEditor> {
               Expanded(
                 child: TextField(
                   controller: _stockCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d+\.?\d{0,2}'),
+                    ),
                   ],
                   decoration: InputDecoration(labelText: l10n.invStock),
                 ),
@@ -377,14 +400,32 @@ class _VariantEditorState extends ConsumerState<_VariantEditor> {
           ),
           if (!_isEdit) ...[
             const SizedBox(height: 12),
-            TextField(
-              controller: _barcodeCtrl,
-              decoration: InputDecoration(labelText: l10n.invBarcode),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _barcodeCtrl,
+                    decoration: InputDecoration(labelText: l10n.invBarcode),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: l10n.invBarcode,
+                  icon: const Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: BrandColors.primary,
+                  ),
+                  onPressed: _scanBarcode,
+                ),
+              ],
             ),
           ],
           if (_error != null) ...[
             const SizedBox(height: 12),
-            Text(_error!, style: const TextStyle(color: BrandColors.error, fontSize: 13)),
+            Text(
+              _error!,
+              style: const TextStyle(color: BrandColors.error, fontSize: 13),
+            ),
           ],
           const SizedBox(height: 20),
           SizedBox(
@@ -435,11 +476,11 @@ class _VariantEditorState extends ConsumerState<_VariantEditor> {
   }
 
   Widget _numField(TextEditingController c, String label) => TextField(
-        controller: c,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-        ],
-        decoration: InputDecoration(labelText: label, prefixText: '₹ '),
-      );
+    controller: c,
+    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+    ],
+    decoration: InputDecoration(labelText: label, prefixText: '₹ '),
+  );
 }

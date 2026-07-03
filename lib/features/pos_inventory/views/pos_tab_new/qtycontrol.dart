@@ -29,4 +29,3 @@ class _QtyControl extends StatelessWidget {
     );
   }
 }
-

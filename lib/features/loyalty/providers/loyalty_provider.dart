@@ -7,15 +7,21 @@ import '../models/loyalty_models.dart';
 /// Store loyalty config (cached for the session).
 final loyaltyConfigProvider = FutureProvider<LoyaltyConfig>((ref) async {
   try {
-    final data = await ref.read(apiClientProvider).get('/kirana/loyalty/config');
-    if (data is Map) return LoyaltyConfig.fromJson(data.cast<String, dynamic>());
+    final data = await ref
+        .read(apiClientProvider)
+        .get('/kirana/loyalty/config');
+    if (data is Map) {
+      return LoyaltyConfig.fromJson(data.cast<String, dynamic>());
+    }
   } catch (_) {}
   return LoyaltyConfig.fallback;
 });
 
 /// A customer's points / tier / history.
-final customerLoyaltyProvider =
-    FutureProvider.family<CustomerLoyalty, int>((ref, customerId) async {
+final customerLoyaltyProvider = FutureProvider.family<CustomerLoyalty, int>((
+  ref,
+  customerId,
+) async {
   final data = await ref
       .read(apiClientProvider)
       .get('/kirana/customers/$customerId/loyalty');

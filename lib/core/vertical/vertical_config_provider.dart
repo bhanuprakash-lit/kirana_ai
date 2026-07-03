@@ -8,7 +8,9 @@ import 'vertical_config.dart';
 /// never break the UI — grocery behaviour is the safe default.
 final verticalConfigProvider = FutureProvider<VerticalConfig>((ref) async {
   try {
-    final data = await ref.read(apiClientProvider).get('/kirana/vertical-config');
+    final data = await ref
+        .read(apiClientProvider)
+        .get('/kirana/vertical-config');
     if (data is Map<String, dynamic>) {
       return VerticalConfig.fromJson(data);
     }

@@ -91,4 +91,3 @@ class _CatalogResultTile extends StatelessWidget {
     ),
   );
 }
-

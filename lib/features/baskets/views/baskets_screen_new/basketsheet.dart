@@ -485,4 +485,3 @@ class _BasketSheetState extends ConsumerState<_BasketSheet> {
     );
   }
 }
-

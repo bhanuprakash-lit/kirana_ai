@@ -42,10 +42,13 @@ class _WarrantyScreenState extends ConsumerState<WarrantyScreen>
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         title: const Text('Warranty & Serials'),
-        bottom: TabBar(controller: _tabs, tabs: const [
-          Tab(text: 'Claims'),
-          Tab(text: 'Serials'),
-        ]),
+        bottom: TabBar(
+          controller: _tabs,
+          tabs: const [
+            Tab(text: 'Claims'),
+            Tab(text: 'Serials'),
+          ],
+        ),
       ),
       body: TabBarView(controller: _tabs, children: [_claims(), _serials()]),
       floatingActionButton: FloatingActionButton.extended(
@@ -78,59 +81,72 @@ class _WarrantyScreenState extends ConsumerState<WarrantyScreen>
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             padding: const EdgeInsets.all(20),
-            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('New warranty claim',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 16),
-              // Pick the serial/IMEI the claim is about (never free-typed).
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () async {
-                  final picked = await _pickSerial();
-                  if (picked != null) setSt(() => serial = picked);
-                },
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Serial / IMEI',
-                    suffixIcon: Icon(Icons.arrow_drop_down_rounded),
-                  ),
-                  child: Text(
-                    serial == null
-                        ? 'Select a serial'
-                        : serial!['serial_no'].toString(),
-                    style: TextStyle(
-                      color: serial == null ? BrandColors.muted : BrandColors.ink,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'New warranty claim',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 16),
+                // Pick the serial/IMEI the claim is about (never free-typed).
+                InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () async {
+                    final picked = await _pickSerial();
+                    if (picked != null) setSt(() => serial = picked);
+                  },
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Serial / IMEI',
+                      suffixIcon: Icon(Icons.arrow_drop_down_rounded),
+                    ),
+                    child: Text(
+                      serial == null
+                          ? 'Select a serial'
+                          : serial!['serial_no'].toString(),
+                      style: TextStyle(
+                        color: serial == null
+                            ? BrandColors.muted
+                            : BrandColors.ink,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: issue,
-                maxLines: 2,
-                decoration: const InputDecoration(labelText: 'Issue / problem'),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: FilledButton(
-                  onPressed: () async {
-                    if (serial == null) return;
-                    await ref.read(apiClientProvider).post('/kirana/warranty-claims', {
-                      'serial_id': serial!['serial_id'],
-                      'product_id': serial!['product_id'],
-                      if (serial!['customer_id'] != null)
-                        'customer_id': serial!['customer_id'],
-                      if (issue.text.trim().isNotEmpty) 'issue': issue.text.trim(),
-                    });
-                    ref.invalidate(claimsProvider);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  },
-                  child: const Text('Create claim'),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: issue,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Issue / problem',
+                  ),
                 ),
-              ),
-            ]),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton(
+                    onPressed: () async {
+                      if (serial == null) return;
+                      await ref
+                          .read(apiClientProvider)
+                          .post('/kirana/warranty-claims', {
+                            'serial_id': serial!['serial_id'],
+                            'product_id': serial!['product_id'],
+                            if (serial!['customer_id'] != null)
+                              'customer_id': serial!['customer_id'],
+                            if (issue.text.trim().isNotEmpty)
+                              'issue': issue.text.trim(),
+                          });
+                      ref.invalidate(claimsProvider);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    },
+                    child: const Text('Create claim'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -155,9 +171,13 @@ class _WarrantyScreenState extends ConsumerState<WarrantyScreen>
       data: (list) => list.isEmpty
           ? const Center(
               child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text('No warranty claims logged.',
-                      style: TextStyle(color: BrandColors.muted))))
+                padding: EdgeInsets.all(32),
+                child: Text(
+                  'No warranty claims logged.',
+                  style: TextStyle(color: BrandColors.muted),
+                ),
+              ),
+            )
           : ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: list.length,
@@ -172,26 +192,43 @@ class _WarrantyScreenState extends ConsumerState<WarrantyScreen>
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: BrandColors.border),
                   ),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('${c['product_name'] ?? "Product"}${c['serial_no'] != null ? " · ${c['serial_no']}" : ""}',
-                        style: const TextStyle(fontWeight: FontWeight.w700)),
-                    if (c['issue'] != null)
-                      Text(c['issue'].toString(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${c['product_name'] ?? "Product"}${c['serial_no'] != null ? " · ${c['serial_no']}" : ""}',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      if (c['issue'] != null)
+                        Text(
+                          c['issue'].toString(),
                           style: const TextStyle(
-                              fontSize: 12, color: BrandColors.muted)),
-                    const SizedBox(height: 8),
-                    Wrap(spacing: 6, children: ['open', 'resolved', 'rejected'].map((st) {
-                      return ChoiceChip(
-                        label: Text(st, style: const TextStyle(fontSize: 11)),
-                        selected: status == st,
-                        onSelected: (_) async {
-                          await ref.read(apiClientProvider).patch(
-                              '/kirana/warranty-claims/${c['claim_id']}', {'status': st});
-                          ref.invalidate(claimsProvider);
-                        },
-                      );
-                    }).toList()),
-                  ]),
+                            fontSize: 12,
+                            color: BrandColors.muted,
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 6,
+                        children: ['open', 'resolved', 'rejected'].map((st) {
+                          return ChoiceChip(
+                            label: Text(
+                              st,
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                            selected: status == st,
+                            onSelected: (_) async {
+                              await ref.read(apiClientProvider).patch(
+                                '/kirana/warranty-claims/${c['claim_id']}',
+                                {'status': st},
+                              );
+                              ref.invalidate(claimsProvider);
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
@@ -206,9 +243,13 @@ class _WarrantyScreenState extends ConsumerState<WarrantyScreen>
       data: (list) => list.isEmpty
           ? const Center(
               child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text('No serials registered.',
-                      style: TextStyle(color: BrandColors.muted))))
+                padding: EdgeInsets.all(32),
+                child: Text(
+                  'No serials registered.',
+                  style: TextStyle(color: BrandColors.muted),
+                ),
+              ),
+            )
           : ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: list.length,
@@ -247,7 +288,8 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final sorted = [...widget.serials]..sort((a, b) {
+    final sorted = [...widget.serials]
+      ..sort((a, b) {
         final aSold = (a['status'] == 'sold') ? 0 : 1;
         final bSold = (b['status'] == 'sold') ? 0 : 1;
         return aSold.compareTo(bSold);
@@ -256,12 +298,16 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
     final filtered = q.isEmpty
         ? sorted
         : sorted
-            .where((s) =>
-                (s['serial_no']?.toString().toLowerCase() ?? '').contains(q))
-            .toList();
+              .where(
+                (s) => (s['serial_no']?.toString().toLowerCase() ?? '')
+                    .contains(q),
+              )
+              .toList();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: DraggableScrollableSheet(
         initialChildSize: 0.7,
         minChildSize: 0.4,
@@ -292,8 +338,11 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
                   onChanged: (v) => setState(() => _query = v),
                   decoration: InputDecoration(
                     hintText: 'Search serial / IMEI',
-                    prefixIcon: const Icon(Icons.search_rounded,
-                        size: 20, color: BrandColors.muted),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      size: 20,
+                      color: BrandColors.muted,
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
@@ -301,7 +350,9 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 10),
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                   ),
                 ),
               ),
@@ -309,8 +360,10 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
               Expanded(
                 child: filtered.isEmpty
                     ? const Center(
-                        child: Text('No serials registered.',
-                            style: TextStyle(color: BrandColors.muted)),
+                        child: Text(
+                          'No serials registered.',
+                          style: TextStyle(color: BrandColors.muted),
+                        ),
                       )
                     : ListView.builder(
                         controller: scrollCtrl,
@@ -322,12 +375,20 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            title: Text(s['serial_no']?.toString() ?? '—',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 14)),
-                            subtitle: Text('status: ${s['status'] ?? "in_stock"}',
-                                style: const TextStyle(
-                                    fontSize: 12, color: BrandColors.muted)),
+                            title: Text(
+                              s['serial_no']?.toString() ?? '—',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'status: ${s['status'] ?? "in_stock"}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: BrandColors.muted,
+                              ),
+                            ),
                             onTap: () => Navigator.pop(context, s),
                           );
                         },

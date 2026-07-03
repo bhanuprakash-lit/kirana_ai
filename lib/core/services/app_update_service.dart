@@ -94,7 +94,9 @@ class AppUpdateService {
       final info = await PackageInfo.fromPlatform();
       final currentVersion = info.version;
 
-      final uri = Uri.parse('https://itunes.apple.com/lookup?id=$_iosAppStoreId');
+      final uri = Uri.parse(
+        'https://itunes.apple.com/lookup?id=$_iosAppStoreId',
+      );
       final response = await http.get(uri).timeout(const Duration(seconds: 5));
       if (response.statusCode != 200) return false;
 

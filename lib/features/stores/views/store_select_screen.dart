@@ -40,11 +40,19 @@ class StoreSelectScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 12),
-                  const Text('Choose a store',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: BrandColors.ink)),
+                  const Text(
+                    'Choose a store',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      color: BrandColors.ink,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  const Text('Pick which store to open. You can switch any time.',
-                      style: TextStyle(color: BrandColors.muted)),
+                  const Text(
+                    'Pick which store to open. You can switch any time.',
+                    style: TextStyle(color: BrandColors.muted),
+                  ),
                   const SizedBox(height: 20),
                   Expanded(
                     child: ListView.separated(
@@ -56,7 +64,9 @@ class StoreSelectScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () async {
                             try {
-                              await ref.read(storeActionsProvider).switchStore(s.storeId);
+                              await ref
+                                  .read(storeActionsProvider)
+                                  .switchStore(s.storeId);
                             } catch (_) {}
                             if (context.mounted) context.go('/home');
                           },
@@ -71,29 +81,53 @@ class StoreSelectScreen extends ConsumerWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 22,
-                                  backgroundColor: BrandColors.primary.withValues(alpha: 0.12),
+                                  backgroundColor: BrandColors.primary
+                                      .withValues(alpha: 0.12),
                                   child: Text(
-                                    s.storeName.isNotEmpty ? s.storeName[0].toUpperCase() : '?',
-                                    style: const TextStyle(color: BrandColors.primary, fontWeight: FontWeight.bold, fontSize: 18),
+                                    s.storeName.isNotEmpty
+                                        ? s.storeName[0].toUpperCase()
+                                        : '?',
+                                    style: const TextStyle(
+                                      color: BrandColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(s.storeName,
-                                          maxLines: 1, overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
                                       Text(
-                                        s.verticalCode[0].toUpperCase() + s.verticalCode.substring(1) +
-                                            (s.city != null && s.city!.isNotEmpty ? ' · ${s.city}' : ''),
-                                        style: const TextStyle(color: BrandColors.muted, fontSize: 13),
+                                        s.storeName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Text(
+                                        s.verticalCode[0].toUpperCase() +
+                                            s.verticalCode.substring(1) +
+                                            (s.city != null &&
+                                                    s.city!.isNotEmpty
+                                                ? ' · ${s.city}'
+                                                : ''),
+                                        style: const TextStyle(
+                                          color: BrandColors.muted,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                const Icon(Icons.chevron_right_rounded, color: BrandColors.muted),
+                                const Icon(
+                                  Icons.chevron_right_rounded,
+                                  color: BrandColors.muted,
+                                ),
                               ],
                             ),
                           ),

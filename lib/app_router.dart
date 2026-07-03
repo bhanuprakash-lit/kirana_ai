@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'features/auth/views/login_screen.dart';
 import 'features/dashboard/views/dashboard_screen.dart';
 import 'features/dashboard/views/intelligence_details/intelligence_detail_screen.dart';
+import 'features/dashboard/views/forecast_items_screen.dart';
 import 'features/onboarding/views/language_select_screen.dart';
 import 'features/onboarding/views/onboarding_screen.dart';
 import 'features/pos_inventory/views/transaction_history_screen.dart';
@@ -97,6 +98,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final type = state.pathParameters['type'] ?? 'fast_moving';
           return IntelligenceDetailScreen(type: type);
+        },
+      ),
+      GoRoute(
+        path: '/forecast-items',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return ForecastItemsScreen(
+            storeId: extra['store_id'] as int? ?? 1,
+            initialHorizon: extra['horizon_days'] as int? ?? 1,
+          );
         },
       ),
       GoRoute(

@@ -10,6 +10,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
 import '../../vision/providers/vision_provider.dart';
+import '../../vision/views/onboarding_stockin_screen.dart';
 import '../../vision/views/vision_screen.dart';
 import '../../finance/views/finance_screen.dart';
 import '../../auth/providers/user_provider.dart';
@@ -176,6 +177,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     if (action == 'vision' || action == 'open_vision') {
       ref.read(dashboardTabProvider.notifier).switchTab(3);
     }
+
+    // 6) Bulk stock-in results ready — open the onboarding review for that session.
+    if (action == 'open_onboarding_review') {
+      final sessionId = int.tryParse(nav['session_id'] ?? '');
+      ref.read(dashboardTabProvider.notifier).switchTab(2); // POS/Inventory
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => OnboardingStockInScreen(resumeSessionId: sessionId),
+        ));
+      });
+    }
   }
 
   Future<void> _initSubscription() async {
@@ -230,10 +243,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         _visitedTabs.contains(i) ? tabs[i] : const SizedBox.shrink(),
     ];
     return Scaffold(
-      body: IndexedStack(
-        index: safeIndex,
-        children: lazyTabs,
-      ),
+      body: IndexedStack(index: safeIndex, children: lazyTabs),
       bottomNavigationBar: NavigationBar(
         selectedIndex: safeIndex,
         onDestinationSelected: (i) =>
@@ -282,13 +292,30 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
 
   Future<void> _request() async {
     setState(() => _loading = true);
+    var failed = false;
     try {
       await ref
           .read(subscriptionProvider.notifier)
           .requestTrial(tier: _selectedTier);
     } catch (_) {
+      failed = true;
+      // The trial is often granted server-side (approval commits) even when the
+      // response fails, which previously left the owner stuck on this screen with
+      // the error silently swallowed. Re-fetch the authoritative state so the gate
+      // can move them to their dashboard / pending screen.
+      await ref.read(subscriptionProvider.notifier).refresh();
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+    if (!mounted) return;
+    // Only surface an error if we genuinely didn't move on (no access and not
+    // pending); otherwise the reactive gate has already navigated away.
+    final sub = ref.read(subscriptionProvider).asData?.value;
+    final movedOn = sub != null && (sub.hasAppAccess || sub.isPending);
+    if (failed && !movedOn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).dashTrialRequestError)),
+      );
     }
   }
 
