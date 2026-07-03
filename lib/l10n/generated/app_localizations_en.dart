@@ -5068,6 +5068,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get visionScanFailed => 'Scan failed. Please retake the photo.';
 
   @override
+  String get visionStillProcessing =>
+      'Still analysing your photos — this can take a couple of minutes. The result will appear here when it\'s ready.';
+
+  @override
+  String get visionCheckAgain => 'Check again';
+
+  @override
   String get visionNoPhotoYet => 'No photo taken yet.';
 
   @override

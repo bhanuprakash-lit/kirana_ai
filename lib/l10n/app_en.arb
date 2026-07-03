@@ -3129,6 +3129,8 @@
   "visionReview": "Review",
   "visionAnalyzing": "Analyzing shelf… this can take up to a minute",
   "visionScanFailed": "Scan failed. Please retake the photo.",
+  "visionStillProcessing": "Still analysing your photos — this can take a couple of minutes. The result will appear here when it's ready.",
+  "visionCheckAgain": "Check again",
   "visionNoPhotoYet": "No photo taken yet.",
   "visionProductsIdentified": "Products identified",
   "visionUnitsCounted": "Units counted",

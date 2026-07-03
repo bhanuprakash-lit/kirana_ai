@@ -8849,6 +8849,18 @@ abstract class AppLocalizations {
   /// **'Scan failed. Please retake the photo.'**
   String get visionScanFailed;
 
+  /// No description provided for @visionStillProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Still analysing your photos — this can take a couple of minutes. The result will appear here when it\'s ready.'**
+  String get visionStillProcessing;
+
+  /// No description provided for @visionCheckAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get visionCheckAgain;
+
   /// No description provided for @visionNoPhotoYet.
   ///
   /// In en, this message translates to:

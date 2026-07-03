@@ -234,7 +234,8 @@ class AppLocalizationsTe extends AppLocalizations {
   String get accountErrUsernameMin3 => 'యూజర్‌నేమ్ కనీసం 3 అక్షరాలు ఉండాలి';
 
   @override
-  String get accountErrUsernameMax30 => 'Username can be at most 30 characters';
+  String get accountErrUsernameMax30 =>
+      'వినియోగదారు పేరు గరిష్టంగా 30 అక్షరాలు ఉండవచ్చు';
 
   @override
   String get accountErrUsernameChars =>
@@ -245,7 +246,7 @@ class AppLocalizationsTe extends AppLocalizations {
       'ఆ యూజర్‌నేమ్ తీసుకోబడింది. మరొకటి ప్రయత్నించండి.';
 
   @override
-  String get accountUsernameAvailable => 'Username is available';
+  String get accountUsernameAvailable => 'వినియోగదారు పేరు అందుబాటులో ఉంది';
 
   @override
   String get businessTitle => 'మీ దుకాణం గురించి\nమాకు చెప్పండి';
@@ -501,7 +502,7 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get dashTrialRequestError =>
-      'Couldn\'t start your trial just now. Please check your connection and try again.';
+      'ఇప్పుడు మీ ట్రయల్ ప్రారంభించలేకపోయాము. దయచేసి మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.';
 
   @override
   String get dashTrialSignInDifferent => 'వేరే ఖాతాలోకి సైన్ ఇన్ చేయండి';
@@ -5063,6 +5064,13 @@ class AppLocalizationsTe extends AppLocalizations {
   String get visionScanFailed => 'స్కాన్ విఫలమైంది. దయచేసి మళ్ళీ ఫోటో తీయండి.';
 
   @override
+  String get visionStillProcessing =>
+      'మీ ఫోటోల విశ్లేషణ జరుగుతోంది — దీనికి కొన్ని నిమిషాలు పట్టవచ్చు. సిద్ధమైనప్పుడు ఫలితం ఇక్కడ కనిపిస్తుంది.';
+
+  @override
+  String get visionCheckAgain => 'మళ్ళీ తనిఖీ చేయండి';
+
+  @override
   String get visionNoPhotoYet => 'ఇంకా ఫోటో తీయలేదు.';
 
   @override
@@ -5124,201 +5132,202 @@ class AppLocalizationsTe extends AppLocalizations {
       'బిల్లింగ్ కౌంటర్ వైపు మీ ఫోన్ చూపించండి, వస్తువులు దాటుతుండగానే అమ్మకాలు ఆటోమేటిక్‌గా లెక్కించబడతాయి. మేము దీనికి తుది మెరుగులు దిద్దుతున్నాం.';
 
   @override
-  String get visionCounterStartTitle => 'Live Sale Counter';
+  String get visionCounterStartTitle => 'లైవ్ సేల్ కౌంటర్';
 
   @override
   String get visionCounterStartDesc =>
-      'Point your phone at the billing counter. Items passing across the line are counted automatically — no barcode scanning.';
+      'మీ ఫోన్‌ను బిల్లింగ్ కౌంటర్ వైపు పట్టుకోండి. గీతను దాటే వస్తువులు స్వయంచాలకంగా లెక్కించబడతాయి — బార్‌కోడ్ స్కానింగ్ లేదు.';
 
   @override
-  String get visionCounterStart => 'Start counting';
+  String get visionCounterStart => 'లెక్కింపు ప్రారంభించండి';
 
   @override
-  String get visionCounterFinish => 'Finish';
+  String get visionCounterFinish => 'ముగించండి';
 
   @override
-  String get visionCounterPause => 'Pause';
+  String get visionCounterPause => 'పాజ్ చేయండి';
 
   @override
-  String get visionCounterResume => 'Resume';
+  String get visionCounterResume => 'కొనసాగించండి';
 
   @override
-  String get visionCounterUndo => 'Undo';
+  String get visionCounterUndo => 'రద్దు చేయండి';
 
   @override
-  String get visionCounterFlip => 'Flip side';
+  String get visionCounterFlip => 'వైపు మార్చండి';
 
   @override
-  String get visionCounterCounted => 'Counted';
+  String get visionCounterCounted => 'లెక్కించబడింది';
 
   @override
   String get visionCounterNothingYet =>
-      'Move items across the line to count them.';
+      'వస్తువులను లెక్కించడానికి వాటిని గీత దాటి కదిలించండి.';
 
   @override
   String get visionCounterHint =>
-      'Items crossing into the green zone are counted as sold.';
+      'ఆకుపచ్చ జోన్‌లోకి దాటే వస్తువులు అమ్ముడైనట్లు లెక్కించబడతాయి.';
 
   @override
-  String get visionCounterZoneStore => 'In store';
+  String get visionCounterZoneStore => 'దుకాణంలో';
 
   @override
-  String get visionCounterZoneSold => 'Sold';
+  String get visionCounterZoneSold => 'అమ్ముడైంది';
 
   @override
-  String get visionCounterModelMissingTitle => 'Counter model not installed';
+  String get visionCounterModelMissingTitle =>
+      'కౌంటర్ మోడల్ ఇన్‌స్టాల్ చేయబడలేదు';
 
   @override
   String get visionCounterModelMissingDesc =>
-      'The on-device counting model isn\'t bundled in this build yet. It\'s coming in an update — shelf scanning still works.';
+      'ఆన్-డివైస్ లెక్కింపు మోడల్ ఈ బిల్డ్‌లో ఇంకా చేర్చబడలేదు. ఇది ఒక అప్‌డేట్‌లో వస్తోంది — షెల్ఫ్ స్కానింగ్ ఇంకా పనిచేస్తుంది.';
 
   @override
-  String get visionCounterPermTitle => 'Camera access needed';
+  String get visionCounterPermTitle => 'కెమెరా యాక్సెస్ అవసరం';
 
   @override
   String get visionCounterPermDesc =>
-      'Allow camera access to count items at the billing counter.';
+      'బిల్లింగ్ కౌంటర్‌లో వస్తువులను లెక్కించడానికి కెమెరా యాక్సెస్‌ను అనుమతించండి.';
 
   @override
-  String get visionCounterGrant => 'Allow camera';
+  String get visionCounterGrant => 'కెమెరాను అనుమతించండి';
 
   @override
-  String get visionCounterOpenSettings => 'Open settings';
+  String get visionCounterOpenSettings => 'సెట్టింగ్‌లను తెరవండి';
 
   @override
-  String get visionCounterFinishConfirmTitle => 'Finish counting?';
+  String get visionCounterFinishConfirmTitle => 'లెక్కింపు ముగించాలా?';
 
   @override
   String get visionCounterFinishConfirmDesc =>
-      'We\'ll save today\'s tally and add it to your counter summary.';
+      'మేము నేటి లెక్కను సేవ్ చేసి మీ కౌంటర్ సారాంశానికి జోడిస్తాము.';
 
   @override
-  String get visionCounterSave => 'Save count';
+  String get visionCounterSave => 'లెక్కను సేవ్ చేయండి';
 
   @override
-  String get visionCounterDiscard => 'Discard';
+  String get visionCounterDiscard => 'విస్మరించండి';
 
   @override
-  String get visionCounterKeepCounting => 'Keep counting';
+  String get visionCounterKeepCounting => 'లెక్కింపు కొనసాగించండి';
 
   @override
-  String get visionCounterSavedTitle => 'Counting saved';
+  String get visionCounterSavedTitle => 'లెక్కింపు సేవ్ చేయబడింది';
 
   @override
   String visionCounterSaved(int count, int skus) {
-    return 'Saved $count items across $skus products.';
+    return '$skus ఉత్పత్తులలో $count వస్తువులు సేవ్ చేయబడ్డాయి.';
   }
 
   @override
   String get visionCounterOfflineNote =>
-      'Saved on your phone. It\'ll sync when the counter service is available.';
+      'మీ ఫోన్‌లో సేవ్ చేయబడింది. కౌంటర్ సేవ అందుబాటులోకి వచ్చినప్పుడు ఇది సింక్ అవుతుంది.';
 
   @override
   String visionCounterPending(int count) {
-    return '$count not synced yet';
+    return '$count ఇంకా సింక్ కాలేదు';
   }
 
   @override
-  String get visionCounterSummaryTitle => 'Today\'s counter tally';
+  String get visionCounterSummaryTitle => 'నేటి కౌంటర్ లెక్క';
 
   @override
   String get visionCounterSummaryEmpty =>
-      'No items counted today. Tap Start counting to begin.';
+      'ఈరోజు ఏ వస్తువూ లెక్కించబడలేదు. ప్రారంభించడానికి \'లెక్కింపు ప్రారంభించండి\' నొక్కండి.';
 
   @override
-  String get visionCounterSummaryTotal => 'Total counted today';
+  String get visionCounterSummaryTotal => 'ఈరోజు మొత్తం లెక్కించబడింది';
 
   @override
-  String get visionCounterUnknownItem => 'Unrecognised product';
+  String get visionCounterUnknownItem => 'గుర్తించని ఉత్పత్తి';
 
   @override
-  String get onbCtaTitle => 'Have hundreds of items?';
+  String get onbCtaTitle => 'వందల వస్తువులు ఉన్నాయా?';
 
   @override
   String get onbCtaSubtitle =>
-      'Photograph your shelves and we\'ll identify the products and add them to your inventory — no scanning each one.';
+      'మీ షెల్ఫ్‌లను ఫోటో తీయండి, మేము ఉత్పత్తులను గుర్తించి మీ ఇన్వెంటరీకి జోడిస్తాము — ప్రతిదాన్ని స్కాన్ చేయాల్సిన అవసరం లేదు.';
 
   @override
-  String get onbCtaButton => 'Snap your shelves';
+  String get onbCtaButton => 'మీ షెల్ఫ్‌లను ఫోటో తీయండి';
 
   @override
-  String get onbCaptureTitle => 'Photograph your shelves';
+  String get onbCaptureTitle => 'మీ షెల్ఫ్‌లను ఫోటో తీయండి';
 
   @override
   String get onbCaptureHint =>
-      'Take 3 to 10 clear photos covering all your shelves. Good lighting helps us identify more products.';
+      'మీ అన్ని షెల్ఫ్‌లను కవర్ చేస్తూ 3 నుండి 10 స్పష్టమైన ఫోటోలు తీయండి. మంచి వెలుతురు ఎక్కువ ఉత్పత్తులను గుర్తించడంలో సహాయపడుతుంది.';
 
   @override
-  String get onbTakePhoto => 'Take a photo';
+  String get onbTakePhoto => 'ఫోటో తీయండి';
 
   @override
   String onbPhotosProgress(int count) {
-    return '$count of 10 photos';
+    return '10లో $count ఫోటోలు';
   }
 
   @override
-  String get onbMinPhotos => 'Add at least 3 photos';
+  String get onbMinPhotos => 'కనీసం 3 ఫోటోలు జోడించండి';
 
   @override
-  String get onbAnalyze => 'Identify products';
+  String get onbAnalyze => 'ఉత్పత్తులను గుర్తించండి';
 
   @override
-  String get onbProcessingTitle => 'We\'re reviewing your shelf photos';
+  String get onbProcessingTitle => 'మేము మీ షెల్ఫ్ ఫోటోలను సమీక్షిస్తున్నాము';
 
   @override
   String get onbProcessingDesc =>
-      'Our system is identifying the products on your shelves. This usually takes under a minute. Please keep this screen open — we\'ll show the results here shortly.';
+      'మా వ్యవస్థ మీ షెల్ఫ్‌లోని ఉత్పత్తులను గుర్తిస్తోంది. దీనికి సాధారణంగా ఒక నిమిషం కంటే తక్కువ సమయం పడుతుంది. దయచేసి ఈ స్క్రీన్‌ను తెరిచి ఉంచండి — మేము ఫలితాలను త్వరలో ఇక్కడ చూపిస్తాము.';
 
   @override
-  String get onbReviewTitle => 'Confirm your stock';
+  String get onbReviewTitle => 'మీ స్టాక్‌ను నిర్ధారించండి';
 
   @override
   String get onbReviewDisclaimer =>
-      'These are the products we identified from your photos. We may occasionally miss or misread an item, so please cross-check and adjust the quantities. We\'re continually improving our accuracy.';
+      'ఇవి మీ ఫోటోల నుండి మేము గుర్తించిన ఉత్పత్తులు. మేము అప్పుడప్పుడు ఒక వస్తువును కోల్పోవచ్చు లేదా తప్పుగా చదవవచ్చు, కాబట్టి దయచేసి పరిమాణాలను సరిచూసి సర్దుబాటు చేయండి. మేము నిరంతరం మా ఖచ్చితత్వాన్ని మెరుగుపరుస్తున్నాము.';
 
   @override
   String onbReviewSummary(int mapped, int unmapped) {
-    return '$mapped ready · $unmapped need a product';
+    return '$mapped సిద్ధం · $unmapped కి ఉత్పత్తి కావాలి';
   }
 
   @override
-  String get onbUnrecognised => 'Not recognised — choose a product';
+  String get onbUnrecognised => 'గుర్తించబడలేదు — ఒక ఉత్పత్తిని ఎంచుకోండి';
 
   @override
-  String get onbChooseProduct => 'Choose product';
+  String get onbChooseProduct => 'ఉత్పత్తిని ఎంచుకోండి';
 
   @override
-  String get onbQuantity => 'Qty';
+  String get onbQuantity => 'పరిమాణం';
 
   @override
-  String get onbCommit => 'Add to my inventory';
+  String get onbCommit => 'నా ఇన్వెంటరీకి జోడించండి';
 
   @override
-  String get onbCommitting => 'Adding to your inventory…';
+  String get onbCommitting => 'మీ ఇన్వెంటరీకి జోడించబడుతోంది…';
 
   @override
-  String get onbDoneTitle => 'Stock added';
+  String get onbDoneTitle => 'స్టాక్ జోడించబడింది';
 
   @override
   String onbDoneDesc(int products, int units) {
-    return '$products products ($units units) added to your inventory. You can set prices anytime from the Inventory tab.';
+    return '$products ఉత్పత్తులు ($units వస్తువులు) మీ ఇన్వెంటరీకి జోడించబడ్డాయి. మీరు ఇన్వెంటరీ ట్యాబ్ నుండి ఎప్పుడైనా ధరలను సెట్ చేయవచ్చు.';
   }
 
   @override
   String get onbEmptyDetected =>
-      'We couldn\'t identify products in these photos. Please retake them in better light, showing the packaging clearly.';
+      'ఈ ఫోటోలలో మేము ఉత్పత్తులను గుర్తించలేకపోయాము. దయచేసి మంచి వెలుతురులో, ప్యాకేజింగ్‌ను స్పష్టంగా చూపిస్తూ మళ్ళీ ఫోటో తీయండి.';
 
   @override
-  String get onbRetake => 'Retake photos';
+  String get onbRetake => 'మళ్ళీ ఫోటోలు తీయండి';
 
   @override
-  String get onbFailedTitle => 'We couldn\'t finish';
+  String get onbFailedTitle => 'మేము పూర్తి చేయలేకపోయాము';
 
   @override
-  String get onbDone => 'Done';
+  String get onbDone => 'పూర్తయింది';
 
   @override
-  String get onbRemove => 'Remove';
+  String get onbRemove => 'తీసివేయండి';
 
   @override
   String get visionAddPhotosTitle => 'షెల్ఫ్ ఫోటోలు జోడించండి';
