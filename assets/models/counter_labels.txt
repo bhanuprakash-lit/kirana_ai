@@ -13,9 +13,11 @@ ambica_agarbathi
 ambica_mahalakshmi_doop
 amore_rusk
 amruthanjan
+Anoos_blackxpert_haircolor
 anoos_henna
 anurag_pooja_oil
 anushri_agarbathi
+appy_fizz
 ariel_fl_1litre_pouch
 ariel_liquid_sachet
 ariel_matic_liquid_FL_trial_pack
@@ -32,12 +34,15 @@ bambino_semiya_500g
 bambino_semiya_packet
 banjaras_black_henna
 barath_vasi_agarbathi
+bindu_fizz_jeera_masala
 bisleri_soda
 bisleri_water_bottle
 black_hit
 black_rose_hair_color
 black_stone_agarbathi
 blue_lays
+boost_bottle_200g
+boost_bottle_500g
 Boost_sachet
 bourbon_biscuits
 bournvita_500g
@@ -61,6 +66,7 @@ cinthol_soap
 clear_shampoo_sachet
 clinic_plus_shampoo
 closeup_tooth_paste
+coco_cola_200ml
 colgate_maxfresh_blue_tooth_paste_100g
 colgate_maxfresh_red
 colgate_maxfresh_red_tooth_paste_100g
@@ -71,6 +77,7 @@ colgate_tooth_paste
 colgate_tooth_paste_100g
 colgate_vedashakthi_tooth_paste
 Colin cleaner
+colin_200ml
 comfort fabric softener
 comfort_fabric_conditioner_black_sachet
 comfort_fabric_conditioner_blue_1L
@@ -164,6 +171,7 @@ good_knight_green_shakti_coil
 good_knight_refill
 good_knight_set
 gowdurbar_agarbathi
+grb_cow_ghee_200g
 grb_ghee_100ml
 grb_ghee_200ml
 green_kurkure
@@ -184,6 +192,7 @@ harpic_toilet_cleaner_original
 head_and_shoulders_daily_clean_shampoo_sachet
 head_and_shoulders_neem_shampoo_sachet
 head_and_shoulders_shampoo_bottle
+hellmann's_real_mayonnaise
 hide_and_seek_biscuit_packet
 himalaya cucumber and coconut soap
 himalaya_soap_almond_and_rose
@@ -231,6 +240,7 @@ lux_white_soap
 maaza_200ml
 maggi 2-minute instant noodles
 maggi_4pack
+maggi_6pack
 maggi_8pack
 maggi_masala_magic
 maggi_packet
@@ -276,6 +286,7 @@ mysore_sandal_trio_box
 naivedya_doop
 nani_ghee
 navaratna_hair_oil
+nestle_milkmaid
 nilon's_pasta_masala
 niloufer_elaichi_tea_sachet
 niloufer_supreme_tea_100g
@@ -283,6 +294,7 @@ nimyle_floor_cleaner
 nippo_aaa_batteries
 nisha_hair_color
 nova_cream
+nutrela_soya_chunks
 nutri_choice_biscuit
 nycil_cool_powder
 odonil_air_freshner
@@ -333,8 +345,10 @@ rexona_soap
 rin_bar_10/-
 rin_bar_20/-
 rin_matic_liquid_1L_pouch
+rin_surf_1kg
 rudraksha_agarbathi
 saffola_masala_oats
+Saffola_soft_creamy_oats
 sandal_agarbathi
 santoor_aloevera_soaps
 santoor_baby_soap
@@ -344,6 +358,7 @@ sensodyne_tooth_paste
 sensodyne_tooth_paste_20/-
 shivan_agarbathi
 snickers_chocolate
+softouch_bottle
 sprite_1L
 stayfree_secure_xl
 sting
@@ -358,6 +373,7 @@ surf_excel_matic_liquid_FL_pouch
 surf_excel_matic_liquid_TL_pouch
 surf_excel_matic_sachet
 surf_excelmatic_topload_sachet
+surfexcel_matic_liquid_TL_sachet
 surfexcel_soap
 surfexcel_soap_10/-
 swastik_chilli_powder_sachet
@@ -365,6 +381,7 @@ swastik_turmeric_powder_sachet
 Swastiks ginger pickle
 Swastiks mango pickle
 Swastiks red  chilli pickle
+swastiks_ginger_&_garlic_paste
 swastiks_mango_pickle_200g
 swastiks_tomato_pickle_200g
 swastiks_tomato_pickle_500g
@@ -372,8 +389,10 @@ synthetic_vinegar_bottle_1l
 taj_mahal_tea_powder
 tang_orange_instant_mix_powder
 tata_tea_agni
+tata_tea_gold
 tetley_green_tea
 thumsup_200ml
+tide_surf_1kg
 tresemme shampoo
 tressme_conditioner_sachet
 tressme_shampoo_sachet

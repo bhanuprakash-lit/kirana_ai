@@ -68,7 +68,10 @@ class VisionNotifier extends Notifier<VisionState> {
   ApiClient get _client => ref.read(apiClientProvider);
 
   static const _pollEvery = Duration(seconds: 3);
-  static const _pollMax = 30; // ~90s ceiling before we stop waiting
+  // ~3min ceiling: a full 10-photo batch (Gemini + YOLO per image) can take well
+  // over a minute. If we still time out, the session stays visible as "processing"
+  // (the card polls/refreshes) rather than silently vanishing.
+  static const _pollMax = 60;
 
   @override
   VisionState build() {

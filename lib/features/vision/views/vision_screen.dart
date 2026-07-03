@@ -11,6 +11,7 @@ import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
 import '../models/vision_models.dart';
 import '../providers/vision_provider.dart';
+import '../widgets/item_thumb.dart';
 import 'counter_screen.dart';
 
 /// 4th dashboard tab. Pro-gated as a whole (like Procurement). Hosts three
@@ -309,7 +310,41 @@ class _SessionCard extends ConsumerWidget {
                   ],
                 ),
               )
-            else if (session != null && session!.isFailed) ...[
+            else if (session != null && session!.isPending) ...[
+              // The upload succeeded and analysis is still running on the server
+              // (a full photo batch can outlast the in-app poll). Keep the session
+              // visible as "processing" with a manual refresh instead of falling
+              // through to the blank "no photo yet" state.
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.visionStillProcessing,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: BrandColors.muted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      ref.read(visionProvider.notifier).loadToday(),
+                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                  label: Text(l10n.visionCheckAgain),
+                ),
+              ),
+            ] else if (session != null && session!.isFailed) ...[
               Text(
                 l10n.visionScanFailed,
                 style: const TextStyle(color: BrandColors.error),
@@ -760,11 +795,13 @@ class _SessionItemsScreenState extends ConsumerState<_SessionItemsScreen> {
                     borderRadius: BorderRadius.circular(14),
                     side: const BorderSide(color: BrandColors.border),
                   ),
-                  leading: Icon(
-                    it.needsReview
+                  leading: VisionItemThumb(
+                    itemId: it.itemId,
+                    size: 48,
+                    fallbackIcon: it.needsReview
                         ? Icons.help_outline_rounded
                         : Icons.check_circle_rounded,
-                    color: it.needsReview
+                    fallbackColor: it.needsReview
                         ? BrandColors.orange
                         : BrandColors.success,
                   ),
@@ -855,8 +892,15 @@ class _CorrectionSheetState extends ConsumerState<_CorrectionSheet> {
                 style: const TextStyle(fontSize: 12, color: BrandColors.muted),
               ),
               const SizedBox(height: 12),
+              VisionItemThumb(
+                itemId: widget.item.itemId,
+                size: 128,
+                fallbackIcon: Icons.image_not_supported_outlined,
+                fallbackColor: BrandColors.muted,
+              ),
+              const SizedBox(height: 12),
               TextField(
-                autofocus: true,
+                autofocus: false,
                 decoration: InputDecoration(
                   hintText: l10n.visionSearchProducts,
                   prefixIcon: const Icon(Icons.search_rounded),

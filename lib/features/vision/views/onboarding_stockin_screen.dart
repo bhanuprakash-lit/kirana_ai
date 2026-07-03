@@ -8,6 +8,7 @@ import '../../../core/theme/brand_theme.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../providers/onboarding_provider.dart';
+import '../widgets/item_thumb.dart';
 
 /// Bulk stock-in: photograph shelves in-app → detect products → confirm
 /// quantities → add to inventory. Launched from the empty-inventory CTA.
@@ -449,6 +450,15 @@ class _ReviewTile extends StatelessWidget {
       ),
       child: Row(
         children: [
+          VisionItemThumb(
+            itemId: item.itemId,
+            size: 46,
+            fallbackIcon: needsMap
+                ? Icons.help_outline_rounded
+                : Icons.inventory_2_outlined,
+            fallbackColor: needsMap ? BrandColors.orange : BrandColors.primary,
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

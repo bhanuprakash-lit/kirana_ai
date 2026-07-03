@@ -15,7 +15,7 @@ class AppConfig {
   /// One of: local, dev, prod. Defaults to local for plain `flutter run`.
   static const String env = String.fromEnvironment(
     'ENV',
-    defaultValue: 'local',
+    defaultValue: 'dev',
   );
 
   /// Remote Config parameter name this build reads its backend URL from.

@@ -42,6 +42,10 @@ class ApiClient {
     _cachedPosToken = null;
   }
 
+  /// Bearer token for authenticated media loads (e.g. `Image.network` of a
+  /// backend-served image, which can't go through the JSON helpers below).
+  static Future<String?> mediaAuthToken() => _getAuthToken();
+
   static void updateTokenCache({String? authToken, String? posToken}) {
     if (authToken != null) _cachedAuthToken = authToken;
     if (posToken != null) _cachedPosToken = posToken;
