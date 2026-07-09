@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/api_client.dart';
 import '../../core/store/store_scope.dart';
 import '../../core/theme/brand_theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../profile/models/customer_model.dart';
 import '../../shared/widgets/customer_picker.dart';
 
@@ -185,14 +186,15 @@ class JobCardsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final async = ref.watch(jobCardsProvider);
     return Scaffold(
       backgroundColor: BrandColors.background,
-      appBar: AppBar(title: const Text('Job Cards')),
+      appBar: AppBar(title: Text(l10n.jobTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _add(context, ref),
         icon: const Icon(Icons.add),
-        label: const Text('New job'),
+        label: Text(l10n.jobNewJob),
       ),
       body: async.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -362,6 +364,7 @@ class JobCardsScreen extends ConsumerWidget {
   }
 
   void _add(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final item = TextEditingController();
     final charge = TextEditingController();
     String type = 'repair';
@@ -388,19 +391,25 @@ class JobCardsScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'New job card',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+                Text(
+                  l10n.jobNewJobCard,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 SegmentedButton<String>(
-                  segments: const [
-                    ButtonSegment(value: 'repair', label: Text('Repair')),
+                  segments: [
+                    ButtonSegment(value: 'repair', label: Text(l10n.jobRepair)),
                     ButtonSegment(
                       value: 'alteration',
-                      label: Text('Alteration'),
+                      label: Text(l10n.jobAlteration),
                     ),
-                    ButtonSegment(value: 'preorder', label: Text('Pre-order')),
+                    ButtonSegment(
+                      value: 'preorder',
+                      label: Text(l10n.jobPreorder),
+                    ),
                   ],
                   selected: {type},
                   onSelectionChanged: (s) => setSt(() => type = s.first),

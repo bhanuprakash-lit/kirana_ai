@@ -2962,6 +2962,387 @@ class AppLocalizationsTe extends AppLocalizations {
   String get procRecordReturn => 'రిటర్న్ రికార్డ్ చేయండి';
 
   @override
+  String get rackTitle => 'స్టాక్ ర్యాక్‌లు';
+
+  @override
+  String get rackPlaceStock => 'స్టాక్ ఉంచండి';
+
+  @override
+  String get rackSearchHint => 'ఉత్పత్తి లేదా ర్యాక్ వెతకండి (ఉదా. A1)';
+
+  @override
+  String get rackSaved => 'స్టాక్ ర్యాక్‌లో ఉంచబడింది';
+
+  @override
+  String get rackChangeQty => 'పరిమాణం మార్చండి';
+
+  @override
+  String get rackMove => 'మరో ర్యాక్‌కు తరలించండి';
+
+  @override
+  String get rackRemove => 'ర్యాక్ నుండి తీసివేయండి';
+
+  @override
+  String get rackRemoved => 'ర్యాక్ నుండి తీసివేయబడింది';
+
+  @override
+  String get rackMoved => 'కొత్త ర్యాక్‌కు తరలించబడింది';
+
+  @override
+  String get rackEmpty =>
+      'ఇంకా ర్యాక్‌లు సెటప్ చేయలేదు. ఉత్పత్తిని ర్యాక్‌లో ఉంచడానికి \'స్టాక్ ఉంచండి\' నొక్కండి — తర్వాత దాన్ని త్వరగా కనుగొనవచ్చు.';
+
+  @override
+  String get rackNoMatch => 'మీ శోధనకు ఏ ఉత్పత్తి లేదా ర్యాక్ సరిపోలలేదు.';
+
+  @override
+  String get rackItems => 'వస్తువులు';
+
+  @override
+  String get rackProduct => 'ఉత్పత్తి';
+
+  @override
+  String get rackSelectProduct => 'ఉత్పత్తిని ఎంచుకోండి';
+
+  @override
+  String get rackPickProductFirst => 'ముందుగా ఉత్పత్తిని ఎంచుకోండి';
+
+  @override
+  String get rackNeedLabel => 'ర్యాక్ / బిన్ లేబుల్ నమోదు చేయండి';
+
+  @override
+  String get rackSaveFailed => 'సేవ్ చేయలేకపోయాము. దయచేసి మళ్ళీ ప్రయత్నించండి.';
+
+  @override
+  String get rackLabel => 'ర్యాక్ / బిన్';
+
+  @override
+  String get rackLabelHint => 'ఉదా. A1, పై షెల్ఫ్, కోల్డ్ స్టోరేజ్';
+
+  @override
+  String get rackQuantity => 'ఈ ర్యాక్‌లో పరిమాణం';
+
+  @override
+  String get rackSave => 'సేవ్ చేయండి';
+
+  @override
+  String get rackLoadFailed =>
+      'ర్యాక్‌లను లోడ్ చేయలేకపోయాము. మీ కనెక్షన్‌ను తనిఖీ చేయండి.';
+
+  @override
+  String get rackRetry => 'మళ్ళీ ప్రయత్నించండి';
+
+  @override
+  String get rackLocation => 'ర్యాక్ స్థానం';
+
+  @override
+  String get rackSetLocation => 'ర్యాక్ స్థానాన్ని సెట్ చేయండి';
+
+  @override
+  String get rackNoneForProduct => 'ఇంకా ఏ ర్యాక్‌లోనూ ఉంచలేదు.';
+
+  @override
+  String get procExchangeInstead =>
+      'ఎక్స్చేంజ్ (కస్టమర్ వేరే వస్తువు తీసుకుంటారు)';
+
+  @override
+  String get procRefundAmount => 'రీఫండ్ మొత్తం';
+
+  @override
+  String get fulTitle => 'అంచనాలు & రిటర్న్స్';
+
+  @override
+  String get fulTabEstimates => 'అంచనాలు';
+
+  @override
+  String get fulTabReturns => 'రిటర్న్స్';
+
+  @override
+  String get fulNoReturns =>
+      'ఇంకా రిటర్న్స్ లేవు. కస్టమర్ ఏదైనా తిరిగి తెచ్చినప్పుడు, \'రిటర్న్ నమోదు చేయండి\' నొక్కి వారి ఆర్డర్‌ను ఎంచుకోండి.';
+
+  @override
+  String get fulLogReturn => 'రిటర్న్ నమోదు చేయండి';
+
+  @override
+  String get fulPickOrderTitle => 'ఏ ఆర్డర్ తిరిగి ఇవ్వబడుతోంది?';
+
+  @override
+  String get fulSearchOrders => 'ఆర్డర్ # లేదా కస్టమర్ ద్వారా వెతకండి';
+
+  @override
+  String get fulNoOrders => 'ఇటీవలి ఆర్డర్‌లు కనబడలేదు.';
+
+  @override
+  String get fulExchange => 'ఎక్స్చేంజ్';
+
+  @override
+  String get fulRefund => 'రీఫండ్';
+
+  @override
+  String get fulBackToShelf => 'షెల్ఫ్‌కు తిరిగి';
+
+  @override
+  String get fulToVendor => 'వెండర్‌కు';
+
+  @override
+  String get fulItems => 'వస్తువులు';
+
+  @override
+  String get fulLoadFailed =>
+      'లోడ్ కాలేదు. దయచేసి మీ కనెక్షన్‌ను తనిఖీ చేయండి.';
+
+  @override
+  String get fulRetry => 'మళ్ళీ ప్రయత్నించండి';
+
+  @override
+  String get estEmpty =>
+      'ఇంకా అంచనాలు లేవు. కస్టమర్ కోసం కొటేషన్ సృష్టించండి — దాన్ని షేర్ చేసి తర్వాత అమ్మకంగా మార్చవచ్చు.';
+
+  @override
+  String get estNewEstimate => 'కొత్త అంచనా';
+
+  @override
+  String get estWalkIn => 'వాక్-ఇన్ కస్టమర్';
+
+  @override
+  String get estAddOneItem => 'కనీసం ఒక వస్తువును జోడించండి';
+
+  @override
+  String get estSaveFailed => 'సేవ్ చేయలేకపోయాము. దయచేసి మళ్ళీ ప్రయత్నించండి.';
+
+  @override
+  String get estCustomerOptional => 'కస్టమర్ (ఐచ్ఛికం)';
+
+  @override
+  String get estSelectCustomer => 'కస్టమర్‌ను ఎంచుకోండి';
+
+  @override
+  String get estAddItem => 'వస్తువును జోడించండి';
+
+  @override
+  String get estValidUntil => 'వరకు చెల్లుతుంది';
+
+  @override
+  String get estNoExpiry => 'గడువు లేదు';
+
+  @override
+  String get estSaveEstimate => 'అంచనాను సేవ్ చేయండి';
+
+  @override
+  String get estItemName => 'వస్తువు పేరు';
+
+  @override
+  String get estPickFromCatalog => 'క్యాటలాగ్ నుండి ఎంచుకోండి';
+
+  @override
+  String get estQty => 'పరిమాణం';
+
+  @override
+  String get estUnitPrice => 'యూనిట్ ధర';
+
+  @override
+  String get estAddedToBill => 'బిల్లుకు జోడించబడింది';
+
+  @override
+  String get estSkippedNotInCatalog => 'దాటవేయబడింది (క్యాటలాగ్‌లో లేదు)';
+
+  @override
+  String get estShareHeading => 'అంచనా / కొటేషన్';
+
+  @override
+  String get estShareTotal => 'మొత్తం';
+
+  @override
+  String get estTotal => 'మొత్తం';
+
+  @override
+  String get estStatus => 'స్థితి';
+
+  @override
+  String get estStatusDraft => 'డ్రాఫ్ట్';
+
+  @override
+  String get estStatusSent => 'పంపబడింది';
+
+  @override
+  String get estStatusAccepted => 'ఆమోదించబడింది';
+
+  @override
+  String get estStatusRejected => 'తిరస్కరించబడింది';
+
+  @override
+  String get estShare => 'షేర్ చేయండి';
+
+  @override
+  String get estConvert => 'అమ్మకంగా మార్చండి';
+
+  @override
+  String get staffTitle => 'సిబ్బంది';
+
+  @override
+  String get staffTeamTab => 'బృందం & హాజరు';
+
+  @override
+  String get staffTasksTab => 'పనులు';
+
+  @override
+  String get staffNoStaff => 'ఇంకా సిబ్బంది లేరు. మీ బృందాన్ని జోడించండి.';
+
+  @override
+  String get staffAddStaff => 'సిబ్బందిని జోడించండి';
+
+  @override
+  String get staffNoTasks =>
+      'ఇంకా పనులు లేవు. మీ బృందం కోసం పని లేదా చెక్‌లిస్ట్ అంశాన్ని జోడించండి.';
+
+  @override
+  String get staffAddTask => 'పనిని జోడించండి';
+
+  @override
+  String get jobTitle => 'జాబ్ కార్డులు';
+
+  @override
+  String get jobNewJob => 'కొత్త జాబ్';
+
+  @override
+  String get jobNewJobCard => 'కొత్త జాబ్ కార్డ్';
+
+  @override
+  String get jobRepair => 'రిపేర్';
+
+  @override
+  String get jobAlteration => 'మార్పు';
+
+  @override
+  String get jobPreorder => 'ప్రీ-ఆర్డర్';
+
+  @override
+  String get wtyIssue => 'సమస్య';
+
+  @override
+  String get wtySelectSerial => 'ఒక సీరియల్‌ను ఎంచుకోండి';
+
+  @override
+  String get wtyCreateClaim => 'క్లెయిమ్ సృష్టించండి';
+
+  @override
+  String get wtyNoClaims => 'వారంటీ క్లెయిమ్‌లు ఏవీ నమోదు కాలేదు.';
+
+  @override
+  String get wtyTitle => 'వారంటీ & సీరియల్స్';
+
+  @override
+  String get wtyTabClaims => 'క్లెయిమ్‌లు';
+
+  @override
+  String get wtyTabSerials => 'సీరియల్స్';
+
+  @override
+  String get wtyNewClaim => 'కొత్త క్లెయిమ్';
+
+  @override
+  String get wtyAddSerial => 'సీరియల్ జోడించండి';
+
+  @override
+  String get wtySearchSerials => 'సీరియల్ / IMEI లేదా ఉత్పత్తిని వెతకండి';
+
+  @override
+  String get wtyNoSerials =>
+      'ఇంకా సీరియల్స్ నమోదు కాలేదు. చెక్అవుట్‌లో లేదా క్రింది బటన్‌తో సీరియల్స్ జోడించండి.';
+
+  @override
+  String get wtyAll => 'అన్నీ';
+
+  @override
+  String get wtyInStock => 'స్టాక్‌లో';
+
+  @override
+  String get wtySold => 'అమ్ముడైంది';
+
+  @override
+  String get wtyProduct => 'ఉత్పత్తి';
+
+  @override
+  String get wtySelectProduct => 'ఉత్పత్తిని ఎంచుకోండి';
+
+  @override
+  String get wtySerialImei => 'సీరియల్ / IMEI నంబర్';
+
+  @override
+  String get wtySoldOn => 'అమ్మిన తేదీ';
+
+  @override
+  String get wtyExpired => 'వారంటీ ముగిసింది';
+
+  @override
+  String get wtyExpires => 'ముగుస్తుంది';
+
+  @override
+  String get wtyWarrantyTill => 'వారంటీలో వరకు';
+
+  @override
+  String get wtyPickProduct => 'ముందుగా ఉత్పత్తిని ఎంచుకోండి';
+
+  @override
+  String get wtyEnterSerial => 'సీరియల్ / IMEI నమోదు చేయండి';
+
+  @override
+  String get wtySaveFailed => 'సేవ్ చేయలేకపోయాము. దయచేసి మళ్ళీ ప్రయత్నించండి.';
+
+  @override
+  String get wtySave => 'సేవ్ చేయండి';
+
+  @override
+  String get staffComm => 'కమిషన్';
+
+  @override
+  String get staffEdit => 'సవరించండి';
+
+  @override
+  String get staffOrders30d => 'ఆర్డర్‌లు (30రో)';
+
+  @override
+  String get staffCommEarned => 'కమిషన్';
+
+  @override
+  String get staffEditMember => 'సిబ్బంది సభ్యుడిని సవరించండి';
+
+  @override
+  String get staffName => 'పేరు';
+
+  @override
+  String get staffPhoneOptional => 'ఫోన్ (ఐచ్ఛికం)';
+
+  @override
+  String get staffRoleOptional => 'పాత్ర (ఐచ్ఛికం)';
+
+  @override
+  String get staffCommissionField => 'కమిషన్';
+
+  @override
+  String get staffActive => 'యాక్టివ్';
+
+  @override
+  String get staffActiveHint =>
+      'క్రియారహిత సిబ్బంది జాబితాలు మరియు బిల్లింగ్ నుండి దాచబడతారు.';
+
+  @override
+  String get staffSaveChanges => 'మార్పులను సేవ్ చేయండి';
+
+  @override
+  String get staffAssignedTo => 'కు కేటాయించబడింది';
+
+  @override
+  String get staffBilledBy => 'బిల్ చేసినవారు (ఐచ్ఛికం)';
+
+  @override
+  String get staffNotSet => 'సెట్ చేయలేదు';
+
+  @override
+  String get fulReturnsOnOrder => 'ఈ బిల్లుపై రిటర్న్స్';
+
+  @override
   String procBoughtQty(String qty) {
     return 'కొన్నది $qty ';
   }
@@ -3785,6 +4166,12 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get profSectionAnalytics => 'అనలిటిక్స్';
+
+  @override
+  String get profSectionOperations => 'కార్యకలాపాలు';
+
+  @override
+  String get profSectionSalesMarketing => 'అమ్మకాలు & మార్కెటింగ్';
 
   @override
   String get profSectionStoreAccount => 'స్టోర్ & అకౌంట్';

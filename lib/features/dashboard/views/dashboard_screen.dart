@@ -184,9 +184,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       ref.read(dashboardTabProvider.notifier).switchTab(2); // POS/Inventory
       Future.delayed(const Duration(milliseconds: 300), () {
         if (!mounted) return;
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => OnboardingStockInScreen(resumeSessionId: sessionId),
-        ));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => OnboardingStockInScreen(resumeSessionId: sessionId),
+          ),
+        );
       });
     }
   }
@@ -314,7 +316,9 @@ class _RequestTrialScreenState extends ConsumerState<_RequestTrialScreen> {
     final movedOn = sub != null && (sub.hasAppAccess || sub.isPending);
     if (failed && !movedOn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).dashTrialRequestError)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).dashTrialRequestError),
+        ),
       );
     }
   }

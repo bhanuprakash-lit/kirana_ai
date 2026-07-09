@@ -19,6 +19,7 @@ import 'price_memory_screen.dart';
 // import 'widgets/add_product_sheet.dart';
 import 'widgets/add_product_sheet_new.dart';
 import 'widgets/barcode_scanner_overlay.dart';
+import '../../stockracks/stock_racks_screen.dart';
 import 'widgets/edit_product_sheet.dart';
 
 class InventoryTab extends ConsumerStatefulWidget {
@@ -249,7 +250,9 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                               color: BrandColors.purple.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: BrandColors.purple.withValues(alpha: 0.4),
+                                color: BrandColors.purple.withValues(
+                                  alpha: 0.4,
+                                ),
                               ),
                             ),
                             child: const Icon(
@@ -462,6 +465,12 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                             mlFlags:
                                 mlFlags[entry.value[i].productId] ?? const [],
                             onTap: () => _showEditProduct(entry.value[i]),
+                            onLongPress: () => showProductRacksSheet(
+                              context,
+                              ref,
+                              productId: entry.value[i].productId,
+                              productName: entry.value[i].displayName,
+                            ),
                           ),
                           childCount: entry.value.length,
                         ),
@@ -800,10 +809,12 @@ class _CategoryHeader extends StatelessWidget {
 class _InventoryTile extends StatelessWidget {
   final InventoryItem item;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final List<String> mlFlags;
   const _InventoryTile({
     required this.item,
     required this.onTap,
+    this.onLongPress,
     this.mlFlags = const [],
   });
 
@@ -870,6 +881,7 @@ class _InventoryTile extends StatelessWidget {
       ),
       child: ListTile(
         onTap: onTap,
+        onLongPress: onLongPress,
         dense: true,
         visualDensity: VisualDensity.compact,
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -1078,7 +1090,9 @@ class _EmptyInventory extends StatelessWidget {
               decoration: BoxDecoration(
                 color: BrandColors.purple.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: BrandColors.purple.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: BrandColors.purple.withValues(alpha: 0.2),
+                ),
               ),
               child: Column(
                 children: [

@@ -51,12 +51,14 @@ class CounterEngine {
   // Ordered history of counted (trackId, className) so the owner can undo.
   final List<CrossingEvent> _history = [];
 
-  CounterEngine({this.lineFrac = 0.5, this.direction = CountDirection.leftToRight});
+  CounterEngine({
+    this.lineFrac = 0.5,
+    this.direction = CountDirection.leftToRight,
+  });
 
   /// Per-product tallies, highest count first.
   List<TallyEntry> get tally {
-    final list = _tally.values.toList()
-      ..sort((a, b) => b.qty.compareTo(a.qty));
+    final list = _tally.values.toList()..sort((a, b) => b.qty.compareTo(a.qty));
     return list;
   }
 
@@ -85,7 +87,10 @@ class CounterEngine {
       if (!crossed) continue;
 
       _countedTracks.add(id);
-      final entry = _tally.putIfAbsent(d.className, () => TallyEntry(d.className));
+      final entry = _tally.putIfAbsent(
+        d.className,
+        () => TallyEntry(d.className),
+      );
       entry.qty += 1;
       entry._confSum += d.confidence;
       final ev = CrossingEvent(id, d.className, d.confidence);
@@ -100,7 +105,9 @@ class CounterEngine {
   CrossingEvent? undoLast() {
     if (_history.isEmpty) return null;
     final ev = _history.removeLast();
-    _countedTracks.remove(ev.trackId); // allow it to be recounted if it crosses again
+    _countedTracks.remove(
+      ev.trackId,
+    ); // allow it to be recounted if it crosses again
     final entry = _tally[ev.className];
     if (entry != null) {
       entry.qty -= 1;

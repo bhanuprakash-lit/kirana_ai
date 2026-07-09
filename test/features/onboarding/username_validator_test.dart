@@ -19,10 +19,22 @@ void main() {
     });
 
     test('disallowed characters → invalidChars', () {
-      expect(UsernameRules.evaluate('lohiya store'), UsernameStatus.invalidChars); // space
-      expect(UsernameRules.evaluate('lohiya-store'), UsernameStatus.invalidChars); // hyphen
-      expect(UsernameRules.evaluate('store@1'), UsernameStatus.invalidChars); // symbol
-      expect(UsernameRules.evaluate('café99'), UsernameStatus.invalidChars); // unicode
+      expect(
+        UsernameRules.evaluate('lohiya store'),
+        UsernameStatus.invalidChars,
+      ); // space
+      expect(
+        UsernameRules.evaluate('lohiya-store'),
+        UsernameStatus.invalidChars,
+      ); // hyphen
+      expect(
+        UsernameRules.evaluate('store@1'),
+        UsernameStatus.invalidChars,
+      ); // symbol
+      expect(
+        UsernameRules.evaluate('café99'),
+        UsernameStatus.invalidChars,
+      ); // unicode
     });
 
     test('letters, digits, underscore, mixed case → valid', () {

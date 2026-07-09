@@ -2981,6 +2981,385 @@ class AppLocalizationsMr extends AppLocalizations {
   String get procRecordReturn => 'परतावा नोंदवा';
 
   @override
+  String get rackTitle => 'स्टॉक रॅक';
+
+  @override
+  String get rackPlaceStock => 'स्टॉक ठेवा';
+
+  @override
+  String get rackSearchHint => 'उत्पादन किंवा रॅक शोधा (उदा. A1)';
+
+  @override
+  String get rackSaved => 'स्टॉक रॅकमध्ये ठेवला';
+
+  @override
+  String get rackChangeQty => 'प्रमाण बदला';
+
+  @override
+  String get rackMove => 'दुसऱ्या रॅकमध्ये हलवा';
+
+  @override
+  String get rackRemove => 'रॅकमधून काढा';
+
+  @override
+  String get rackRemoved => 'रॅकमधून काढले';
+
+  @override
+  String get rackMoved => 'नवीन रॅकमध्ये हलवले';
+
+  @override
+  String get rackEmpty =>
+      'अजून रॅक सेट केलेले नाहीत. उत्पादन रॅकमध्ये ठेवण्यासाठी \'स्टॉक ठेवा\' वर टॅप करा — मग तुम्ही ते पटकन शोधू शकता.';
+
+  @override
+  String get rackNoMatch =>
+      'तुमच्या शोधाशी कोणतेही उत्पादन किंवा रॅक जुळत नाही.';
+
+  @override
+  String get rackItems => 'वस्तू';
+
+  @override
+  String get rackProduct => 'उत्पादन';
+
+  @override
+  String get rackSelectProduct => 'उत्पादन निवडा';
+
+  @override
+  String get rackPickProductFirst => 'आधी उत्पादन निवडा';
+
+  @override
+  String get rackNeedLabel => 'रॅक / बिन लेबल टाका';
+
+  @override
+  String get rackSaveFailed => 'जतन करता आले नाही. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String get rackLabel => 'रॅक / बिन';
+
+  @override
+  String get rackLabelHint => 'उदा. A1, वरचा शेल्फ, कोल्ड स्टोरेज';
+
+  @override
+  String get rackQuantity => 'या रॅकमधील प्रमाण';
+
+  @override
+  String get rackSave => 'जतन करा';
+
+  @override
+  String get rackLoadFailed => 'रॅक लोड होऊ शकले नाहीत. तुमचे कनेक्शन तपासा.';
+
+  @override
+  String get rackRetry => 'पुन्हा प्रयत्न करा';
+
+  @override
+  String get rackLocation => 'रॅक स्थान';
+
+  @override
+  String get rackSetLocation => 'रॅक स्थान सेट करा';
+
+  @override
+  String get rackNoneForProduct => 'अजून कोणत्याही रॅकमध्ये ठेवलेले नाही.';
+
+  @override
+  String get procExchangeInstead => 'एक्सचेंज (ग्राहक दुसरी वस्तू घेतो)';
+
+  @override
+  String get procRefundAmount => 'परतावा रक्कम';
+
+  @override
+  String get fulTitle => 'अंदाज आणि परतावे';
+
+  @override
+  String get fulTabEstimates => 'अंदाज';
+
+  @override
+  String get fulTabReturns => 'परतावे';
+
+  @override
+  String get fulNoReturns =>
+      'अजून परतावे नाहीत. ग्राहक काही परत आणल्यास, \'परतावा नोंदवा\' वर टॅप करून त्यांची ऑर्डर निवडा.';
+
+  @override
+  String get fulLogReturn => 'परतावा नोंदवा';
+
+  @override
+  String get fulPickOrderTitle => 'कोणती ऑर्डर परत केली जात आहे?';
+
+  @override
+  String get fulSearchOrders => 'ऑर्डर # किंवा ग्राहकाने शोधा';
+
+  @override
+  String get fulNoOrders => 'अलीकडील ऑर्डर आढळल्या नाहीत.';
+
+  @override
+  String get fulExchange => 'एक्सचेंज';
+
+  @override
+  String get fulRefund => 'परतावा';
+
+  @override
+  String get fulBackToShelf => 'शेल्फवर परत';
+
+  @override
+  String get fulToVendor => 'विक्रेत्याकडे';
+
+  @override
+  String get fulItems => 'वस्तू';
+
+  @override
+  String get fulLoadFailed => 'लोड होऊ शकले नाही. कृपया तुमचे कनेक्शन तपासा.';
+
+  @override
+  String get fulRetry => 'पुन्हा प्रयत्न करा';
+
+  @override
+  String get estEmpty =>
+      'अजून अंदाज नाहीत. ग्राहकासाठी कोट तयार करा — तुम्ही तो शेअर करू शकता आणि नंतर विक्रीत बदलू शकता.';
+
+  @override
+  String get estNewEstimate => 'नवीन अंदाज';
+
+  @override
+  String get estWalkIn => 'वॉक-इन ग्राहक';
+
+  @override
+  String get estAddOneItem => 'किमान एक वस्तू जोडा';
+
+  @override
+  String get estSaveFailed => 'जतन करता आले नाही. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String get estCustomerOptional => 'ग्राहक (पर्यायी)';
+
+  @override
+  String get estSelectCustomer => 'ग्राहक निवडा';
+
+  @override
+  String get estAddItem => 'वस्तू जोडा';
+
+  @override
+  String get estValidUntil => 'पर्यंत वैध';
+
+  @override
+  String get estNoExpiry => 'समाप्ती नाही';
+
+  @override
+  String get estSaveEstimate => 'अंदाज जतन करा';
+
+  @override
+  String get estItemName => 'वस्तूचे नाव';
+
+  @override
+  String get estPickFromCatalog => 'कॅटलॉगमधून निवडा';
+
+  @override
+  String get estQty => 'प्रमाण';
+
+  @override
+  String get estUnitPrice => 'एकक किंमत';
+
+  @override
+  String get estAddedToBill => 'बिलात जोडले';
+
+  @override
+  String get estSkippedNotInCatalog => 'वगळले (कॅटलॉगमध्ये नाही)';
+
+  @override
+  String get estShareHeading => 'अंदाज / कोटेशन';
+
+  @override
+  String get estShareTotal => 'एकूण';
+
+  @override
+  String get estTotal => 'एकूण';
+
+  @override
+  String get estStatus => 'स्थिती';
+
+  @override
+  String get estStatusDraft => 'मसुदा';
+
+  @override
+  String get estStatusSent => 'पाठवले';
+
+  @override
+  String get estStatusAccepted => 'स्वीकारले';
+
+  @override
+  String get estStatusRejected => 'नाकारले';
+
+  @override
+  String get estShare => 'शेअर करा';
+
+  @override
+  String get estConvert => 'विक्रीत रूपांतरित करा';
+
+  @override
+  String get staffTitle => 'कर्मचारी';
+
+  @override
+  String get staffTeamTab => 'टीम आणि उपस्थिती';
+
+  @override
+  String get staffTasksTab => 'कार्ये';
+
+  @override
+  String get staffNoStaff => 'अजून कर्मचारी नाहीत. तुमची टीम जोडा.';
+
+  @override
+  String get staffAddStaff => 'कर्मचारी जोडा';
+
+  @override
+  String get staffNoTasks =>
+      'अजून कार्ये नाहीत. तुमच्या टीमसाठी कार्य किंवा चेकलिस्ट आयटम जोडा.';
+
+  @override
+  String get staffAddTask => 'कार्य जोडा';
+
+  @override
+  String get jobTitle => 'जॉब कार्ड';
+
+  @override
+  String get jobNewJob => 'नवीन जॉब';
+
+  @override
+  String get jobNewJobCard => 'नवीन जॉब कार्ड';
+
+  @override
+  String get jobRepair => 'दुरुस्ती';
+
+  @override
+  String get jobAlteration => 'फेरफार';
+
+  @override
+  String get jobPreorder => 'प्री-ऑर्डर';
+
+  @override
+  String get wtyIssue => 'समस्या';
+
+  @override
+  String get wtySelectSerial => 'एक सीरियल निवडा';
+
+  @override
+  String get wtyCreateClaim => 'क्लेम तयार करा';
+
+  @override
+  String get wtyNoClaims => 'कोणतेही वॉरंटी क्लेम नोंदवलेले नाहीत.';
+
+  @override
+  String get wtyTitle => 'वॉरंटी आणि सीरियल';
+
+  @override
+  String get wtyTabClaims => 'क्लेम';
+
+  @override
+  String get wtyTabSerials => 'सीरियल';
+
+  @override
+  String get wtyNewClaim => 'नवीन क्लेम';
+
+  @override
+  String get wtyAddSerial => 'सीरियल जोडा';
+
+  @override
+  String get wtySearchSerials => 'सीरियल / IMEI किंवा उत्पादन शोधा';
+
+  @override
+  String get wtyNoSerials =>
+      'अजून सीरियल नोंदवलेले नाहीत. चेकआउटवर किंवा खालील बटणाने सीरियल जोडा.';
+
+  @override
+  String get wtyAll => 'सर्व';
+
+  @override
+  String get wtyInStock => 'स्टॉकमध्ये';
+
+  @override
+  String get wtySold => 'विकले';
+
+  @override
+  String get wtyProduct => 'उत्पादन';
+
+  @override
+  String get wtySelectProduct => 'उत्पादन निवडा';
+
+  @override
+  String get wtySerialImei => 'सीरियल / IMEI क्रमांक';
+
+  @override
+  String get wtySoldOn => 'विकले';
+
+  @override
+  String get wtyExpired => 'वॉरंटी संपली';
+
+  @override
+  String get wtyExpires => 'संपेल';
+
+  @override
+  String get wtyWarrantyTill => 'वॉरंटीत पर्यंत';
+
+  @override
+  String get wtyPickProduct => 'आधी उत्पादन निवडा';
+
+  @override
+  String get wtyEnterSerial => 'सीरियल / IMEI टाका';
+
+  @override
+  String get wtySaveFailed => 'जतन करता आले नाही. कृपया पुन्हा प्रयत्न करा.';
+
+  @override
+  String get wtySave => 'जतन करा';
+
+  @override
+  String get staffComm => 'कमिशन';
+
+  @override
+  String get staffEdit => 'संपादित करा';
+
+  @override
+  String get staffOrders30d => 'ऑर्डर (30दि)';
+
+  @override
+  String get staffCommEarned => 'कमिशन';
+
+  @override
+  String get staffEditMember => 'कर्मचारी सदस्य संपादित करा';
+
+  @override
+  String get staffName => 'नाव';
+
+  @override
+  String get staffPhoneOptional => 'फोन (पर्यायी)';
+
+  @override
+  String get staffRoleOptional => 'भूमिका (पर्यायी)';
+
+  @override
+  String get staffCommissionField => 'कमिशन';
+
+  @override
+  String get staffActive => 'सक्रिय';
+
+  @override
+  String get staffActiveHint =>
+      'निष्क्रिय कर्मचारी याद्या आणि बिलिंगमधून लपवले जातात.';
+
+  @override
+  String get staffSaveChanges => 'बदल जतन करा';
+
+  @override
+  String get staffAssignedTo => 'ला नियुक्त';
+
+  @override
+  String get staffBilledBy => 'बिल कोणी केले (पर्यायी)';
+
+  @override
+  String get staffNotSet => 'सेट नाही';
+
+  @override
+  String get fulReturnsOnOrder => 'या बिलावरील परतावे';
+
+  @override
   String procBoughtQty(String qty) {
     return '$qty खरेदी केले ';
   }
@@ -3801,6 +4180,12 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get profSectionAnalytics => 'विश्लेषण';
+
+  @override
+  String get profSectionOperations => 'कामकाज';
+
+  @override
+  String get profSectionSalesMarketing => 'विक्री आणि विपणन';
 
   @override
   String get profSectionStoreAccount => 'दुकान आणि खाते';

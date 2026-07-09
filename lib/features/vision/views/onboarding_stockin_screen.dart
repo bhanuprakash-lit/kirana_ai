@@ -45,7 +45,9 @@ class _OnboardingStockInScreenState
     Future.microtask(() {
       final notifier = ref.read(onboardingProvider.notifier);
       if (widget.resumeSessionId != null) {
-        notifier.resumeSession(widget.resumeSessionId!); // deep-link → straight to review
+        notifier.resumeSession(
+          widget.resumeSessionId!,
+        ); // deep-link → straight to review
       } else {
         notifier.reset(); // fresh capture flow
       }
@@ -83,8 +85,7 @@ class _OnboardingStockInScreenState
           ),
           OnboardingStatus.uploading ||
           OnboardingStatus.processing => const _ProcessingBody(),
-          OnboardingStatus.ready ||
-          OnboardingStatus.committing => _ReviewBody(
+          OnboardingStatus.ready || OnboardingStatus.committing => _ReviewBody(
             committing: state.status == OnboardingStatus.committing,
             addToExisting: widget.addToExisting,
           ),
@@ -93,10 +94,12 @@ class _OnboardingStockInScreenState
             units: state.committedQuantity,
             onDone: () => Navigator.pop(context, true),
           ),
-          OnboardingStatus.failed => _FailedBody(onRetake: () {
-            setState(_paths.clear);
-            ref.read(onboardingProvider.notifier).reset();
-          }),
+          OnboardingStatus.failed => _FailedBody(
+            onRetake: () {
+              setState(_paths.clear);
+              ref.read(onboardingProvider.notifier).reset();
+            },
+          ),
         },
       ),
     );
@@ -126,8 +129,10 @@ class _CaptureBody extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(l10n.onbCaptureHint,
-                  style: const TextStyle(color: BrandColors.muted, height: 1.5)),
+              Text(
+                l10n.onbCaptureHint,
+                style: const TextStyle(color: BrandColors.muted, height: 1.5),
+              ),
               const SizedBox(height: 16),
               if (paths.isEmpty)
                 _EmptyCapture(onAdd: onAdd)
@@ -158,10 +163,15 @@ class _CaptureBody extends StatelessWidget {
                               onTap: () => onRemove(i),
                               child: Container(
                                 decoration: const BoxDecoration(
-                                    color: Colors.black54, shape: BoxShape.circle),
+                                  color: Colors.black54,
+                                  shape: BoxShape.circle,
+                                ),
                                 padding: const EdgeInsets.all(2),
-                                child: const Icon(Icons.close_rounded,
-                                    size: 16, color: Colors.white),
+                                child: const Icon(
+                                  Icons.close_rounded,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -185,7 +195,9 @@ class _CaptureBody extends StatelessWidget {
                       : l10n.onbPhotosProgress(paths.length),
                   style: TextStyle(
                     fontSize: 12,
-                    color: paths.length < 3 ? BrandColors.orange : BrandColors.muted,
+                    color: paths.length < 3
+                        ? BrandColors.orange
+                        : BrandColors.muted,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -194,7 +206,8 @@ class _CaptureBody extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onAnalyze,
                     style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(52)),
+                      minimumSize: const Size.fromHeight(52),
+                    ),
                     icon: const Icon(Icons.auto_awesome_rounded),
                     label: Text(l10n.onbAnalyze),
                   ),
@@ -223,17 +236,26 @@ class _EmptyCapture extends StatelessWidget {
           color: BrandColors.primary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-              color: BrandColors.primary.withValues(alpha: 0.3),
-              style: BorderStyle.solid),
+            color: BrandColors.primary.withValues(alpha: 0.3),
+            style: BorderStyle.solid,
+          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.add_a_photo_rounded, size: 48, color: BrandColors.primary),
+            const Icon(
+              Icons.add_a_photo_rounded,
+              size: 48,
+              color: BrandColors.primary,
+            ),
             const SizedBox(height: 12),
-            Text(l10n.onbTakePhoto,
-                style: const TextStyle(
-                    color: BrandColors.primary, fontWeight: FontWeight.w700)),
+            Text(
+              l10n.onbTakePhoto,
+              style: const TextStyle(
+                color: BrandColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ],
         ),
       ),
@@ -255,7 +277,10 @@ class _AddTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: BrandColors.primary.withValues(alpha: 0.3)),
         ),
-        child: const Icon(Icons.add_a_photo_outlined, color: BrandColors.primary),
+        child: const Icon(
+          Icons.add_a_photo_outlined,
+          color: BrandColors.primary,
+        ),
       ),
     );
   }
@@ -276,18 +301,30 @@ class _ProcessingBody extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(
-              width: 56, height: 56,
+              width: 56,
+              height: 56,
               child: CircularProgressIndicator(strokeWidth: 3),
             ),
             const SizedBox(height: 24),
-            Text(l10n.onbProcessingTitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+            Text(
+              l10n.onbProcessingTitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(height: 10),
-            Text(l10n.onbProcessingDesc,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: BrandColors.muted, height: 1.5)),
+            Text(
+              l10n.onbProcessingDesc,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: BrandColors.muted,
+                height: 1.5,
+              ),
+            ),
           ],
         ),
       ),
@@ -324,8 +361,16 @@ class _ReviewBody extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               child: Row(
                 children: [
-                  Text(l10n.onbReviewSummary(state.mappedCount, state.unmappedCount),
-                      style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                  Text(
+                    l10n.onbReviewSummary(
+                      state.mappedCount,
+                      state.unmappedCount,
+                    ),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -355,10 +400,16 @@ class _ReviewBody extends ConsumerWidget {
                     onPressed: committing || state.committable.isEmpty
                         ? null
                         : () async {
-                            final ok = await notifier.commit(addToExisting: addToExisting);
+                            final ok = await notifier.commit(
+                              addToExisting: addToExisting,
+                            );
                             if (!ok && context.mounted && state.error != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(ref.read(onboardingProvider).error ?? '')),
+                                SnackBar(
+                                  content: Text(
+                                    ref.read(onboardingProvider).error ?? '',
+                                  ),
+                                ),
                               );
                             }
                           },
@@ -367,7 +418,9 @@ class _ReviewBody extends ConsumerWidget {
                       backgroundColor: BrandColors.success,
                     ),
                     icon: const Icon(Icons.inventory_2_rounded),
-                    label: Text(committing ? l10n.onbCommitting : l10n.onbCommit),
+                    label: Text(
+                      committing ? l10n.onbCommitting : l10n.onbCommit,
+                    ),
                   ),
                 ),
               ),
@@ -383,14 +436,20 @@ class _ReviewBody extends ConsumerWidget {
     );
   }
 
-  Future<void> _pickProduct(BuildContext context, WidgetRef ref, int itemId) async {
+  Future<void> _pickProduct(
+    BuildContext context,
+    WidgetRef ref,
+    int itemId,
+  ) async {
     final picked = await showModalBottomSheet<({int id, String name})>(
       context: context,
       isScrollControlled: true,
       builder: (_) => const _ProductPickerSheet(),
     );
     if (picked != null) {
-      ref.read(onboardingProvider.notifier).mapProduct(itemId, picked.id, picked.name);
+      ref
+          .read(onboardingProvider.notifier)
+          .mapProduct(itemId, picked.id, picked.name);
     }
   }
 }
@@ -412,11 +471,21 @@ class _DisclaimerBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, size: 18, color: BrandColors.orange),
+          const Icon(
+            Icons.info_outline_rounded,
+            size: 18,
+            color: BrandColors.orange,
+          ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(text,
-                style: const TextStyle(fontSize: 12, color: BrandColors.ink, height: 1.4)),
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 12,
+                color: BrandColors.ink,
+                height: 1.4,
+              ),
+            ),
           ),
         ],
       ),
@@ -446,7 +515,10 @@ class _ReviewTile extends StatelessWidget {
         color: BrandColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: needsMap ? BrandColors.orange.withValues(alpha: 0.4) : BrandColors.border),
+          color: needsMap
+              ? BrandColors.orange.withValues(alpha: 0.4)
+              : BrandColors.border,
+        ),
       ),
       child: Row(
         children: [
@@ -463,26 +535,46 @@ class _ReviewTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w700, color: BrandColors.ink)),
+                Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: BrandColors.ink,
+                  ),
+                ),
                 const SizedBox(height: 4),
                 if (needsMap)
                   GestureDetector(
                     onTap: onMap,
                     child: Row(
                       children: [
-                        const Icon(Icons.add_link_rounded, size: 14, color: BrandColors.orange),
+                        const Icon(
+                          Icons.add_link_rounded,
+                          size: 14,
+                          color: BrandColors.orange,
+                        ),
                         const SizedBox(width: 4),
-                        Text(l10n.onbChooseProduct,
-                            style: const TextStyle(fontSize: 12, color: BrandColors.orange, fontWeight: FontWeight.w600)),
+                        Text(
+                          l10n.onbChooseProduct,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: BrandColors.orange,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
                   )
                 else
-                  Text('${l10n.onbQuantity}: ${item.quantity}',
-                      style: const TextStyle(fontSize: 12, color: BrandColors.muted)),
+                  Text(
+                    '${l10n.onbQuantity}: ${item.quantity}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: BrandColors.muted,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -506,8 +598,10 @@ class _Stepper extends StatelessWidget {
         Container(
           width: 40,
           alignment: Alignment.center,
-          child: Text('$qty',
-              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+          child: Text(
+            '$qty',
+            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
         ),
         _sqBtn(Icons.add_rounded, () => onChanged(qty + 1)),
       ],
@@ -531,7 +625,8 @@ class _Stepper extends StatelessWidget {
 class _ProductPickerSheet extends ConsumerStatefulWidget {
   const _ProductPickerSheet();
   @override
-  ConsumerState<_ProductPickerSheet> createState() => _ProductPickerSheetState();
+  ConsumerState<_ProductPickerSheet> createState() =>
+      _ProductPickerSheetState();
 }
 
 class _ProductPickerSheetState extends ConsumerState<_ProductPickerSheet> {
@@ -545,14 +640,18 @@ class _ProductPickerSheetState extends ConsumerState<_ProductPickerSheet> {
     final filtered = q.isEmpty
         ? products.take(40).toList()
         : products
-            .where((p) =>
-                p.name.toLowerCase().contains(q) ||
-                (p.brand?.toLowerCase().contains(q) ?? false))
-            .take(40)
-            .toList();
+              .where(
+                (p) =>
+                    p.name.toLowerCase().contains(q) ||
+                    (p.brand?.toLowerCase().contains(q) ?? false),
+              )
+              .take(40)
+              .toList();
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: DraggableScrollableSheet(
         initialChildSize: 0.7,
         maxChildSize: 0.92,
@@ -566,24 +665,35 @@ class _ProductPickerSheetState extends ConsumerState<_ProductPickerSheet> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Text(l10n.onbChooseProduct,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              Text(
+                l10n.onbChooseProduct,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 12),
               TextField(
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: l10n.visionSearchProducts,
                   prefixIcon: const Icon(Icons.search_rounded),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
                 onChanged: (v) => setState(() => _query = v),
               ),
               const SizedBox(height: 8),
               Expanded(
                 child: products.isEmpty
-                    ? Center(child: Text(l10n.visionNoProducts,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: BrandColors.muted)))
+                    ? Center(
+                        child: Text(
+                          l10n.visionNoProducts,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: BrandColors.muted),
+                        ),
+                      )
                     : ListView.builder(
                         controller: sc,
                         itemCount: filtered.length,
@@ -591,11 +701,16 @@ class _ProductPickerSheetState extends ConsumerState<_ProductPickerSheet> {
                           final p = filtered[i];
                           return ListTile(
                             dense: true,
-                            title: Text(p.displayName,
-                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                            title: Text(
+                              p.displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             trailing: const Icon(Icons.chevron_right_rounded),
-                            onTap: () =>
-                                Navigator.pop(context, (id: p.productId, name: p.displayName)),
+                            onTap: () => Navigator.pop(context, (
+                              id: p.productId,
+                              name: p.displayName,
+                            )),
                           );
                         },
                       ),
@@ -614,7 +729,11 @@ class _DoneBody extends StatelessWidget {
   final int products;
   final int units;
   final VoidCallback onDone;
-  const _DoneBody({required this.products, required this.units, required this.onDone});
+  const _DoneBody({
+    required this.products,
+    required this.units,
+    required this.onDone,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -631,21 +750,39 @@ class _DoneBody extends StatelessWidget {
                 color: BrandColors.success.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.check_circle_rounded, size: 56, color: BrandColors.success),
+              child: const Icon(
+                Icons.check_circle_rounded,
+                size: 56,
+                color: BrandColors.success,
+              ),
             ),
             const SizedBox(height: 20),
-            Text(l10n.onbDoneTitle,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: BrandColors.ink)),
+            Text(
+              l10n.onbDoneTitle,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(height: 10),
-            Text(l10n.onbDoneDesc(products, units),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: BrandColors.muted, height: 1.5)),
+            Text(
+              l10n.onbDoneDesc(products, units),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: BrandColors.muted,
+                height: 1.5,
+              ),
+            ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
                 onPressed: onDone,
-                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52),
+                ),
                 child: Text(l10n.onbDone),
               ),
             ),
@@ -670,15 +807,27 @@ class _FailedBody extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline_rounded, size: 52, color: BrandColors.error.withValues(alpha: 0.7)),
+            Icon(
+              Icons.error_outline_rounded,
+              size: 52,
+              color: BrandColors.error.withValues(alpha: 0.7),
+            ),
             const SizedBox(height: 16),
-            Text(message == null ? l10n.onbFailedTitle : l10n.onbFailedTitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+            Text(
+              message == null ? l10n.onbFailedTitle : l10n.onbFailedTitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(message ?? l10n.onbEmptyDetected,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: BrandColors.muted)),
+            Text(
+              message ?? l10n.onbEmptyDetected,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: BrandColors.muted),
+            ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onRetake,

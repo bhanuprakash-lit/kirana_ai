@@ -8,6 +8,7 @@ import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/pos_provider.dart';
 import '../../providers/printer_provider.dart';
+import '../../../staff/staff_provider.dart';
 import '../order_details_screen.dart';
 import 'basket_savings_banner.dart';
 import 'pos_deeplink_section.dart';
@@ -302,6 +303,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   bool _success = false;
   String? _localError;
   int? _udhaarCustomerId;
+  int? _billedByStaffId; // M5 — staff member who billed this order (optional)
   String? _udhaarCustomerName;
   // Partial-udhaar slider — how much of the order goes on credit.
   // Initialised to the full order total when Udhaar is chosen.
@@ -494,6 +496,38 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
     }
   }
 
+  /// Optional "who billed this?" selector — only appears when the store has
+  /// active staff. Setting it lets the Staff screen show sales + commission per
+  /// person. Renders nothing (and stays null) for solo shops.
+  Widget _buildBilledBySelector() {
+    final l10n = AppLocalizations.of(context);
+    final staff = ref.watch(staffListProvider).asData?.value ?? const [];
+    if (staff.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: DropdownButtonFormField<int?>(
+        initialValue: _billedByStaffId,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: l10n.staffBilledBy,
+          prefixIcon: const Icon(Icons.badge_outlined, size: 20),
+          isDense: true,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        items: [
+          DropdownMenuItem<int?>(value: null, child: Text(l10n.staffNotSet)),
+          ...staff.map(
+            (m) => DropdownMenuItem<int?>(
+              value: m.staffId,
+              child: Text(m.name, overflow: TextOverflow.ellipsis),
+            ),
+          ),
+        ],
+        onChanged: (v) => setState(() => _billedByStaffId = v),
+      ),
+    );
+  }
+
   Future<void> _confirm() async {
     if (_paymentMethod == 'udhaar' && _udhaarCustomerId == null) {
       setState(() => _localError = _l10n.posSelectCustomerForUdhaar);
@@ -544,6 +578,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           appointmentId: _deepLinks.appointmentId,
           jobCardId: _deepLinks.jobCardId,
           extraCharge: _deepLinks.appointmentCharge,
+          staffId: _billedByStaffId,
         );
     if (!mounted) return;
     if (result != null) {
@@ -773,6 +808,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                       links: _deepLinks,
                       onChanged: () => setState(() {}),
                     ),
+
+                    // ── Billed by (M5) — attributes sales + commission to staff ───────
+                    _buildBilledBySelector(),
 
                     // ── Billed appointment charge (O2) ────────────────────────────────
                     if (_deepLinks.appointmentCharge > 0) ...[

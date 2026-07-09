@@ -3016,6 +3016,389 @@ class AppLocalizationsMl extends AppLocalizations {
   String get procRecordReturn => 'റിട്ടേൺ രേഖപ്പെടുത്തുക';
 
   @override
+  String get rackTitle => 'സ്റ്റോക്ക് റാക്കുകൾ';
+
+  @override
+  String get rackPlaceStock => 'സ്റ്റോക്ക് വയ്ക്കുക';
+
+  @override
+  String get rackSearchHint => 'ഉൽപ്പന്നം അല്ലെങ്കിൽ റാക്ക് തിരയുക (ഉദാ. A1)';
+
+  @override
+  String get rackSaved => 'സ്റ്റോക്ക് റാക്കിൽ വച്ചു';
+
+  @override
+  String get rackChangeQty => 'അളവ് മാറ്റുക';
+
+  @override
+  String get rackMove => 'മറ്റൊരു റാക്കിലേക്ക് നീക്കുക';
+
+  @override
+  String get rackRemove => 'റാക്കിൽ നിന്ന് നീക്കം ചെയ്യുക';
+
+  @override
+  String get rackRemoved => 'റാക്കിൽ നിന്ന് നീക്കി';
+
+  @override
+  String get rackMoved => 'പുതിയ റാക്കിലേക്ക് നീക്കി';
+
+  @override
+  String get rackEmpty =>
+      'ഇതുവരെ റാക്കുകളൊന്നും സജ്ജീകരിച്ചിട്ടില്ല. ഒരു ഉൽപ്പന്നം റാക്കിൽ വയ്ക്കാൻ \'സ്റ്റോക്ക് വയ്ക്കുക\' ടാപ്പ് ചെയ്യുക — പിന്നെ അത് വേഗം കണ്ടെത്താം.';
+
+  @override
+  String get rackNoMatch =>
+      'നിങ്ങളുടെ തിരയലുമായി ഉൽപ്പന്നങ്ങളോ റാക്കുകളോ പൊരുത്തപ്പെടുന്നില്ല.';
+
+  @override
+  String get rackItems => 'സാധനങ്ങൾ';
+
+  @override
+  String get rackProduct => 'ഉൽപ്പന്നം';
+
+  @override
+  String get rackSelectProduct => 'ഒരു ഉൽപ്പന്നം തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get rackPickProductFirst => 'ആദ്യം ഒരു ഉൽപ്പന്നം തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get rackNeedLabel => 'റാക്ക് / ബിൻ ലേബൽ നൽകുക';
+
+  @override
+  String get rackSaveFailed => 'സംരക്ഷിക്കാനായില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.';
+
+  @override
+  String get rackLabel => 'റാക്ക് / ബിൻ';
+
+  @override
+  String get rackLabelHint => 'ഉദാ. A1, മുകളിലെ ഷെൽഫ്, കോൾഡ് സ്റ്റോറേജ്';
+
+  @override
+  String get rackQuantity => 'ഈ റാക്കിലെ അളവ്';
+
+  @override
+  String get rackSave => 'സംരക്ഷിക്കുക';
+
+  @override
+  String get rackLoadFailed =>
+      'റാക്കുകൾ ലോഡ് ചെയ്യാനായില്ല. നിങ്ങളുടെ കണക്ഷൻ പരിശോധിക്കുക.';
+
+  @override
+  String get rackRetry => 'വീണ്ടും ശ്രമിക്കുക';
+
+  @override
+  String get rackLocation => 'റാക്ക് സ്ഥാനം';
+
+  @override
+  String get rackSetLocation => 'റാക്ക് സ്ഥാനം സജ്ജമാക്കുക';
+
+  @override
+  String get rackNoneForProduct => 'ഇതുവരെ ഒരു റാക്കിലും വച്ചിട്ടില്ല.';
+
+  @override
+  String get procExchangeInstead =>
+      'എക്സ്ചേഞ്ച് (ഉപഭോക്താവ് മറ്റൊരു സാധനം എടുക്കുന്നു)';
+
+  @override
+  String get procRefundAmount => 'റീഫണ്ട് തുക';
+
+  @override
+  String get fulTitle => 'എസ്റ്റിമേറ്റുകളും റിട്ടേണുകളും';
+
+  @override
+  String get fulTabEstimates => 'എസ്റ്റിമേറ്റുകൾ';
+
+  @override
+  String get fulTabReturns => 'റിട്ടേണുകൾ';
+
+  @override
+  String get fulNoReturns =>
+      'ഇതുവരെ റിട്ടേണുകളില്ല. ഉപഭോക്താവ് എന്തെങ്കിലും തിരികെ കൊണ്ടുവരുമ്പോൾ, \'റിട്ടേൺ രേഖപ്പെടുത്തുക\' ടാപ്പ് ചെയ്ത് അവരുടെ ഓർഡർ തിരഞ്ഞെടുക്കുക.';
+
+  @override
+  String get fulLogReturn => 'റിട്ടേൺ രേഖപ്പെടുത്തുക';
+
+  @override
+  String get fulPickOrderTitle => 'ഏത് ഓർഡറാണ് തിരികെ നൽകുന്നത്?';
+
+  @override
+  String get fulSearchOrders =>
+      'ഓർഡർ # അല്ലെങ്കിൽ ഉപഭോക്താവ് ഉപയോഗിച്ച് തിരയുക';
+
+  @override
+  String get fulNoOrders => 'സമീപകാല ഓർഡറുകളൊന്നും കണ്ടെത്തിയില്ല.';
+
+  @override
+  String get fulExchange => 'എക്സ്ചേഞ്ച്';
+
+  @override
+  String get fulRefund => 'റീഫണ്ട്';
+
+  @override
+  String get fulBackToShelf => 'ഷെൽഫിലേക്ക് തിരികെ';
+
+  @override
+  String get fulToVendor => 'വെണ്ടർക്ക്';
+
+  @override
+  String get fulItems => 'സാധനങ്ങൾ';
+
+  @override
+  String get fulLoadFailed =>
+      'ലോഡ് ചെയ്യാനായില്ല. ദയവായി നിങ്ങളുടെ കണക്ഷൻ പരിശോധിക്കുക.';
+
+  @override
+  String get fulRetry => 'വീണ്ടും ശ്രമിക്കുക';
+
+  @override
+  String get estEmpty =>
+      'ഇതുവരെ എസ്റ്റിമേറ്റുകളില്ല. ഒരു ഉപഭോക്താവിനായി ഒരു ക്വോട്ട് സൃഷ്ടിക്കുക — അത് പങ്കിടാം, പിന്നീട് വിൽപ്പനയാക്കാം.';
+
+  @override
+  String get estNewEstimate => 'പുതിയ എസ്റ്റിമേറ്റ്';
+
+  @override
+  String get estWalkIn => 'വാക്ക്-ഇൻ ഉപഭോക്താവ്';
+
+  @override
+  String get estAddOneItem => 'കുറഞ്ഞത് ഒരു സാധനം ചേർക്കുക';
+
+  @override
+  String get estSaveFailed => 'സംരക്ഷിക്കാനായില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.';
+
+  @override
+  String get estCustomerOptional => 'ഉപഭോക്താവ് (ഓപ്ഷണൽ)';
+
+  @override
+  String get estSelectCustomer => 'ഉപഭോക്താവിനെ തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get estAddItem => 'സാധനം ചേർക്കുക';
+
+  @override
+  String get estValidUntil => 'വരെ സാധുവാണ്';
+
+  @override
+  String get estNoExpiry => 'കാലഹരണമില്ല';
+
+  @override
+  String get estSaveEstimate => 'എസ്റ്റിമേറ്റ് സംരക്ഷിക്കുക';
+
+  @override
+  String get estItemName => 'സാധനത്തിന്റെ പേര്';
+
+  @override
+  String get estPickFromCatalog => 'കാറ്റലോഗിൽ നിന്ന് തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get estQty => 'എണ്ണം';
+
+  @override
+  String get estUnitPrice => 'യൂണിറ്റ് വില';
+
+  @override
+  String get estAddedToBill => 'ബില്ലിൽ ചേർത്തു';
+
+  @override
+  String get estSkippedNotInCatalog => 'ഒഴിവാക്കി (കാറ്റലോഗിൽ ഇല്ല)';
+
+  @override
+  String get estShareHeading => 'എസ്റ്റിമേറ്റ് / ക്വോട്ടേഷൻ';
+
+  @override
+  String get estShareTotal => 'ആകെ';
+
+  @override
+  String get estTotal => 'ആകെ';
+
+  @override
+  String get estStatus => 'നില';
+
+  @override
+  String get estStatusDraft => 'ഡ്രാഫ്റ്റ്';
+
+  @override
+  String get estStatusSent => 'അയച്ചു';
+
+  @override
+  String get estStatusAccepted => 'സ്വീകരിച്ചു';
+
+  @override
+  String get estStatusRejected => 'നിരസിച്ചു';
+
+  @override
+  String get estShare => 'പങ്കിടുക';
+
+  @override
+  String get estConvert => 'വിൽപ്പനയാക്കുക';
+
+  @override
+  String get staffTitle => 'സ്റ്റാഫ്';
+
+  @override
+  String get staffTeamTab => 'ടീമും ഹാജരും';
+
+  @override
+  String get staffTasksTab => 'ടാസ്ക്കുകൾ';
+
+  @override
+  String get staffNoStaff => 'ഇതുവരെ സ്റ്റാഫ് ഇല്ല. നിങ്ങളുടെ ടീമിനെ ചേർക്കുക.';
+
+  @override
+  String get staffAddStaff => 'സ്റ്റാഫ് ചേർക്കുക';
+
+  @override
+  String get staffNoTasks =>
+      'ഇതുവരെ ടാസ്ക്കുകളില്ല. നിങ്ങളുടെ ടീമിനായി ഒരു ടാസ്ക്ക് അല്ലെങ്കിൽ ചെക്ക്‌ലിസ്റ്റ് ഇനം ചേർക്കുക.';
+
+  @override
+  String get staffAddTask => 'ടാസ്ക്ക് ചേർക്കുക';
+
+  @override
+  String get jobTitle => 'ജോബ് കാർഡുകൾ';
+
+  @override
+  String get jobNewJob => 'പുതിയ ജോലി';
+
+  @override
+  String get jobNewJobCard => 'പുതിയ ജോബ് കാർഡ്';
+
+  @override
+  String get jobRepair => 'റിപ്പയർ';
+
+  @override
+  String get jobAlteration => 'മാറ്റം';
+
+  @override
+  String get jobPreorder => 'പ്രീ-ഓർഡർ';
+
+  @override
+  String get wtyIssue => 'പ്രശ്നം';
+
+  @override
+  String get wtySelectSerial => 'ഒരു സീരിയൽ തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get wtyCreateClaim => 'ക്ലെയിം സൃഷ്ടിക്കുക';
+
+  @override
+  String get wtyNoClaims => 'വാറന്റി ക്ലെയിമുകളൊന്നും രേഖപ്പെടുത്തിയിട്ടില്ല.';
+
+  @override
+  String get wtyTitle => 'വാറന്റിയും സീരിയലുകളും';
+
+  @override
+  String get wtyTabClaims => 'ക്ലെയിമുകൾ';
+
+  @override
+  String get wtyTabSerials => 'സീരിയലുകൾ';
+
+  @override
+  String get wtyNewClaim => 'പുതിയ ക്ലെയിം';
+
+  @override
+  String get wtyAddSerial => 'സീരിയൽ ചേർക്കുക';
+
+  @override
+  String get wtySearchSerials => 'സീരിയൽ / IMEI അല്ലെങ്കിൽ ഉൽപ്പന്നം തിരയുക';
+
+  @override
+  String get wtyNoSerials =>
+      'ഇതുവരെ സീരിയലുകളൊന്നും രജിസ്റ്റർ ചെയ്തിട്ടില്ല. ചെക്ക്ഔട്ടിലോ താഴെയുള്ള ബട്ടൺ ഉപയോഗിച്ചോ സീരിയലുകൾ ചേർക്കുക.';
+
+  @override
+  String get wtyAll => 'എല്ലാം';
+
+  @override
+  String get wtyInStock => 'സ്റ്റോക്കിൽ';
+
+  @override
+  String get wtySold => 'വിറ്റു';
+
+  @override
+  String get wtyProduct => 'ഉൽപ്പന്നം';
+
+  @override
+  String get wtySelectProduct => 'ഒരു ഉൽപ്പന്നം തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get wtySerialImei => 'സീരിയൽ / IMEI നമ്പർ';
+
+  @override
+  String get wtySoldOn => 'വിറ്റത്';
+
+  @override
+  String get wtyExpired => 'വാറന്റി കാലഹരണപ്പെട്ടു';
+
+  @override
+  String get wtyExpires => 'കാലഹരണം';
+
+  @override
+  String get wtyWarrantyTill => 'വാറന്റിയിൽ വരെ';
+
+  @override
+  String get wtyPickProduct => 'ആദ്യം ഒരു ഉൽപ്പന്നം തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get wtyEnterSerial => 'സീരിയൽ / IMEI നൽകുക';
+
+  @override
+  String get wtySaveFailed => 'സംരക്ഷിക്കാനായില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.';
+
+  @override
+  String get wtySave => 'സംരക്ഷിക്കുക';
+
+  @override
+  String get staffComm => 'കമ്മീഷൻ';
+
+  @override
+  String get staffEdit => 'എഡിറ്റ്';
+
+  @override
+  String get staffOrders30d => 'ഓർഡറുകൾ (30ദി)';
+
+  @override
+  String get staffCommEarned => 'കമ്മീഷൻ';
+
+  @override
+  String get staffEditMember => 'സ്റ്റാഫ് അംഗത്തെ എഡിറ്റ് ചെയ്യുക';
+
+  @override
+  String get staffName => 'പേര്';
+
+  @override
+  String get staffPhoneOptional => 'ഫോൺ (ഓപ്ഷണൽ)';
+
+  @override
+  String get staffRoleOptional => 'റോൾ (ഓപ്ഷണൽ)';
+
+  @override
+  String get staffCommissionField => 'കമ്മീഷൻ';
+
+  @override
+  String get staffActive => 'സജീവം';
+
+  @override
+  String get staffActiveHint =>
+      'നിഷ്ക്രിയ സ്റ്റാഫ് ലിസ്റ്റുകളിൽ നിന്നും ബില്ലിംഗിൽ നിന്നും മറയ്ക്കപ്പെടും.';
+
+  @override
+  String get staffSaveChanges => 'മാറ്റങ്ങൾ സംരക്ഷിക്കുക';
+
+  @override
+  String get staffAssignedTo => 'ന് നൽകി';
+
+  @override
+  String get staffBilledBy => 'ബിൽ ചെയ്തത് (ഓപ്ഷണൽ)';
+
+  @override
+  String get staffNotSet => 'സജ്ജമാക്കിയിട്ടില്ല';
+
+  @override
+  String get fulReturnsOnOrder => 'ഈ ബില്ലിലെ റിട്ടേണുകൾ';
+
+  @override
   String procBoughtQty(String qty) {
     return 'വാങ്ങിയത് $qty ';
   }
@@ -3841,6 +4224,12 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get profSectionAnalytics => 'അനലിറ്റിക്സ്';
+
+  @override
+  String get profSectionOperations => 'പ്രവർത്തനങ്ങൾ';
+
+  @override
+  String get profSectionSalesMarketing => 'വിൽപ്പനയും മാർക്കറ്റിംഗും';
 
   @override
   String get profSectionStoreAccount => 'സ്റ്റോർ & അക്കൗണ്ട്';

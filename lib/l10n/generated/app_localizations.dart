@@ -5160,6 +5160,750 @@ abstract class AppLocalizations {
   /// **'Record return'**
   String get procRecordReturn;
 
+  /// No description provided for @rackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock Racks'**
+  String get rackTitle;
+
+  /// No description provided for @rackPlaceStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Place stock'**
+  String get rackPlaceStock;
+
+  /// No description provided for @rackSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search product or rack (e.g. A1)'**
+  String get rackSearchHint;
+
+  /// No description provided for @rackSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock placed in rack'**
+  String get rackSaved;
+
+  /// No description provided for @rackChangeQty.
+  ///
+  /// In en, this message translates to:
+  /// **'Change quantity'**
+  String get rackChangeQty;
+
+  /// No description provided for @rackMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to another rack'**
+  String get rackMove;
+
+  /// No description provided for @rackRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from rack'**
+  String get rackRemove;
+
+  /// No description provided for @rackRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from rack'**
+  String get rackRemoved;
+
+  /// No description provided for @rackMoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved to new rack'**
+  String get rackMoved;
+
+  /// No description provided for @rackEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No racks set up yet. Tap Place stock to put a product in a rack — then you can find it fast.'**
+  String get rackEmpty;
+
+  /// No description provided for @rackNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No products or racks match your search.'**
+  String get rackNoMatch;
+
+  /// No description provided for @rackItems.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get rackItems;
+
+  /// No description provided for @rackProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get rackProduct;
+
+  /// No description provided for @rackSelectProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a product'**
+  String get rackSelectProduct;
+
+  /// No description provided for @rackPickProductFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a product first'**
+  String get rackPickProductFirst;
+
+  /// No description provided for @rackNeedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a rack / bin label'**
+  String get rackNeedLabel;
+
+  /// No description provided for @rackSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Please try again.'**
+  String get rackSaveFailed;
+
+  /// No description provided for @rackLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rack / bin'**
+  String get rackLabel;
+
+  /// No description provided for @rackLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. A1, top shelf, cold storage'**
+  String get rackLabelHint;
+
+  /// No description provided for @rackQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity in this rack'**
+  String get rackQuantity;
+
+  /// No description provided for @rackSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get rackSave;
+
+  /// No description provided for @rackLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load racks. Check your connection.'**
+  String get rackLoadFailed;
+
+  /// No description provided for @rackRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get rackRetry;
+
+  /// No description provided for @rackLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Rack location'**
+  String get rackLocation;
+
+  /// No description provided for @rackSetLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Set rack location'**
+  String get rackSetLocation;
+
+  /// No description provided for @rackNoneForProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Not placed in any rack yet.'**
+  String get rackNoneForProduct;
+
+  /// No description provided for @procExchangeInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange (customer takes another item)'**
+  String get procExchangeInstead;
+
+  /// No description provided for @procRefundAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund amount'**
+  String get procRefundAmount;
+
+  /// No description provided for @fulTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimates & Returns'**
+  String get fulTitle;
+
+  /// No description provided for @fulTabEstimates.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimates'**
+  String get fulTabEstimates;
+
+  /// No description provided for @fulTabReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Returns'**
+  String get fulTabReturns;
+
+  /// No description provided for @fulNoReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'No returns yet. When a customer brings something back, tap Log return and pick their order.'**
+  String get fulNoReturns;
+
+  /// No description provided for @fulLogReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Log return'**
+  String get fulLogReturn;
+
+  /// No description provided for @fulPickOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which order is being returned?'**
+  String get fulPickOrderTitle;
+
+  /// No description provided for @fulSearchOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by order # or customer'**
+  String get fulSearchOrders;
+
+  /// No description provided for @fulNoOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent orders found.'**
+  String get fulNoOrders;
+
+  /// No description provided for @fulExchange.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange'**
+  String get fulExchange;
+
+  /// No description provided for @fulRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund'**
+  String get fulRefund;
+
+  /// No description provided for @fulBackToShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'back to shelf'**
+  String get fulBackToShelf;
+
+  /// No description provided for @fulToVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'to vendor'**
+  String get fulToVendor;
+
+  /// No description provided for @fulItems.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get fulItems;
+
+  /// No description provided for @fulLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load. Please check your connection.'**
+  String get fulLoadFailed;
+
+  /// No description provided for @fulRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get fulRetry;
+
+  /// No description provided for @estEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No estimates yet. Create a quote for a customer — you can share it and turn it into a sale later.'**
+  String get estEmpty;
+
+  /// No description provided for @estNewEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'New estimate'**
+  String get estNewEstimate;
+
+  /// No description provided for @estWalkIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk-in customer'**
+  String get estWalkIn;
+
+  /// No description provided for @estAddOneItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one item'**
+  String get estAddOneItem;
+
+  /// No description provided for @estSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Please try again.'**
+  String get estSaveFailed;
+
+  /// No description provided for @estCustomerOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer (optional)'**
+  String get estCustomerOptional;
+
+  /// No description provided for @estSelectCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Select customer'**
+  String get estSelectCustomer;
+
+  /// No description provided for @estAddItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item'**
+  String get estAddItem;
+
+  /// No description provided for @estValidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until'**
+  String get estValidUntil;
+
+  /// No description provided for @estNoExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'No expiry'**
+  String get estNoExpiry;
+
+  /// No description provided for @estSaveEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Save estimate'**
+  String get estSaveEstimate;
+
+  /// No description provided for @estItemName.
+  ///
+  /// In en, this message translates to:
+  /// **'Item name'**
+  String get estItemName;
+
+  /// No description provided for @estPickFromCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from catalog'**
+  String get estPickFromCatalog;
+
+  /// No description provided for @estQty.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get estQty;
+
+  /// No description provided for @estUnitPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit price'**
+  String get estUnitPrice;
+
+  /// No description provided for @estAddedToBill.
+  ///
+  /// In en, this message translates to:
+  /// **'added to bill'**
+  String get estAddedToBill;
+
+  /// No description provided for @estSkippedNotInCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'skipped (not in catalog)'**
+  String get estSkippedNotInCatalog;
+
+  /// No description provided for @estShareHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate / Quotation'**
+  String get estShareHeading;
+
+  /// No description provided for @estShareTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get estShareTotal;
+
+  /// No description provided for @estTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get estTotal;
+
+  /// No description provided for @estStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get estStatus;
+
+  /// No description provided for @estStatusDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get estStatusDraft;
+
+  /// No description provided for @estStatusSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get estStatusSent;
+
+  /// No description provided for @estStatusAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get estStatusAccepted;
+
+  /// No description provided for @estStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get estStatusRejected;
+
+  /// No description provided for @estShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get estShare;
+
+  /// No description provided for @estConvert.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert to sale'**
+  String get estConvert;
+
+  /// No description provided for @staffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get staffTitle;
+
+  /// No description provided for @staffTeamTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Team & attendance'**
+  String get staffTeamTab;
+
+  /// No description provided for @staffTasksTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get staffTasksTab;
+
+  /// No description provided for @staffNoStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'No staff yet. Add your team.'**
+  String get staffNoStaff;
+
+  /// No description provided for @staffAddStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Add staff'**
+  String get staffAddStaff;
+
+  /// No description provided for @staffNoTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks yet. Add a task or checklist item for your team.'**
+  String get staffNoTasks;
+
+  /// No description provided for @staffAddTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Add task'**
+  String get staffAddTask;
+
+  /// No description provided for @jobTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Job Cards'**
+  String get jobTitle;
+
+  /// No description provided for @jobNewJob.
+  ///
+  /// In en, this message translates to:
+  /// **'New job'**
+  String get jobNewJob;
+
+  /// No description provided for @jobNewJobCard.
+  ///
+  /// In en, this message translates to:
+  /// **'New job card'**
+  String get jobNewJobCard;
+
+  /// No description provided for @jobRepair.
+  ///
+  /// In en, this message translates to:
+  /// **'Repair'**
+  String get jobRepair;
+
+  /// No description provided for @jobAlteration.
+  ///
+  /// In en, this message translates to:
+  /// **'Alteration'**
+  String get jobAlteration;
+
+  /// No description provided for @jobPreorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-order'**
+  String get jobPreorder;
+
+  /// No description provided for @wtyIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue / problem'**
+  String get wtyIssue;
+
+  /// No description provided for @wtySelectSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a serial'**
+  String get wtySelectSerial;
+
+  /// No description provided for @wtyCreateClaim.
+  ///
+  /// In en, this message translates to:
+  /// **'Create claim'**
+  String get wtyCreateClaim;
+
+  /// No description provided for @wtyNoClaims.
+  ///
+  /// In en, this message translates to:
+  /// **'No warranty claims logged.'**
+  String get wtyNoClaims;
+
+  /// No description provided for @wtyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty & Serials'**
+  String get wtyTitle;
+
+  /// No description provided for @wtyTabClaims.
+  ///
+  /// In en, this message translates to:
+  /// **'Claims'**
+  String get wtyTabClaims;
+
+  /// No description provided for @wtyTabSerials.
+  ///
+  /// In en, this message translates to:
+  /// **'Serials'**
+  String get wtyTabSerials;
+
+  /// No description provided for @wtyNewClaim.
+  ///
+  /// In en, this message translates to:
+  /// **'New claim'**
+  String get wtyNewClaim;
+
+  /// No description provided for @wtyAddSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Add serial'**
+  String get wtyAddSerial;
+
+  /// No description provided for @wtySearchSerials.
+  ///
+  /// In en, this message translates to:
+  /// **'Search serial / IMEI or product'**
+  String get wtySearchSerials;
+
+  /// No description provided for @wtyNoSerials.
+  ///
+  /// In en, this message translates to:
+  /// **'No serials registered yet. Add serials at checkout or with the button below.'**
+  String get wtyNoSerials;
+
+  /// No description provided for @wtyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get wtyAll;
+
+  /// No description provided for @wtyInStock.
+  ///
+  /// In en, this message translates to:
+  /// **'In stock'**
+  String get wtyInStock;
+
+  /// No description provided for @wtySold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get wtySold;
+
+  /// No description provided for @wtyProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get wtyProduct;
+
+  /// No description provided for @wtySelectProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a product'**
+  String get wtySelectProduct;
+
+  /// No description provided for @wtySerialImei.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial / IMEI number'**
+  String get wtySerialImei;
+
+  /// No description provided for @wtySoldOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold on'**
+  String get wtySoldOn;
+
+  /// No description provided for @wtyExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty expired'**
+  String get wtyExpired;
+
+  /// No description provided for @wtyExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get wtyExpires;
+
+  /// No description provided for @wtyWarrantyTill.
+  ///
+  /// In en, this message translates to:
+  /// **'Under warranty till'**
+  String get wtyWarrantyTill;
+
+  /// No description provided for @wtyPickProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a product first'**
+  String get wtyPickProduct;
+
+  /// No description provided for @wtyEnterSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the serial / IMEI'**
+  String get wtyEnterSerial;
+
+  /// No description provided for @wtySaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Please try again.'**
+  String get wtySaveFailed;
+
+  /// No description provided for @wtySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get wtySave;
+
+  /// No description provided for @staffComm.
+  ///
+  /// In en, this message translates to:
+  /// **'comm'**
+  String get staffComm;
+
+  /// No description provided for @staffEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get staffEdit;
+
+  /// No description provided for @staffOrders30d.
+  ///
+  /// In en, this message translates to:
+  /// **'orders (30d)'**
+  String get staffOrders30d;
+
+  /// No description provided for @staffCommEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'commission'**
+  String get staffCommEarned;
+
+  /// No description provided for @staffEditMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit staff member'**
+  String get staffEditMember;
+
+  /// No description provided for @staffName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get staffName;
+
+  /// No description provided for @staffPhoneOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (optional)'**
+  String get staffPhoneOptional;
+
+  /// No description provided for @staffRoleOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Role (optional)'**
+  String get staffRoleOptional;
+
+  /// No description provided for @staffCommissionField.
+  ///
+  /// In en, this message translates to:
+  /// **'Commission'**
+  String get staffCommissionField;
+
+  /// No description provided for @staffActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get staffActive;
+
+  /// No description provided for @staffActiveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive staff are hidden from lists and billing.'**
+  String get staffActiveHint;
+
+  /// No description provided for @staffSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get staffSaveChanges;
+
+  /// No description provided for @staffAssignedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned to'**
+  String get staffAssignedTo;
+
+  /// No description provided for @staffBilledBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed by (optional)'**
+  String get staffBilledBy;
+
+  /// No description provided for @staffNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get staffNotSet;
+
+  /// No description provided for @fulReturnsOnOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Returns on this bill'**
+  String get fulReturnsOnOrder;
+
   /// No description provided for @procBoughtQty.
   ///
   /// In en, this message translates to:
@@ -6580,6 +7324,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Analytics'**
   String get profSectionAnalytics;
+
+  /// No description provided for @profSectionOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Operations'**
+  String get profSectionOperations;
+
+  /// No description provided for @profSectionSalesMarketing.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales & marketing'**
+  String get profSectionSalesMarketing;
 
   /// No description provided for @profSectionStoreAccount.
   ///

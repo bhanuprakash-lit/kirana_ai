@@ -4,7 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kirana_ai/features/vision/counter/counter_engine.dart';
 import 'package:kirana_ai/features/vision/counter/simple_tracker.dart';
 
-CounterDetection _det(int? id, double cx, {String cls = 'santoor_soap', double conf = 0.9}) {
+CounterDetection _det(
+  int? id,
+  double cx, {
+  String cls = 'santoor_soap',
+  double conf = 0.9,
+}) {
   // A small box centred at cx (normalized). Height/width fixed.
   const w = 0.1, h = 0.2;
   return CounterDetection(
@@ -45,8 +50,14 @@ void main() {
 
     test('counts distinct tracks and different products separately', () {
       final e = CounterEngine(lineFrac: 0.5);
-      e.processFrame([_det(1, 0.2, cls: 'santoor_soap'), _det(2, 0.2, cls: 'red_label_tea_powder')]);
-      final ev = e.processFrame([_det(1, 0.6, cls: 'santoor_soap'), _det(2, 0.6, cls: 'red_label_tea_powder')]);
+      e.processFrame([
+        _det(1, 0.2, cls: 'santoor_soap'),
+        _det(2, 0.2, cls: 'red_label_tea_powder'),
+      ]);
+      final ev = e.processFrame([
+        _det(1, 0.6, cls: 'santoor_soap'),
+        _det(2, 0.6, cls: 'red_label_tea_powder'),
+      ]);
       expect(ev.length, 2);
       expect(e.totalUnits, 2);
       expect(e.totalSkus, 2);
@@ -90,15 +101,21 @@ void main() {
       for (final cx in [0.15, 0.30, 0.45, 0.60, 0.75]) {
         const w = 0.1, h = 0.2;
         final tracked = tracker.update([
-          TrackerInput(Rect.fromLTWH(cx - w / 2, 0.4, w, h), 'santoor_soap', 0.9),
+          TrackerInput(
+            Rect.fromLTWH(cx - w / 2, 0.4, w, h),
+            'santoor_soap',
+            0.9,
+          ),
         ]);
         final dets = tracked
-            .map((t) => CounterDetection(
-                  trackId: t.id,
-                  className: t.className,
-                  confidence: t.confidence,
-                  boxNorm: t.box,
-                ))
+            .map(
+              (t) => CounterDetection(
+                trackId: t.id,
+                className: t.className,
+                confidence: t.confidence,
+                boxNorm: t.box,
+              ),
+            )
             .toList();
         engine.processFrame(dets);
       }

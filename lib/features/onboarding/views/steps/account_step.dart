@@ -211,7 +211,8 @@ class _AccountStepState extends ConsumerState<AccountStep> {
     final status = UsernameRules.evaluate(_usernameCtrl.text);
     setState(() {
       _usernameStatus = status;
-      _usernameAvailable = null; // availability only matters once format is valid
+      _usernameAvailable =
+          null; // availability only matters once format is valid
       _error = null;
     });
     // Only spend a network round-trip once the username is well-formed.
@@ -247,13 +248,20 @@ class _AccountStepState extends ConsumerState<AccountStep> {
       );
     }
     if (_usernameAvailable == true) {
-      return const Icon(Icons.check_circle_rounded,
-          color: BrandColors.success, size: 20);
+      return const Icon(
+        Icons.check_circle_rounded,
+        color: BrandColors.success,
+        size: 20,
+      );
     }
     if (_usernameAvailable == false ||
         _usernameStatus == UsernameStatus.invalidChars ||
         _usernameStatus == UsernameStatus.tooLong) {
-      return const Icon(Icons.cancel_rounded, color: BrandColors.error, size: 20);
+      return const Icon(
+        Icons.cancel_rounded,
+        color: BrandColors.error,
+        size: 20,
+      );
     }
     return null;
   }

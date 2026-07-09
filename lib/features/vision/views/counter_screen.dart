@@ -135,10 +135,8 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
     }
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      builder: (_) => _FinishSheet(
-        total: _engine.totalUnits,
-        skus: _engine.totalSkus,
-      ),
+      builder: (_) =>
+          _FinishSheet(total: _engine.totalUnits, skus: _engine.totalSkus),
     );
     if (confirmed != true) return;
 
@@ -175,9 +173,11 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(reachable
-            ? l10n.visionCounterSaved(total, skus)
-            : '${l10n.visionCounterSaved(total, skus)} ${l10n.visionCounterOfflineNote}'),
+        content: Text(
+          reachable
+              ? l10n.visionCounterSaved(total, skus)
+              : '${l10n.visionCounterSaved(total, skus)} ${l10n.visionCounterOfflineNote}',
+        ),
         backgroundColor: BrandColors.success,
       ),
     );
@@ -264,10 +264,18 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _zoneChip(soldOnRight ? l10n.visionCounterZoneStore : l10n.visionCounterZoneSold,
-                soldOnRight ? Colors.white70 : BrandColors.success),
-            _zoneChip(soldOnRight ? l10n.visionCounterZoneSold : l10n.visionCounterZoneStore,
-                soldOnRight ? BrandColors.success : Colors.white70),
+            _zoneChip(
+              soldOnRight
+                  ? l10n.visionCounterZoneStore
+                  : l10n.visionCounterZoneSold,
+              soldOnRight ? Colors.white70 : BrandColors.success,
+            ),
+            _zoneChip(
+              soldOnRight
+                  ? l10n.visionCounterZoneSold
+                  : l10n.visionCounterZoneStore,
+              soldOnRight ? BrandColors.success : Colors.white70,
+            ),
           ],
         ),
       ),
@@ -280,8 +288,10 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
       color: Colors.black.withValues(alpha: 0.45),
       borderRadius: BorderRadius.circular(20),
     ),
-    child: Text(label,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700)),
+    child: Text(
+      label,
+      style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700),
+    ),
   );
 
   Widget _topBar(BuildContext context, AppLocalizations l10n) {
@@ -300,13 +310,24 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.shopping_bag_rounded, color: Colors.white, size: 18),
+                const Icon(
+                  Icons.shopping_bag_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
-                Text('${l10n.visionCounterCounted}: ',
-                    style: const TextStyle(color: Colors.white70, fontSize: 13)),
-                Text('${_engine.totalUnits}',
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+                Text(
+                  '${l10n.visionCounterCounted}: ',
+                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+                Text(
+                  '${_engine.totalUnits}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
               ],
             ),
           ),
@@ -320,10 +341,16 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.cloud_upload_outlined, color: Colors.white, size: 14),
+                  const Icon(
+                    Icons.cloud_upload_outlined,
+                    color: Colors.white,
+                    size: 14,
+                  ),
                   const SizedBox(width: 6),
-                  Text(l10n.visionCounterPending(pending),
-                      style: const TextStyle(color: Colors.white, fontSize: 11)),
+                  Text(
+                    l10n.visionCounterPending(pending),
+                    style: const TextStyle(color: Colors.white, fontSize: 11),
+                  ),
                 ],
               ),
             ),
@@ -350,9 +377,14 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
               children: [
                 const Icon(Icons.add_circle, color: Colors.white, size: 18),
                 const SizedBox(width: 8),
-                Text('+1  ${_lastCountedLabel ?? ''}',
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
+                Text(
+                  '+1  ${_lastCountedLabel ?? ''}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ],
             ),
           ),
@@ -367,7 +399,12 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
       right: 0,
       bottom: 0,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + MediaQuery.of(context).padding.bottom),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          12,
+          16,
+          16 + MediaQuery.of(context).padding.bottom,
+        ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
@@ -389,31 +426,47 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
             const SizedBox(height: 10),
             Row(
               children: [
-                _roundBtn(Icons.undo_rounded, l10n.visionCounterUndo,
-                    onTap: _engine.isEmpty ? null : _undo),
+                _roundBtn(
+                  Icons.undo_rounded,
+                  l10n.visionCounterUndo,
+                  onTap: _engine.isEmpty ? null : _undo,
+                ),
                 const SizedBox(width: 10),
-                _roundBtn(Icons.swap_horiz_rounded, l10n.visionCounterFlip, onTap: _flip),
+                _roundBtn(
+                  Icons.swap_horiz_rounded,
+                  l10n.visionCounterFlip,
+                  onTap: _flip,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: FilledButton.icon(
                     onPressed: _toggleRun,
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(52),
-                      backgroundColor:
-                          _running ? BrandColors.orange : BrandColors.success,
+                      backgroundColor: _running
+                          ? BrandColors.orange
+                          : BrandColors.success,
                     ),
-                    icon: Icon(_running
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded),
-                    label: Text(_running
-                        ? l10n.visionCounterPause
-                        : (_started ? l10n.visionCounterResume : l10n.visionCounterStart)),
+                    icon: Icon(
+                      _running ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                    ),
+                    label: Text(
+                      _running
+                          ? l10n.visionCounterPause
+                          : (_started
+                                ? l10n.visionCounterResume
+                                : l10n.visionCounterStart),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 if (_started)
-                  _roundBtn(Icons.check_rounded, l10n.visionCounterFinish,
-                      onTap: _finish, color: BrandColors.primary),
+                  _roundBtn(
+                    Icons.check_rounded,
+                    l10n.visionCounterFinish,
+                    onTap: _finish,
+                    color: BrandColors.primary,
+                  ),
               ],
             ),
           ],
@@ -442,12 +495,19 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
             ),
             child: Row(
               children: [
-                Text(_prettify(t.className),
-                    style: const TextStyle(color: Colors.white, fontSize: 12)),
+                Text(
+                  _prettify(t.className),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
                 const SizedBox(width: 6),
-                Text('×${t.qty}',
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900)),
+                Text(
+                  '×${t.qty}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
               ],
             ),
           );
@@ -456,20 +516,29 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
     );
   }
 
-  Widget _roundBtn(IconData icon, String tooltip,
-      {VoidCallback? onTap, Color? color}) {
+  Widget _roundBtn(
+    IconData icon,
+    String tooltip, {
+    VoidCallback? onTap,
+    Color? color,
+  }) {
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: (color ?? Colors.white).withValues(alpha: onTap == null ? 0.15 : 0.22),
+        color: (color ?? Colors.white).withValues(
+          alpha: onTap == null ? 0.15 : 0.22,
+        ),
         shape: const CircleBorder(),
         child: InkWell(
           onTap: onTap,
           customBorder: const CircleBorder(),
           child: Padding(
             padding: const EdgeInsets.all(14),
-            child: Icon(icon,
-                color: onTap == null ? Colors.white38 : Colors.white, size: 22),
+            child: Icon(
+              icon,
+              color: onTap == null ? Colors.white38 : Colors.white,
+              size: 22,
+            ),
           ),
         ),
       ),
@@ -516,25 +585,40 @@ class _CounterLanding extends ConsumerWidget {
             decoration: BoxDecoration(
               color: BrandColors.success.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: BrandColors.success.withValues(alpha: 0.25)),
+              border: Border.all(
+                color: BrandColors.success.withValues(alpha: 0.25),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.videocam_rounded, color: BrandColors.success),
+                    const Icon(
+                      Icons.videocam_rounded,
+                      color: BrandColors.success,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(l10n.visionCounterStartTitle,
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w800)),
+                      child: Text(
+                        l10n.visionCounterStartTitle,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(l10n.visionCounterStartDesc,
-                    style: const TextStyle(fontSize: 13, color: BrandColors.muted, height: 1.4)),
+                Text(
+                  l10n.visionCounterStartDesc,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: BrandColors.muted,
+                    height: 1.4,
+                  ),
+                ),
               ],
             ),
           ),
@@ -552,23 +636,39 @@ class _CounterLanding extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(l10n.visionCounterSummaryTitle,
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+              Text(
+                l10n.visionCounterSummaryTitle,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                ),
+              ),
               if (state.pendingCount > 0)
-                Text(l10n.visionCounterPending(state.pendingCount),
-                    style: const TextStyle(color: BrandColors.orange, fontSize: 12)),
+                Text(
+                  l10n.visionCounterPending(state.pendingCount),
+                  style: const TextStyle(
+                    color: BrandColors.orange,
+                    fontSize: 12,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 10),
           if (state.summaryLoading && summary.isEmpty)
-            const Center(child: Padding(
-              padding: EdgeInsets.all(24), child: CircularProgressIndicator())),
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: CircularProgressIndicator(),
+              ),
+            ),
           if (!state.summaryLoading && summary.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text(l10n.visionCounterSummaryEmpty,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: BrandColors.muted)),
+              child: Text(
+                l10n.visionCounterSummaryEmpty,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: BrandColors.muted),
+              ),
             ),
           if (summary.isNotEmpty) ...[
             Container(
@@ -581,12 +681,18 @@ class _CounterLanding extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(l10n.visionCounterSummaryTotal,
-                      style: const TextStyle(fontWeight: FontWeight.w700)),
-                  Text('${state.summaryTotal}',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w900,
-                          color: BrandColors.success)),
+                  Text(
+                    l10n.visionCounterSummaryTotal,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    '${state.summaryTotal}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: BrandColors.success,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -597,24 +703,34 @@ class _CounterLanding extends ConsumerWidget {
                 child: Row(
                   children: [
                     Icon(
-                      it.isUnknown ? Icons.help_outline_rounded : Icons.check_circle_rounded,
+                      it.isUnknown
+                          ? Icons.help_outline_rounded
+                          : Icons.check_circle_rounded,
                       size: 18,
-                      color: it.isUnknown ? BrandColors.orange : BrandColors.success,
+                      color: it.isUnknown
+                          ? BrandColors.orange
+                          : BrandColors.success,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        it.isUnknown ? '${it.displayName} · ${l10n.visionCounterUnknownItem}' : it.displayName,
+                        it.isUnknown
+                            ? '${it.displayName} · ${l10n.visionCounterUnknownItem}'
+                            : it.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: it.isUnknown ? BrandColors.muted : BrandColors.ink,
+                          color: it.isUnknown
+                              ? BrandColors.muted
+                              : BrandColors.ink,
                           fontSize: 13,
                         ),
                       ),
                     ),
-                    Text('×${it.qty}',
-                        style: const TextStyle(fontWeight: FontWeight.w800)),
+                    Text(
+                      '×${it.qty}',
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
                   ],
                 ),
               ),
@@ -674,16 +790,22 @@ class _FinishSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.visionCounterFinishConfirmTitle,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+            Text(
+              l10n.visionCounterFinishConfirmTitle,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
             const SizedBox(height: 8),
-            Text(l10n.visionCounterSaved(total, skus),
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: BrandColors.muted)),
+            Text(
+              l10n.visionCounterSaved(total, skus),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: BrandColors.muted),
+            ),
             const SizedBox(height: 6),
-            Text(l10n.visionCounterFinishConfirmDesc,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: BrandColors.muted, fontSize: 12)),
+            Text(
+              l10n.visionCounterFinishConfirmDesc,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: BrandColors.muted, fontSize: 12),
+            ),
             const SizedBox(height: 18),
             Row(
               children: [
@@ -714,7 +836,10 @@ class _FinishSheet extends StatelessWidget {
 class _PermissionPrompt extends StatelessWidget {
   final bool permanentlyDenied;
   final VoidCallback onGrant;
-  const _PermissionPrompt({required this.permanentlyDenied, required this.onGrant});
+  const _PermissionPrompt({
+    required this.permanentlyDenied,
+    required this.onGrant,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -723,8 +848,9 @@ class _PermissionPrompt extends StatelessWidget {
       icon: Icons.photo_camera_front_outlined,
       title: l10n.visionCounterPermTitle,
       message: l10n.visionCounterPermDesc,
-      actionLabel:
-          permanentlyDenied ? l10n.visionCounterOpenSettings : l10n.visionCounterGrant,
+      actionLabel: permanentlyDenied
+          ? l10n.visionCounterOpenSettings
+          : l10n.visionCounterGrant,
       onAction: permanentlyDenied ? openAppSettings : onGrant,
     );
   }
@@ -752,16 +878,27 @@ class _CounterMessage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 52, color: BrandColors.muted.withValues(alpha: 0.5)),
+            Icon(
+              icon,
+              size: 52,
+              color: BrandColors.muted.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 14),
-            Text(title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w800, color: BrandColors.ink)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: BrandColors.ink,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: BrandColors.muted)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: BrandColors.muted),
+            ),
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 18),
               FilledButton(onPressed: onAction, child: Text(actionLabel!)),
