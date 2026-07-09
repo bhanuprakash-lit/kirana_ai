@@ -3015,6 +3015,390 @@ class AppLocalizationsTa extends AppLocalizations {
   String get procRecordReturn => 'திரும்பப்பெறுதலைப் பதிவு செய்';
 
   @override
+  String get rackTitle => 'இருப்பு அலமாரிகள்';
+
+  @override
+  String get rackPlaceStock => 'இருப்பை வைக்கவும்';
+
+  @override
+  String get rackSearchHint => 'பொருள் அல்லது அலமாரியைத் தேடவும் (எ.கா. A1)';
+
+  @override
+  String get rackSaved => 'இருப்பு அலமாரியில் வைக்கப்பட்டது';
+
+  @override
+  String get rackChangeQty => 'அளவை மாற்று';
+
+  @override
+  String get rackMove => 'வேறு அலமாரிக்கு நகர்த்து';
+
+  @override
+  String get rackRemove => 'அலமாரியிலிருந்து அகற்று';
+
+  @override
+  String get rackRemoved => 'அலமாரியிலிருந்து அகற்றப்பட்டது';
+
+  @override
+  String get rackMoved => 'புதிய அலமாரிக்கு நகர்த்தப்பட்டது';
+
+  @override
+  String get rackEmpty =>
+      'இன்னும் அலமாரிகள் அமைக்கப்படவில்லை. ஒரு பொருளை அலமாரியில் வைக்க \'இருப்பை வைக்கவும்\' தட்டவும் — பிறகு அதை விரைவாகக் கண்டுபிடிக்கலாம்.';
+
+  @override
+  String get rackNoMatch =>
+      'உங்கள் தேடலுக்கு எந்தப் பொருளும் அலமாரியும் பொருந்தவில்லை.';
+
+  @override
+  String get rackItems => 'பொருட்கள்';
+
+  @override
+  String get rackProduct => 'பொருள்';
+
+  @override
+  String get rackSelectProduct => 'ஒரு பொருளைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get rackPickProductFirst => 'முதலில் ஒரு பொருளைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get rackNeedLabel => 'அலமாரி / பெட்டி லேபிளை உள்ளிடவும்';
+
+  @override
+  String get rackSaveFailed => 'சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get rackLabel => 'அலமாரி / பெட்டி';
+
+  @override
+  String get rackLabelHint => 'எ.கா. A1, மேல் அடுக்கு, குளிர் சேமிப்பு';
+
+  @override
+  String get rackQuantity => 'இந்த அலமாரியில் அளவு';
+
+  @override
+  String get rackSave => 'சேமி';
+
+  @override
+  String get rackLoadFailed =>
+      'அலமாரிகளை ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்க்கவும்.';
+
+  @override
+  String get rackRetry => 'மீண்டும் முயற்சிக்கவும்';
+
+  @override
+  String get rackLocation => 'அலமாரி இடம்';
+
+  @override
+  String get rackSetLocation => 'அலமாரி இடத்தை அமைக்கவும்';
+
+  @override
+  String get rackNoneForProduct => 'இன்னும் எந்த அலமாரியிலும் வைக்கப்படவில்லை.';
+
+  @override
+  String get procExchangeInstead =>
+      'மாற்று (வாடிக்கையாளர் வேறு பொருள் எடுக்கிறார்)';
+
+  @override
+  String get procRefundAmount => 'திருப்பித் தொகை';
+
+  @override
+  String get fulTitle => 'மதிப்பீடுகள் & திரும்பப்பெறுதல்கள்';
+
+  @override
+  String get fulTabEstimates => 'மதிப்பீடுகள்';
+
+  @override
+  String get fulTabReturns => 'திரும்பப்பெறுதல்கள்';
+
+  @override
+  String get fulNoReturns =>
+      'இன்னும் திரும்பப்பெறுதல்கள் இல்லை. வாடிக்கையாளர் எதையாவது திருப்பிக் கொண்டு வந்தால், \'திரும்பப்பெறுதலைப் பதிவு செய்\' தட்டி அவர்களின் ஆர்டரைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get fulLogReturn => 'திரும்பப்பெறுதலைப் பதிவு செய்';
+
+  @override
+  String get fulPickOrderTitle => 'எந்த ஆர்டர் திருப்பித் தரப்படுகிறது?';
+
+  @override
+  String get fulSearchOrders => 'ஆர்டர் # அல்லது வாடிக்கையாளர் மூலம் தேடவும்';
+
+  @override
+  String get fulNoOrders => 'சமீபத்திய ஆர்டர்கள் எதுவும் இல்லை.';
+
+  @override
+  String get fulExchange => 'மாற்று';
+
+  @override
+  String get fulRefund => 'திருப்பித் தருதல்';
+
+  @override
+  String get fulBackToShelf => 'அலமாரிக்குத் திரும்பியது';
+
+  @override
+  String get fulToVendor => 'விற்பனையாளருக்கு';
+
+  @override
+  String get fulItems => 'பொருட்கள்';
+
+  @override
+  String get fulLoadFailed =>
+      'ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்க்கவும்.';
+
+  @override
+  String get fulRetry => 'மீண்டும் முயற்சிக்கவும்';
+
+  @override
+  String get estEmpty =>
+      'இன்னும் மதிப்பீடுகள் இல்லை. வாடிக்கையாளருக்கு ஒரு விலைப்புள்ளியை உருவாக்கவும் — அதைப் பகிர்ந்து பின்னர் விற்பனையாக மாற்றலாம்.';
+
+  @override
+  String get estNewEstimate => 'புதிய மதிப்பீடு';
+
+  @override
+  String get estWalkIn => 'நேரடி வாடிக்கையாளர்';
+
+  @override
+  String get estAddOneItem => 'குறைந்தது ஒரு பொருளைச் சேர்க்கவும்';
+
+  @override
+  String get estSaveFailed => 'சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get estCustomerOptional => 'வாடிக்கையாளர் (விருப்பம்)';
+
+  @override
+  String get estSelectCustomer => 'வாடிக்கையாளரைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get estAddItem => 'பொருளைச் சேர்';
+
+  @override
+  String get estValidUntil => 'வரை செல்லுபடியாகும்';
+
+  @override
+  String get estNoExpiry => 'காலாவधि இல்லை';
+
+  @override
+  String get estSaveEstimate => 'மதிப்பீட்டைச் சேமி';
+
+  @override
+  String get estItemName => 'பொருளின் பெயர்';
+
+  @override
+  String get estPickFromCatalog => 'பட்டியலிலிருந்து தேர்ந்தெடு';
+
+  @override
+  String get estQty => 'அளவு';
+
+  @override
+  String get estUnitPrice => 'அலகு விலை';
+
+  @override
+  String get estAddedToBill => 'பில்லில் சேர்க்கப்பட்டது';
+
+  @override
+  String get estSkippedNotInCatalog => 'தவிர்க்கப்பட்டது (பட்டியலில் இல்லை)';
+
+  @override
+  String get estShareHeading => 'மதிப்பீடு / விலைப்புள்ளி';
+
+  @override
+  String get estShareTotal => 'மொத்தம்';
+
+  @override
+  String get estTotal => 'மொத்தம்';
+
+  @override
+  String get estStatus => 'நிலை';
+
+  @override
+  String get estStatusDraft => 'வரைவு';
+
+  @override
+  String get estStatusSent => 'அனுப்பப்பட்டது';
+
+  @override
+  String get estStatusAccepted => 'ஏற்கப்பட்டது';
+
+  @override
+  String get estStatusRejected => 'நிராகரிக்கப்பட்டது';
+
+  @override
+  String get estShare => 'பகிர்';
+
+  @override
+  String get estConvert => 'விற்பனையாக மாற்று';
+
+  @override
+  String get staffTitle => 'பணியாளர்கள்';
+
+  @override
+  String get staffTeamTab => 'குழு & வருகை';
+
+  @override
+  String get staffTasksTab => 'பணிகள்';
+
+  @override
+  String get staffNoStaff =>
+      'இன்னும் பணியாளர்கள் இல்லை. உங்கள் குழுவைச் சேர்க்கவும்.';
+
+  @override
+  String get staffAddStaff => 'பணியாளரைச் சேர்';
+
+  @override
+  String get staffNoTasks =>
+      'இன்னும் பணிகள் இல்லை. உங்கள் குழுவிற்கு ஒரு பணி அல்லது சரிபார்ப்புப் பட்டியல் உருப்படியைச் சேர்க்கவும்.';
+
+  @override
+  String get staffAddTask => 'பணியைச் சேர்';
+
+  @override
+  String get jobTitle => 'பணி அட்டைகள்';
+
+  @override
+  String get jobNewJob => 'புதிய பணி';
+
+  @override
+  String get jobNewJobCard => 'புதிய பணி அட்டை';
+
+  @override
+  String get jobRepair => 'பழுது';
+
+  @override
+  String get jobAlteration => 'மாற்றம்';
+
+  @override
+  String get jobPreorder => 'முன்பதிவு';
+
+  @override
+  String get wtyIssue => 'சிக்கல்';
+
+  @override
+  String get wtySelectSerial => 'ஒரு சீரியலைத் தேர்ந்தெடு';
+
+  @override
+  String get wtyCreateClaim => 'உரிமைகோரலை உருவாக்கு';
+
+  @override
+  String get wtyNoClaims =>
+      'உத்தரவாத உரிமைகோரல்கள் எதுவும் பதிவு செய்யப்படவில்லை.';
+
+  @override
+  String get wtyTitle => 'உத்தரவாதம் & சீரியல்கள்';
+
+  @override
+  String get wtyTabClaims => 'உரிமைகோரல்கள்';
+
+  @override
+  String get wtyTabSerials => 'சீரியல்கள்';
+
+  @override
+  String get wtyNewClaim => 'புதிய உரிமைகோரல்';
+
+  @override
+  String get wtyAddSerial => 'சீரியல் சேர்';
+
+  @override
+  String get wtySearchSerials => 'சீரியல் / IMEI அல்லது பொருளைத் தேடு';
+
+  @override
+  String get wtyNoSerials =>
+      'இன்னும் சீரியல்கள் பதிவு செய்யப்படவில்லை. செக்அவுட்டில் அல்லது கீழே உள்ள பொத்தானால் சீரியல்களைச் சேர்க்கவும்.';
+
+  @override
+  String get wtyAll => 'அனைத்தும்';
+
+  @override
+  String get wtyInStock => 'இருப்பில்';
+
+  @override
+  String get wtySold => 'விற்றது';
+
+  @override
+  String get wtyProduct => 'பொருள்';
+
+  @override
+  String get wtySelectProduct => 'ஒரு பொருளைத் தேர்ந்தெடு';
+
+  @override
+  String get wtySerialImei => 'சீரியல் / IMEI எண்';
+
+  @override
+  String get wtySoldOn => 'விற்பனை';
+
+  @override
+  String get wtyExpired => 'உத்தரவாதம் முடிந்தது';
+
+  @override
+  String get wtyExpires => 'காலாவधியாகிறது';
+
+  @override
+  String get wtyWarrantyTill => 'உத்தரவாதத்தில் வரை';
+
+  @override
+  String get wtyPickProduct => 'முதலில் ஒரு பொருளைத் தேர்ந்தெடு';
+
+  @override
+  String get wtyEnterSerial => 'சீரியல் / IMEI ஐ உள்ளிடவும்';
+
+  @override
+  String get wtySaveFailed => 'சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get wtySave => 'சேமி';
+
+  @override
+  String get staffComm => 'கமிஷன்';
+
+  @override
+  String get staffEdit => 'திருத்து';
+
+  @override
+  String get staffOrders30d => 'ஆர்டர்கள் (30நா)';
+
+  @override
+  String get staffCommEarned => 'கமிஷன்';
+
+  @override
+  String get staffEditMember => 'பணியாளரைத் திருத்து';
+
+  @override
+  String get staffName => 'பெயர்';
+
+  @override
+  String get staffPhoneOptional => 'தொலைபேசி (விருப்பம்)';
+
+  @override
+  String get staffRoleOptional => 'பங்கு (விருப்பம்)';
+
+  @override
+  String get staffCommissionField => 'கமிஷன்';
+
+  @override
+  String get staffActive => 'செயலில்';
+
+  @override
+  String get staffActiveHint =>
+      'செயலில் இல்லாத பணியாளர்கள் பட்டியல்கள் மற்றும் பில்லிங்கில் மறைக்கப்படுவார்கள்.';
+
+  @override
+  String get staffSaveChanges => 'மாற்றங்களைச் சேமி';
+
+  @override
+  String get staffAssignedTo => 'ஒதுக்கப்பட்டது';
+
+  @override
+  String get staffBilledBy => 'பில் செய்தவர் (விருப்பம்)';
+
+  @override
+  String get staffNotSet => 'அமைக்கப்படவில்லை';
+
+  @override
+  String get fulReturnsOnOrder => 'இந்த பில்லில் திரும்பப்பெறுதல்கள்';
+
+  @override
   String procBoughtQty(String qty) {
     return 'வாங்கியது $qty ';
   }
@@ -3844,6 +4228,12 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get profSectionAnalytics => 'பகுப்பாய்வு';
+
+  @override
+  String get profSectionOperations => 'செயல்பாடுகள்';
+
+  @override
+  String get profSectionSalesMarketing => 'விற்பனை & சந்தைப்படுத்தல்';
 
   @override
   String get profSectionStoreAccount => 'கடை & கணக்கு';

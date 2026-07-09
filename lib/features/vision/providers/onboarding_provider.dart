@@ -5,7 +5,15 @@ import '../../auth/repositories/auth_repository.dart' show ApiException;
 import '../models/vision_models.dart';
 
 /// Bulk stock-in ("snap your shelves") flow state machine.
-enum OnboardingStatus { idle, uploading, processing, ready, committing, done, failed }
+enum OnboardingStatus {
+  idle,
+  uploading,
+  processing,
+  ready,
+  committing,
+  done,
+  failed,
+}
 
 /// One detected product on the review screen — its quantity is editable and, for
 /// an unrecognised detection, the owner can map it to a real catalog product.
@@ -81,14 +89,23 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
 
   /// Upload captured shelf photos, then wait for detection to finish.
   Future<void> analyze(List<String> filePaths) async {
-    state = state.copyWith(status: OnboardingStatus.uploading, clearError: true, items: []);
+    state = state.copyWith(
+      status: OnboardingStatus.uploading,
+      clearError: true,
+      items: [],
+    );
     try {
-      final res = await _client.postMultipart(
-        '/kirana/vision/onboarding/analyze',
-        filePaths: filePaths,
-      ) as Map<String, dynamic>;
+      final res =
+          await _client.postMultipart(
+                '/kirana/vision/onboarding/analyze',
+                filePaths: filePaths,
+              )
+              as Map<String, dynamic>;
       final sessionId = (res['session_id'] as num).toInt();
-      state = state.copyWith(status: OnboardingStatus.processing, sessionId: sessionId);
+      state = state.copyWith(
+        status: OnboardingStatus.processing,
+        sessionId: sessionId,
+      );
       await _pollUntilDone(sessionId);
     } catch (e) {
       state = state.copyWith(status: OnboardingStatus.failed, error: _msg(e));
@@ -99,7 +116,11 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   /// during processing). Loads its items if detection already finished, else waits.
   Future<void> resumeSession(int sessionId) async {
     state = state.copyWith(
-        status: OnboardingStatus.processing, sessionId: sessionId, items: [], clearError: true);
+      status: OnboardingStatus.processing,
+      sessionId: sessionId,
+      items: [],
+      clearError: true,
+    );
     await _pollUntilDone(sessionId);
   }
 
@@ -124,21 +145,27 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         // transient; keep polling
       }
     }
-    state = state.copyWith(status: OnboardingStatus.failed, error: 'Timed out reading your photos');
+    state = state.copyWith(
+      status: OnboardingStatus.failed,
+      error: 'Timed out reading your photos',
+    );
   }
 
   Future<void> _loadItems(int sessionId) async {
     final res =
-        await _client.get('/kirana/vision/session/$sessionId/items') as List<dynamic>;
+        await _client.get('/kirana/vision/session/$sessionId/items')
+            as List<dynamic>;
     final items = res
         .map((j) => VisionItem.fromJson(j as Map<String, dynamic>))
-        .map((v) => OnboardingReviewItem(
-              itemId: v.itemId,
-              label: v.label,
-              detectedUnknown: v.isUnknown,
-              productId: v.correctedProductId ?? v.productId,
-              quantity: v.count,
-            ))
+        .map(
+          (v) => OnboardingReviewItem(
+            itemId: v.itemId,
+            label: v.label,
+            detectedUnknown: v.isUnknown,
+            productId: v.correctedProductId ?? v.productId,
+            quantity: v.count,
+          ),
+        )
         .toList();
     state = state.copyWith(status: OnboardingStatus.ready, items: items);
   }
@@ -146,26 +173,31 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   // ── Review edits ─────────────────────────────────────────────────────────────
 
   void setQuantity(int itemId, int quantity) {
-    state = state.copyWith(items: [
-      for (final i in state.items)
-        if (i.itemId == itemId)
-          (i..quantity = quantity < 0 ? 0 : quantity)
-        else
-          i,
-    ]);
+    state = state.copyWith(
+      items: [
+        for (final i in state.items)
+          if (i.itemId == itemId)
+            (i..quantity = quantity < 0 ? 0 : quantity)
+          else
+            i,
+      ],
+    );
   }
 
   /// Map an unrecognised detection to a catalog product (owner picked it).
   void mapProduct(int itemId, int productId, String label) {
-    state = state.copyWith(items: [
-      for (final i in state.items)
-        if (i.itemId == itemId) (i..productId = productId) else i,
-    ]);
+    state = state.copyWith(
+      items: [
+        for (final i in state.items)
+          if (i.itemId == itemId) (i..productId = productId) else i,
+      ],
+    );
   }
 
   void removeItem(int itemId) {
     state = state.copyWith(
-        items: state.items.where((i) => i.itemId != itemId).toList());
+      items: state.items.where((i) => i.itemId != itemId).toList(),
+    );
   }
 
   // ── Commit ───────────────────────────────────────────────────────────────────
@@ -177,20 +209,29 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     if (sessionId == null) return false;
     final payload = state.committable;
     if (payload.isEmpty) {
-      state = state.copyWith(error: 'Add a quantity to at least one product first.');
+      state = state.copyWith(
+        error: 'Add a quantity to at least one product first.',
+      );
       return false;
     }
-    state = state.copyWith(status: OnboardingStatus.committing, clearError: true);
+    state = state.copyWith(
+      status: OnboardingStatus.committing,
+      clearError: true,
+    );
     try {
-      final res = await _client.post('/kirana/vision/onboarding/commit/$sessionId', {
-        'items': [
-          for (final i in payload) {'product_id': i.productId, 'quantity': i.quantity},
-        ],
-        'add_to_existing': addToExisting,
-      }) as Map<String, dynamic>;
+      final res =
+          await _client.post('/kirana/vision/onboarding/commit/$sessionId', {
+                'items': [
+                  for (final i in payload)
+                    {'product_id': i.productId, 'quantity': i.quantity},
+                ],
+                'add_to_existing': addToExisting,
+              })
+              as Map<String, dynamic>;
       state = state.copyWith(
         status: OnboardingStatus.done,
-        committedProducts: (res['products_added'] as num?)?.toInt() ?? payload.length,
+        committedProducts:
+            (res['products_added'] as num?)?.toInt() ?? payload.length,
         committedQuantity: (res['total_quantity'] as num?)?.toInt() ?? 0,
       );
       return true;
@@ -206,4 +247,6 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
 }
 
 final onboardingProvider =
-    NotifierProvider<OnboardingNotifier, OnboardingState>(OnboardingNotifier.new);
+    NotifierProvider<OnboardingNotifier, OnboardingState>(
+      OnboardingNotifier.new,
+    );

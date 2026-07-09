@@ -180,19 +180,52 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               ),
 
-              _SectionLabel(l10n.profSectionAnalytics),
+              // ── Operations — day-to-day running of the store ──────────────
+              _SectionLabel(l10n.profSectionOperations),
               _GroupCard(
                 rows: [
                   _CompactRow(
-                    icon: Icons.analytics_outlined,
-                    label: l10n.profKpiSubscriptions,
-                    onTap: () => context.push('/profile/kpis'),
+                    icon: Icons.badge_outlined,
+                    label: l10n.profStaff,
+                    onTap: () => context.push('/profile/staff'),
                   ),
                   _CompactRow(
-                    icon: Icons.history_rounded,
-                    label: l10n.profTransactionHistory,
-                    onTap: () => context.push('/profile/history'),
+                    icon: Icons.receipt_long_outlined,
+                    label: l10n.profEstimatesReturns,
+                    onTap: () => context.push('/profile/fulfilment'),
                   ),
+                  _CompactRow(
+                    icon: Icons.grid_view_rounded,
+                    label: l10n.profStockRacks,
+                    onTap: () => context.push('/profile/stock-racks'),
+                  ),
+                  // Job cards (alteration / repair / pre-order) are meaningless
+                  // for a grocery kirana — gate them to the other verticals.
+                  if (verticalConfigOf(ref).verticalCode != 'grocery')
+                    _CompactRow(
+                      icon: Icons.build_circle_outlined,
+                      label: l10n.profJobCards,
+                      onTap: () => context.push('/profile/job-cards'),
+                    ),
+                  if (verticalConfigOf(ref).has('warranty'))
+                    _CompactRow(
+                      icon: Icons.verified_user_outlined,
+                      label: l10n.profWarranty,
+                      onTap: () => context.push('/profile/warranty'),
+                    ),
+                  if (verticalConfigOf(ref).verticalCode != 'grocery')
+                    _CompactRow(
+                      icon: Icons.receipt_long_rounded,
+                      label: l10n.profGstReport,
+                      onTap: () => context.push('/profile/gst-report'),
+                    ),
+                ],
+              ),
+
+              // ── Sales & marketing — growing revenue ───────────────────────
+              _SectionLabel(l10n.profSectionSalesMarketing),
+              _GroupCard(
+                rows: [
                   _CompactRow(
                     icon: Icons.shopping_basket_rounded,
                     label: l10n.profMyBaskets,
@@ -209,6 +242,23 @@ class ProfileScreen extends ConsumerWidget {
                       label: l10n.profServices,
                       onTap: () => context.push('/profile/services'),
                     ),
+                ],
+              ),
+
+              // ── Analytics — understanding the numbers ─────────────────────
+              _SectionLabel(l10n.profSectionAnalytics),
+              _GroupCard(
+                rows: [
+                  _CompactRow(
+                    icon: Icons.analytics_outlined,
+                    label: l10n.profKpiSubscriptions,
+                    onTap: () => context.push('/profile/kpis'),
+                  ),
+                  _CompactRow(
+                    icon: Icons.history_rounded,
+                    label: l10n.profTransactionHistory,
+                    onTap: () => context.push('/profile/history'),
+                  ),
                   if (ref
                           .watch(storeRollupProvider)
                           .asData
@@ -219,38 +269,6 @@ class ProfileScreen extends ConsumerWidget {
                       icon: Icons.compare_arrows_rounded,
                       label: l10n.profStoreComparison,
                       onTap: () => context.push('/profile/store-comparison'),
-                    ),
-                  _CompactRow(
-                    icon: Icons.badge_outlined,
-                    label: l10n.profStaff,
-                    onTap: () => context.push('/profile/staff'),
-                  ),
-                  _CompactRow(
-                    icon: Icons.receipt_long_outlined,
-                    label: l10n.profEstimatesReturns,
-                    onTap: () => context.push('/profile/fulfilment'),
-                  ),
-                  _CompactRow(
-                    icon: Icons.grid_view_rounded,
-                    label: l10n.profStockRacks,
-                    onTap: () => context.push('/profile/stock-racks'),
-                  ),
-                  _CompactRow(
-                    icon: Icons.build_circle_outlined,
-                    label: l10n.profJobCards,
-                    onTap: () => context.push('/profile/job-cards'),
-                  ),
-                  if (verticalConfigOf(ref).has('warranty'))
-                    _CompactRow(
-                      icon: Icons.verified_user_outlined,
-                      label: l10n.profWarranty,
-                      onTap: () => context.push('/profile/warranty'),
-                    ),
-                  if (verticalConfigOf(ref).verticalCode != 'grocery')
-                    _CompactRow(
-                      icon: Icons.receipt_long_rounded,
-                      label: l10n.profGstReport,
-                      onTap: () => context.push('/profile/gst-report'),
                     ),
                 ],
               ),

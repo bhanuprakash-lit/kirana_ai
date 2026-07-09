@@ -5,10 +5,10 @@ void main() {
   group('AppConfig.updateFromRemote', () {
     test('null and empty strings leave baseUrl on the dev fallback', () {
       AppConfig.updateFromRemote(null);
-      expect(AppConfig.baseUrl, AppConfig.devBaseUrl);
+      expect(AppConfig.baseUrl, AppConfig.defaultBaseUrl);
 
       AppConfig.updateFromRemote('   ');
-      expect(AppConfig.baseUrl, AppConfig.devBaseUrl);
+      expect(AppConfig.baseUrl, AppConfig.defaultBaseUrl);
     });
 
     test('valid URL is accepted and trailing slashes are stripped', () {
@@ -21,10 +21,10 @@ void main() {
 
     test('malformed URLs are rejected and fall back', () {
       AppConfig.updateFromRemote('not a url');
-      expect(AppConfig.baseUrl, AppConfig.devBaseUrl);
+      expect(AppConfig.baseUrl, AppConfig.defaultBaseUrl);
 
       AppConfig.updateFromRemote('https://');
-      expect(AppConfig.baseUrl, AppConfig.devBaseUrl);
+      expect(AppConfig.baseUrl, AppConfig.defaultBaseUrl);
     });
 
     test('apiBaseUrl mirrors baseUrl', () {

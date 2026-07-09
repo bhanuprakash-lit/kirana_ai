@@ -6,6 +6,7 @@ import '../../../../core/services/api_client.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
+import '../../../fulfilment/fulfilment.dart' show returnsProvider;
 import '../../providers/inventory_provider.dart';
 import '../../providers/pos_provider.dart';
 
@@ -29,6 +30,7 @@ class _ReturnLine {
   final int productId;
   final String name;
   final double orderedQty;
+  final double unitPrice; // what the customer paid — drives the refund default
   int returnQty = 0;
   bool resaleable = true;
 
@@ -36,6 +38,7 @@ class _ReturnLine {
     required this.productId,
     required this.name,
     required this.orderedQty,
+    required this.unitPrice,
   });
 }
 
@@ -49,6 +52,9 @@ class _ReturnSheet extends ConsumerStatefulWidget {
 
 class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
   late final List<_ReturnLine> _lines;
+  final _refundCtrl = TextEditingController();
+  bool _refundEdited = false; // stop auto-filling once the owner types a value
+  bool _isExchange = false;
   bool _saving = false;
 
   AppLocalizations get _l10n =>
@@ -63,16 +69,43 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
       final item = raw as Map<String, dynamic>;
       final pid = (item['product_id'] as num?)?.toInt() ?? 0;
       final qty = (item['quantity'] as num?)?.toDouble() ?? 0;
+      final price =
+          (item['selling_price'] as num?)?.toDouble() ??
+          (item['unit_price'] as num?)?.toDouble() ??
+          0;
       final product = products.where((p) => p.productId == pid).firstOrNull;
       return _ReturnLine(
         productId: pid,
-        name: product?.name ?? _l10n.procProductNumber('$pid'),
+        name:
+            (item['product_name'] as String?) ??
+            product?.name ??
+            _l10n.procProductNumber('$pid'),
         orderedQty: qty,
+        unitPrice: price,
       );
     }).toList();
   }
 
+  @override
+  void dispose() {
+    _refundCtrl.dispose();
+    super.dispose();
+  }
+
   bool get _hasReturns => _lines.any((l) => l.returnQty > 0);
+
+  double get _suggestedRefund =>
+      _lines.fold(0.0, (sum, l) => sum + l.returnQty * l.unitPrice);
+
+  /// Keep the refund field tracking the selected items until the owner edits it.
+  void _syncRefund() {
+    if (_refundEdited) return;
+    _refundCtrl.text = _isExchange
+        ? '0'
+        : _suggestedRefund.toStringAsFixed(
+            _suggestedRefund.truncateToDouble() == _suggestedRefund ? 0 : 2,
+          );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,8 +164,47 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
               itemBuilder: (_, i) => _lineTile(_lines[i]),
             ),
           ),
+          if (_hasReturns)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 4, 24, 0),
+              child: Column(
+                children: [
+                  SwitchListTile.adaptive(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    value: _isExchange,
+                    onChanged: (v) => setState(() {
+                      _isExchange = v;
+                      _syncRefund();
+                    }),
+                    title: Text(
+                      l10n.procExchangeInstead,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: _refundCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    onChanged: (_) => _refundEdited = true,
+                    decoration: InputDecoration(
+                      labelText: l10n.procRefundAmount,
+                      prefixText: '₹ ',
+                      isDense: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
             child: SizedBox(
               height: 52,
               width: double.infinity,
@@ -172,7 +244,10 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
                 ),
               ),
               _stepBtn(Icons.remove, line.returnQty > 0, () {
-                setState(() => line.returnQty--);
+                setState(() {
+                  line.returnQty--;
+                  _syncRefund();
+                });
               }),
               SizedBox(
                 width: 34,
@@ -186,7 +261,10 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
                 ),
               ),
               _stepBtn(Icons.add, line.returnQty < maxQty, () {
-                setState(() => line.returnQty++);
+                setState(() {
+                  line.returnQty++;
+                  _syncRefund();
+                });
               }),
             ],
           ),
@@ -263,9 +341,14 @@ class _ReturnSheetState extends ConsumerState<_ReturnSheet> {
       final res = await client.post('/kirana/returns', {
         'order_id': widget.order['order_id'],
         'items': items,
+        'refund_amount': double.tryParse(_refundCtrl.text.trim()) ?? 0,
+        'is_exchange': _isExchange,
+        if (widget.order['customer_id'] != null)
+          'customer_id': widget.order['customer_id'],
       });
-      // Stock changed — refresh inventory + POS catalog.
+      // Stock changed — refresh inventory + POS catalog + returns history.
       ref.invalidate(inventoryProvider);
+      ref.invalidate(returnsProvider);
       ref.read(posProvider.notifier).reloadProducts();
       if (!mounted) return;
       Navigator.pop(context);

@@ -20,11 +20,12 @@ class CounterItemPayload {
     if (avgConfidence != null) 'avg_confidence': avgConfidence,
   };
 
-  factory CounterItemPayload.fromJson(Map<String, dynamic> j) => CounterItemPayload(
-    className: j['class_name'] as String? ?? '',
-    qty: (j['qty'] as num?)?.toInt() ?? 0,
-    avgConfidence: (j['avg_confidence'] as num?)?.toDouble(),
-  );
+  factory CounterItemPayload.fromJson(Map<String, dynamic> j) =>
+      CounterItemPayload(
+        className: j['class_name'] as String? ?? '',
+        qty: (j['qty'] as num?)?.toInt() ?? 0,
+        avgConfidence: (j['avg_confidence'] as num?)?.toDouble(),
+      );
 }
 
 /// A finalized on-device counting session, pending or done syncing. Persisted
@@ -61,22 +62,20 @@ class CounterSession {
     'items': items.map((e) => e.toJson()).toList(),
   };
 
-  Map<String, dynamic> toStorageJson() => {
-    ...toSyncJson(),
-    'synced': synced,
-  };
+  Map<String, dynamic> toStorageJson() => {...toSyncJson(), 'synced': synced};
 
-  factory CounterSession.fromStorageJson(Map<String, dynamic> j) => CounterSession(
-    clientUid: j['client_uid'] as String,
-    sessionDate: j['session_date'] as String? ?? '',
-    deviceLabel: j['device_label'] as String?,
-    startedAt: j['started_at'] as String?,
-    endedAt: j['ended_at'] as String?,
-    items: (j['items'] as List<dynamic>? ?? [])
-        .map((e) => CounterItemPayload.fromJson(e as Map<String, dynamic>))
-        .toList(),
-    synced: j['synced'] as bool? ?? false,
-  );
+  factory CounterSession.fromStorageJson(Map<String, dynamic> j) =>
+      CounterSession(
+        clientUid: j['client_uid'] as String,
+        sessionDate: j['session_date'] as String? ?? '',
+        deviceLabel: j['device_label'] as String?,
+        startedAt: j['started_at'] as String?,
+        endedAt: j['ended_at'] as String?,
+        items: (j['items'] as List<dynamic>? ?? [])
+            .map((e) => CounterItemPayload.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        synced: j['synced'] as bool? ?? false,
+      );
 
   CounterSession copyWith({bool? synced}) => CounterSession(
     clientUid: clientUid,
@@ -105,11 +104,12 @@ class CounterSummaryItem {
     required this.isUnknown,
   });
 
-  factory CounterSummaryItem.fromJson(Map<String, dynamic> j) => CounterSummaryItem(
-    productId: (j['product_id'] as num?)?.toInt(),
-    className: j['class_name'] as String? ?? '',
-    displayName: j['display_name'] as String? ?? '',
-    qty: (j['qty'] as num?)?.toInt() ?? 0,
-    isUnknown: j['is_unknown'] as bool? ?? true,
-  );
+  factory CounterSummaryItem.fromJson(Map<String, dynamic> j) =>
+      CounterSummaryItem(
+        productId: (j['product_id'] as num?)?.toInt(),
+        className: j['class_name'] as String? ?? '',
+        displayName: j['display_name'] as String? ?? '',
+        qty: (j['qty'] as num?)?.toInt() ?? 0,
+        isUnknown: j['is_unknown'] as bool? ?? true,
+      );
 }

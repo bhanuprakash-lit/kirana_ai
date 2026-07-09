@@ -112,9 +112,11 @@ class SimpleTracker {
   }
 
   static double _iou(Rect a, Rect b) {
-    final ix = (a.right < b.right ? a.right : b.right) -
+    final ix =
+        (a.right < b.right ? a.right : b.right) -
         (a.left > b.left ? a.left : b.left);
-    final iy = (a.bottom < b.bottom ? a.bottom : b.bottom) -
+    final iy =
+        (a.bottom < b.bottom ? a.bottom : b.bottom) -
         (a.top > b.top ? a.top : b.top);
     if (ix <= 0 || iy <= 0) return 0;
     final inter = ix * iy;

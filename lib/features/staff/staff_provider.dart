@@ -83,6 +83,41 @@ final staffAttendanceProvider =
       };
     });
 
+/// Sales + commission for one staff member over the recent window.
+class StaffSales {
+  final int staffId;
+  final double revenue;
+  final int orders;
+  final double commission;
+  const StaffSales({
+    required this.staffId,
+    required this.revenue,
+    required this.orders,
+    required this.commission,
+  });
+  factory StaffSales.fromJson(Map<String, dynamic> j) => StaffSales(
+    staffId: (j['staff_id'] as num).toInt(),
+    revenue: (j['revenue'] as num?)?.toDouble() ?? 0,
+    orders: (j['orders'] as num?)?.toInt() ?? 0,
+    commission: (j['commission'] as num?)?.toDouble() ?? 0,
+  );
+}
+
+/// {staffId: StaffSales} for the last 30 days.
+final staffSalesProvider = FutureProvider<Map<int, StaffSales>>((ref) async {
+  ref.watch(storeScopeProvider);
+  final d = await ref
+      .read(apiClientProvider)
+      .get('/kirana/staff/sales?days=30');
+  final l = (d is Map ? d['staff'] : null) as List<dynamic>? ?? [];
+  return {
+    for (final e in l.whereType<Map>())
+      (e['staff_id'] as num).toInt(): StaffSales.fromJson(
+        e.cast<String, dynamic>(),
+      ),
+  };
+});
+
 class StaffActions {
   StaffActions(this.ref);
   final Ref ref;
@@ -91,6 +126,17 @@ class StaffActions {
   Future<void> addStaff(Map<String, dynamic> body) async {
     await _c.post('/kirana/staff', body);
     ref.invalidate(staffListProvider);
+  }
+
+  Future<void> updateStaff(int staffId, Map<String, dynamic> body) async {
+    await _c.patch('/kirana/staff/$staffId', body);
+    ref.invalidate(staffListProvider);
+    ref.invalidate(staffSalesProvider);
+  }
+
+  Future<void> deleteTask(int taskId) async {
+    await _c.delete('/kirana/staff/tasks/$taskId');
+    ref.invalidate(staffTasksProvider);
   }
 
   Future<void> markAttendance(int staffId, String date, String status) async {

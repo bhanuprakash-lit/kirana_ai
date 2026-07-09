@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/brand_theme.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/action_widgets.dart';
 import 'staff_provider.dart';
 
@@ -28,15 +29,16 @@ class _StaffScreenState extends ConsumerState<StaffScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('Staff'),
+        title: Text(l10n.staffTitle),
         bottom: TabBar(
           controller: _tabs,
-          tabs: const [
-            Tab(text: 'Team & Attendance'),
-            Tab(text: 'Tasks'),
+          tabs: [
+            Tab(text: l10n.staffTeamTab),
+            Tab(text: l10n.staffTasksTab),
           ],
         ),
       ),
@@ -56,12 +58,12 @@ class _StaffScreenState extends ConsumerState<StaffScreen>
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('$e')),
           data: (list) => list.isEmpty
-              ? const Center(
+              ? Center(
                   child: Padding(
-                    padding: EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(32),
                     child: Text(
-                      'No staff yet. Add your team.',
-                      style: TextStyle(color: BrandColors.muted),
+                      AppLocalizations.of(context).staffNoStaff,
+                      style: const TextStyle(color: BrandColors.muted),
                     ),
                   ),
                 )
@@ -86,7 +88,7 @@ class _StaffScreenState extends ConsumerState<StaffScreen>
             heroTag: 'addStaff',
             onPressed: _addStaff,
             icon: const Icon(Icons.person_add_alt_1),
-            label: const Text('Add staff'),
+            label: Text(AppLocalizations.of(context).staffAddStaff),
           ),
         ),
       ],
@@ -101,12 +103,13 @@ class _StaffScreenState extends ConsumerState<StaffScreen>
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('$e')),
           data: (list) => list.isEmpty
-              ? const Center(
+              ? Center(
                   child: Padding(
-                    padding: EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(32),
                     child: Text(
-                      'No tasks. Add a daily checklist item.',
-                      style: TextStyle(color: BrandColors.muted),
+                      AppLocalizations.of(context).staffNoTasks,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: BrandColors.muted),
                     ),
                   ),
                 )
@@ -114,22 +117,40 @@ class _StaffScreenState extends ConsumerState<StaffScreen>
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
                   children: list
                       .map(
-                        (t) => CheckboxListTile(
-                          value: t.isDone,
-                          onChanged: (v) => ref
-                              .read(staffActionsProvider)
-                              .setTaskDone(t.taskId, v ?? false),
-                          title: Text(
-                            t.title,
-                            style: TextStyle(
-                              decoration: t.isDone
-                                  ? TextDecoration.lineThrough
-                                  : null,
+                        (t) => Dismissible(
+                          key: ValueKey('task_${t.taskId}'),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            color: BrandColors.error.withValues(alpha: 0.12),
+                            child: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: BrandColors.error,
                             ),
                           ),
-                          subtitle: t.staffName != null
-                              ? Text(t.staffName!)
-                              : null,
+                          onDismissed: (_) => ref
+                              .read(staffActionsProvider)
+                              .deleteTask(t.taskId),
+                          child: CheckboxListTile(
+                            value: t.isDone,
+                            onChanged: (v) => ref
+                                .read(staffActionsProvider)
+                                .setTaskDone(t.taskId, v ?? false),
+                            title: Text(
+                              t.title,
+                              style: TextStyle(
+                                decoration: t.isDone
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                            ),
+                            subtitle: t.staffName != null
+                                ? Text(
+                                    '${AppLocalizations.of(context).staffAssignedTo} ${t.staffName}',
+                                  )
+                                : null,
+                          ),
                         ),
                       )
                       .toList(),
@@ -142,7 +163,7 @@ class _StaffScreenState extends ConsumerState<StaffScreen>
             heroTag: 'addTask',
             onPressed: _addTask,
             icon: const Icon(Icons.add_task),
-            label: const Text('Add task'),
+            label: Text(AppLocalizations.of(context).staffAddTask),
           ),
         ),
       ],
@@ -367,14 +388,21 @@ class _StaffCard extends ConsumerWidget {
               ),
               if (member.commissionPct > 0)
                 Text(
-                  '${member.commissionPct.toStringAsFixed(0)}% comm',
+                  '${member.commissionPct.toStringAsFixed(0)}% ${AppLocalizations.of(context).staffComm}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: BrandColors.muted,
                   ),
                 ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                visualDensity: VisualDensity.compact,
+                tooltip: AppLocalizations.of(context).staffEdit,
+                onPressed: () => showStaffEditor(context, ref, member),
+              ),
             ],
           ),
+          _SalesLine(staffId: member.staffId),
           const Divider(height: 18),
           Row(
             children: [
@@ -553,5 +581,200 @@ class _AttendanceSummaryBar extends StatelessWidget {
         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       ),
     ],
+  );
+}
+
+/// Per-member sales + commission over the last 30 days (from orders billed to
+/// them). Renders nothing until there's at least one attributed sale.
+class _SalesLine extends ConsumerWidget {
+  final int staffId;
+  const _SalesLine({required this.staffId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final s = ref.watch(staffSalesProvider).asData?.value[staffId];
+    if (s == null || s.orders == 0) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.trending_up_rounded,
+            size: 16,
+            color: BrandColors.success,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '₹${s.revenue.toStringAsFixed(0)} · ${s.orders} ${l10n.staffOrders30d}',
+            style: const TextStyle(fontSize: 12, color: BrandColors.ink),
+          ),
+          if (s.commission > 0) ...[
+            const Spacer(),
+            Text(
+              '₹${s.commission.toStringAsFixed(0)} ${l10n.staffCommEarned}',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: BrandColors.success,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Edit an existing staff member: name, phone, role, commission %, active.
+void showStaffEditor(BuildContext context, WidgetRef ref, StaffMember member) {
+  final name = TextEditingController(text: member.name);
+  final phone = TextEditingController(text: member.phone ?? '');
+  final role = TextEditingController(text: member.role ?? '');
+  final commission = TextEditingController(
+    text: member.commissionPct > 0
+        ? member.commissionPct.toStringAsFixed(
+            member.commissionPct.truncateToDouble() == member.commissionPct
+                ? 0
+                : 1,
+          )
+        : '',
+  );
+  bool active = member.isActive;
+  bool saving = false;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) {
+      final l10n = AppLocalizations.of(ctx);
+      return StatefulBuilder(
+        builder: (ctx, setState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            left: 20,
+            right: 20,
+            top: 16,
+          ),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.staffEditMember,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: name,
+                  decoration: InputDecoration(labelText: l10n.staffName),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: phone,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 10,
+                  decoration: InputDecoration(
+                    labelText: l10n.staffPhoneOptional,
+                    counterText: '',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: role,
+                        decoration: InputDecoration(
+                          labelText: l10n.staffRoleOptional,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: commission,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: l10n.staffCommissionField,
+                          suffixText: '%',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  value: active,
+                  onChanged: (v) => setState(() => active = v),
+                  title: Text(l10n.staffActive),
+                  subtitle: Text(
+                    l10n.staffActiveHint,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: FilledButton(
+                    onPressed: saving
+                        ? null
+                        : () async {
+                            if (name.text.trim().isEmpty) return;
+                            setState(() => saving = true);
+                            try {
+                              await ref.read(staffActionsProvider).updateStaff(
+                                member.staffId,
+                                {
+                                  'name': name.text.trim(),
+                                  'phone': phone.text.trim().isEmpty
+                                      ? null
+                                      : phone.text.trim(),
+                                  'role': role.text.trim().isEmpty
+                                      ? null
+                                      : role.text.trim(),
+                                  'commission_pct':
+                                      double.tryParse(commission.text.trim()) ??
+                                      0,
+                                  'is_active': active,
+                                },
+                              );
+                              if (ctx.mounted) Navigator.pop(ctx);
+                            } catch (_) {
+                              setState(() => saving = false);
+                            }
+                          },
+                    child: saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(l10n.staffSaveChanges),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
   );
 }

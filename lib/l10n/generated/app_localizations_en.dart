@@ -2978,6 +2978,384 @@ class AppLocalizationsEn extends AppLocalizations {
   String get procRecordReturn => 'Record return';
 
   @override
+  String get rackTitle => 'Stock Racks';
+
+  @override
+  String get rackPlaceStock => 'Place stock';
+
+  @override
+  String get rackSearchHint => 'Search product or rack (e.g. A1)';
+
+  @override
+  String get rackSaved => 'Stock placed in rack';
+
+  @override
+  String get rackChangeQty => 'Change quantity';
+
+  @override
+  String get rackMove => 'Move to another rack';
+
+  @override
+  String get rackRemove => 'Remove from rack';
+
+  @override
+  String get rackRemoved => 'Removed from rack';
+
+  @override
+  String get rackMoved => 'Moved to new rack';
+
+  @override
+  String get rackEmpty =>
+      'No racks set up yet. Tap Place stock to put a product in a rack — then you can find it fast.';
+
+  @override
+  String get rackNoMatch => 'No products or racks match your search.';
+
+  @override
+  String get rackItems => 'items';
+
+  @override
+  String get rackProduct => 'Product';
+
+  @override
+  String get rackSelectProduct => 'Select a product';
+
+  @override
+  String get rackPickProductFirst => 'Pick a product first';
+
+  @override
+  String get rackNeedLabel => 'Enter a rack / bin label';
+
+  @override
+  String get rackSaveFailed => 'Couldn\'t save. Please try again.';
+
+  @override
+  String get rackLabel => 'Rack / bin';
+
+  @override
+  String get rackLabelHint => 'e.g. A1, top shelf, cold storage';
+
+  @override
+  String get rackQuantity => 'Quantity in this rack';
+
+  @override
+  String get rackSave => 'Save';
+
+  @override
+  String get rackLoadFailed => 'Couldn\'t load racks. Check your connection.';
+
+  @override
+  String get rackRetry => 'Try again';
+
+  @override
+  String get rackLocation => 'Rack location';
+
+  @override
+  String get rackSetLocation => 'Set rack location';
+
+  @override
+  String get rackNoneForProduct => 'Not placed in any rack yet.';
+
+  @override
+  String get procExchangeInstead => 'Exchange (customer takes another item)';
+
+  @override
+  String get procRefundAmount => 'Refund amount';
+
+  @override
+  String get fulTitle => 'Estimates & Returns';
+
+  @override
+  String get fulTabEstimates => 'Estimates';
+
+  @override
+  String get fulTabReturns => 'Returns';
+
+  @override
+  String get fulNoReturns =>
+      'No returns yet. When a customer brings something back, tap Log return and pick their order.';
+
+  @override
+  String get fulLogReturn => 'Log return';
+
+  @override
+  String get fulPickOrderTitle => 'Which order is being returned?';
+
+  @override
+  String get fulSearchOrders => 'Search by order # or customer';
+
+  @override
+  String get fulNoOrders => 'No recent orders found.';
+
+  @override
+  String get fulExchange => 'Exchange';
+
+  @override
+  String get fulRefund => 'Refund';
+
+  @override
+  String get fulBackToShelf => 'back to shelf';
+
+  @override
+  String get fulToVendor => 'to vendor';
+
+  @override
+  String get fulItems => 'items';
+
+  @override
+  String get fulLoadFailed => 'Couldn\'t load. Please check your connection.';
+
+  @override
+  String get fulRetry => 'Try again';
+
+  @override
+  String get estEmpty =>
+      'No estimates yet. Create a quote for a customer — you can share it and turn it into a sale later.';
+
+  @override
+  String get estNewEstimate => 'New estimate';
+
+  @override
+  String get estWalkIn => 'Walk-in customer';
+
+  @override
+  String get estAddOneItem => 'Add at least one item';
+
+  @override
+  String get estSaveFailed => 'Couldn\'t save. Please try again.';
+
+  @override
+  String get estCustomerOptional => 'Customer (optional)';
+
+  @override
+  String get estSelectCustomer => 'Select customer';
+
+  @override
+  String get estAddItem => 'Add item';
+
+  @override
+  String get estValidUntil => 'Valid until';
+
+  @override
+  String get estNoExpiry => 'No expiry';
+
+  @override
+  String get estSaveEstimate => 'Save estimate';
+
+  @override
+  String get estItemName => 'Item name';
+
+  @override
+  String get estPickFromCatalog => 'Pick from catalog';
+
+  @override
+  String get estQty => 'Qty';
+
+  @override
+  String get estUnitPrice => 'Unit price';
+
+  @override
+  String get estAddedToBill => 'added to bill';
+
+  @override
+  String get estSkippedNotInCatalog => 'skipped (not in catalog)';
+
+  @override
+  String get estShareHeading => 'Estimate / Quotation';
+
+  @override
+  String get estShareTotal => 'Total';
+
+  @override
+  String get estTotal => 'Total';
+
+  @override
+  String get estStatus => 'Status';
+
+  @override
+  String get estStatusDraft => 'Draft';
+
+  @override
+  String get estStatusSent => 'Sent';
+
+  @override
+  String get estStatusAccepted => 'Accepted';
+
+  @override
+  String get estStatusRejected => 'Rejected';
+
+  @override
+  String get estShare => 'Share';
+
+  @override
+  String get estConvert => 'Convert to sale';
+
+  @override
+  String get staffTitle => 'Staff';
+
+  @override
+  String get staffTeamTab => 'Team & attendance';
+
+  @override
+  String get staffTasksTab => 'Tasks';
+
+  @override
+  String get staffNoStaff => 'No staff yet. Add your team.';
+
+  @override
+  String get staffAddStaff => 'Add staff';
+
+  @override
+  String get staffNoTasks =>
+      'No tasks yet. Add a task or checklist item for your team.';
+
+  @override
+  String get staffAddTask => 'Add task';
+
+  @override
+  String get jobTitle => 'Job Cards';
+
+  @override
+  String get jobNewJob => 'New job';
+
+  @override
+  String get jobNewJobCard => 'New job card';
+
+  @override
+  String get jobRepair => 'Repair';
+
+  @override
+  String get jobAlteration => 'Alteration';
+
+  @override
+  String get jobPreorder => 'Pre-order';
+
+  @override
+  String get wtyIssue => 'Issue / problem';
+
+  @override
+  String get wtySelectSerial => 'Select a serial';
+
+  @override
+  String get wtyCreateClaim => 'Create claim';
+
+  @override
+  String get wtyNoClaims => 'No warranty claims logged.';
+
+  @override
+  String get wtyTitle => 'Warranty & Serials';
+
+  @override
+  String get wtyTabClaims => 'Claims';
+
+  @override
+  String get wtyTabSerials => 'Serials';
+
+  @override
+  String get wtyNewClaim => 'New claim';
+
+  @override
+  String get wtyAddSerial => 'Add serial';
+
+  @override
+  String get wtySearchSerials => 'Search serial / IMEI or product';
+
+  @override
+  String get wtyNoSerials =>
+      'No serials registered yet. Add serials at checkout or with the button below.';
+
+  @override
+  String get wtyAll => 'All';
+
+  @override
+  String get wtyInStock => 'In stock';
+
+  @override
+  String get wtySold => 'Sold';
+
+  @override
+  String get wtyProduct => 'Product';
+
+  @override
+  String get wtySelectProduct => 'Select a product';
+
+  @override
+  String get wtySerialImei => 'Serial / IMEI number';
+
+  @override
+  String get wtySoldOn => 'Sold on';
+
+  @override
+  String get wtyExpired => 'Warranty expired';
+
+  @override
+  String get wtyExpires => 'Expires';
+
+  @override
+  String get wtyWarrantyTill => 'Under warranty till';
+
+  @override
+  String get wtyPickProduct => 'Pick a product first';
+
+  @override
+  String get wtyEnterSerial => 'Enter the serial / IMEI';
+
+  @override
+  String get wtySaveFailed => 'Couldn\'t save. Please try again.';
+
+  @override
+  String get wtySave => 'Save';
+
+  @override
+  String get staffComm => 'comm';
+
+  @override
+  String get staffEdit => 'Edit';
+
+  @override
+  String get staffOrders30d => 'orders (30d)';
+
+  @override
+  String get staffCommEarned => 'commission';
+
+  @override
+  String get staffEditMember => 'Edit staff member';
+
+  @override
+  String get staffName => 'Name';
+
+  @override
+  String get staffPhoneOptional => 'Phone (optional)';
+
+  @override
+  String get staffRoleOptional => 'Role (optional)';
+
+  @override
+  String get staffCommissionField => 'Commission';
+
+  @override
+  String get staffActive => 'Active';
+
+  @override
+  String get staffActiveHint =>
+      'Inactive staff are hidden from lists and billing.';
+
+  @override
+  String get staffSaveChanges => 'Save changes';
+
+  @override
+  String get staffAssignedTo => 'Assigned to';
+
+  @override
+  String get staffBilledBy => 'Billed by (optional)';
+
+  @override
+  String get staffNotSet => 'Not set';
+
+  @override
+  String get fulReturnsOnOrder => 'Returns on this bill';
+
+  @override
   String procBoughtQty(String qty) {
     return 'bought $qty ';
   }
@@ -3797,6 +4175,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profSectionAnalytics => 'Analytics';
+
+  @override
+  String get profSectionOperations => 'Operations';
+
+  @override
+  String get profSectionSalesMarketing => 'Sales & marketing';
 
   @override
   String get profSectionStoreAccount => 'Store & Account';

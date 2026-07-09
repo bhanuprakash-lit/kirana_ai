@@ -13,10 +13,7 @@ class AppConfig {
   /// Which environment this build targets, set via `--dart-define=ENV=...`.
   /// Determines which Remote Config key is fetched (`backend_url_<env>`).
   /// One of: local, dev, prod. Defaults to local for plain `flutter run`.
-  static const String env = String.fromEnvironment(
-    'ENV',
-    defaultValue: 'dev',
-  );
+  static const String env = String.fromEnvironment('ENV', defaultValue: 'dev');
 
   /// Remote Config parameter name this build reads its backend URL from.
   static String get remoteConfigKey => 'backend_url_$env';

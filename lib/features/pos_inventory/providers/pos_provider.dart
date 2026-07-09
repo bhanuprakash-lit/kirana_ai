@@ -639,6 +639,7 @@ class PosNotifier extends Notifier<PosState> {
     int? appointmentId, // M4 complete + bill an appointment
     int? jobCardId, // M9 bill a finished job card
     double extraCharge = 0, // M4 — billed appointment's service price (O2)
+    int? staffId, // M5 — staff member who billed this order (sales/commission)
   }) async {
     if (state.cart.isEmpty && extraCharge <= 0) return null;
     state = state.copyWith(isPlacingOrder: true, clearError: true);
@@ -680,6 +681,7 @@ class PosNotifier extends Notifier<PosState> {
         'membership_id': ?membershipId,
         'appointment_id': ?appointmentId,
         'job_card_id': ?jobCardId,
+        'staff_id': ?staffId,
         'items': state.cart
             .map(
               (i) => {

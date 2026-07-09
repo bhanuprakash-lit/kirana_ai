@@ -16,7 +16,8 @@ class CounterState {
   final List<CounterSummaryItem> summary; // today's server-aggregated tally
   final bool summaryLoading;
   final int pendingCount; // locally-queued sessions not yet synced
-  final bool backendReachable; // false ⇒ counter endpoints not deployed / offline
+  final bool
+  backendReachable; // false ⇒ counter endpoints not deployed / offline
   final String? error;
 
   const CounterState({
@@ -131,8 +132,11 @@ class CounterNotifier extends Notifier<CounterState> {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(_pendingKey) ?? const [];
     return raw
-        .map((s) => CounterSession.fromStorageJson(
-            jsonDecode(s) as Map<String, dynamic>))
+        .map(
+          (s) => CounterSession.fromStorageJson(
+            jsonDecode(s) as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -147,7 +151,9 @@ class CounterNotifier extends Notifier<CounterState> {
 
   Future<void> _enqueue(CounterSession session) async {
     final all = await _loadPending();
-    all.removeWhere((s) => s.clientUid == session.clientUid); // de-dupe on retry
+    all.removeWhere(
+      (s) => s.clientUid == session.clientUid,
+    ); // de-dupe on retry
     all.add(session);
     await _savePending(all);
   }
@@ -170,9 +176,7 @@ class CounterNotifier extends Notifier<CounterState> {
 
   Future<void> _refreshPendingCount([List<CounterSession>? known]) async {
     final all = known ?? await _loadPending();
-    state = state.copyWith(
-      pendingCount: all.where((s) => !s.synced).length,
-    );
+    state = state.copyWith(pendingCount: all.where((s) => !s.synced).length);
   }
 }
 

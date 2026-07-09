@@ -96,6 +96,86 @@ class _OrderSerialsCard extends ConsumerWidget {
   }
 }
 
+/// Returns recorded against this order (unified sales_return history).
+final _orderReturnsProvider = FutureProvider.autoDispose
+    .family<List<Map<String, dynamic>>, int>((ref, orderId) async {
+      final data = await ref
+          .read(apiClientProvider)
+          .get('/kirana/sales-returns?order_id=$orderId');
+      final list =
+          (data is Map ? data['returns'] : null) as List<dynamic>? ?? [];
+      return list
+          .whereType<Map>()
+          .map((e) => e.cast<String, dynamic>())
+          .toList();
+    });
+
+/// Bill section showing any return/exchange recorded on this order — so the
+/// owner sees at a glance that (part of) the bill came back. Renders nothing
+/// when the order has no returns.
+class _OrderReturnsCard extends ConsumerWidget {
+  final int orderId;
+  const _OrderReturnsCard({required this.orderId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final returns =
+        ref.watch(_orderReturnsProvider(orderId)).asData?.value ?? const [];
+    if (returns.isEmpty) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE87722).withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFE87722).withValues(alpha: 0.35),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.assignment_return_rounded,
+                size: 18,
+                color: Color(0xFFE87722),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                l10n.fulReturnsOnOrder,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          for (final r in returns)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                [
+                  if (r['is_exchange'] == true)
+                    l10n.fulExchange
+                  else
+                    '${l10n.fulRefund} ₹${(r['refund_amount'] as num?)?.toStringAsFixed(0) ?? "0"}',
+                  ((r['items'] as List<dynamic>? ?? const [])
+                      .whereType<Map>()
+                      .map((i) => '${i['qty']}× ${i['name'] ?? '—'}')
+                      .join(', ')),
+                ].where((s) => s.isNotEmpty).join('  ·  '),
+                style: const TextStyle(fontSize: 12.5, height: 1.4),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class OrderDetailsScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> order;
 
@@ -329,6 +409,14 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
             ),
           ],
 
+          // ── Returns recorded against this order ──────────────────────────
+          if (widget.order['order_id'] != null) ...[
+            const SizedBox(height: 16),
+            _OrderReturnsCard(
+              orderId: (widget.order['order_id'] as num).toInt(),
+            ),
+          ],
+
           const SizedBox(height: 28),
           Row(
             children: [
@@ -505,7 +593,12 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
             width: double.infinity,
             height: 52,
             child: OutlinedButton.icon(
-              onPressed: () => showReturnSheet(context, ref, widget.order),
+              onPressed: () async {
+                await showReturnSheet(context, ref, widget.order);
+                // Refresh the "returns on this bill" card.
+                final oid = (widget.order['order_id'] as num?)?.toInt();
+                if (oid != null) ref.invalidate(_orderReturnsProvider(oid));
+              },
               icon: const Icon(
                 Icons.assignment_return_outlined,
                 size: 18,
