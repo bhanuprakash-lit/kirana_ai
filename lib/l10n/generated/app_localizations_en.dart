@@ -3057,6 +3057,68 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rackNoneForProduct => 'Not placed in any rack yet.';
 
   @override
+  String get rackAddRack => 'Add rack';
+
+  @override
+  String get rackNameLabel => 'Rack name';
+
+  @override
+  String get rackAdded => 'Rack added';
+
+  @override
+  String rackAlreadyExists(String label) {
+    return 'Already exists as $label';
+  }
+
+  @override
+  String get rackRenameRack => 'Rename rack';
+
+  @override
+  String get rackRenamed => 'Rack renamed';
+
+  @override
+  String get rackDeleteRack => 'Delete rack';
+
+  @override
+  String get rackDeleted => 'Rack deleted';
+
+  @override
+  String get rackDeleteNotEmpty =>
+      'This rack still has items. Move or remove them first.';
+
+  @override
+  String get rackMergeInto => 'Merge into another rack';
+
+  @override
+  String rackMergeConfirm(String source, String target) {
+    return 'Move everything from $source into $target? $source will be removed.';
+  }
+
+  @override
+  String get rackMerged => 'Racks merged';
+
+  @override
+  String get rackChooseRack => 'Choose rack';
+
+  @override
+  String get rackSearchRacks => 'Search or type a new rack name';
+
+  @override
+  String rackAddAs(String label) {
+    return 'Add \"$label\" as a new rack';
+  }
+
+  @override
+  String get rackNoRacksYet =>
+      'No racks yet. Type a name above to add your first rack.';
+
+  @override
+  String get rackEmptyHint => 'Empty — tap to place stock here';
+
+  @override
+  String get rackPickRackFirst => 'Pick a rack first';
+
+  @override
   String get procExchangeInstead => 'Exchange (customer takes another item)';
 
   @override

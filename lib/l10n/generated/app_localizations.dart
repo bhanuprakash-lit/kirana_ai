@@ -5316,6 +5316,114 @@ abstract class AppLocalizations {
   /// **'Not placed in any rack yet.'**
   String get rackNoneForProduct;
 
+  /// No description provided for @rackAddRack.
+  ///
+  /// In en, this message translates to:
+  /// **'Add rack'**
+  String get rackAddRack;
+
+  /// No description provided for @rackNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rack name'**
+  String get rackNameLabel;
+
+  /// No description provided for @rackAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Rack added'**
+  String get rackAdded;
+
+  /// No description provided for @rackAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Already exists as {label}'**
+  String rackAlreadyExists(String label);
+
+  /// No description provided for @rackRenameRack.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename rack'**
+  String get rackRenameRack;
+
+  /// No description provided for @rackRenamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Rack renamed'**
+  String get rackRenamed;
+
+  /// No description provided for @rackDeleteRack.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete rack'**
+  String get rackDeleteRack;
+
+  /// No description provided for @rackDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Rack deleted'**
+  String get rackDeleted;
+
+  /// No description provided for @rackDeleteNotEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This rack still has items. Move or remove them first.'**
+  String get rackDeleteNotEmpty;
+
+  /// No description provided for @rackMergeInto.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge into another rack'**
+  String get rackMergeInto;
+
+  /// No description provided for @rackMergeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Move everything from {source} into {target}? {source} will be removed.'**
+  String rackMergeConfirm(String source, String target);
+
+  /// No description provided for @rackMerged.
+  ///
+  /// In en, this message translates to:
+  /// **'Racks merged'**
+  String get rackMerged;
+
+  /// No description provided for @rackChooseRack.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose rack'**
+  String get rackChooseRack;
+
+  /// No description provided for @rackSearchRacks.
+  ///
+  /// In en, this message translates to:
+  /// **'Search or type a new rack name'**
+  String get rackSearchRacks;
+
+  /// No description provided for @rackAddAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Add \"{label}\" as a new rack'**
+  String rackAddAs(String label);
+
+  /// No description provided for @rackNoRacksYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No racks yet. Type a name above to add your first rack.'**
+  String get rackNoRacksYet;
+
+  /// No description provided for @rackEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty — tap to place stock here'**
+  String get rackEmptyHint;
+
+  /// No description provided for @rackPickRackFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a rack first'**
+  String get rackPickRackFirst;
+
   /// No description provided for @procExchangeInstead.
   ///
   /// In en, this message translates to:

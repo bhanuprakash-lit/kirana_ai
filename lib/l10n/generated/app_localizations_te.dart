@@ -3042,6 +3042,68 @@ class AppLocalizationsTe extends AppLocalizations {
   String get rackNoneForProduct => 'ఇంకా ఏ ర్యాక్‌లోనూ ఉంచలేదు.';
 
   @override
+  String get rackAddRack => 'ర్యాక్ జోడించండి';
+
+  @override
+  String get rackNameLabel => 'ర్యాక్ పేరు';
+
+  @override
+  String get rackAdded => 'ర్యాక్ జోడించబడింది';
+
+  @override
+  String rackAlreadyExists(String label) {
+    return 'ఈ ర్యాక్ ఇప్పటికే $label పేరుతో ఉంది';
+  }
+
+  @override
+  String get rackRenameRack => 'ర్యాక్ పేరు మార్చండి';
+
+  @override
+  String get rackRenamed => 'ర్యాక్ పేరు మారింది';
+
+  @override
+  String get rackDeleteRack => 'ర్యాక్ తొలగించండి';
+
+  @override
+  String get rackDeleted => 'ర్యాక్ తొలగించబడింది';
+
+  @override
+  String get rackDeleteNotEmpty =>
+      'ఈ ర్యాక్‌లో ఇంకా సరుకులు ఉన్నాయి. ముందుగా వాటిని తీసేయండి లేదా వేరే చోటికి మార్చండి.';
+
+  @override
+  String get rackMergeInto => 'మరో ర్యాక్‌లో కలపండి';
+
+  @override
+  String rackMergeConfirm(String source, String target) {
+    return '$sourceలోని అన్నీ $targetకి తరలించాలా? $source తొలగించబడుతుంది.';
+  }
+
+  @override
+  String get rackMerged => 'ర్యాక్‌లు కలిపేశాం';
+
+  @override
+  String get rackChooseRack => 'ర్యాక్ ఎంచుకోండి';
+
+  @override
+  String get rackSearchRacks => 'ర్యాక్ వెతకండి లేదా కొత్త పేరు టైప్ చేయండి';
+
+  @override
+  String rackAddAs(String label) {
+    return '\"$label\" కొత్త ర్యాక్‌గా జోడించండి';
+  }
+
+  @override
+  String get rackNoRacksYet =>
+      'ఇంకా ర్యాక్‌లు లేవు. పైన పేరు టైప్ చేసి మొదటి ర్యాక్ జోడించండి.';
+
+  @override
+  String get rackEmptyHint => 'ఖాళీ — ఇక్కడ సరుకు పెట్టడానికి నొక్కండి';
+
+  @override
+  String get rackPickRackFirst => 'ముందుగా ర్యాక్ ఎంచుకోండి';
+
+  @override
   String get procExchangeInstead =>
       'ఎక్స్చేంజ్ (కస్టమర్ వేరే వస్తువు తీసుకుంటారు)';
 

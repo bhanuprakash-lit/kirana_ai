@@ -2988,6 +2988,68 @@ class AppLocalizationsHi extends AppLocalizations {
   String get rackNoneForProduct => 'अभी किसी रैक में नहीं रखा गया।';
 
   @override
+  String get rackAddRack => 'रैक जोड़ें';
+
+  @override
+  String get rackNameLabel => 'रैक का नाम';
+
+  @override
+  String get rackAdded => 'रैक जुड़ गया';
+
+  @override
+  String rackAlreadyExists(String label) {
+    return 'यह रैक पहले से $label नाम से मौजूद है';
+  }
+
+  @override
+  String get rackRenameRack => 'रैक का नाम बदलें';
+
+  @override
+  String get rackRenamed => 'रैक का नाम बदल गया';
+
+  @override
+  String get rackDeleteRack => 'रैक हटाएं';
+
+  @override
+  String get rackDeleted => 'रैक हट गया';
+
+  @override
+  String get rackDeleteNotEmpty =>
+      'इस रैक में अभी सामान है। पहले उसे हटाएं या दूसरी जगह रखें।';
+
+  @override
+  String get rackMergeInto => 'दूसरे रैक में मिलाएं';
+
+  @override
+  String rackMergeConfirm(String source, String target) {
+    return '$source का सारा सामान $target में ले जाएं? $source हट जाएगा।';
+  }
+
+  @override
+  String get rackMerged => 'रैक मिला दिए गए';
+
+  @override
+  String get rackChooseRack => 'रैक चुनें';
+
+  @override
+  String get rackSearchRacks => 'रैक खोजें या नया नाम लिखें';
+
+  @override
+  String rackAddAs(String label) {
+    return '\"$label\" नया रैक जोड़ें';
+  }
+
+  @override
+  String get rackNoRacksYet =>
+      'अभी कोई रैक नहीं। ऊपर नाम लिखकर पहला रैक जोड़ें।';
+
+  @override
+  String get rackEmptyHint => 'खाली — यहां सामान रखने के लिए टैप करें';
+
+  @override
+  String get rackPickRackFirst => 'पहले रैक चुनें';
+
+  @override
   String get procExchangeInstead => 'एक्सचेंज (ग्राहक दूसरी वस्तु लेता है)';
 
   @override

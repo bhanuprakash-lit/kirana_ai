@@ -1891,6 +1891,48 @@
   "rackLocation": "Rack location",
   "rackSetLocation": "Set rack location",
   "rackNoneForProduct": "Not placed in any rack yet.",
+  "rackAddRack": "Add rack",
+  "rackNameLabel": "Rack name",
+  "rackAdded": "Rack added",
+  "rackAlreadyExists": "Already exists as {label}",
+  "@rackAlreadyExists": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "rackRenameRack": "Rename rack",
+  "rackRenamed": "Rack renamed",
+  "rackDeleteRack": "Delete rack",
+  "rackDeleted": "Rack deleted",
+  "rackDeleteNotEmpty": "This rack still has items. Move or remove them first.",
+  "rackMergeInto": "Merge into another rack",
+  "rackMergeConfirm": "Move everything from {source} into {target}? {source} will be removed.",
+  "@rackMergeConfirm": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "rackMerged": "Racks merged",
+  "rackChooseRack": "Choose rack",
+  "rackSearchRacks": "Search or type a new rack name",
+  "rackAddAs": "Add \"{label}\" as a new rack",
+  "@rackAddAs": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "rackNoRacksYet": "No racks yet. Type a name above to add your first rack.",
+  "rackEmptyHint": "Empty — tap to place stock here",
+  "rackPickRackFirst": "Pick a rack first",
   "procExchangeInstead": "Exchange (customer takes another item)",
   "procRefundAmount": "Refund amount",
   "fulTitle": "Estimates & Returns",
