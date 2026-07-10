@@ -3096,6 +3096,69 @@ class AppLocalizationsTa extends AppLocalizations {
   String get rackNoneForProduct => 'இன்னும் எந்த அலமாரியிலும் வைக்கப்படவில்லை.';
 
   @override
+  String get rackAddRack => 'அலமாரி சேர்';
+
+  @override
+  String get rackNameLabel => 'அலமாரியின் பெயர்';
+
+  @override
+  String get rackAdded => 'அலமாரி சேர்க்கப்பட்டது';
+
+  @override
+  String rackAlreadyExists(String label) {
+    return 'இந்த அலமாரி ஏற்கனவே $label என்ற பெயரில் உள்ளது';
+  }
+
+  @override
+  String get rackRenameRack => 'அலமாரியின் பெயரை மாற்று';
+
+  @override
+  String get rackRenamed => 'அலமாரியின் பெயர் மாற்றப்பட்டது';
+
+  @override
+  String get rackDeleteRack => 'அலமாரியை நீக்கு';
+
+  @override
+  String get rackDeleted => 'அலமாரி நீக்கப்பட்டது';
+
+  @override
+  String get rackDeleteNotEmpty =>
+      'இந்த அலமாரியில் இன்னும் பொருட்கள் உள்ளன. முதலில் அவற்றை அகற்றவும் அல்லது இடமாற்றவும்.';
+
+  @override
+  String get rackMergeInto => 'மற்றொரு அலமாரியுடன் இணை';
+
+  @override
+  String rackMergeConfirm(String source, String target) {
+    return '$source இல் உள்ள அனைத்தையும் $target க்கு நகர்த்தவா? $source நீக்கப்படும்.';
+  }
+
+  @override
+  String get rackMerged => 'அலமாரிகள் இணைக்கப்பட்டன';
+
+  @override
+  String get rackChooseRack => 'அலமாரியைத் தேர்ந்தெடு';
+
+  @override
+  String get rackSearchRacks =>
+      'அலமாரியைத் தேடவும் அல்லது புதிய பெயரை உள்ளிடவும்';
+
+  @override
+  String rackAddAs(String label) {
+    return '\"$label\" புதிய அலமாரியாக சேர்';
+  }
+
+  @override
+  String get rackNoRacksYet =>
+      'இன்னும் அலமாரிகள் இல்லை. மேலே பெயரை உள்ளிட்டு முதல் அலமாரியைச் சேர்க்கவும்.';
+
+  @override
+  String get rackEmptyHint => 'காலி — இங்கு பொருள் வைக்க தட்டவும்';
+
+  @override
+  String get rackPickRackFirst => 'முதலில் அலமாரியைத் தேர்ந்தெடுக்கவும்';
+
+  @override
   String get procExchangeInstead =>
       'மாற்று (வாடிக்கையாளர் வேறு பொருள் எடுக்கிறார்)';
 
