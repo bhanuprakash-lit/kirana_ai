@@ -3,13 +3,14 @@
 
 class VisionSession {
   final int sessionId;
-  final String sessionType; // 'morning' | 'evening'
+  final String sessionType; // 'morning' | 'evening' | 'onboarding'
   final String sessionDate; // YYYY-MM-DD
   final String status; // 'pending' | 'done' | 'failed'
   final int totalSkus;
   final int totalUnits;
   final int unknownCount;
   final String? createdAt;
+  final int photoCount; // photos uploaded with this scan (viewable in history)
 
   const VisionSession({
     required this.sessionId,
@@ -20,6 +21,7 @@ class VisionSession {
     required this.totalUnits,
     required this.unknownCount,
     this.createdAt,
+    this.photoCount = 0,
   });
 
   bool get isMorning => sessionType == 'morning';
@@ -36,6 +38,7 @@ class VisionSession {
     totalUnits: (j['total_units'] as num?)?.toInt() ?? 0,
     unknownCount: (j['unknown_count'] as num?)?.toInt() ?? 0,
     createdAt: j['created_at']?.toString(),
+    photoCount: (j['photo_count'] as num?)?.toInt() ?? 0,
   );
 }
 

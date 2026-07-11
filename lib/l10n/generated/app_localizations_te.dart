@@ -5628,6 +5628,42 @@ class AppLocalizationsTe extends AppLocalizations {
   String get visionCounterUnknownItem => 'గుర్తించని ఉత్పత్తి';
 
   @override
+  String get visionUploading => 'ఫోటోలు అప్‌లోడ్ అవుతున్నాయి…';
+
+  @override
+  String get visionUploadAccepted =>
+      'ఫోటోలు అప్‌లోడ్ అయ్యాయి! ఇప్పుడు వాటిని చదువుతున్నాం — మీరు ఈ స్క్రీన్ వదిలి వెళ్లవచ్చు. పూర్తయ్యాక మీకు తెలియజేస్తాం.';
+
+  @override
+  String get visionHistoryTitle => 'స్కాన్ చరిత్ర';
+
+  @override
+  String get visionHistoryEmpty =>
+      'ఇంకా స్కాన్‌లు లేవు. మీ షెల్ఫ్ స్కాన్‌లు వాటి ఫోటోలు, ఫలితాలతో ఇక్కడ కనిపిస్తాయి.';
+
+  @override
+  String get visionHistoryStockIn => 'స్టాక్-ఇన్ స్కాన్';
+
+  @override
+  String get visionPhotos => 'ఫోటోలు';
+
+  @override
+  String get visionStatusDone => 'పూర్తయింది';
+
+  @override
+  String get visionStatusProcessing => 'జరుగుతోంది';
+
+  @override
+  String get visionStatusFailed => 'విఫలమైంది';
+
+  @override
+  String get visionCounterHistoryTitle => 'ఇటీవలి లెక్కింపులు';
+
+  @override
+  String get visionCounterHistoryEmpty =>
+      'ఇంకా లెక్కింపులు లేవు. ఒక లెక్కింపు పూర్తి చేస్తే అది ఇక్కడ కనిపిస్తుంది.';
+
+  @override
   String get onbCtaTitle => 'వందల వస్తువులు ఉన్నాయా?';
 
   @override

@@ -23,9 +23,10 @@ class _Track {
 /// YOLO plugin returns per-frame boxes with no identity; this assigns each a stable
 /// [id] across frames so the [CounterEngine] can count a moving item exactly once.
 ///
-/// Good enough for the counter: items pass one at a time across the counter, so
-/// simple IoU association between consecutive frames is reliable without motion
-/// prediction. Deterministic and camera-free ⇒ unit-testable.
+/// Tuned to survive real counter conditions: a hand shake or motion blur drops the
+/// detector for a moment, so tracks live [maxAge] frames without a match, weak
+/// detections may EXTEND a track but not START one ([minNewTrackConfidence]), and
+/// association prefers the same class so two adjacent products don't swap ids.
 class SimpleTracker {
   /// Minimum IoU to consider a detection the continuation of a track.
   final double iouThreshold;
@@ -36,26 +37,36 @@ class SimpleTracker {
   /// stable when an item moves several box-widths between frames.
   final double maxCenterDist;
 
-  /// Frames a track survives without a match before it's dropped (handles brief
-  /// occlusion / a dropped detection).
+  /// Frames a track survives without a match before it's dropped. Generous on
+  /// purpose (~1–2 s of camera frames): brief occlusion, a shake or a couple of
+  /// missed detections must not orphan a track mid-crossing — that's how counts
+  /// used to get lost.
   final int maxAge;
+
+  /// A detection below this confidence can only continue an existing track,
+  /// never spawn a new one. Lets the camera feed run at a low threshold (sticky
+  /// tracking) without low-confidence noise becoming countable phantom tracks.
+  final double minNewTrackConfidence;
 
   int _nextId = 1;
   final List<_Track> _tracks = [];
 
   SimpleTracker({
-    this.iouThreshold = 0.3,
-    this.maxCenterDist = 0.15,
-    this.maxAge = 8,
+    this.iouThreshold = 0.25,
+    this.maxCenterDist = 0.2,
+    this.maxAge = 24,
+    this.minNewTrackConfidence = 0.0,
   });
 
   List<TrackedBox> update(List<TrackerInput> dets) {
     final assigned = <int>{}; // indices of dets already matched
 
-    // Greedy: match each track to its best unmatched detection by IoU, falling
-    // back to centre proximity when boxes don't overlap.
+    // Greedy: match each track to its best unmatched detection. Same-class
+    // detections always beat different-class ones (adjacent products must not
+    // swap identities); within a class prefer higher IoU, then nearer centre.
     for (final t in _tracks) {
       int bestIdx = -1;
+      var bestSameClass = false;
       double bestIou = 0;
       double bestDist = double.infinity;
       for (var i = 0; i < dets.length; i++) {
@@ -64,8 +75,13 @@ class SimpleTracker {
         final dist = _centerDist(t.box, dets[i].box);
         final qualifies = iou >= iouThreshold || dist <= maxCenterDist;
         if (!qualifies) continue;
-        // Prefer higher IoU; break ties / no-overlap cases by nearer centre.
-        if (iou > bestIou || (iou == bestIou && dist < bestDist)) {
+        final sameClass = dets[i].className == t.className;
+        final better = bestIdx < 0 ||
+            (sameClass && !bestSameClass) ||
+            (sameClass == bestSameClass &&
+                (iou > bestIou || (iou == bestIou && dist < bestDist)));
+        if (better) {
+          bestSameClass = sameClass;
           bestIou = iou;
           bestDist = dist;
           bestIdx = i;
@@ -83,10 +99,12 @@ class SimpleTracker {
       }
     }
 
-    // Unmatched detections spawn new tracks.
+    // Unmatched detections spawn new tracks — but only confident ones. Weak
+    // frames keep tracks alive above; they must not create countable identities.
     for (var i = 0; i < dets.length; i++) {
       if (assigned.contains(i)) continue;
       final d = dets[i];
+      if (d.confidence < minNewTrackConfidence) continue;
       _tracks.add(_Track(_nextId++, d.box, d.className, d.confidence));
     }
 

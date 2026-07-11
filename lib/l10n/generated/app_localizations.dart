@@ -9923,6 +9923,72 @@ abstract class AppLocalizations {
   /// **'Unrecognised product'**
   String get visionCounterUnknownItem;
 
+  /// No description provided for @visionUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading photos…'**
+  String get visionUploading;
+
+  /// No description provided for @visionUploadAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos uploaded! We\'re reading them now — you can leave this screen. We\'ll notify you when it\'s done.'**
+  String get visionUploadAccepted;
+
+  /// No description provided for @visionHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan history'**
+  String get visionHistoryTitle;
+
+  /// No description provided for @visionHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No scans yet. Your shelf scans will show up here with their photos and results.'**
+  String get visionHistoryEmpty;
+
+  /// No description provided for @visionHistoryStockIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock-in scan'**
+  String get visionHistoryStockIn;
+
+  /// No description provided for @visionPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'photos'**
+  String get visionPhotos;
+
+  /// No description provided for @visionStatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get visionStatusDone;
+
+  /// No description provided for @visionStatusProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing'**
+  String get visionStatusProcessing;
+
+  /// No description provided for @visionStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get visionStatusFailed;
+
+  /// No description provided for @visionCounterHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent counting sessions'**
+  String get visionCounterHistoryTitle;
+
+  /// No description provided for @visionCounterHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No counting sessions yet. Finish a counting run and it will show up here.'**
+  String get visionCounterHistoryEmpty;
+
   /// No description provided for @onbCtaTitle.
   ///
   /// In en, this message translates to:

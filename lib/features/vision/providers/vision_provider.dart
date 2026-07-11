@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/api_client.dart';
@@ -6,6 +8,11 @@ import '../../auth/repositories/auth_repository.dart' show ApiException;
 import '../models/vision_models.dart';
 
 /// State for the Vision shelf-inventory feature (one store, today).
+///
+/// busyMorning/busyEvening are true only while the photos are UPLOADING — the
+/// owner is held just for that. Analysis runs server-side; its progress shows on
+/// the session card as a "processing" status (pending → done/failed), refreshed
+/// by a detached poll + the completion push, so the owner can leave the screen.
 class VisionState {
   final List<VisionSession> sessions;
   final bool busyMorning;
@@ -13,6 +20,8 @@ class VisionState {
   final Map<int, List<VisionItem>> items; // by sessionId
   final List<SalesDeltaItem>? sales; // null = not loaded; [] = loaded-but-empty
   final bool salesLoading;
+  final List<VisionSession> history; // recent scans across days, newest first
+  final bool historyLoading;
   final String? error;
 
   const VisionState({
@@ -22,6 +31,8 @@ class VisionState {
     this.items = const {},
     this.sales,
     this.salesLoading = false,
+    this.history = const [],
+    this.historyLoading = false,
     this.error,
   });
 
@@ -49,6 +60,8 @@ class VisionState {
     Map<int, List<VisionItem>>? items,
     List<SalesDeltaItem>? sales,
     bool? salesLoading,
+    List<VisionSession>? history,
+    bool? historyLoading,
     String? error,
     bool clearError = false,
   }) {
@@ -59,6 +72,8 @@ class VisionState {
       items: items ?? this.items,
       sales: sales ?? this.sales,
       salesLoading: salesLoading ?? this.salesLoading,
+      history: history ?? this.history,
+      historyLoading: historyLoading ?? this.historyLoading,
       error: clearError ? null : (error ?? this.error),
     );
   }
@@ -94,10 +109,12 @@ class VisionNotifier extends Notifier<VisionState> {
     }
   }
 
-  /// Upload a set of captured shelf photos (3–10) and wait for the async analysis
-  /// to finish. [filePaths] come from the UI's image picker. [type] is
-  /// 'morning'|'evening'.
-  Future<void> capture(String type, List<String> filePaths) async {
+  /// Upload a set of captured shelf photos (3–10). Blocks ONLY for the upload;
+  /// the analysis continues server-side and this returns as soon as the backend
+  /// accepts the batch (202), so the owner is free to leave the screen. A
+  /// detached poll (plus the completion push notification) updates the session
+  /// card from "processing" to done/failed. Returns true when accepted.
+  Future<bool> capture(String type, List<String> filePaths) async {
     final isMorning = type == 'morning';
     state = state.copyWith(
       busyMorning: isMorning ? true : null,
@@ -113,9 +130,11 @@ class VisionNotifier extends Notifier<VisionState> {
               as Map<String, dynamic>;
       final sessionId = (res['session_id'] as num).toInt();
       await loadToday();
-      await _pollUntilDone(sessionId);
+      unawaited(_pollUntilDone(sessionId)); // keep refreshing in the background
+      return true;
     } catch (e) {
       state = state.copyWith(error: _msg(e));
+      return false;
     } finally {
       state = state.copyWith(
         busyMorning: isMorning ? false : null,
@@ -139,6 +158,26 @@ class VisionNotifier extends Notifier<VisionState> {
         }
         return;
       }
+    }
+  }
+
+  // ── Scan history ──────────────────────────────────────────────────────────────
+
+  /// Past scans across the last [days] days (newest first) — what was uploaded,
+  /// when, and with what result. Failures keep the old list; history is a view,
+  /// never a blocker.
+  Future<void> loadHistory({int days = 14}) async {
+    state = state.copyWith(historyLoading: true);
+    try {
+      final res =
+          await _client.get('/kirana/vision/sessions?days=$days')
+              as List<dynamic>;
+      final sessions = res
+          .map((j) => VisionSession.fromJson(j as Map<String, dynamic>))
+          .toList();
+      state = state.copyWith(history: sessions, historyLoading: false);
+    } catch (_) {
+      state = state.copyWith(historyLoading: false);
     }
   }
 

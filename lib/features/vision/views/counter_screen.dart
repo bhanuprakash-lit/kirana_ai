@@ -32,7 +32,11 @@ class CounterScreen extends ConsumerStatefulWidget {
 class _CounterScreenState extends ConsumerState<CounterScreen> {
   final _controller = YOLOViewController();
   final _engine = CounterEngine(lineFrac: 0.5);
-  final _tracker = SimpleTracker();
+  // Sticky tracking: weak detections may extend a track (so a shake or blur
+  // doesn't orphan it mid-crossing) but only confident ones may start a track.
+  final _tracker = SimpleTracker(
+    minNewTrackConfidence: CounterModel.countConfidence,
+  );
 
   PermissionStatus? _camPerm;
   bool _running = false; // actively counting vs paused
@@ -68,9 +72,12 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
 
   void _onResult(List<YOLOResult> results) {
     if (!_running) return;
+    // Feed everything the camera reports (already gated at liveConfidence by the
+    // view). The tracker itself decides what may become a NEW track — this split
+    // is what makes acquisition fast AND tracking survive a shaky hand.
     final inputs = <TrackerInput>[
       for (final r in results)
-        if (r.confidence >= CounterModel.defaultConfidence)
+        if (r.confidence >= CounterModel.liveConfidence)
           TrackerInput(r.normalizedBox, r.className, r.confidence),
     ];
     final tracked = _tracker.update(inputs);
@@ -232,7 +239,7 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
           modelPath: CounterModel.tfliteAsset,
           task: YOLOTask.detect,
           controller: _controller,
-          confidenceThreshold: CounterModel.defaultConfidence,
+          confidenceThreshold: CounterModel.liveConfidence,
           onResult: _onResult,
         ),
         // Sold line + zone tint.
@@ -294,8 +301,21 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
     ),
   );
 
+  /// ₹ value of the live tally so far, priced via the cached class→price map.
+  /// Items without a known price simply don't contribute.
+  double get _liveValue {
+    final prices = ref.read(counterProvider).prices;
+    var v = 0.0;
+    for (final t in _engine.tally) {
+      final p = prices[t.className]?.price;
+      if (p != null) v += p * t.qty;
+    }
+    return v;
+  }
+
   Widget _topBar(BuildContext context, AppLocalizations l10n) {
     final pending = ref.watch(counterProvider).pendingCount;
+    final value = _liveValue;
     return Positioned(
       top: 12,
       left: 12,
@@ -328,6 +348,17 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
+                if (value > 0) ...[
+                  const SizedBox(width: 10),
+                  Text(
+                    '₹${value.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      color: BrandColors.success,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -478,6 +509,7 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
   Widget _tallyStrip() {
     final tally = _engine.tally;
     if (tally.isEmpty) return const SizedBox.shrink();
+    final prices = ref.watch(counterProvider).prices;
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -486,6 +518,8 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
           final t = tally[i];
+          final info = prices[t.className];
+          final price = info?.price;
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -496,7 +530,11 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
             child: Row(
               children: [
                 Text(
-                  _prettify(t.className),
+                  // The catalog name (when matched) is what the owner knows;
+                  // fall back to the prettified model class.
+                  info != null && !info.isUnknown
+                      ? info.displayName
+                      : _prettify(t.className),
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
                 const SizedBox(width: 6),
@@ -508,6 +546,17 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
+                if (price != null) ...[
+                  const SizedBox(width: 6),
+                  Text(
+                    '₹${(price * t.qty).toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      color: BrandColors.success,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ],
             ),
           );
@@ -575,7 +624,11 @@ class _CounterLanding extends ConsumerWidget {
     final summary = state.summary;
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(counterProvider.notifier).loadSummary(),
+      onRefresh: () async {
+        final n = ref.read(counterProvider.notifier);
+        await n.loadSummary();
+        await n.loadHistory();
+      },
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -685,57 +738,237 @@ class _CounterLanding extends ConsumerWidget {
                     l10n.visionCounterSummaryTotal,
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
-                  Text(
-                    '${state.summaryTotal}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      color: BrandColors.success,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        '${state.summaryTotal}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: BrandColors.success,
+                        ),
+                      ),
+                      if (state.summaryValue > 0) ...[
+                        const SizedBox(width: 10),
+                        Text(
+                          '₹${state.summaryValue.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: BrandColors.primary,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 8),
-            for (final it in summary)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Icon(
-                      it.isUnknown
-                          ? Icons.help_outline_rounded
-                          : Icons.check_circle_rounded,
-                      size: 18,
-                      color: it.isUnknown
-                          ? BrandColors.orange
-                          : BrandColors.success,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        it.isUnknown
-                            ? '${it.displayName} · ${l10n.visionCounterUnknownItem}'
-                            : it.displayName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: it.isUnknown
-                              ? BrandColors.muted
-                              : BrandColors.ink,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '×${it.qty}',
-                      style: const TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                  ],
+            for (final it in summary) _SummaryRow(it),
+          ],
+          const SizedBox(height: 22),
+          Text(
+            l10n.visionCounterHistoryTitle,
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+          ),
+          const SizedBox(height: 10),
+          if (state.historyLoading && state.history.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               ),
-          ],
+            )
+          else if (state.history.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                l10n.visionCounterHistoryEmpty,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: BrandColors.muted, fontSize: 13),
+              ),
+            )
+          else
+            for (final s in state.history) _HistoryCard(session: s),
         ],
+      ),
+    );
+  }
+}
+
+/// One product line of the day summary — with its ₹ value when priced.
+class _SummaryRow extends StatelessWidget {
+  final CounterSummaryItem it;
+  const _SummaryRow(this.it);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(
+            it.isUnknown
+                ? Icons.help_outline_rounded
+                : Icons.check_circle_rounded,
+            size: 18,
+            color: it.isUnknown ? BrandColors.orange : BrandColors.success,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              it.isUnknown
+                  ? '${it.displayName} · ${l10n.visionCounterUnknownItem}'
+                  : it.displayName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: it.isUnknown ? BrandColors.muted : BrandColors.ink,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          Text('×${it.qty}', style: const TextStyle(fontWeight: FontWeight.w800)),
+          SizedBox(
+            width: 72,
+            child: Text(
+              it.lineValue != null
+                  ? '₹${it.lineValue!.toStringAsFixed(0)}'
+                  : '—',
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: it.lineValue != null
+                    ? BrandColors.primary
+                    : BrandColors.muted,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One past counting run: when, how much, worth how much. Tap for the items.
+class _HistoryCard extends StatelessWidget {
+  final CounterHistorySession session;
+  const _HistoryCard({required this.session});
+
+  String _timeRange() {
+    String hm(String? iso) {
+      if (iso == null) return '';
+      final d = DateTime.tryParse(iso)?.toLocal();
+      if (d == null) return '';
+      return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+    }
+
+    final a = hm(session.startedAt);
+    final b = hm(session.endedAt);
+    if (a.isEmpty && b.isEmpty) return session.sessionDate;
+    return '${session.sessionDate}  ·  $a${b.isEmpty ? '' : '–$b'}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: BrandColors.border),
+      ),
+      child: ListTile(
+        leading: const Icon(Icons.receipt_long_rounded, color: BrandColors.primary),
+        title: Text(
+          l10n.visionCounterSaved(session.totalUnits, session.totalSkus),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+        ),
+        subtitle: Text(
+          _timeRange(),
+          style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+        ),
+        trailing: Text(
+          session.totalValue > 0
+              ? '₹${session.totalValue.toStringAsFixed(0)}'
+              : '—',
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 15,
+            color: BrandColors.primary,
+          ),
+        ),
+        onTap: () => showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _HistoryDetailSheet(session: session),
+        ),
+      ),
+    );
+  }
+}
+
+class _HistoryDetailSheet extends StatelessWidget {
+  final CounterHistorySession session;
+  const _HistoryDetailSheet({required this.session});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.visionCounterHistoryTitle,
+              style: const TextStyle(fontSize: 13, color: BrandColors.muted),
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.visionCounterSaved(
+                      session.totalUnits,
+                      session.totalSkus,
+                    ),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                if (session.totalValue > 0)
+                  Text(
+                    '₹${session.totalValue.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: BrandColors.primary,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [for (final it in session.items) _SummaryRow(it)],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

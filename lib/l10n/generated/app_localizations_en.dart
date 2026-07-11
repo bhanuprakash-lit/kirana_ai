@@ -5628,6 +5628,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get visionCounterUnknownItem => 'Unrecognised product';
 
   @override
+  String get visionUploading => 'Uploading photos…';
+
+  @override
+  String get visionUploadAccepted =>
+      'Photos uploaded! We\'re reading them now — you can leave this screen. We\'ll notify you when it\'s done.';
+
+  @override
+  String get visionHistoryTitle => 'Scan history';
+
+  @override
+  String get visionHistoryEmpty =>
+      'No scans yet. Your shelf scans will show up here with their photos and results.';
+
+  @override
+  String get visionHistoryStockIn => 'Stock-in scan';
+
+  @override
+  String get visionPhotos => 'photos';
+
+  @override
+  String get visionStatusDone => 'Done';
+
+  @override
+  String get visionStatusProcessing => 'Processing';
+
+  @override
+  String get visionStatusFailed => 'Failed';
+
+  @override
+  String get visionCounterHistoryTitle => 'Recent counting sessions';
+
+  @override
+  String get visionCounterHistoryEmpty =>
+      'No counting sessions yet. Finish a counting run and it will show up here.';
+
+  @override
   String get onbCtaTitle => 'Have hundreds of items?';
 
   @override
