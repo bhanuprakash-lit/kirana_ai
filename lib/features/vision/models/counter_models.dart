@@ -88,13 +88,17 @@ class CounterSession {
   );
 }
 
-/// One row of the server-aggregated daily counter summary.
+/// One row of the server-aggregated daily counter summary (also reused as a
+/// history-session line). Carries the store's selling price so tallies read as
+/// money, not just units.
 class CounterSummaryItem {
   final int? productId;
   final String className;
   final String displayName;
   final int qty;
   final bool isUnknown;
+  final double? price;
+  final double? lineValue;
 
   const CounterSummaryItem({
     required this.productId,
@@ -102,6 +106,8 @@ class CounterSummaryItem {
     required this.displayName,
     required this.qty,
     required this.isUnknown,
+    this.price,
+    this.lineValue,
   });
 
   factory CounterSummaryItem.fromJson(Map<String, dynamic> j) =>
@@ -111,5 +117,83 @@ class CounterSummaryItem {
         displayName: j['display_name'] as String? ?? '',
         qty: (j['qty'] as num?)?.toInt() ?? 0,
         isUnknown: j['is_unknown'] as bool? ?? true,
+        price: (j['price'] as num?)?.toDouble(),
+        lineValue: (j['line_value'] as num?)?.toDouble(),
+      );
+}
+
+/// What one on-device model class resolves to in this store's catalog: product,
+/// display name, and current selling price. Fetched once per counter launch and
+/// cached, so the LIVE tally can price items even before any sync.
+class CounterClassPrice {
+  final String className;
+  final int? productId;
+  final String displayName;
+  final double? price;
+  final bool isUnknown;
+
+  const CounterClassPrice({
+    required this.className,
+    required this.productId,
+    required this.displayName,
+    required this.price,
+    required this.isUnknown,
+  });
+
+  factory CounterClassPrice.fromJson(Map<String, dynamic> j) =>
+      CounterClassPrice(
+        className: j['class_name'] as String? ?? '',
+        productId: (j['product_id'] as num?)?.toInt(),
+        displayName: j['display_name'] as String? ?? '',
+        price: (j['price'] as num?)?.toDouble(),
+        isUnknown: j['is_unknown'] as bool? ?? true,
+      );
+
+  Map<String, dynamic> toJson() => {
+    'class_name': className,
+    'product_id': productId,
+    'display_name': displayName,
+    'price': price,
+    'is_unknown': isUnknown,
+  };
+}
+
+/// One past counting run in the owner's scan history.
+class CounterHistorySession {
+  final int sessionId;
+  final String sessionDate;
+  final String? startedAt;
+  final String? endedAt;
+  final int totalUnits;
+  final int totalSkus;
+  final int unknownCount;
+  final double totalValue;
+  final List<CounterSummaryItem> items;
+
+  const CounterHistorySession({
+    required this.sessionId,
+    required this.sessionDate,
+    required this.startedAt,
+    required this.endedAt,
+    required this.totalUnits,
+    required this.totalSkus,
+    required this.unknownCount,
+    required this.totalValue,
+    required this.items,
+  });
+
+  factory CounterHistorySession.fromJson(Map<String, dynamic> j) =>
+      CounterHistorySession(
+        sessionId: (j['session_id'] as num).toInt(),
+        sessionDate: j['session_date'] as String? ?? '',
+        startedAt: j['started_at'] as String?,
+        endedAt: j['ended_at'] as String?,
+        totalUnits: (j['total_units'] as num?)?.toInt() ?? 0,
+        totalSkus: (j['total_skus'] as num?)?.toInt() ?? 0,
+        unknownCount: (j['unknown_count'] as num?)?.toInt() ?? 0,
+        totalValue: (j['total_value'] as num?)?.toDouble() ?? 0,
+        items: (j['items'] as List<dynamic>? ?? [])
+            .map((e) => CounterSummaryItem.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
 }

@@ -5566,6 +5566,42 @@ class AppLocalizationsHi extends AppLocalizations {
   String get visionCounterUnknownItem => 'अपरिचित उत्पाद';
 
   @override
+  String get visionUploading => 'फोटो अपलोड हो रहे हैं…';
+
+  @override
+  String get visionUploadAccepted =>
+      'फोटो अपलोड हो गए! अब हम उन्हें पढ़ रहे हैं — आप यह स्क्रीन छोड़ सकते हैं। पूरा होने पर हम आपको बताएंगे।';
+
+  @override
+  String get visionHistoryTitle => 'स्कैन इतिहास';
+
+  @override
+  String get visionHistoryEmpty =>
+      'अभी कोई स्कैन नहीं। आपके शेल्फ स्कैन उनके फोटो और नतीजों के साथ यहां दिखेंगे।';
+
+  @override
+  String get visionHistoryStockIn => 'स्टॉक-इन स्कैन';
+
+  @override
+  String get visionPhotos => 'फोटो';
+
+  @override
+  String get visionStatusDone => 'पूरा';
+
+  @override
+  String get visionStatusProcessing => 'चल रहा है';
+
+  @override
+  String get visionStatusFailed => 'विफल';
+
+  @override
+  String get visionCounterHistoryTitle => 'हाल की गिनती';
+
+  @override
+  String get visionCounterHistoryEmpty =>
+      'अभी कोई गिनती नहीं। गिनती पूरी करें और वह यहां दिखेगी।';
+
+  @override
   String get onbCtaTitle => 'सैकड़ों वस्तुएं हैं?';
 
   @override

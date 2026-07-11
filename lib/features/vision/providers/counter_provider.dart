@@ -6,15 +6,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
 import '../../../core/store/store_scope.dart';
 import '../../auth/repositories/auth_repository.dart' show ApiException;
+import '../counter/counter_model.dart';
 import '../models/counter_models.dart';
 
 /// State for the sale-area counter's off-camera concerns: syncing finalized
-/// sessions to the backend and showing today's aggregated tally. The live
+/// sessions to the backend, today's aggregated tally, the scan history, and the
+/// class→product/price map that lets the LIVE tally show money. The live
 /// counting (camera + engine) lives in the counter screen; this provider owns
 /// persistence + sync so a session is never lost when the backend is down.
 class CounterState {
   final List<CounterSummaryItem> summary; // today's server-aggregated tally
   final bool summaryLoading;
+  final double summaryValue; // ₹ value of today's tally (server-priced)
+  final List<CounterHistorySession> history; // recent sessions, newest first
+  final bool historyLoading;
+  final Map<String, CounterClassPrice> prices; // model class → product + price
   final int pendingCount; // locally-queued sessions not yet synced
   final bool
   backendReachable; // false ⇒ counter endpoints not deployed / offline
@@ -23,6 +29,10 @@ class CounterState {
   const CounterState({
     this.summary = const [],
     this.summaryLoading = false,
+    this.summaryValue = 0,
+    this.history = const [],
+    this.historyLoading = false,
+    this.prices = const {},
     this.pendingCount = 0,
     this.backendReachable = true,
     this.error,
@@ -33,6 +43,10 @@ class CounterState {
   CounterState copyWith({
     List<CounterSummaryItem>? summary,
     bool? summaryLoading,
+    double? summaryValue,
+    List<CounterHistorySession>? history,
+    bool? historyLoading,
+    Map<String, CounterClassPrice>? prices,
     int? pendingCount,
     bool? backendReachable,
     String? error,
@@ -40,6 +54,10 @@ class CounterState {
   }) => CounterState(
     summary: summary ?? this.summary,
     summaryLoading: summaryLoading ?? this.summaryLoading,
+    summaryValue: summaryValue ?? this.summaryValue,
+    history: history ?? this.history,
+    historyLoading: historyLoading ?? this.historyLoading,
+    prices: prices ?? this.prices,
     pendingCount: pendingCount ?? this.pendingCount,
     backendReachable: backendReachable ?? this.backendReachable,
     error: clearError ? null : (error ?? this.error),
@@ -50,13 +68,16 @@ class CounterNotifier extends Notifier<CounterState> {
   ApiClient get _client => ref.read(apiClientProvider);
 
   static const _pendingKey = 'counter_pending_sessions_v1';
+  static const _pricesKey = 'counter_class_prices_v1';
 
   @override
   CounterState build() {
     ref.watch(storeScopeProvider); // reload on store switch
     Future.microtask(() async {
       await _refreshPendingCount();
+      await loadPrices();
       await loadSummary();
+      await loadHistory();
       await retryPending();
     });
     return const CounterState();
@@ -75,6 +96,7 @@ class CounterNotifier extends Notifier<CounterState> {
           .toList();
       state = state.copyWith(
         summary: items,
+        summaryValue: (res['total_value'] as num?)?.toDouble() ?? 0,
         summaryLoading: false,
         backendReachable: true,
       );
@@ -91,6 +113,73 @@ class CounterNotifier extends Notifier<CounterState> {
       state = state.copyWith(summaryLoading: false, backendReachable: false);
     }
   }
+
+  // ── Scan history ────────────────────────────────────────────────────────────
+
+  Future<void> loadHistory({int days = 14}) async {
+    state = state.copyWith(historyLoading: true);
+    try {
+      final res =
+          await _client.get('/kirana/vision/counter/sessions?days=$days')
+              as Map<String, dynamic>;
+      final sessions = (res['sessions'] as List<dynamic>? ?? [])
+          .map(
+            (j) => CounterHistorySession.fromJson(j as Map<String, dynamic>),
+          )
+          .toList();
+      state = state.copyWith(history: sessions, historyLoading: false);
+    } catch (_) {
+      // History is a nice-to-have view; a failure never blocks counting.
+      state = state.copyWith(historyLoading: false);
+    }
+  }
+
+  // ── Class → product/price map (live tally pricing) ──────────────────────────
+
+  /// Resolve the on-device model's class labels to catalog products + prices.
+  /// Server round-trip once per launch; cached locally so the live tally is
+  /// priced even offline (with yesterday's prices, which is fine for a glance).
+  Future<void> loadPrices() async {
+    // Serve the cache first so the camera never waits on the network.
+    final prefs = await SharedPreferences.getInstance();
+    final cached = prefs.getString(_pricesKey);
+    if (cached != null && state.prices.isEmpty) {
+      try {
+        final list = (jsonDecode(cached) as List<dynamic>)
+            .map((j) => CounterClassPrice.fromJson(j as Map<String, dynamic>))
+            .toList();
+        state = state.copyWith(
+          prices: {for (final p in list) p.className: p},
+        );
+      } catch (_) {/* stale cache format — refreshed below */}
+    }
+
+    final labels = await ref.read(counterLabelsProvider.future);
+    if (labels.isEmpty) return;
+    try {
+      final res =
+          await _client.post('/kirana/vision/counter/resolve', {
+                'class_names': labels,
+              })
+              as Map<String, dynamic>;
+      final list = (res['items'] as List<dynamic>? ?? [])
+          .map((j) => CounterClassPrice.fromJson(j as Map<String, dynamic>))
+          .toList();
+      state = state.copyWith(
+        prices: {for (final p in list) p.className: p},
+        backendReachable: true,
+      );
+      await prefs.setString(
+        _pricesKey,
+        jsonEncode([for (final p in list) p.toJson()]),
+      );
+    } catch (_) {
+      // Offline / not deployed: the cached (possibly empty) map stays in use.
+    }
+  }
+
+  /// Price for one on-device class, if known.
+  double? priceFor(String className) => state.prices[className]?.price;
 
   // ── Sync queue ───────────────────────────────────────────────────────────────
 

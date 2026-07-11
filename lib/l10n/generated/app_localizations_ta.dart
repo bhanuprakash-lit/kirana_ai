@@ -5699,6 +5699,42 @@ class AppLocalizationsTa extends AppLocalizations {
   String get visionCounterUnknownItem => 'அடையாளம் தெரியாத பொருள்';
 
   @override
+  String get visionUploading => 'புகைப்படங்கள் பதிவேற்றப்படுகின்றன…';
+
+  @override
+  String get visionUploadAccepted =>
+      'புகைப்படங்கள் பதிவேற்றப்பட்டன! இப்போது அவற்றைப் படிக்கிறோம் — நீங்கள் இந்தத் திரையை விட்டு வெளியேறலாம். முடிந்ததும் உங்களுக்குத் தெரிவிப்போம்.';
+
+  @override
+  String get visionHistoryTitle => 'ஸ்கேன் வரலாறு';
+
+  @override
+  String get visionHistoryEmpty =>
+      'இன்னும் ஸ்கேன்கள் இல்லை. உங்கள் அலமாரி ஸ்கேன்கள் அவற்றின் புகைப்படங்கள் மற்றும் முடிவுகளுடன் இங்கே தோன்றும்.';
+
+  @override
+  String get visionHistoryStockIn => 'சரக்கு சேர்ப்பு ஸ்கேன்';
+
+  @override
+  String get visionPhotos => 'புகைப்படங்கள்';
+
+  @override
+  String get visionStatusDone => 'முடிந்தது';
+
+  @override
+  String get visionStatusProcessing => 'நடைபெறுகிறது';
+
+  @override
+  String get visionStatusFailed => 'தோல்வி';
+
+  @override
+  String get visionCounterHistoryTitle => 'சமீபத்திய எண்ணிக்கைகள்';
+
+  @override
+  String get visionCounterHistoryEmpty =>
+      'இன்னும் எண்ணிக்கைகள் இல்லை. ஒரு எண்ணிக்கையை முடித்தால் அது இங்கே தோன்றும்.';
+
+  @override
   String get onbCtaTitle => 'நூற்றுக்கணக்கான பொருட்கள் உள்ளதா?';
 
   @override

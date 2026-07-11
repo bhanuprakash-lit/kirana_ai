@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/config/app_config.dart';
+import '../../../core/services/api_client.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
@@ -60,6 +62,16 @@ class _VisionScreenState extends ConsumerState<VisionScreen>
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         title: Text(l10n.visionTitle),
+        actions: [
+          IconButton(
+            tooltip: l10n.visionHistoryTitle,
+            icon: const Icon(Icons.history_rounded),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const _ScanHistoryScreen()),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tab,
           tabs: [
@@ -190,7 +202,20 @@ class _ShelfTab extends ConsumerWidget {
       builder: (_) => const _CaptureSheet(),
     );
     if (paths == null || paths.isEmpty) return;
-    await ref.read(visionProvider.notifier).capture(type, paths);
+    final accepted = await ref
+        .read(visionProvider.notifier)
+        .capture(type, paths);
+    // The upload is done and analysis continues server-side — tell the owner
+    // they're free to go; the card tracks progress and a push lands on finish.
+    if (accepted && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).visionUploadAccepted),
+          backgroundColor: BrandColors.success,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   @override
@@ -294,13 +319,14 @@ class _SessionCard extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             if (busy)
+              // Photos are uploading — the only phase that holds the owner here.
               Center(
                 child: Column(
                   children: [
                     const CircularProgressIndicator(),
                     const SizedBox(height: 10),
                     Text(
-                      l10n.visionAnalyzing,
+                      l10n.visionUploading,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 12,
@@ -378,6 +404,7 @@ class _SessionCard extends ConsumerWidget {
                         MaterialPageRoute(
                           builder: (_) => _SessionItemsScreen(
                             sessionId: session!.sessionId,
+                            photoCount: session!.photoCount,
                           ),
                         ),
                       ),
@@ -740,7 +767,8 @@ class _SalesTile extends StatelessWidget {
 
 class _SessionItemsScreen extends ConsumerStatefulWidget {
   final int sessionId;
-  const _SessionItemsScreen({required this.sessionId});
+  final int photoCount;
+  const _SessionItemsScreen({required this.sessionId, this.photoCount = 0});
 
   @override
   ConsumerState<_SessionItemsScreen> createState() =>
@@ -785,9 +813,16 @@ class _SessionItemsScreenState extends ConsumerState<_SessionItemsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : ListView.separated(
               padding: const EdgeInsets.all(16),
-              itemCount: items.length,
+              itemCount: items.length + (widget.photoCount > 0 ? 1 : 0),
               separatorBuilder: (_, _) => const SizedBox(height: 8),
-              itemBuilder: (_, i) {
+              itemBuilder: (_, index) {
+                if (widget.photoCount > 0 && index == 0) {
+                  return _SessionPhotosStrip(
+                    sessionId: widget.sessionId,
+                    photoCount: widget.photoCount,
+                  );
+                }
+                final i = index - (widget.photoCount > 0 ? 1 : 0);
                 final it = items[i];
                 return ListTile(
                   tileColor: BrandColors.surface,
@@ -953,6 +988,281 @@ class _CorrectionSheetState extends ConsumerState<_CorrectionSheet> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Scan history ────────────────────────────────────────────────────────────
+
+/// Every past shelf scan (morning/evening/onboarding) with its status, photos
+/// and results — nothing is discarded just because the owner left the screen.
+class _ScanHistoryScreen extends ConsumerStatefulWidget {
+  const _ScanHistoryScreen();
+
+  @override
+  ConsumerState<_ScanHistoryScreen> createState() => _ScanHistoryScreenState();
+}
+
+class _ScanHistoryScreenState extends ConsumerState<_ScanHistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(visionProvider.notifier).loadHistory());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final state = ref.watch(visionProvider);
+
+    return Scaffold(
+      backgroundColor: BrandColors.background,
+      appBar: AppBar(title: Text(l10n.visionHistoryTitle)),
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(visionProvider.notifier).loadHistory(),
+        child: state.historyLoading && state.history.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : state.history.isEmpty
+            ? ListView(
+                children: [
+                  const SizedBox(height: 120),
+                  _EmptyState(
+                    icon: Icons.history_rounded,
+                    message: l10n.visionHistoryEmpty,
+                  ),
+                ],
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: state.history.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 8),
+                itemBuilder: (_, i) => _HistoryTile(state.history[i]),
+              ),
+      ),
+    );
+  }
+}
+
+class _HistoryTile extends StatelessWidget {
+  final VisionSession s;
+  const _HistoryTile(this.s);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final isMorning = s.sessionType == 'morning';
+    final isOnboarding = s.sessionType == 'onboarding';
+    final typeLabel = isOnboarding
+        ? l10n.visionHistoryStockIn
+        : (isMorning ? l10n.visionMorningTitle : l10n.visionEveningTitle);
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: BrandColors.border),
+      ),
+      child: ListTile(
+        leading: Icon(
+          isOnboarding
+              ? Icons.add_business_rounded
+              : (isMorning ? Icons.wb_sunny_rounded : Icons.nights_stay_rounded),
+          color: isOnboarding
+              ? BrandColors.purple
+              : (isMorning ? BrandColors.orange : BrandColors.primary),
+        ),
+        title: Text(
+          '$typeLabel · ${s.sessionDate}',
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+        ),
+        subtitle: Text(
+          s.isDone
+              ? '${s.totalSkus} ${l10n.visionProductsIdentified} · '
+                    '${s.totalUnits} ${l10n.visionUnitsCounted} · '
+                    '${s.photoCount} ${l10n.visionPhotos}'
+              : '${s.photoCount} ${l10n.visionPhotos}',
+          style: const TextStyle(fontSize: 11, color: BrandColors.muted),
+        ),
+        trailing: _StatusChip(status: s.status),
+        onTap: s.isDone || s.photoCount > 0
+            ? () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => _SessionItemsScreen(
+                    sessionId: s.sessionId,
+                    photoCount: s.photoCount,
+                  ),
+                ),
+              )
+            : null,
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final String status;
+  const _StatusChip({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final (label, color) = switch (status) {
+      'done' => (l10n.visionStatusDone, BrandColors.success),
+      'failed' => (l10n.visionStatusFailed, BrandColors.error),
+      _ => (l10n.visionStatusProcessing, BrandColors.orange),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+/// The photos the owner uploaded for one scan — small authed thumbnails, tap
+/// for full screen. Photos may be gone for very old scans (pre-durable-storage);
+/// those tiles just show a placeholder.
+class _SessionPhotosStrip extends StatelessWidget {
+  final int sessionId;
+  final int photoCount;
+  const _SessionPhotosStrip({
+    required this.sessionId,
+    required this.photoCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${l10n.visionPhotos} ($photoCount)',
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 84,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: photoCount,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (_, i) => GestureDetector(
+              onTap: () => showDialog<void>(
+                context: context,
+                builder: (_) => _PhotoViewer(sessionId: sessionId, index: i),
+              ),
+              child: _SessionPhoto(
+                sessionId: sessionId,
+                index: i,
+                size: 84,
+                thumb: true,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SessionPhoto extends StatelessWidget {
+  final int sessionId;
+  final int index;
+  final double size;
+  final bool thumb;
+  const _SessionPhoto({
+    required this.sessionId,
+    required this.index,
+    required this.size,
+    required this.thumb,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Container(
+      width: size,
+      height: size,
+      color: BrandColors.muted.withValues(alpha: 0.08),
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.image_not_supported_outlined,
+        color: BrandColors.muted,
+        size: size * 0.4,
+      ),
+    );
+    final url =
+        '${AppConfig.apiBaseUrl}/kirana/vision/session/$sessionId/photo/$index'
+        '${thumb ? '?thumb=1' : ''}';
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: FutureBuilder<String?>(
+          future: ApiClient.mediaAuthToken(),
+          builder: (_, snap) {
+            final token = snap.data;
+            if (token == null) return fallback;
+            return Image.network(
+              url,
+              headers: {'Authorization': 'Bearer $token'},
+              fit: BoxFit.cover,
+              gaplessPlayback: true,
+              errorBuilder: (_, _, _) => fallback,
+              loadingBuilder: (ctx, child, progress) =>
+                  progress == null ? child : fallback,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _PhotoViewer extends StatelessWidget {
+  final int sessionId;
+  final int index;
+  const _PhotoViewer({required this.sessionId, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.black,
+      insetPadding: const EdgeInsets.all(12),
+      child: Stack(
+        children: [
+          InteractiveViewer(
+            child: Center(
+              child: _SessionPhoto(
+                sessionId: sessionId,
+                index: index,
+                size: double.infinity,
+                thumb: false,
+              ),
+            ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: IconButton(
+              icon: const Icon(Icons.close_rounded, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+        ],
       ),
     );
   }

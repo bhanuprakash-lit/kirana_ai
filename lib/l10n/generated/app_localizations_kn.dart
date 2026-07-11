@@ -5657,6 +5657,42 @@ class AppLocalizationsKn extends AppLocalizations {
   String get visionCounterUnknownItem => 'ಗುರುತಿಸದ ಉತ್ಪನ್ನ';
 
   @override
+  String get visionUploading => 'ಫೋಟೋಗಳು ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿವೆ…';
+
+  @override
+  String get visionUploadAccepted =>
+      'ಫೋಟೋಗಳು ಅಪ್‌ಲೋಡ್ ಆದವು! ಈಗ ಅವನ್ನು ಓದುತ್ತಿದ್ದೇವೆ — ನೀವು ಈ ಪರದೆಯಿಂದ ಹೊರಹೋಗಬಹುದು. ಮುಗಿದ ಮೇಲೆ ನಿಮಗೆ ತಿಳಿಸುತ್ತೇವೆ.';
+
+  @override
+  String get visionHistoryTitle => 'ಸ್ಕ್ಯಾನ್ ಇತಿಹಾಸ';
+
+  @override
+  String get visionHistoryEmpty =>
+      'ಇನ್ನೂ ಸ್ಕ್ಯಾನ್‌ಗಳಿಲ್ಲ. ನಿಮ್ಮ ಶೆಲ್ಫ್ ಸ್ಕ್ಯಾನ್‌ಗಳು ಅವುಗಳ ಫೋಟೋ ಮತ್ತು ಫಲಿತಾಂಶಗಳೊಂದಿಗೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.';
+
+  @override
+  String get visionHistoryStockIn => 'ಸ್ಟಾಕ್-ಇನ್ ಸ್ಕ್ಯಾನ್';
+
+  @override
+  String get visionPhotos => 'ಫೋಟೋಗಳು';
+
+  @override
+  String get visionStatusDone => 'ಮುಗಿದಿದೆ';
+
+  @override
+  String get visionStatusProcessing => 'ನಡೆಯುತ್ತಿದೆ';
+
+  @override
+  String get visionStatusFailed => 'ವಿಫಲವಾಗಿದೆ';
+
+  @override
+  String get visionCounterHistoryTitle => 'ಇತ್ತೀಚಿನ ಎಣಿಕೆಗಳು';
+
+  @override
+  String get visionCounterHistoryEmpty =>
+      'ಇನ್ನೂ ಎಣಿಕೆಗಳಿಲ್ಲ. ಒಂದು ಎಣಿಕೆ ಮುಗಿಸಿದರೆ ಅದು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.';
+
+  @override
   String get onbCtaTitle => 'ನೂರಾರು ವಸ್ತುಗಳಿವೆಯೇ?';
 
   @override

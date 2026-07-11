@@ -8,9 +8,17 @@ class CounterModel {
   static const String tfliteAsset = 'assets/models/counter_model.tflite';
   static const String labelsAsset = 'assets/models/counter_labels.txt';
 
-  /// Default detection confidence for the live feed. A touch higher than the
-  /// plugin default (0.25) to cut counter noise; tunable in the UI later.
-  static const double defaultConfidence = 0.4;
+  /// Camera-feed threshold, deliberately LOW: an item that is already being
+  /// tracked keeps its identity through blur/shake/motion frames where the
+  /// detector's confidence dips. Raising this is what made the old counter
+  /// "lose everything on a small disturbance" — weak frames disappeared and
+  /// tracks aged out.
+  static const double liveConfidence = 0.25;
+
+  /// Confidence required to START a new track (and hence ever be counted).
+  /// Acquisition stays precise while tracking stays sticky: weak detections can
+  /// only extend existing tracks, never spawn phantom ones.
+  static const double countConfidence = 0.4;
 }
 
 /// Whether the on-device model binary is actually bundled. Until the .tflite is
@@ -22,5 +30,20 @@ final counterModelAvailableProvider = FutureProvider<bool>((ref) async {
     return data.lengthInBytes > 0;
   } catch (_) {
     return false;
+  }
+});
+
+/// The on-device model's class labels (one per line). Used to ask the backend
+/// which catalog product + price each class maps to, so the live tally can show
+/// money, not just units. Empty when the model/labels aren't bundled.
+final counterLabelsProvider = FutureProvider<List<String>>((ref) async {
+  try {
+    final raw = await rootBundle.loadString(CounterModel.labelsAsset);
+    return [
+      for (final line in raw.split('\n'))
+        if (line.trim().isNotEmpty) line.trim(),
+    ];
+  } catch (_) {
+    return const [];
   }
 });

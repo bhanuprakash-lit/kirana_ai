@@ -5697,6 +5697,42 @@ class AppLocalizationsMl extends AppLocalizations {
   String get visionCounterUnknownItem => 'തിരിച്ചറിയാത്ത ഉൽപ്പന്നം';
 
   @override
+  String get visionUploading => 'ഫോട്ടോകൾ അപ്‌ലോഡ് ചെയ്യുന്നു…';
+
+  @override
+  String get visionUploadAccepted =>
+      'ഫോട്ടോകൾ അപ്‌ലോഡ് ആയി! ഇപ്പോൾ അവ വായിക്കുകയാണ് — നിങ്ങൾക്ക് ഈ സ്ക്രീൻ വിട്ടുപോകാം. കഴിയുമ്പോൾ അറിയിക്കാം.';
+
+  @override
+  String get visionHistoryTitle => 'സ്കാൻ ചരിത്രം';
+
+  @override
+  String get visionHistoryEmpty =>
+      'ഇതുവരെ സ്കാനുകളില്ല. നിങ്ങളുടെ ഷെൽഫ് സ്കാനുകൾ അവയുടെ ഫോട്ടോകളും ഫലങ്ങളും സഹിതം ഇവിടെ കാണാം.';
+
+  @override
+  String get visionHistoryStockIn => 'സ്റ്റോക്ക്-ഇൻ സ്കാൻ';
+
+  @override
+  String get visionPhotos => 'ഫോട്ടോകൾ';
+
+  @override
+  String get visionStatusDone => 'കഴിഞ്ഞു';
+
+  @override
+  String get visionStatusProcessing => 'നടക്കുന്നു';
+
+  @override
+  String get visionStatusFailed => 'പരാജയപ്പെട്ടു';
+
+  @override
+  String get visionCounterHistoryTitle => 'സമീപകാല എണ്ണലുകൾ';
+
+  @override
+  String get visionCounterHistoryEmpty =>
+      'ഇതുവരെ എണ്ണലുകളില്ല. ഒരു എണ്ണൽ പൂർത്തിയാക്കിയാൽ അത് ഇവിടെ കാണാം.';
+
+  @override
   String get onbCtaTitle => 'നൂറുകണക്കിന് വസ്തുക്കൾ ഉണ്ടോ?';
 
   @override
