@@ -2988,6 +2988,176 @@ class AppLocalizationsHi extends AppLocalizations {
   String get rackNoneForProduct => 'अभी किसी रैक में नहीं रखा गया।';
 
   @override
+  String get tutNext => 'आगे';
+
+  @override
+  String get tutDone => 'समझ गया';
+
+  @override
+  String get tutSkip => 'छोड़ें';
+
+  @override
+  String get tutTapHere => 'आगे बढ़ने के लिए चमकते बटन पर टैप करें';
+
+  @override
+  String get tutDismiss => 'छिपाएं';
+
+  @override
+  String get tutChecklistTitle => 'शुरुआत करें';
+
+  @override
+  String tutChecklistSubtitle(int done, int total) {
+    return '$total में से $done पूरे — कोई भी कदम टैप करें';
+  }
+
+  @override
+  String get tutStepAddProduct => 'अपना पहला प्रोडक्ट जोड़ें';
+
+  @override
+  String get tutStepFirstSale => 'अपना पहला बिल बनाएं';
+
+  @override
+  String get tutStepUdhaar => 'एक उधार लिखें';
+
+  @override
+  String get tutStepReport => 'आज का धंधा देखें';
+
+  @override
+  String get tutStepLanguage => 'अपनी भाषा चुनें';
+
+  @override
+  String get tutWelcomeHomeTitle => 'होम';
+
+  @override
+  String get tutWelcomeHomeBody =>
+      'आपका पूरा दिन एक नज़र में — बिक्री, कमाई और ज़रूरी सूचनाएं यहां हैं।';
+
+  @override
+  String get tutWelcomeKhataTitle => 'खाता';
+
+  @override
+  String get tutWelcomeKhataBody => 'आपकी उधार बही। हर उधार और वसूली एक जगह।';
+
+  @override
+  String get tutWelcomeBillingTitle => 'बिलिंग और स्टॉक';
+
+  @override
+  String get tutWelcomeBillingBody => 'बिल बनाएं और अपना माल यहां संभालें।';
+
+  @override
+  String get tutWelcomeVisionTitle => 'विज़न AI';
+
+  @override
+  String get tutWelcomeVisionBody =>
+      'कैमरे से स्टॉक गिनें — शेल्फ स्कैन करें, सामान गिनें।';
+
+  @override
+  String get tutWelcomeChecklistTitle => 'यहां से शुरू करें';
+
+  @override
+  String get tutWelcomeChecklistBody =>
+      'दुकान चालू करने के पांच छोटे कदम। कोई भी कदम टैप करें, हम साथ में करेंगे।';
+
+  @override
+  String get tutReportTitle => 'आज का धंधा';
+
+  @override
+  String get tutReportBody =>
+      'यह कार्ड दिखाता है कि आज क्या बिका और कितना कमाया। हर शाम देखें।';
+
+  @override
+  String get tutFsSearchTitle => 'प्रोडक्ट खोजें';
+
+  @override
+  String get tutFsSearchBody =>
+      'यहां प्रोडक्ट का नाम लिखें, फिर बिल में जोड़ने के लिए उस पर टैप करें।';
+
+  @override
+  String get tutFsCustomerTitle => 'ग्राहक जोड़ें';
+
+  @override
+  String get tutFsCustomerBody =>
+      'खरीदने वाले ग्राहक को चुनने के लिए यहां टैप करें — या सिर्फ नाम और फोन से नया जोड़ें।';
+
+  @override
+  String get tutFsChargeTitle => 'पैसे लें';
+
+  @override
+  String get tutFsChargeBody =>
+      'बिल तैयार है। पेमेंट का तरीका चुनने और बिल पूरा करने के लिए यहां टैप करें।';
+
+  @override
+  String get tutFsPaymentTitle => 'पेमेंट कैसे होगा?';
+
+  @override
+  String get tutFsPaymentBody =>
+      'अभी नकद — या बाद में वसूलने के लिए उधार। उधार सीधे आपके खाते में जाता है।';
+
+  @override
+  String get tutFsConfirmTitle => 'बिल पूरा करें';
+
+  @override
+  String get tutFsConfirmBody => 'बिक्री पूरी करने के लिए इस बटन पर टैप करें।';
+
+  @override
+  String get tutApFabTitle => 'प्रोडक्ट जोड़ें';
+
+  @override
+  String get tutApFabBody =>
+      'अपना पहला प्रोडक्ट दुकान में डालने के लिए + बटन टैप करें।';
+
+  @override
+  String get tutApSearchTitle => 'कैटलॉग में खोजें';
+
+  @override
+  String get tutApSearchBody =>
+      'प्रोडक्ट का नाम लिखें और सूची से चुनें — नाम, फोटो और जानकारी अपने आप भर जाएगी।';
+
+  @override
+  String get tutApPriceTitle => 'आपका बेचने का दाम';
+
+  @override
+  String get tutApPriceBody => 'जिस दाम पर आप बेचते हैं, वह लिखें।';
+
+  @override
+  String get tutApStockTitle => 'कितने हैं?';
+
+  @override
+  String get tutApStockBody => 'अभी शेल्फ पर जितने हैं, वह संख्या लिखें।';
+
+  @override
+  String get tutApSaveTitle => 'सेव करें';
+
+  @override
+  String get tutApSaveBody =>
+      'सेव पर टैप करें — प्रोडक्ट बेचने के लिए तैयार है।';
+
+  @override
+  String get learnTitle => 'सीखें';
+
+  @override
+  String get learnSubtitle =>
+      'छोटी गाइड जो आपको ऐप घुमाती हैं। कभी भी दोबारा देखें।';
+
+  @override
+  String get learnReplayWelcome => 'ऐप की सैर';
+
+  @override
+  String get learnFlowAddProduct => 'प्रोडक्ट कैसे जोड़ें';
+
+  @override
+  String get learnFlowFirstSale => 'बिल कैसे बनाएं';
+
+  @override
+  String get learnReplay => 'दिखाओ';
+
+  @override
+  String get learnShowTips => 'टिप्स दिखाएं';
+
+  @override
+  String get learnShowTipsDesc => 'पहली बार खुलने वाली स्क्रीन पर मदद की टिप्स';
+
+  @override
   String get procExchangeInstead => 'एक्सचेंज (ग्राहक दूसरी वस्तु लेता है)';
 
   @override

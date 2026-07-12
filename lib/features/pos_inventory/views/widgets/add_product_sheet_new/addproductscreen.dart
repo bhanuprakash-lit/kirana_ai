@@ -393,6 +393,8 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 
     if (!mounted) return;
     if (firstError == null) {
+      // Getting-started checklist + guided add-product flow: a product exists.
+      ref.read(tutorialProvider.notifier).onProductAdded();
       setState(() {
         _saving = false;
         _success = true;
@@ -420,8 +422,71 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
     }
   }
 
+  /// Guided add-product flow: on the catalog stage, point at the search box
+  /// ("type the name, pick it — details fill in"); once a product is picked
+  /// (form stage), walk price → stock → Save. The owner types real values;
+  /// the spotlight just tells him what each field means.
+  void _maybeAddProductTutorial() {
+    if (!mounted) return;
+    final c = ref.read(tutorialProvider.notifier);
+    if (!c.flowActive(Tut.flowAddProduct)) return;
+    final l10n = _l10n;
+    if (_stage == _Stage.search) {
+      if (!c.shouldShow(Tut.apSearch, flow: Tut.flowAddProduct)) return;
+      showTutorialSegment(
+        context,
+        ref,
+        id: Tut.apSearch,
+        steps: [
+          TutStep(
+            targetKey: TutorialKeys.invCatalogSearch,
+            title: l10n.tutApSearchTitle,
+            body: l10n.tutApSearchBody,
+          ),
+        ],
+        nextLabel: l10n.tutNext,
+        doneLabel: l10n.tutDone,
+        skipLabel: l10n.tutSkip,
+      );
+    } else {
+      if (!c.shouldShow(Tut.apForm, flow: Tut.flowAddProduct)) return;
+      showTutorialSegment(
+        context,
+        ref,
+        id: Tut.apForm,
+        steps: [
+          TutStep(
+            targetKey: TutorialKeys.invPrice,
+            title: l10n.tutApPriceTitle,
+            body: l10n.tutApPriceBody,
+          ),
+          TutStep(
+            targetKey: TutorialKeys.invStock,
+            title: l10n.tutApStockTitle,
+            body: l10n.tutApStockBody,
+          ),
+          TutStep(
+            targetKey: TutorialKeys.invSave,
+            title: l10n.tutApSaveTitle,
+            body: l10n.tutApSaveBody,
+            align: ContentAlign.top,
+          ),
+        ],
+        nextLabel: l10n.tutNext,
+        doneLabel: l10n.tutDone,
+        skipLabel: l10n.tutSkip,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(
+        const Duration(milliseconds: 400),
+        _maybeAddProductTutorial,
+      );
+    });
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: BrandColors.background,
@@ -491,6 +556,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             children: [
               Expanded(
                 child: TextField(
+                  key: TutorialKeys.invCatalogSearch,
                   controller: _searchCtrl,
                   autofocus: true,
                   decoration: InputDecoration(
@@ -971,6 +1037,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 
           const SizedBox(height: 28),
           SizedBox(
+            key: TutorialKeys.invSave,
             height: 56,
             child: LoadingButton(
               label: verticalConfigOf(ref).has('variants')
@@ -1049,10 +1116,18 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
           Row(
             children: [
               Expanded(
-                child: _f2NumField(v.priceCtrl, l10n.invPrice, prefix: '₹ '),
+                child: KeyedSubtree(
+                  key: idx == 0 ? TutorialKeys.invPrice : null,
+                  child: _f2NumField(v.priceCtrl, l10n.invPrice, prefix: '₹ '),
+                ),
               ),
               const SizedBox(width: 10),
-              Expanded(child: _f2NumField(v.stockCtrl, l10n.invStock)),
+              Expanded(
+                child: KeyedSubtree(
+                  key: idx == 0 ? TutorialKeys.invStock : null,
+                  child: _f2NumField(v.stockCtrl, l10n.invStock),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -1308,6 +1383,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
             children: [
               Expanded(
                 child: TextFormField(
+                  key: isFirst ? TutorialKeys.invPrice : null,
                   controller: v.priceCtrl,
                   autofocus: isFirst && _linked != null,
                   enabled: !_saving && !_success,
@@ -1376,6 +1452,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
 
           // Stock
           TextFormField(
+            key: isFirst ? TutorialKeys.invStock : null,
             controller: v.stockCtrl,
             enabled: !_saving && !_success,
             decoration: InputDecoration(

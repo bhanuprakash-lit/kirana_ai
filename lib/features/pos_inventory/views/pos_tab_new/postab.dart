@@ -1000,6 +1000,75 @@ class _PosTabState extends ConsumerState<PosTab> {
     );
   }
 
+  /// Guided first-sale flow (Getting started → "Make your first bill").
+  /// The bill's own state machine picks the next lesson: no items yet → show
+  /// where to search; items but no customer → tap the customer chip; customer
+  /// picked → tap the charge button. Each spotlight makes the owner perform
+  /// the REAL action, so finishing the tutorial IS finishing his first sale.
+  void _maybeFirstSaleTutorial(PosState state) {
+    if (!mounted) return;
+    final c = ref.read(tutorialProvider.notifier);
+    if (!c.flowActive(Tut.flowFirstSale)) return;
+    if (state.products.isEmpty) return; // nothing to sell yet
+    final l10n = _l10n;
+    if (state.cart.isEmpty) {
+      if (!c.shouldShow(Tut.fsSearch, flow: Tut.flowFirstSale)) return;
+      showTutorialSegment(
+        context,
+        ref,
+        id: Tut.fsSearch,
+        steps: [
+          TutStep(
+            targetKey: TutorialKeys.posSearch,
+            title: l10n.tutFsSearchTitle,
+            body: l10n.tutFsSearchBody,
+          ),
+        ],
+        nextLabel: l10n.tutNext,
+        doneLabel: l10n.tutDone,
+        skipLabel: l10n.tutSkip,
+      );
+    } else if (state.selectedCustomerId == null) {
+      if (!c.shouldShow(Tut.fsCustomer, flow: Tut.flowFirstSale)) return;
+      showTutorialSegment(
+        context,
+        ref,
+        id: Tut.fsCustomer,
+        steps: [
+          TutStep(
+            targetKey: TutorialKeys.posCustomer,
+            title: l10n.tutFsCustomerTitle,
+            body: l10n.tutFsCustomerBody,
+            tapTarget: true,
+            onTapTarget: _showCustomerSearchSheet,
+            align: ContentAlign.top,
+          ),
+        ],
+        tapHint: l10n.tutTapHere,
+        skipLabel: l10n.tutSkip,
+      );
+    } else {
+      if (!c.shouldShow(Tut.fsCharge, flow: Tut.flowFirstSale)) return;
+      showTutorialSegment(
+        context,
+        ref,
+        id: Tut.fsCharge,
+        steps: [
+          TutStep(
+            targetKey: TutorialKeys.posOrder,
+            title: l10n.tutFsChargeTitle,
+            body: l10n.tutFsChargeBody,
+            tapTarget: true,
+            onTapTarget: () => showOrderDialog(context, ref),
+            align: ContentAlign.top,
+          ),
+        ],
+        tapHint: l10n.tutTapHere,
+        skipLabel: l10n.tutSkip,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Open the scanner when something requests it (e.g. the home-screen widget's
@@ -1012,6 +1081,15 @@ class _PosTabState extends ConsumerState<PosTab> {
     final cart = state.cart;
     final isSearching = _query.isNotEmpty;
     final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+
+    // Guided first-sale flow reacts to the live bill state on every rebuild.
+    ref.watch(tutorialProvider.select((s) => (s.activeFlow, s.loaded)));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(
+        const Duration(milliseconds: 350),
+        () => _maybeFirstSaleTutorial(ref.read(posProvider)),
+      );
+    });
 
     return PopScope(
       // Intercept back when there's something to clear on this screen first.
@@ -1042,6 +1120,7 @@ class _PosTabState extends ConsumerState<PosTab> {
                   children: [
                     Expanded(
                       child: TextField(
+                        key: TutorialKeys.posSearch,
                         controller: _searchCtrl,
                         onChanged: (v) => setState(() => _query = v),
                         style: const TextStyle(fontSize: 14),

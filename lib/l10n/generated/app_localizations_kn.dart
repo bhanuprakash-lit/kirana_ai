@@ -3068,6 +3068,177 @@ class AppLocalizationsKn extends AppLocalizations {
   String get rackNoneForProduct => 'ಇನ್ನೂ ಯಾವುದೇ ರ್ಯಾಕ್‌ನಲ್ಲಿ ಇರಿಸಿಲ್ಲ.';
 
   @override
+  String get tutNext => 'ಮುಂದೆ';
+
+  @override
+  String get tutDone => 'ಅರ್ಥವಾಯಿತು';
+
+  @override
+  String get tutSkip => 'ಬಿಟ್ಟುಬಿಡಿ';
+
+  @override
+  String get tutTapHere => 'ಮುಂದುವರಿಯಲು ಹೊಳೆಯುವ ಬಟನ್ ಒತ್ತಿರಿ';
+
+  @override
+  String get tutDismiss => 'ಮರೆಮಾಡಿ';
+
+  @override
+  String get tutChecklistTitle => 'ಪ್ರಾರಂಭಿಸೋಣ';
+
+  @override
+  String tutChecklistSubtitle(int done, int total) {
+    return '$totalರಲ್ಲಿ $done ಮುಗಿದಿದೆ — ಯಾವುದೇ ಹಂತ ಒತ್ತಿರಿ';
+  }
+
+  @override
+  String get tutStepAddProduct => 'ನಿಮ್ಮ ಮೊದಲ ಸಾಮಾನು ಸೇರಿಸಿ';
+
+  @override
+  String get tutStepFirstSale => 'ನಿಮ್ಮ ಮೊದಲ ಬಿಲ್ ಮಾಡಿ';
+
+  @override
+  String get tutStepUdhaar => 'ಒಂದು ಉದ್ರಿ ಬರೆಯಿರಿ';
+
+  @override
+  String get tutStepReport => 'ಇಂದಿನ ವ್ಯಾಪಾರ ನೋಡಿ';
+
+  @override
+  String get tutStepLanguage => 'ನಿಮ್ಮ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get tutWelcomeHomeTitle => 'ಮುಖಪುಟ';
+
+  @override
+  String get tutWelcomeHomeBody =>
+      'ನಿಮ್ಮ ದಿನ ಒಂದೇ ನೋಟದಲ್ಲಿ — ಮಾರಾಟ, ಲಾಭ, ಎಚ್ಚರಿಕೆಗಳು ಇಲ್ಲಿವೆ.';
+
+  @override
+  String get tutWelcomeKhataTitle => 'ಖಾತೆ';
+
+  @override
+  String get tutWelcomeKhataBody =>
+      'ನಿಮ್ಮ ಉದ್ರಿ ಪುಸ್ತಕ. ಪ್ರತಿ ಸಾಲ ಮತ್ತು ವಸೂಲಿ ಒಂದೇ ಕಡೆ.';
+
+  @override
+  String get tutWelcomeBillingTitle => 'ಬಿಲ್ಲಿಂಗ್ & ಸ್ಟಾಕ್';
+
+  @override
+  String get tutWelcomeBillingBody =>
+      'ಬಿಲ್ ಮಾಡುವುದು, ಸಾಮಾನು ನಿರ್ವಹಿಸುವುದು ಇಲ್ಲಿ.';
+
+  @override
+  String get tutWelcomeVisionTitle => 'ವಿಷನ್ AI';
+
+  @override
+  String get tutWelcomeVisionBody =>
+      'ಕ್ಯಾಮೆರಾದಿಂದ ಸ್ಟಾಕ್ ಎಣಿಸಿ — ಶೆಲ್ಫ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ, ಸಾಮಾನು ಎಣಿಸಿ.';
+
+  @override
+  String get tutWelcomeChecklistTitle => 'ಇಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ';
+
+  @override
+  String get tutWelcomeChecklistBody =>
+      'ಅಂಗಡಿ ಸಿದ್ಧಪಡಿಸಲು ಐದು ಸಣ್ಣ ಹಂತಗಳು. ಯಾವುದನ್ನಾದರೂ ಒತ್ತಿರಿ, ಜೊತೆಯಾಗಿ ಮಾಡೋಣ.';
+
+  @override
+  String get tutReportTitle => 'ಇಂದಿನ ವ್ಯಾಪಾರ';
+
+  @override
+  String get tutReportBody =>
+      'ಇಂದು ಏನು ಮಾರಿದ್ದೀರಿ, ಎಷ್ಟು ಗಳಿಸಿದ್ದೀರಿ ಎಂದು ಈ ಕಾರ್ಡ್ ತೋರಿಸುತ್ತದೆ. ಪ್ರತಿ ಸಂಜೆ ನೋಡಿ.';
+
+  @override
+  String get tutFsSearchTitle => 'ಸಾಮಾನು ಹುಡುಕಿ';
+
+  @override
+  String get tutFsSearchBody =>
+      'ಇಲ್ಲಿ ಸಾಮಾನಿನ ಹೆಸರು ಟೈಪ್ ಮಾಡಿ, ಬಿಲ್‌ಗೆ ಸೇರಿಸಲು ಅದನ್ನು ಒತ್ತಿರಿ.';
+
+  @override
+  String get tutFsCustomerTitle => 'ಗ್ರಾಹಕರನ್ನು ಸೇರಿಸಿ';
+
+  @override
+  String get tutFsCustomerBody =>
+      'ಖರೀದಿಸುತ್ತಿರುವ ಗ್ರಾಹಕರನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಇಲ್ಲಿ ಒತ್ತಿರಿ — ಅಥವಾ ಹೆಸರು, ಫೋನ್‌ನಿಂದ ಹೊಸಬರನ್ನು ಸೇರಿಸಿ.';
+
+  @override
+  String get tutFsChargeTitle => 'ಹಣ ತೆಗೆದುಕೊಳ್ಳಿ';
+
+  @override
+  String get tutFsChargeBody =>
+      'ಬಿಲ್ ಸಿದ್ಧ. ಪಾವತಿ ವಿಧಾನ ಆರಿಸಿ ಬಿಲ್ ಮುಗಿಸಲು ಇಲ್ಲಿ ಒತ್ತಿರಿ.';
+
+  @override
+  String get tutFsPaymentTitle => 'ಹೇಗೆ ಪಾವತಿಸುತ್ತಾರೆ?';
+
+  @override
+  String get tutFsPaymentBody =>
+      'ಈಗ ನಗದು — ಅಥವಾ ನಂತರ ವಸೂಲಿಗೆ ಉದ್ರಿ. ಉದ್ರಿ ನೇರವಾಗಿ ನಿಮ್ಮ ಖಾತೆಗೆ ಹೋಗುತ್ತದೆ.';
+
+  @override
+  String get tutFsConfirmTitle => 'ಬಿಲ್ ಮುಗಿಸಿ';
+
+  @override
+  String get tutFsConfirmBody => 'ಮಾರಾಟ ಪೂರ್ಣಗೊಳಿಸಲು ಈ ಬಟನ್ ಒತ್ತಿರಿ.';
+
+  @override
+  String get tutApFabTitle => 'ಸಾಮಾನು ಸೇರಿಸಿ';
+
+  @override
+  String get tutApFabBody =>
+      'ನಿಮ್ಮ ಮೊದಲ ಸಾಮಾನನ್ನು ಅಂಗಡಿಗೆ ಸೇರಿಸಲು + ಬಟನ್ ಒತ್ತಿರಿ.';
+
+  @override
+  String get tutApSearchTitle => 'ಕ್ಯಾಟಲಾಗ್‌ನಲ್ಲಿ ಹುಡುಕಿ';
+
+  @override
+  String get tutApSearchBody =>
+      'ಸಾಮಾನಿನ ಹೆಸರು ಟೈಪ್ ಮಾಡಿ ಪಟ್ಟಿಯಿಂದ ಆರಿಸಿ — ಹೆಸರು, ಫೋಟೋ, ವಿವರ ತಾವಾಗಿ ತುಂಬುತ್ತವೆ.';
+
+  @override
+  String get tutApPriceTitle => 'ನಿಮ್ಮ ಮಾರಾಟ ಬೆಲೆ';
+
+  @override
+  String get tutApPriceBody => 'ನೀವು ಮಾರುವ ಬೆಲೆ ಬರೆಯಿರಿ.';
+
+  @override
+  String get tutApStockTitle => 'ಎಷ್ಟು ಇವೆ?';
+
+  @override
+  String get tutApStockBody => 'ಈಗ ಶೆಲ್ಫ್‌ನಲ್ಲಿ ಎಷ್ಟಿವೆ ಎಂದು ಬರೆಯಿರಿ.';
+
+  @override
+  String get tutApSaveTitle => 'ಸೇವ್ ಮಾಡಿ';
+
+  @override
+  String get tutApSaveBody => 'ಸೇವ್ ಒತ್ತಿರಿ — ಸಾಮಾನು ಮಾರಾಟಕ್ಕೆ ಸಿದ್ಧ.';
+
+  @override
+  String get learnTitle => 'ಕಲಿಯಿರಿ';
+
+  @override
+  String get learnSubtitle =>
+      'ಆ್ಯಪ್ ತೋರಿಸುವ ಸಣ್ಣ ಮಾರ್ಗದರ್ಶಿಗಳು. ಯಾವಾಗ ಬೇಕಾದರೂ ಮತ್ತೆ ನೋಡಿ.';
+
+  @override
+  String get learnReplayWelcome => 'ಆ್ಯಪ್ ಪ್ರವಾಸ';
+
+  @override
+  String get learnFlowAddProduct => 'ಸಾಮಾನು ಸೇರಿಸುವುದು ಹೇಗೆ';
+
+  @override
+  String get learnFlowFirstSale => 'ಬಿಲ್ ಮಾಡುವುದು ಹೇಗೆ';
+
+  @override
+  String get learnReplay => 'ತೋರಿಸು';
+
+  @override
+  String get learnShowTips => 'ಸಲಹೆ ತೋರಿಸಿ';
+
+  @override
+  String get learnShowTipsDesc => 'ಮೊದಲ ಬಾರಿ ತೆರೆಯುವ ಪರದೆಗಳಲ್ಲಿ ಸಹಾಯ ಸಲಹೆಗಳು';
+
+  @override
   String get procExchangeInstead =>
       'ವಿನಿಮಯ (ಗ್ರಾಹಕರು ಬೇರೆ ವಸ್ತು ತೆಗೆದುಕೊಳ್ಳುತ್ತಾರೆ)';
 

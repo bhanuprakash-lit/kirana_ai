@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/api_client.dart';
+import '../../../core/tutorial/tutorial_keys.dart';
 import '../../../core/theme/brand_theme.dart';
 import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -252,22 +253,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ref.read(dashboardTabProvider.notifier).switchTab(i),
         destinations: [
           NavigationDestination(
+            key: TutorialKeys.navHome,
             icon: const Icon(Icons.home_outlined),
             selectedIcon: const Icon(Icons.home_rounded),
             label: l10n.dashNavHome,
           ),
           NavigationDestination(
+            key: TutorialKeys.navKhata,
             icon: const Icon(Icons.menu_book_outlined),
             selectedIcon: const Icon(Icons.menu_book_rounded),
             label: l10n.dashNavKhata,
           ),
           NavigationDestination(
+            key: TutorialKeys.navBilling,
             icon: const Icon(Icons.storefront_outlined),
             selectedIcon: const Icon(Icons.storefront_rounded),
             label: l10n.dashNavBilling,
           ),
           if (showVision)
             NavigationDestination(
+              key: TutorialKeys.navVision,
               icon: const Icon(Icons.center_focus_weak_outlined),
               selectedIcon: const Icon(Icons.center_focus_strong_rounded),
               label: l10n.visionNavLabel,

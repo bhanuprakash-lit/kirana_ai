@@ -313,6 +313,11 @@ class ProfileScreen extends ConsumerWidget {
                     onTap: () => context.push('/profile/subscription'),
                   ),
                   _CompactRow(
+                    icon: Icons.school_rounded,
+                    label: l10n.learnTitle,
+                    onTap: () => context.push('/profile/learn'),
+                  ),
+                  _CompactRow(
                     icon: Icons.help_outline_rounded,
                     label: l10n.profHelpSupport,
                     onTap: () => context.push('/profile/support'),

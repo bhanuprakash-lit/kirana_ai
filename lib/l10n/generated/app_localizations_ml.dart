@@ -3097,6 +3097,179 @@ class AppLocalizationsMl extends AppLocalizations {
   String get rackNoneForProduct => 'ഇതുവരെ ഒരു റാക്കിലും വച്ചിട്ടില്ല.';
 
   @override
+  String get tutNext => 'അടുത്തത്';
+
+  @override
+  String get tutDone => 'മനസ്സിലായി';
+
+  @override
+  String get tutSkip => 'ഒഴിവാക്കുക';
+
+  @override
+  String get tutTapHere => 'തുടരാൻ തിളങ്ങുന്ന ബട്ടൺ ടാപ്പ് ചെയ്യുക';
+
+  @override
+  String get tutDismiss => 'മറയ്ക്കുക';
+
+  @override
+  String get tutChecklistTitle => 'തുടങ്ങാം';
+
+  @override
+  String tutChecklistSubtitle(int done, int total) {
+    return '$totalൽ $done കഴിഞ്ഞു — ഏതെങ്കിലും ഘട്ടം ടാപ്പ് ചെയ്യുക';
+  }
+
+  @override
+  String get tutStepAddProduct => 'നിങ്ങളുടെ ആദ്യ സാധനം ചേർക്കുക';
+
+  @override
+  String get tutStepFirstSale => 'നിങ്ങളുടെ ആദ്യ ബിൽ ഉണ്ടാക്കുക';
+
+  @override
+  String get tutStepUdhaar => 'ഒരു കടം എഴുതുക';
+
+  @override
+  String get tutStepReport => 'ഇന്നത്തെ കച്ചവടം കാണുക';
+
+  @override
+  String get tutStepLanguage => 'നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get tutWelcomeHomeTitle => 'ഹോം';
+
+  @override
+  String get tutWelcomeHomeBody =>
+      'നിങ്ങളുടെ ദിവസം ഒറ്റനോട്ടത്തിൽ — വിൽപ്പന, ലാഭം, അറിയിപ്പുകൾ ഇവിടെ.';
+
+  @override
+  String get tutWelcomeKhataTitle => 'കണക്ക്';
+
+  @override
+  String get tutWelcomeKhataBody =>
+      'നിങ്ങളുടെ കടം പുസ്തകം. എല്ലാ കടവും വസൂലും ഒരിടത്ത്.';
+
+  @override
+  String get tutWelcomeBillingTitle => 'ബില്ലിംഗ് & സ്റ്റോക്ക്';
+
+  @override
+  String get tutWelcomeBillingBody =>
+      'ബിൽ ഉണ്ടാക്കുന്നതും സാധനങ്ങൾ നോക്കുന്നതും ഇവിടെ.';
+
+  @override
+  String get tutWelcomeVisionTitle => 'വിഷൻ AI';
+
+  @override
+  String get tutWelcomeVisionBody =>
+      'ക്യാമറ കൊണ്ട് സ്റ്റോക്ക് എണ്ണുക — ഷെൽഫ് സ്കാൻ ചെയ്യുക.';
+
+  @override
+  String get tutWelcomeChecklistTitle => 'ഇവിടെ തുടങ്ങുക';
+
+  @override
+  String get tutWelcomeChecklistBody =>
+      'കട ഒരുക്കാൻ അഞ്ച് ചെറിയ ഘട്ടങ്ങൾ. ഏതെങ്കിലും ടാപ്പ് ചെയ്യൂ, ഒരുമിച്ച് ചെയ്യാം.';
+
+  @override
+  String get tutReportTitle => 'ഇന്നത്തെ കച്ചവടം';
+
+  @override
+  String get tutReportBody =>
+      'ഇന്ന് എന്ത് വിറ്റു, എത്ര കിട്ടി എന്ന് ഈ കാർഡ് കാണിക്കുന്നു. എല്ലാ വൈകുന്നേരവും നോക്കുക.';
+
+  @override
+  String get tutFsSearchTitle => 'സാധനം കണ്ടെത്തുക';
+
+  @override
+  String get tutFsSearchBody =>
+      'ഇവിടെ സാധനത്തിന്റെ പേര് ടൈപ്പ് ചെയ്ത്, ബില്ലിൽ ചേർക്കാൻ അതിൽ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutFsCustomerTitle => 'ഉപഭോക്താവിനെ ചേർക്കുക';
+
+  @override
+  String get tutFsCustomerBody =>
+      'വാങ്ങുന്ന ആളെ തിരഞ്ഞെടുക്കാൻ ഇവിടെ ടാപ്പ് ചെയ്യുക — അല്ലെങ്കിൽ പേരും ഫോണും കൊണ്ട് പുതിയ ആളെ ചേർക്കുക.';
+
+  @override
+  String get tutFsChargeTitle => 'പണം വാങ്ങുക';
+
+  @override
+  String get tutFsChargeBody =>
+      'ബിൽ തയ്യാർ. പണമടയ്ക്കൽ രീതി തിരഞ്ഞെടുത്ത് ബിൽ തീർക്കാൻ ഇവിടെ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutFsPaymentTitle => 'എങ്ങനെ പണം തരുന്നു?';
+
+  @override
+  String get tutFsPaymentBody =>
+      'ഇപ്പോൾ പണം — അല്ലെങ്കിൽ പിന്നീട് വസൂലാക്കാൻ കടം. കടം നേരെ നിങ്ങളുടെ കണക്കിലേക്ക് പോകുന്നു.';
+
+  @override
+  String get tutFsConfirmTitle => 'ബിൽ തീർക്കുക';
+
+  @override
+  String get tutFsConfirmBody =>
+      'വിൽപ്പന പൂർത്തിയാക്കാൻ ഈ ബട്ടൺ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutApFabTitle => 'സാധനം ചേർക്കുക';
+
+  @override
+  String get tutApFabBody =>
+      'നിങ്ങളുടെ ആദ്യ സാധനം കടയിൽ ചേർക്കാൻ + ബട്ടൺ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutApSearchTitle => 'കാറ്റലോഗിൽ തിരയുക';
+
+  @override
+  String get tutApSearchBody =>
+      'സാധനത്തിന്റെ പേര് ടൈപ്പ് ചെയ്ത് പട്ടികയിൽ നിന്ന് തിരഞ്ഞെടുക്കുക — പേരും ഫോട്ടോയും വിവരങ്ങളും തനിയെ നിറയും.';
+
+  @override
+  String get tutApPriceTitle => 'നിങ്ങളുടെ വിൽപ്പന വില';
+
+  @override
+  String get tutApPriceBody => 'നിങ്ങൾ വിൽക്കുന്ന വില എഴുതുക.';
+
+  @override
+  String get tutApStockTitle => 'എത്ര എണ്ണം ഉണ്ട്?';
+
+  @override
+  String get tutApStockBody => 'ഇപ്പോൾ ഷെൽഫിൽ എത്രയുണ്ടെന്ന് എഴുതുക.';
+
+  @override
+  String get tutApSaveTitle => 'സേവ് ചെയ്യുക';
+
+  @override
+  String get tutApSaveBody => 'സേവ് ടാപ്പ് ചെയ്യുക — സാധനം വിൽക്കാൻ തയ്യാർ.';
+
+  @override
+  String get learnTitle => 'പഠിക്കുക';
+
+  @override
+  String get learnSubtitle =>
+      'ആപ്പ് കാണിച്ചുതരുന്ന ചെറിയ ഗൈഡുകൾ. എപ്പോൾ വേണമെങ്കിലും വീണ്ടും കാണുക.';
+
+  @override
+  String get learnReplayWelcome => 'ആപ്പ് പര്യടനം';
+
+  @override
+  String get learnFlowAddProduct => 'സാധനം ചേർക്കുന്നത് എങ്ങനെ';
+
+  @override
+  String get learnFlowFirstSale => 'ബിൽ ഉണ്ടാക്കുന്നത് എങ്ങനെ';
+
+  @override
+  String get learnReplay => 'കാണിക്കൂ';
+
+  @override
+  String get learnShowTips => 'നുറുങ്ങുകൾ കാണിക്കുക';
+
+  @override
+  String get learnShowTipsDesc =>
+      'ആദ്യമായി തുറക്കുന്ന സ്ക്രീനുകളിൽ സഹായ നുറുങ്ങുകൾ';
+
+  @override
   String get procExchangeInstead =>
       'എക്സ്ചേഞ്ച് (ഉപഭോക്താവ് മറ്റൊരു സാധനം എടുക്കുന്നു)';
 

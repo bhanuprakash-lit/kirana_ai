@@ -24,7 +24,11 @@ import '../../../stores/views/store_switcher_sheet.dart';
 import '../../models/overview_models.dart';
 import '../../providers/kpi_provider.dart';
 import '../../providers/overview_provider.dart';
+import '../../../../core/tutorial/tutorial_controller.dart';
+import '../../../../core/tutorial/tutorial_keys.dart';
+import '../../../../core/tutorial/tutorial_overlay.dart';
 import '../dashboard_screen.dart';
+import '../widgets/getting_started_card.dart';
 import '../widgets/forecast_strip.dart';
 
 class OverviewTab extends ConsumerStatefulWidget {
@@ -83,10 +87,65 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
     return '${months[now.month - 1]} ${now.day}, ${now.year}';
   }
 
+  /// First-launch welcome tour: one line per bottom-nav tab, ending on the
+  /// getting-started card. Fires once (persisted), always skippable.
+  void _maybeWelcome() {
+    if (!mounted) return;
+    final c = ref.read(tutorialProvider.notifier);
+    if (!c.shouldShow(Tut.welcome)) return;
+    final l10n = AppLocalizations.of(context);
+    showTutorialSegment(
+      context,
+      ref,
+      id: Tut.welcome,
+      steps: [
+        TutStep(
+          targetKey: TutorialKeys.navHome,
+          title: l10n.tutWelcomeHomeTitle,
+          body: l10n.tutWelcomeHomeBody,
+          align: ContentAlign.top,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.navKhata,
+          title: l10n.tutWelcomeKhataTitle,
+          body: l10n.tutWelcomeKhataBody,
+          align: ContentAlign.top,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.navBilling,
+          title: l10n.tutWelcomeBillingTitle,
+          body: l10n.tutWelcomeBillingBody,
+          align: ContentAlign.top,
+        ),
+        // Dropped automatically when the Vision tab is vertical-gated off.
+        TutStep(
+          targetKey: TutorialKeys.navVision,
+          title: l10n.tutWelcomeVisionTitle,
+          body: l10n.tutWelcomeVisionBody,
+          align: ContentAlign.top,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.homeChecklist,
+          title: l10n.tutWelcomeChecklistTitle,
+          body: l10n.tutWelcomeChecklistBody,
+        ),
+      ],
+      nextLabel: l10n.tutNext,
+      doneLabel: l10n.tutDone,
+      skipLabel: l10n.tutSkip,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncData = ref.watch(overviewProvider);
     final l10n = AppLocalizations.of(context);
+    // Rebuild when tutorial state loads so the welcome tour can fire; small
+    // delay lets the checklist card and nav bar lay out before spotlighting.
+    ref.watch(tutorialProvider.select((s) => s.loaded));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 400), _maybeWelcome);
+    });
 
     return Scaffold(
       backgroundColor: BrandColors.background,
@@ -137,12 +196,16 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                   ),
                   data: (data) => SliverList(
                     delegate: SliverChildListDelegate([
+                      const GettingStartedCard(),
                       _MorningBriefingRibbon(reco: data.recommendations),
                       ForecastStrip(storeId: data.store.storeId),
                       const _ProAlertsStrip(),
                       _IntelligenceStrip(reco: data.recommendations),
                       const SizedBox(height: 24),
-                      _TodaySalesCard(sales: data.dailySales),
+                      KeyedSubtree(
+                        key: TutorialKeys.homeTodaySales,
+                        child: _TodaySalesCard(sales: data.dailySales),
+                      ),
                       const SizedBox(height: 16),
                       const _KpiSummaryRow(),
                       // const _VerticalKpiSection(),
@@ -171,6 +234,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                     ),
                     data: (data) => SliverList(
                       delegate: SliverChildListDelegate([
+                        const GettingStartedCard(),
                         _MorningBriefingRibbon(reco: data.recommendations),
                         ForecastStrip(storeId: data.store.storeId),
                         const _ProAlertsStrip(),
