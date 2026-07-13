@@ -240,7 +240,12 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                         const _ProAlertsStrip(),
                         _IntelligenceStrip(reco: data.recommendations),
                         const SizedBox(height: 24),
-                        _TodaySalesCard(sales: data.dailySales),
+                        // Same anchor as the iOS branch — only one platform
+                        // list builds, so the GlobalKey is never duplicated.
+                        KeyedSubtree(
+                          key: TutorialKeys.homeTodaySales,
+                          child: _TodaySalesCard(sales: data.dailySales),
+                        ),
                         const SizedBox(height: 16),
                         const _KpiSummaryRow(),
                         // const _VerticalKpiSection(),
