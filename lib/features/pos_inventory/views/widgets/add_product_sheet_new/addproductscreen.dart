@@ -437,6 +437,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         context,
         ref,
         id: Tut.apSearch,
+        flow: Tut.flowAddProduct,
         steps: [
           TutStep(
             targetKey: TutorialKeys.invCatalogSearch,
@@ -454,6 +455,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         context,
         ref,
         id: Tut.apForm,
+        flow: Tut.flowAddProduct,
         steps: [
           TutStep(
             targetKey: TutorialKeys.invPrice,

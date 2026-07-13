@@ -52,13 +52,26 @@ void showTutorialSegment(
   WidgetRef ref, {
   required String id,
   required List<TutStep> steps,
+  String? flow,
   String? nextLabel,
   String? doneLabel,
   String? skipLabel,
   String? tapHint,
   VoidCallback? onFinish,
-}) {
+}) async {
   final controller = ref.read(tutorialProvider.notifier);
+
+  // A previous step's overlay may still be playing its closing animation —
+  // exactly what happens when tapping a highlighted button opens the next
+  // sheet. QUEUE behind it instead of giving up (the caller's trigger is a
+  // one-shot and won't retry), then re-check every gate: the wait may have
+  // outlived the segment's validity (seen, flow ended, screen covered).
+  for (var i = 0; i < 40 && ref.read(tutorialProvider).overlayActive; i++) {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+  }
+  if (ref.read(tutorialProvider).overlayActive) return; // stuck — give up
+  if (!controller.shouldShow(id, flow: flow)) return;
+  if (!context.mounted) return;
   if (!steps.any((s) => s.targetKey.currentContext != null)) return;
   // Never spotlight a screen that's buried under a sheet/dialog: the anchors
   // are mounted but invisible, so the tour would point at widgets the owner

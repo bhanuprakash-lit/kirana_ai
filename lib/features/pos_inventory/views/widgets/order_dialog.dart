@@ -646,6 +646,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           context,
           ref,
           id: Tut.fsPayment,
+          flow: Tut.flowFirstSale,
           steps: [
             TutStep(
               targetKey: TutorialKeys.payMethods,

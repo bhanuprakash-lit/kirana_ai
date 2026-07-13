@@ -91,6 +91,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
       context,
       ref,
       id: Tut.apFab,
+      flow: Tut.flowAddProduct,
       steps: [
         TutStep(
           targetKey: TutorialKeys.invAddFab,

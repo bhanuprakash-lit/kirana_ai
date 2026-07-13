@@ -49,9 +49,10 @@ void main() {
       c.startFlow(Tut.flowFirstSale);
       expect(c.shouldShow(Tut.fsSearch, flow: Tut.flowFirstSale), isTrue);
 
-      // Only one overlay at a time.
+      // An active overlay does NOT gate shouldShow — segments queue behind
+      // it in the overlay layer instead of dying (sheet-race fix).
       c.setOverlayActive(true);
-      expect(c.shouldShow(Tut.fsSearch, flow: Tut.flowFirstSale), isFalse);
+      expect(c.shouldShow(Tut.fsSearch, flow: Tut.flowFirstSale), isTrue);
       c.setOverlayActive(false);
 
       // Master switch wins over everything.

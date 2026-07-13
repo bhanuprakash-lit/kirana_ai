@@ -1017,6 +1017,7 @@ class _PosTabState extends ConsumerState<PosTab> {
         context,
         ref,
         id: Tut.fsSearch,
+        flow: Tut.flowFirstSale,
         steps: [
           TutStep(
             targetKey: TutorialKeys.posSearch,
@@ -1034,6 +1035,7 @@ class _PosTabState extends ConsumerState<PosTab> {
         context,
         ref,
         id: Tut.fsCustomer,
+        flow: Tut.flowFirstSale,
         steps: [
           TutStep(
             targetKey: TutorialKeys.posCustomer,
@@ -1053,6 +1055,7 @@ class _PosTabState extends ConsumerState<PosTab> {
         context,
         ref,
         id: Tut.fsCharge,
+        flow: Tut.flowFirstSale,
         steps: [
           TutStep(
             targetKey: TutorialKeys.posOrder,

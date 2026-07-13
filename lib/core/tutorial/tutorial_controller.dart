@@ -127,11 +127,18 @@ class TutorialController extends Notifier<TutorialState> {
 
   // ── Segment gating ─────────────────────────────────────────────────────────
 
-  /// May segment [id] fire now? [flow] non-null means the segment belongs to a
+  /// May segment [id] fire? [flow] non-null means the segment belongs to a
   /// guided flow and only fires while that flow is running.
+  ///
+  /// Deliberately does NOT consider [TutorialState.overlayActive]: a segment
+  /// requested while the previous spotlight is still playing its closing
+  /// animation must QUEUE, not die — the overlay layer waits for clearance
+  /// and re-checks this gate right before showing. (This was the "nothing
+  /// happens until I reopen the sheet" bug: the sheet's one-shot trigger ran
+  /// while the tapped step's overlay was dismissing and gave up forever.)
   bool shouldShow(String id, {String? flow}) {
     final s = state;
-    if (!s.loaded || !s.enabled || s.overlayActive) return false;
+    if (!s.loaded || !s.enabled) return false;
     if (s.seen.contains(id)) return false;
     if (flow != null && s.activeFlow != flow) return false;
     return true;
