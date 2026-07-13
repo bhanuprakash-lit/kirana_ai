@@ -60,6 +60,10 @@ void showTutorialSegment(
 }) {
   final controller = ref.read(tutorialProvider.notifier);
   if (!steps.any((s) => s.targetKey.currentContext != null)) return;
+  // Never spotlight a screen that's buried under a sheet/dialog: the anchors
+  // are mounted but invisible, so the tour would point at widgets the owner
+  // can't see (e.g. the charge button behind the add-customer sheet).
+  if (!(ModalRoute.of(context)?.isCurrent ?? true)) return;
 
   controller.setOverlayActive(true);
   _skipLabel = skipLabel ?? 'Skip';
@@ -155,7 +159,12 @@ void showTutorialSegment(
       // the anchor's FINAL position, not where it was mid-animation.
       await waitForStablePosition(step.targetKey);
     }
-    if (!context.mounted) {
+    // The waits above can outlive the screen: the owner may have acted faster
+    // than the tour (placed the order → sheet popped) or something modal may
+    // have opened on top. Retry on the next natural trigger instead.
+    if (!context.mounted ||
+        step.targetKey.currentContext == null ||
+        !(ModalRoute.of(context)?.isCurrent ?? true)) {
       abort();
       return;
     }
@@ -191,7 +200,16 @@ void showTutorialSegment(
         });
       },
       onSkip: () {
-        done(skipped: true);
+        // The package also fires onSkip INTERNALLY when the spotlighted
+        // anchor unmounts mid-step (screen popped under the overlay). That's
+        // not the owner saying "leave me alone" — abort without marking seen
+        // so the segment retries on the next visit; only a real Skip tap
+        // (anchor still alive) silences the flow.
+        if (step.targetKey.currentContext == null) {
+          abort();
+        } else {
+          done(skipped: true);
+        }
         return true;
       },
     );

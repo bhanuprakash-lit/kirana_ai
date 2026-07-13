@@ -637,7 +637,10 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
       if (!mounted) return;
       final c = ref.read(tutorialProvider.notifier);
       if (!c.shouldShow(Tut.fsPayment, flow: Tut.flowFirstSale)) return;
-      Future.delayed(const Duration(milliseconds: 350), () {
+      // Short delay only — the overlay itself waits for the sheet's entrance
+      // animation to settle, and firing early beats a fast tap on the real
+      // confirm button (which would pop the sheet under the tour).
+      Future.delayed(const Duration(milliseconds: 120), () {
         if (!mounted) return;
         showTutorialSegment(
           context,
