@@ -86,6 +86,33 @@ void showTutorialSegment(
     controller.setOverlayActive(false);
   }
 
+  // The coach mark measures the target ONCE when it opens — if the anchor is
+  // still moving (a FAB scaling in, a tab page settling, a scroll easing) the
+  // spotlight lands where the widget *was*, off-target or even off-screen.
+  // So: sample the anchor's global position until it holds still for a few
+  // consecutive frames (or give up after ~2s and show anyway).
+  Future<void> waitForStablePosition(GlobalKey key) async {
+    Offset? last;
+    var stableRuns = 0;
+    for (var i = 0; i < 40; i++) {
+      final box = key.currentContext?.findRenderObject() as RenderBox?;
+      if (box == null || !box.attached || !box.hasSize) {
+        stableRuns = 0;
+        last = null;
+      } else {
+        final pos = box.localToGlobal(Offset.zero);
+        if (last != null && (pos - last).distance < 0.5) {
+          stableRuns++;
+          if (stableRuns >= 3) return;
+        } else {
+          stableRuns = 0;
+        }
+        last = pos;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+  }
+
   var index = 0;
 
   Future<void> showNext() async {
@@ -117,8 +144,9 @@ void showTutorialSegment(
       } catch (_) {
         // Not inside a scrollable / viewport quirk — spotlight where it is.
       }
-      // Let the scroll settle so the focus ring lands on the final position.
-      await Future<void>.delayed(const Duration(milliseconds: 80));
+      // Let the scroll/entrance animations settle so the focus ring lands on
+      // the anchor's FINAL position, not where it was mid-animation.
+      await waitForStablePosition(step.targetKey);
     }
     if (!context.mounted) {
       abort();
