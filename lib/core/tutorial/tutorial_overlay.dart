@@ -65,16 +65,23 @@ void showTutorialSegment(
   _skipLabel = skipLabel ?? 'Skip';
   var finished = false;
 
+  // tutorial_coach_mark can invoke onSkip DURING ITS OWN BUILD: when a
+  // spotlighted anchor unmounts mid-tour (the tapped action replaced the
+  // screen), _buildContents calls skip() synchronously. Provider writes are
+  // illegal in the build phase, so all controller mutations here are deferred
+  // by a microtask; `finished` still flips synchronously to stay re-entrant.
   void done({required bool skipped}) {
     if (finished) return;
     finished = true;
-    controller.setOverlayActive(false);
-    if (skipped) {
-      controller.skipFlow(id);
-    } else {
-      controller.markSeen(id);
-      onFinish?.call();
-    }
+    Future.microtask(() {
+      controller.setOverlayActive(false);
+      if (skipped) {
+        controller.skipFlow(id);
+      } else {
+        controller.markSeen(id);
+        onFinish?.call();
+      }
+    });
   }
 
   // The screen may be disposed mid-tour (owner navigated away via a tapped
@@ -83,7 +90,7 @@ void showTutorialSegment(
   void abort() {
     if (finished) return;
     finished = true;
-    controller.setOverlayActive(false);
+    Future.microtask(() => controller.setOverlayActive(false));
   }
 
   // The coach mark measures the target ONCE when it opens — if the anchor is
@@ -176,8 +183,12 @@ void showTutorialSegment(
         }
       },
       onFinish: () {
-        index++;
-        showNext();
+        // Same build-phase hazard as onSkip: defer before touching providers
+        // or inserting the next step's overlay.
+        Future.microtask(() {
+          index++;
+          showNext();
+        });
       },
       onSkip: () {
         done(skipped: true);
