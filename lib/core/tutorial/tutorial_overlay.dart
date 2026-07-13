@@ -42,6 +42,11 @@ class TutStep {
 /// nothing is mounted the segment doesn't fire (and stays un-seen, so it can
 /// retry on a later visit). Marks the segment seen on finish; Skip abandons
 /// the whole guided flow — "leave me alone" must mean it.
+///
+/// Steps run ONE AT A TIME, each preceded by [Scrollable.ensureVisible] on its
+/// anchor: the dim overlay blocks scrolling, so a target below the fold (the
+/// Save button at the end of a long form, a card further down the Home feed)
+/// would otherwise be spotlit off-screen with no way to reach it.
 void showTutorialSegment(
   BuildContext context,
   WidgetRef ref, {
@@ -54,13 +59,10 @@ void showTutorialSegment(
   VoidCallback? onFinish,
 }) {
   final controller = ref.read(tutorialProvider.notifier);
-  final mounted = [
-    for (final s in steps)
-      if (s.targetKey.currentContext != null) s,
-  ];
-  if (mounted.isEmpty) return;
+  if (!steps.any((s) => s.targetKey.currentContext != null)) return;
 
   controller.setOverlayActive(true);
+  _skipLabel = skipLabel ?? 'Skip';
   var finished = false;
 
   void done({required bool skipped}) {
@@ -75,42 +77,93 @@ void showTutorialSegment(
     }
   }
 
-  late final TutorialCoachMark mark;
-  mark = TutorialCoachMark(
-    targets: [
-      for (var i = 0; i < mounted.length; i++)
+  // The screen may be disposed mid-tour (owner navigated away via a tapped
+  // action, back button, deep link…). Stop without marking seen, so the
+  // segment can fire again on the next visit.
+  void abort() {
+    if (finished) return;
+    finished = true;
+    controller.setOverlayActive(false);
+  }
+
+  var index = 0;
+
+  Future<void> showNext() async {
+    // Skip anchors that aren't on this screen (vertical-gated tabs etc.).
+    while (index < steps.length &&
+        steps[index].targetKey.currentContext == null) {
+      index++;
+    }
+    if (index >= steps.length) {
+      done(skipped: false);
+      return;
+    }
+    final step = steps[index];
+    // No later mounted anchor ⇒ this is the closing step ("Got it").
+    final isLast = !steps
+        .skip(index + 1)
+        .any((s) => s.targetKey.currentContext != null);
+
+    // Bring the anchor into view before spotlighting it.
+    final targetCtx = step.targetKey.currentContext;
+    if (targetCtx != null) {
+      try {
+        await Scrollable.ensureVisible(
+          targetCtx,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+        );
+      } catch (_) {
+        // Not inside a scrollable / viewport quirk — spotlight where it is.
+      }
+      // Let the scroll settle so the focus ring lands on the final position.
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+    }
+    if (!context.mounted) {
+      abort();
+      return;
+    }
+
+    late final TutorialCoachMark mark;
+    mark = TutorialCoachMark(
+      targets: [
         _target(
-          mounted[i],
-          isLast: i == mounted.length - 1,
+          step,
+          isLast: isLast,
           nextLabel: nextLabel ?? 'Next',
           doneLabel: doneLabel ?? 'OK',
           tapHint: tapHint,
         ),
-    ],
-    colorShadow: Colors.black,
-    opacityShadow: 0.75,
-    paddingFocus: 6,
-    hideSkip: true, // we render our own skip inside the content card
-    onClickTarget: (t) {
-      final step = mounted.firstWhere((s) => s.targetKey == t.keyTarget);
-      if (step.tapTarget) {
-        // Advancing past the last target finishes the mark; run the real
-        // action after the overlay is gone so sheets/dialogs open cleanly.
-        Future.microtask(() => step.onTapTarget?.call());
-      }
-    },
-    onFinish: () => done(skipped: false),
-    onSkip: () {
-      done(skipped: true);
-      return true;
-    },
-  );
-  mark.show(context: context, rootOverlay: true);
+      ],
+      colorShadow: Colors.black,
+      opacityShadow: 0.75,
+      paddingFocus: 6,
+      hideSkip: true, // we render our own skip inside the content card
+      onClickTarget: (_) {
+        if (step.tapTarget) {
+          // Advancing finishes this mark; run the real action after the
+          // overlay is gone so sheets/dialogs open cleanly.
+          Future.microtask(() => step.onTapTarget?.call());
+        }
+      },
+      onFinish: () {
+        index++;
+        showNext();
+      },
+      onSkip: () {
+        done(skipped: true);
+        return true;
+      },
+    );
+    mark.show(context: context, rootOverlay: true);
 
-  // Expose skip to the content cards.
-  _activeSkip = () => mark.skip();
-  _activeNext = () => mark.next();
-  _skipLabel = skipLabel ?? 'Skip';
+    // Expose skip/next to the content card of the current step.
+    _activeSkip = () => mark.skip();
+    _activeNext = () => mark.next();
+  }
+
+  showNext();
 }
 
 // The content builders need to drive the coach mark; tutorial_coach_mark's
