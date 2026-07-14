@@ -1,361 +1,205 @@
-# Kirana AI — How the App Works
+# Kirana AI — Feature Overview
 
-This document explains every feature in the app from a user's point of view: where to go, what to tap, and what happens as a result.
+A quick tour of everything the app does, from a user's point of view. This is
+the short overview — for step-by-step instructions see the full
+**[User Manual](USER_MANUAL.md)**, and for the camera stock-counting features
+see the **[Vision AI User Guide](VISION_AI_USER_GUIDE.md)**.
+
+**Last updated:** July 2026 · Covers multi-vertical stores, product variants,
+GST billing, the Vision AI tab, and all operations/marketing modules.
+
+---
+
+## One app, many kinds of shop (Verticals)
+
+Kirana AI is no longer grocery-only. At signup you pick your **store type**, and
+the app adapts to it. Each type maps to one of **seven behaviour profiles**:
+
+| Store types | Vertical | What turns on |
+| --- | --- | --- |
+| Kirana, Supermarket, Provision, Fruits & Veg, Pharmacy, Bakery | **Grocery** | Expiry dates, loose/by-weight selling, kg/g/L units, the Vision camera tab |
+| Clothing, Boutique, Mono-brand | **Apparel** | Size/colour variants, GST |
+| Footwear | **Footwear** | Size variants (pairs), GST |
+| Mobile & Electronics | **Electronics** | Model/storage variants, serial/IMEI + warranty, GST |
+| Optical | **Optical** | Variants, warranty, appointments, prescriptions |
+| Salon, Parlour, Fitness | **Services** | Appointments, memberships, services catalogue |
+| Fancy & Gift, Stationery & Books | **General** | Simple piece-based selling |
+
+The practical effect: **rows, tabs and fields that don't apply to your shop are
+hidden**, so every owner sees a version of the app tuned to their business. You
+can change your store type later in Profile → Store Settings.
 
 ---
 
 ## Getting Started
 
-### First Launch — Onboarding
-When you open the app for the first time, it takes you through a setup flow to create your store profile.
+**Onboarding** creates your store profile: verify your phone with an OTP (or
+sign in with username/password), enter your store name, email, **store type**
+(sets your vertical), location, and estimated daily customers, then accept the
+terms. New accounts pick a **free trial plan** (Basic or Pro), which the team
+approves — usually within a few hours.
 
-- Enter your **phone number** to receive an OTP, or use **email and password** to sign in.
-- Fill in your **store name**, **location**, **business category**, and estimated daily footfall.
-- Once complete, your account is created and you land on the Home Dashboard.
-
-On every subsequent launch, the app checks your login status and takes you straight to the dashboard — no re-login needed unless you sign out.
-
----
-
-## Home Dashboard
-
-The first screen you see after logging in. It is split into three tabs at the bottom: **Overview**, **POS**, and **Finance**.
+On later launches the app checks your login and goes straight to the dashboard.
 
 ---
 
-### Overview Tab
+## The Home Dashboard
 
-This is your daily business snapshot.
+The bottom tabs depend on your shop type:
 
-**What you see:**
-- A greeting with your name and today's date.
-- **Today's Sales card** — total revenue billed today, number of orders, and average order value.
-- **AI Intelligence cards** — four automatically updated cards that highlight what needs your attention:
-  - **Fast Moving** — products selling fastest right now. Useful to make sure you have enough stock.
-  - **Stockout Risk** — items the AI predicts will run out in the next 3–7 days based on your sales velocity.
-  - **Reorder Required** — items already below your minimum stock threshold.
-  - **High Profit** — products with the best margins, so you know what to push.
-- **Pro Alerts strip** *(Pro plan only)* — a horizontal row of coloured chips at the top for things needing immediate action: overdue udhaar, low stock, expiring items, or subscription issues. Tap any chip to jump directly to the relevant screen.
+| Tab | Purpose | Who sees it |
+| --- | --- | --- |
+| **Home** | Daily overview, AI insights, today's sales | Everyone |
+| **Khata** | Customer credit (udhaar) & supplier credit | Everyone |
+| **Billing** | POS / Inventory / Procurement | Everyone |
+| **Vision** | Camera stock counting | Grocery shops on Pro |
 
-**What you can do:**
-- Tap any intelligence card to open a full ranked list with details for that category.
-- Tap the **bell icon** (top right) to see all your notifications.
-- Tap the **+ New Sale** floating button to jump straight to billing.
-
----
-
-## POS (Point of Sale)
-
-**Where:** Home → POS tab (second tab at the bottom)
-
-The billing screen. Use this every time a customer buys something.
-
-### Building a Cart
-
-**Search for a product:**
-Type the product name, brand, or barcode number in the search bar at the top. Matching products appear instantly. Tap one to add it to the cart.
-
-**Scan a barcode:**
-Tap the **barcode icon** next to the search bar. The camera opens and scans continuously. Each item scanned is looked up in your inventory and added to the list at the bottom of the scanner sheet. Tap **Add to Cart** when done to move all scanned items to the cart at once.
-
-- If a scanned barcode is not in your inventory, you get two options: **Add as New Product** (opens the product creation form with the barcode pre-filled) or **Link to an Existing Item** (pick any existing product without a barcode to assign this barcode to it).
-
-**Loose / weighed items:**
-For items sold by weight or volume (e.g. dal, oil), tapping them opens a dialog asking for the quantity or weight. Enter the amount and confirm.
-
-**Daily Basket Campaigns:**
-Below the search bar there is a horizontal scroll of AI-suggested campaign cards (e.g. "Morning Essentials", "Weekend Family Basket"). Each card shows the bundle items and a suggested price. Tap **Add to Cart** on a campaign card to add all items in that bundle to your cart in one go.
-
-### Managing the Cart
-
-Once items are in the cart:
-- **Increase/decrease quantity** using the + and − buttons on each row.
-- **Swipe a cart row left** to remove that item.
-- Tap the **Clear** button (top right of the cart section) to empty the entire cart — a confirmation prompt appears so you don't do it by accident.
-
-### Completing a Sale
-
-Tap the **Checkout** button. A dialog appears where you:
-1. **Select a customer** (optional) — search from your saved customers or leave blank for a walk-in.
-2. **Choose payment method** — Cash, UPI, Card, or Credit (for khata/udhaar).
-3. Confirm the total and tap **Place Order**.
-
-The order is saved, stock is deducted automatically, and if you selected Credit the amount is added to that customer's khata balance.
-
-### Today's Orders
-
-Tap the **Today** button (clock icon area) to see a sheet listing every order billed today with their amounts and payment methods.
+### Home (Overview)
+Your daily snapshot: greeting and date, a **Morning Briefing** ribbon for urgent
+items, a **Pro Alerts** strip (overdue udhaar, low stock, expiry), four **AI
+Intelligence cards** (Fast Moving, Stockout Risk, Reorder Required, High
+Profit), a **Today's Sales** card, your subscribed **KPI cards**, and a **Store
+Overview**. Tap the bell for notifications or **+ New Sale** to jump to billing.
 
 ---
 
-## Inventory
+## Billing (Point of Sale)
 
-**Where:** Home → POS tab → **Inventory** sub-tab
+Ring up sales fast:
 
-Manage your product catalogue and stock levels.
-
-**What you see:**
-- All products grouped by category, each showing current stock quantity and unit.
-- Colour indicators: red for out-of-stock, orange for low stock.
-
-**What you can do:**
-- **Search** products by name or category.
-- **Tap a product** to edit its details — name, price, MRP, stock quantity, reorder level, expiry date.
-- **Add a new product** using the + button (top right). Fill in name, category, price, MRP, and optionally scan a barcode. The app tries to fetch product details automatically from the barcode.
-- **Filter** by low-stock or near-expiry to focus on what needs attention.
-
----
-
-## Procurement
-
-**Where:** Home → POS tab → **Procurement** sub-tab
-
-Log goods received from suppliers.
-
-- Create a purchase entry: select the supplier, add products and quantities received, and record the invoice amount.
-- The stock levels in Inventory update automatically when a purchase is confirmed.
-- Pending and completed purchase orders are listed here for reference.
+- **Search** by name/brand/barcode, or **scan barcodes** continuously (unknown
+  barcodes can be added as new or linked to an existing product).
+- **Variants** — for clothing/footwear/electronics/optical, a picker lets you
+  sell the exact size/colour/model, and stock is deducted from that variant.
+- **Loose items** (grocery) prompt for weight/volume.
+- **AI entry** 🔒 — dictate an order by **voice** or photograph a **handwritten
+  list**; the AI builds the cart.
+- **Bundles & Deals** — add whole baskets or AI-suggested campaigns in one tap.
+- **Checkout** — pick a customer, redeem **loyalty points / coupons**, choose
+  who **billed** it (staff), and pay by Cash/UPI/Card/Credit. GST-registered
+  shops get a **tax breakup** on the bill. Stock, khata and loyalty update
+  automatically.
+- **Today's Orders** lists everything billed today; receipts share on WhatsApp.
 
 ---
 
-## Finance
+## Inventory (Stock)
 
-**Where:** Home → Finance tab (third tab at the bottom)
+Manage your catalogue and stock levels: search, category filter, colour-coded
+low/out-of-stock, and tap to edit (price, MRP, stock, expiry, barcode, **GST/HSN
+and variants** where relevant). Add products from a **global catalogue of
+11,000+ items** with barcodes, images and MRP, defining as many **variants** as
+you need. Grocery shops can also **fill inventory by photographing shelves**
+(see Vision, below). Long-press a product to see or set its **rack location**.
 
-Tracks all credit — both what your customers owe you and what you owe your suppliers.
-
-### Udhaar Tab (Customer Credit)
-
-Udhaar means goods given on credit to customers. This tab shows:
-- A summary of **total outstanding amount** across all customers.
-- A list of every customer with an open balance, showing how much they owe and since when.
-- Customers with overdue balances are highlighted.
-
-**What you can do:**
-- Tap a customer row to see their full credit history and individual transactions.
-- Tap the **WhatsApp icon** on any customer to send them a payment reminder message directly.
-- Mark payments as received when a customer pays off their balance.
-
-### Distributor Tab (Supplier Credit)
-
-Shows credit you owe to your distributors and suppliers.
-- Lists each supplier with the total outstanding amount.
-- Tapping a supplier shows the individual purchase orders that make up the balance.
+**Procurement** 🔒 (Pro): manage suppliers and purchase orders, **scan paper
+invoices** for AI extraction, and mark orders Received (adds stock) or Paid.
 
 ---
 
-## Customer Relations
+## Vision AI — count stock with your camera 🔒 Grocery + Pro
 
-**Where:** Profile → Customer Relations
+Grocery-family shops on Pro get a **Vision** tab that uses the phone camera to
+count stock:
 
-A full directory of your store's customers.
+- **Shelf Scan** — photograph shelves morning and evening; the difference is
+  **what sold today**.
+- **Review** — check and correct the app's counts (each correction teaches it).
+- **Live Counter** — an on-device tally that counts items as they cross a line
+  at the counter (works offline).
+- **Camera Stock-In** — photograph shelves to fill or top up inventory
+  automatically (reachable from the Stock tab).
 
-**What you see:**
-- Every customer with their name, phone, and automatically computed segment badge:
-  - **Regular** — ordered 3+ times in the last 30 days
-  - **Bulk** — high total spending, not inactive
-  - **Occasional** — 1+ orders in 90 days but not regular
-  - **Impulse** — active but no clear pattern
-  - **Credit** — has an outstanding udhaar balance
-  - **Inactive** — no orders in over 60 days
-
-**Filtering and search:**
-- Type in the search bar to find customers by name or phone.
-- Tap any segment badge (Regular, Bulk, etc.) at the top to filter the list to just that group.
-
-**Syncing contacts:**
-Tap the **Sync icon** (top right). The app reads your phone contacts and imports names and numbers that aren't already in the system. You can review before saving.
-
-**Adding a customer manually:**
-Tap the **+ button** (bottom right). Fill in name, phone, email (optional), and household size.
-
-**Editing or deleting a customer:**
-Tap any customer in the list to open their detail screen, then use the edit (pencil) or delete (bin) icons in the top bar.
+➡️ Full details in the **[Vision AI User Guide](VISION_AI_USER_GUIDE.md)**.
 
 ---
 
-## Customer Detail
+## Khata (Finance)
 
-**Where:** Profile → Customer Relations → tap any customer
+Track credit both ways:
 
-A complete profile for one customer.
-
-**What you see:**
-- Name, phone, email.
-- Three summary cards: current khata balance, total amount ever spent, total number of orders.
-- **Customer Info** section: household size, date they joined, and their **Area / Association** (the nearby area they belong to, used for heatmap tracking).
-- Full **Purchase History** — every order they've placed, with date, total, and a tap-through to full order details.
-
-**Tagging a customer to an area:**
-In the Customer Info section, tap the **Area / Association** dropdown. It shows all the nearby areas you have added (apartments, hostels, etc.). Select the one this customer belongs to. This links their orders to that area and populates the heatmap. To unlink, choose "None."
+- **Udhaar** — customers who owe you: total outstanding, per-customer balances
+  and history, WhatsApp reminders, due dates, and **Record Payment**.
+- **Suppliers** — money you owe distributors, broken down by purchase order.
 
 ---
 
-## Area Associations
+## Profile — your control centre
 
-**Where:** Profile → Area Associations
+Everything else lives under Profile, grouped into sections (rows appear only if
+they apply to your shop and plan):
 
-Track which nearby locations your customers come from, and see how much revenue each area generates.
+### Customers
+- **Customer Growth** 🔒 — referral campaigns with shareable QR codes.
+- **Customer Relations** — a searchable directory with auto-segments (Regular,
+  Bulk, Occasional, Impulse, Credit, Inactive), contact sync, and per-customer
+  detail including **profile & wishlist** (prescriptions, style/size profiles).
+- **Area Associations** — track nearby apartments/hostels/offices and a
+  **customer heatmap** of revenue by area.
 
-### My Areas Tab
+### Operations
+- **Staff** — team roster, attendance, task checklist, and **sales/commission
+  per member** (via "Billed by" at checkout).
+- **Estimates & Returns** — multi-line **quotations** you can share and
+  **convert to a sale**, plus a unified **returns** history with restock/vendor
+  handling.
+- **Stock Racks** — find where a product physically sits; place, move and remove
+  stock by rack.
+- **Job Cards** 🏷️ — alterations, repairs and pre-orders with a status workflow
+  (non-grocery).
+- **Warranty & Serials** 🏷️ — register serials/IMEIs with warranty-until badges
+  and manage warranty claims (electronics/optical).
+- **GST Report** 🏷️ — collected-GST summary for filing (non-grocery).
 
-Add the locations near your store that are sources of regular customers — apartment complexes, hostels, schools, offices, or residential colonies.
+### Sales & Marketing
+- **My Baskets** — saved bundles (with tiered pricing and savings banners) that
+  appear in POS.
+- **Loyalty & Offers** — points, tiers, coupons, and birthday/anniversary
+  offers; redeemed at checkout.
+- **Services & Appointments** 🏷️ — services catalogue, appointment calendar
+  (book/complete/cancel/no-show) and prepaid memberships (services/optical).
 
-**Adding an area:**
-Tap the **+ button** (top right). Choose the area type (apartment, hostel, school, office, colony), enter a name, optionally enter the estimated number of households, and add any notes. Tap **Add Area**.
+### Analytics
+- **KPI Subscriptions** — choose which metrics show on your dashboard. Beyond
+  the common set, shops get **vertical-specific KPIs** (sell-through, size-curve,
+  markdown, GMROI, service revenue, appointment utilisation, staff performance,
+  zone comparison, warranty-claim rate) — the team enables these per vertical,
+  live, with no app update.
+- **Transaction History** — full, filterable sales log with shareable receipts.
+- **Store Comparison** 🏷️ — compare revenue across your stores by zone/city
+  (multi-store owners).
 
-**Managing areas:**
-- Use the **toggle switch** on each area to mark it active or inactive. Inactive areas are excluded from campaign suggestions.
-- Tap the **delete icon** to remove an area entirely.
+### Store & Account
+- **Switch Store** — move between multiple stores under one login.
+- **Language** — the app is fully translated into **7 languages**.
+- **Store Settings** — name, address, store type (vertical), hours.
+- **Configuration** — default payment, AI suggestion toggles, notification
+  preferences, quiet hours.
+- **Password & Security** — set or change your password.
 
-### Customer Heatmap Tab
-
-Shows revenue, order count, average order value, and customer count for each area over the last 90 days. A bar indicates each area's share of total revenue relative to the highest-performing area.
-
-> **Note:** Data only appears here after you tag customers to areas from the Customer Detail screen.
-
----
-
-## KPI Subscriptions
-
-**Where:** Profile → KPI Subscriptions
-
-Choose which business metrics you want to monitor on your dashboard.
-
-**What you see:**
-- If you haven't subscribed to any KPIs yet, the screen opens in edit mode showing all available KPIs grouped by category (Sales, Inventory, Finance, Customer, etc.).
-- If you already have subscriptions, your chosen KPIs are shown as live metric cards with current values.
-
-**Subscribing to a KPI:**
-In edit mode, tap any KPI card to toggle it on or off. When done, tap **Done** to save. Your selections appear as cards on the dashboard overview.
-
-**Editing later:**
-Tap the **settings icon** (top right) to go back to edit mode and change your selection.
-
----
-
-## Customer Growth (Referral)
-
-**Where:** Profile → Customer Growth
-**Requires:** Pro plan
-
-Turn your existing customers into a growth engine by creating referral campaigns.
-
-**Creating a campaign:**
-Tap **+ New Campaign**. Give the campaign a name, set the reward for the referrer (the existing customer who brings someone new), and optionally set an expiry date.
-
-**Sharing the campaign:**
-Once created, tap the campaign card to open it, then tap **Share QR**. A QR code is generated that you can print or show to customers. When a new customer scans it, they are linked to the referrer, who earns the reward.
-
----
-
-## Cashflow Support
-
-**Where:** Profile → Cashflow Support banner (the dark blue card)
-**Requires:** Pro plan
-
-Apply for business financing between ₹50,000 and ₹10,00,000 tailored to kirana store owners.
-
-- The screen shows eligibility criteria and available financing ranges.
-- Fill in the application form with business details and submit.
-- Track application status from the same screen.
+### Plan & Support
+- **Subscription & Plans** — Free Trial (14 days), **Basic ₹200/mo**, **Pro
+  ₹500/mo**, via Google Play Billing; restore/cancel supported.
+- **Cashflow Support** 🔒 — apply for ₹50 K–₹10 L business financing.
+- **Help & Support** — FAQ, categorised issue reporting, and email support.
 
 ---
 
-## Subscription & Plans
+## Notifications
 
-**Where:** Profile → Subscription & Plans
-
-Manage which plan your store is on.
-
-**Plans available:**
-
-| Plan | Monthly Cost | Per Day |
-|------|-------------|---------|
-| Free Trial | Free for 14 days | — |
-| Basic | ₹200/month | ₹7/day |
-| Pro | ₹500/month | ₹17/day |
-
-**How to upgrade:**
-Tap **Get Basic** or **Get Pro**. This triggers Google Play Billing — a standard payment sheet appears. Complete payment and your plan activates within seconds.
-
-**Trial period:**
-New stores get a 14-day free trial with Basic-level access. A countdown shows how many days remain. After the trial ends, the app shows an upgrade wall — you can still see the dashboard but cannot bill or access most features until you subscribe.
-
-**Restore a purchase:**
-If you reinstalled the app or switched phones, tap **Restore Purchases** to recover an existing subscription linked to your Google account.
-
----
-
-## Transaction History
-
-**Where:** Profile → Transaction History
-
-A full log of every sale billed through the POS, accessible any time.
-
-- Filter by **date range**, **payment method** (Cash, UPI, Card, Credit), and **order status**.
-- Tap any transaction to see the full itemised order with product names, quantities, prices, and the customer name if one was selected.
-
----
-
-## Store Settings
-
-**Where:** Profile → Store Settings
-
-Edit your store's public details:
-- Store name and address
-- Business category
-- Operating hours
-
-Changes are saved to your account and reflected wherever your store name appears in the app.
-
----
-
-## Configuration
-
-**Where:** Profile → Configuration
-
-Personal preferences for how the app behaves:
-- **Default payment method** — pre-selects Cash, UPI, etc. when the checkout dialog opens.
-- **AI suggestion settings** — turn on or off specific types of intelligence suggestions.
-- **Notification preferences** — control which alert types you receive as push notifications.
-
----
-
-## Help & Support
-
-**Where:** Profile → Help & Support
-
-Three options:
-
-**FAQs:**
-Answers to common questions — how to add products, how stockout prediction works, how to manage khata, how to sync contacts, what KPIs are, and how to view sales reports.
-
-**Report an Issue:**
-Fill in a categorised form to report a problem:
-- Categories: App bug, Pricing issue, Inventory problem, AI recommendation issue, POS error, Feature request.
-- Describe the issue and submit. The team receives it directly.
-
-**Contact:**
-Direct contact options (WhatsApp / email) for anything not covered by FAQs.
-
----
-
-## Push Notifications
-
-You receive push notifications for important events even when the app is closed:
-
-- **Trial ending soon** — reminder before your free trial expires.
-- **Subscription activated** — confirmation after payment goes through.
-- **Udhaar reminder sent** — confirmation when a WhatsApp reminder is dispatched to a customer.
-- **Low stock / expiry alert** *(Pro)* — when a product hits your reorder threshold or is nearing expiry.
-
-Tapping a notification opens the app directly to the relevant screen.
+Push alerts (even when the app is closed): trial ending, subscription activated,
+udhaar reminder sent, low stock / expiry 🔒, trial approved, and **Vision scan
+ready**. Tapping one opens the relevant screen.
 
 ---
 
 ## Sign Out
 
-**Where:** Profile → scroll to the bottom → **Sign Out** button
+Profile → **Sign Out** clears your session on this device; your data stays on
+the server. Log back in with the same phone number or username/password to
+restore everything.
 
-Clears your session from this device. Your data remains on the server. Log back in with the same phone number or email to restore everything.
+---
+
+*For the detailed, screen-by-screen walkthrough, see the
+**[User Manual](USER_MANUAL.md)**.*
