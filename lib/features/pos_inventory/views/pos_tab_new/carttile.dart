@@ -71,7 +71,7 @@ class _CartTile extends ConsumerWidget {
                             p,
                             override,
                           )
-                        : null,
+                        : () => _showEditLinePriceSheet(context, ref, item),
                     child: Row(
                       children: [
                         Container(
@@ -128,24 +128,43 @@ class _CartTile extends ConsumerWidget {
                             p,
                             override,
                           )
-                        : null,
+                        : () => _showEditLinePriceSheet(context, ref, item),
                     child: Row(
                       children: [
-                        Text(
-                          p.priceLabel,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: BrandColors.muted,
+                        // A one-time override shows the edited price with the
+                        // catalog price struck through beside it.
+                        if (override != null) ...[
+                          Text(
+                            '₹${override.toStringAsFixed(1)}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: BrandColors.accent,
+                            ),
                           ),
-                        ),
-                        if (hasCustomer) ...[
                           const SizedBox(width: 4),
-                          Icon(
-                            Icons.edit_rounded,
-                            size: 10,
-                            color: BrandColors.muted.withValues(alpha: 0.7),
+                          Text(
+                            p.priceLabel,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: BrandColors.muted,
+                              decoration: TextDecoration.lineThrough,
+                            ),
                           ),
-                        ],
+                        ] else
+                          Text(
+                            p.priceLabel,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: BrandColors.muted,
+                            ),
+                          ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.edit_rounded,
+                          size: 10,
+                          color: BrandColors.muted.withValues(alpha: 0.7),
+                        ),
                       ],
                     ),
                   ),

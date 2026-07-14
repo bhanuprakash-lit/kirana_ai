@@ -22,7 +22,6 @@ import '../providers/inventory_provider.dart';
 import '../providers/variant_provider.dart';
 import '../../../core/vertical/vertical_config_provider.dart';
 import 'pos_tab_new/variant_picker_sheet.dart';
-import '../../../../core/services/contact_service.dart';
 import 'widgets/continuous_scanner_sheet.dart';
 import 'widgets/order_dialog.dart';
 import 'widgets/basket_savings_banner.dart';
@@ -35,6 +34,9 @@ import 'widgets/handwriting_order_sheet.dart';
 import '../../services/models/service_models.dart';
 import '../../services/providers/service_provider.dart';
 import '../../profile/views/customer_detail_screen.dart';
+import '../../profile/models/customer_model.dart' show Customer;
+import '../../profile/views/customer_management_screen.dart'
+    show CustomerFormSheet;
 import '../../campaigns/models/campaign_model.dart' as campaign_card_lib;
 import '../../campaigns/providers/campaign_provider.dart';
 import '../../campaigns/views/widgets/campaign_card.dart';
@@ -108,6 +110,35 @@ Future<void> _showSetCustomerPriceSheet(
       const SnackBar(content: Text('Could not save price. Try again.')),
     );
   }
+}
+
+/// One-time price edit for a cart line when NO customer is selected — the
+/// override applies to this sale only and is discarded with the cart.
+Future<void> _showEditLinePriceSheet(
+  BuildContext context,
+  WidgetRef ref,
+  dynamic item,
+) async {
+  final p = item.product as PosProduct;
+  final notifier = ref.read(posProvider.notifier);
+  final override = item.unitPriceOverride as double?;
+
+  final action = await showModalBottomSheet<_CustomerPriceEditAction>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _SetCustomerPriceSheet(
+      product: p,
+      customerName: '',
+      titleOverride: 'Price for this sale only',
+      // "Remove" resets an existing override back to the catalog price.
+      hasPin: override != null,
+      initial: override ?? p.price,
+    ),
+  );
+
+  if (action == null) return;
+  notifier.setLinePrice(item.lineKey as String, action.price);
 }
 
 /// Bottom sheet that edits a customer's personal price for one product. Owns

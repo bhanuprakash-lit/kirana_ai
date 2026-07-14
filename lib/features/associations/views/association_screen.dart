@@ -439,6 +439,21 @@ class _StatChip extends StatelessWidget {
 
 // ── Add Association sheet ─────────────────────────────────────────────────────
 
+/// Open the "add nearby area" sheet. Returns the created [StoreAssociation]
+/// (or null if dismissed) so callers — like the add-customer form — can select
+/// the new area immediately.
+Future<StoreAssociation?> showAddAssociationSheet(
+  BuildContext context,
+  WidgetRef ref,
+) {
+  return showModalBottomSheet<StoreAssociation>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _AddAssociationSheet(ref: ref),
+  );
+}
+
 class _AddAssociationSheet extends StatefulWidget {
   final WidgetRef ref;
   const _AddAssociationSheet({required this.ref});
@@ -468,7 +483,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
     if (name.isEmpty) return;
     setState(() => _loading = true);
     try {
-      await widget.ref
+      final created = await widget.ref
           .read(associationProvider.notifier)
           .add(
             name: name,
@@ -478,7 +493,7 @@ class _AddAssociationSheetState extends State<_AddAssociationSheet> {
                 ? null
                 : _notesCtrl.text.trim(),
           );
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context, created);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

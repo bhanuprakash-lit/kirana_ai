@@ -1261,6 +1261,32 @@ class AppLocalizationsMl extends AppLocalizations {
       'പ്രവർത്തനരഹിതം — ഓർഡർ വിശദാംശങ്ങളിൽ നിന്ന് നേരിട്ട് പ്രിന്റ് ചെയ്യുക';
 
   @override
+  String get posConnectPrinterToEnable =>
+      'ഇത് ഓണാക്കാൻ ബ്ലൂടൂത്ത് പ്രിന്റർ കണക്റ്റ് ചെയ്യുക';
+
+  @override
+  String get posCustomDiscount => 'കിഴിവ് (മുഴുവൻ ബില്ലിന്)';
+
+  @override
+  String get procPayFirst => 'ആദ്യം അടയ്ക്കുക';
+
+  @override
+  String get procUnpaid => 'കുടിശ്ശിക';
+
+  @override
+  String get procNextDue => 'അടുത്ത കുടിശ്ശിക';
+
+  @override
+  String get procProductsSupplied => 'ഇവർ വിതരണം ചെയ്യുന്ന ഉൽപ്പന്നങ്ങൾ';
+
+  @override
+  String get procTagProduct => 'ഉൽപ്പന്നം ടാഗ് ചെയ്യുക';
+
+  @override
+  String get procNoTaggedProducts =>
+      'ഇതുവരെ ഉൽപ്പന്നങ്ങൾ ടാഗ് ചെയ്തിട്ടില്ല. ഇവരിൽ നിന്ന് വാങ്ങുന്നവ ടാഗ് ചെയ്യുക — പർച്ചേസ് ഓർഡർ സ്വീകരിക്കുമ്പോൾ ഇത് സ്വയമേവയും നിറയും.';
+
+  @override
   String get posHowMuchUdhaar => 'എത്ര ഉധാറിലേക്ക് പോകുന്നു?';
 
   @override
@@ -4686,6 +4712,9 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get profAreaAssociation => 'ഏരിയ / അസോസിയേഷൻ';
+
+  @override
+  String get profAddNewArea => 'പുതിയ ഏരിയ ചേർക്കുക…';
 
   @override
   String get profUnableToLoadAreas => 'ഏരിയകൾ ലോഡ് ചെയ്യാനായില്ല';

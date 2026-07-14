@@ -1249,6 +1249,32 @@ class AppLocalizationsKn extends AppLocalizations {
       'ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ — ಆರ್ಡರ್ ವಿವರಗಳಿಂದ ಕೈಯಿಂದ ಮುದ್ರಿಸಿ';
 
   @override
+  String get posConnectPrinterToEnable =>
+      'ಇದನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಲು ಬ್ಲೂಟೂತ್ ಪ್ರಿಂಟರ್ ಸಂಪರ್ಕಿಸಿ';
+
+  @override
+  String get posCustomDiscount => 'ರಿಯಾಯಿತಿ (ಇಡೀ ಬಿಲ್)';
+
+  @override
+  String get procPayFirst => 'ಮೊದಲು ಪಾವತಿಸಿ';
+
+  @override
+  String get procUnpaid => 'ಬಾಕಿ';
+
+  @override
+  String get procNextDue => 'ಮುಂದಿನ ಬಾಕಿ';
+
+  @override
+  String get procProductsSupplied => 'ಇವರು ಪೂರೈಸುವ ಉತ್ಪನ್ನಗಳು';
+
+  @override
+  String get procTagProduct => 'ಉತ್ಪನ್ನ ಟ್ಯಾಗ್ ಮಾಡಿ';
+
+  @override
+  String get procNoTaggedProducts =>
+      'ಇನ್ನೂ ಉತ್ಪನ್ನಗಳನ್ನು ಟ್ಯಾಗ್ ಮಾಡಿಲ್ಲ. ಇವರಿಂದ ಖರೀದಿಸುವುದನ್ನು ಟ್ಯಾಗ್ ಮಾಡಿ — ಖರೀದಿ ಆರ್ಡರ್ ಸ್ವೀಕರಿಸಿದಾಗ ಸ್ವಯಂಚಾಲಿತವಾಗಿಯೂ ತುಂಬುತ್ತದೆ.';
+
+  @override
   String get posHowMuchUdhaar => 'ಎಷ್ಟು ಉಧಾರ್‌ಗೆ ಹೋಗುತ್ತದೆ?';
 
   @override
@@ -4651,6 +4677,9 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get profAreaAssociation => 'ಪ್ರದೇಶ / ಸಂಘ';
+
+  @override
+  String get profAddNewArea => 'ಹೊಸ ಏರಿಯಾ ಸೇರಿಸಿ…';
 
   @override
   String get profUnableToLoadAreas => 'ಪ್ರದೇಶಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ';

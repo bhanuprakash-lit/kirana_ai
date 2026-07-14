@@ -1231,6 +1231,32 @@ class AppLocalizationsTe extends AppLocalizations {
       'ఆఫ్ చేయబడింది — ఆర్డర్ వివరాల నుండి మాన్యువల్‌గా ప్రింట్ చేయండి';
 
   @override
+  String get posConnectPrinterToEnable =>
+      'దీన్ని ఆన్ చేయడానికి బ్లూటూత్ ప్రింటర్‌ను కనెక్ట్ చేయండి';
+
+  @override
+  String get posCustomDiscount => 'డిస్కౌంట్ (మొత్తం బిల్లుపై)';
+
+  @override
+  String get procPayFirst => 'ముందుగా చెల్లించండి';
+
+  @override
+  String get procUnpaid => 'బకాయి';
+
+  @override
+  String get procNextDue => 'తదుపరి గడువు';
+
+  @override
+  String get procProductsSupplied => 'వీరు సరఫరా చేసే వస్తువులు';
+
+  @override
+  String get procTagProduct => 'వస్తువును ట్యాగ్ చేయండి';
+
+  @override
+  String get procNoTaggedProducts =>
+      'ఇంకా వస్తువులు ట్యాగ్ చేయలేదు. వీరి నుండి కొనే వస్తువులను ట్యాగ్ చేయండి — పర్చేజ్ ఆర్డర్ స్వీకరించినప్పుడు ఇది ఆటోమేటిక్‌గా కూడా నింపబడుతుంది.';
+
+  @override
   String get posHowMuchUdhaar => 'ఎంత ఉధార్‌కి వెళ్తుంది?';
 
   @override
@@ -4623,6 +4649,9 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get profAreaAssociation => 'ఏరియా / అసోసియేషన్';
+
+  @override
+  String get profAddNewArea => 'కొత్త ఏరియా జోడించండి…';
 
   @override
   String get profUnableToLoadAreas => 'ఏరియాలు లోడ్ చేయలేకపోయాం';

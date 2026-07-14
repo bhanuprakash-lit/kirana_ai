@@ -1223,6 +1223,32 @@ class AppLocalizationsHi extends AppLocalizations {
   String get posAutoPrintDisabled => 'बंद — ऑर्डर विवरण से मैनुअल प्रिंट करें';
 
   @override
+  String get posConnectPrinterToEnable =>
+      'इसे चालू करने के लिए ब्लूटूथ प्रिंटर कनेक्ट करें';
+
+  @override
+  String get posCustomDiscount => 'छूट (पूरे बिल पर)';
+
+  @override
+  String get procPayFirst => 'पहले चुकाएं';
+
+  @override
+  String get procUnpaid => 'बकाया';
+
+  @override
+  String get procNextDue => 'अगली देय';
+
+  @override
+  String get procProductsSupplied => 'इनसे मिलने वाले प्रोडक्ट';
+
+  @override
+  String get procTagProduct => 'प्रोडक्ट जोड़ें';
+
+  @override
+  String get procNoTaggedProducts =>
+      'अभी कोई प्रोडक्ट टैग नहीं है। जो सामान इनसे खरीदते हैं उसे टैग करें — परचेज़ ऑर्डर रिसीव करने पर यह अपने आप भी जुड़ जाता है।';
+
+  @override
   String get posHowMuchUdhaar => 'कितना उधार पर जाएगा?';
 
   @override
@@ -4563,6 +4589,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get profAreaAssociation => 'एरिया / एसोसिएशन';
+
+  @override
+  String get profAddNewArea => 'नया एरिया जोड़ें…';
 
   @override
   String get profUnableToLoadAreas => 'एरिया लोड नहीं हो पाए';

@@ -36,6 +36,60 @@ class Supplier {
   };
 }
 
+/// Per-supplier dues + catalogue rollup for the supplier dashboard.
+/// The backend returns these ordered by payment priority (overdue first,
+/// then earliest due date, then largest outstanding).
+class SupplierOverview {
+  final int supplierId;
+  final int productCount;
+  final double unpaidTotal;
+  final int unpaidOrders;
+  final double overdueAmount;
+  final DateTime? nextDueDate;
+
+  const SupplierOverview({
+    required this.supplierId,
+    required this.productCount,
+    required this.unpaidTotal,
+    required this.unpaidOrders,
+    required this.overdueAmount,
+    this.nextDueDate,
+  });
+
+  factory SupplierOverview.fromJson(Map<String, dynamic> j) => SupplierOverview(
+    supplierId: (j['supplier_id'] as num).toInt(),
+    productCount: (j['product_count'] as num? ?? 0).toInt(),
+    unpaidTotal: (j['unpaid_total'] as num? ?? 0).toDouble(),
+    unpaidOrders: (j['unpaid_orders'] as num? ?? 0).toInt(),
+    overdueAmount: (j['overdue_amount'] as num? ?? 0).toDouble(),
+    nextDueDate: j['next_due_date'] != null
+        ? parseAsUtc(j['next_due_date'] as String)
+        : null,
+  );
+}
+
+/// A product tagged to a supplier (what they sell us).
+class SupplierProduct {
+  final int productId;
+  final String name;
+  final double? costPrice;
+  final double stock;
+
+  const SupplierProduct({
+    required this.productId,
+    required this.name,
+    this.costPrice,
+    required this.stock,
+  });
+
+  factory SupplierProduct.fromJson(Map<String, dynamic> j) => SupplierProduct(
+    productId: (j['product_id'] as num).toInt(),
+    name: (j['name'] ?? 'Product').toString(),
+    costPrice: (j['cost_price'] as num?)?.toDouble(),
+    stock: (j['stock'] as num? ?? 0).toDouble(),
+  );
+}
+
 enum PurchaseStatus { pending, ordered, received, cancelled }
 
 class PurchaseOrder {

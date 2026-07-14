@@ -6,6 +6,7 @@ import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/services/contact_service.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
+import '../../../../shared/widgets/product_picker.dart';
 import '../../models/procurement_models.dart';
 import '../../providers/procurement_provider.dart';
 import '../../providers/inventory_provider.dart';
@@ -67,12 +68,7 @@ class ProcurementTab extends ConsumerWidget {
             if (data.suppliers.isEmpty)
               _emptyState(l10n.procNoSuppliersYet)
             else
-              ...data.suppliers.map(
-                (s) => _SupplierTile(
-                  supplier: s,
-                  onEdit: () => _showEditSupplierSheet(context, ref, s),
-                ),
-              ),
+              ..._supplierTiles(context, ref, data.suppliers),
 
             const SizedBox(height: 24),
             _sectionHeader(
@@ -222,6 +218,50 @@ class ProcurementTab extends ConsumerWidget {
       ),
       const SizedBox(height: 24),
     ];
+  }
+
+  /// Supplier tiles sorted by payment priority (backend order: overdue first,
+  /// then earliest due date, then largest outstanding). The most urgent
+  /// supplier with dues gets a "pay first" badge.
+  List<Widget> _supplierTiles(
+    BuildContext context,
+    WidgetRef ref,
+    List<Supplier> suppliers,
+  ) {
+    final overview =
+        ref.watch(supplierOverviewProvider).asData?.value ??
+        const <int, SupplierOverview>{};
+    final priority = overview.keys.toList();
+    int rank(Supplier s) {
+      final i = priority.indexOf(s.supplierId);
+      return i < 0 ? 1 << 20 : i;
+    }
+
+    final sorted = [...suppliers]..sort((a, b) => rank(a).compareTo(rank(b)));
+    final payFirstId = overview.values
+        .where((o) => o.unpaidTotal > 0)
+        .firstOrNull
+        ?.supplierId;
+
+    return [
+      for (final s in sorted)
+        _SupplierTile(
+          supplier: s,
+          overview: overview[s.supplierId],
+          payFirst: s.supplierId == payFirstId,
+          onEdit: () => _showEditSupplierSheet(context, ref, s),
+          onTap: () => _showSupplierDashboardSheet(context, s),
+        ),
+    ];
+  }
+
+  void _showSupplierDashboardSheet(BuildContext context, Supplier supplier) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _SupplierDashboardSheet(supplier: supplier),
+    );
   }
 
   void _showAddSupplierSheet(BuildContext context, WidgetRef ref) {
@@ -1196,18 +1236,36 @@ class _ReorderCard extends StatelessWidget {
 class _SupplierTile extends StatelessWidget {
   final Supplier supplier;
   final VoidCallback? onEdit;
-  const _SupplierTile({required this.supplier, this.onEdit});
+  final VoidCallback? onTap;
+  final SupplierOverview? overview;
+  final bool payFirst;
+  const _SupplierTile({
+    required this.supplier,
+    this.onEdit,
+    this.onTap,
+    this.overview,
+    this.payFirst = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Container(
+    final o = overview;
+    final hasDue = (o?.unpaidTotal ?? 0) > 0;
+    final overdue = (o?.overdueAmount ?? 0) > 0;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: BrandColors.border),
+        border: Border.all(
+          color: payFirst && hasDue
+              ? BrandColors.error.withValues(alpha: 0.45)
+              : BrandColors.border,
+        ),
       ),
       child: Row(
         children: [
@@ -1267,6 +1325,52 @@ class _SupplierTile extends StatelessWidget {
                       color: BrandColors.muted,
                     ),
                   ),
+                // Dues line — how much this supplier is owed, and whether
+                // any of it is already overdue.
+                if (hasDue)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Row(
+                      children: [
+                        if (payFirst) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: BrandColors.error,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              l10n.procPayFirst.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        Flexible(
+                          child: Text(
+                            overdue
+                                ? '₹${o!.unpaidTotal.toStringAsFixed(0)} · ${l10n.finOverdue} ₹${o.overdueAmount.toStringAsFixed(0)}'
+                                : '₹${o!.unpaidTotal.toStringAsFixed(0)} ${l10n.procUnpaid}',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: overdue
+                                  ? BrandColors.error
+                                  : BrandColors.accent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -1281,8 +1385,280 @@ class _SupplierTile extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
+}
+
+// ── Supplier dashboard sheet ──────────────────────────────────────────────────
+
+/// Tapping a supplier opens their dashboard: outstanding dues at a glance and
+/// the products they supply (tagged manually here, or automatically when a
+/// purchase order is received).
+class _SupplierDashboardSheet extends ConsumerWidget {
+  final Supplier supplier;
+  const _SupplierDashboardSheet({required this.supplier});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final o = ref
+        .watch(supplierOverviewProvider)
+        .asData
+        ?.value[supplier.supplierId];
+    final productsAsync = ref.watch(
+      supplierProductsProvider(supplier.supplierId),
+    );
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.75,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (_, scrollCtrl) => Container(
+        decoration: const BoxDecoration(
+          color: BrandColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: ListView(
+          controller: scrollCtrl,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: BrandColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: BrandColors.primary.withValues(alpha: 0.1),
+                  child: const Icon(
+                    Icons.business_rounded,
+                    color: BrandColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        supplier.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      if (supplier.phone?.isNotEmpty ?? false)
+                        Text(
+                          supplier.phone!,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: BrandColors.muted,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // ── Dues at a glance ──────────────────────────────────────────
+            Row(
+              children: [
+                Expanded(
+                  child: _dueStat(
+                    l10n.procUnpaid,
+                    '₹${(o?.unpaidTotal ?? 0).toStringAsFixed(0)}',
+                    (o?.unpaidTotal ?? 0) > 0
+                        ? BrandColors.accent
+                        : BrandColors.muted,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _dueStat(
+                    l10n.finOverdue,
+                    '₹${(o?.overdueAmount ?? 0).toStringAsFixed(0)}',
+                    (o?.overdueAmount ?? 0) > 0
+                        ? BrandColors.error
+                        : BrandColors.muted,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _dueStat(
+                    l10n.procNextDue,
+                    o?.nextDueDate != null
+                        ? '${o!.nextDueDate!.day}/${o.nextDueDate!.month}'
+                        : '—',
+                    BrandColors.ink,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // ── Products they supply ──────────────────────────────────────
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.procProductsSupplied,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    final picked = await showProductPicker(context, ref);
+                    if (picked == null) return;
+                    try {
+                      await ref
+                          .read(procurementProvider.notifier)
+                          .tagProductToSupplier(
+                            supplier.supplierId,
+                            picked.productId,
+                          );
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.procErrorWithMessage('$e')),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: Text(l10n.procTagProduct),
+                ),
+              ],
+            ),
+            productsAsync.when(
+              loading: () => const ListShimmer(itemCount: 3, itemHeight: 52),
+              error: (e, _) => Text(
+                l10n.procErrorWithMessage('$e'),
+                style: const TextStyle(color: BrandColors.muted),
+              ),
+              data: (products) => products.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        l10n.procNoTaggedProducts,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: BrandColors.muted,
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        for (final p in products)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: BrandColors.border),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        p.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${p.costPrice != null ? '₹${p.costPrice!.toStringAsFixed(1)} · ' : ''}${l10n.invStockLabel(p.stock.toStringAsFixed(0))}',
+                                        style: const TextStyle(
+                                          fontSize: 11.5,
+                                          color: BrandColors.muted,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () => ref
+                                      .read(procurementProvider.notifier)
+                                      .untagProductFromSupplier(
+                                        supplier.supplierId,
+                                        p.productId,
+                                      ),
+                                  icon: const Icon(
+                                    Icons.link_off_rounded,
+                                    size: 18,
+                                    color: BrandColors.muted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _dueStat(String label, String value, Color color) => Container(
+    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: BrandColors.border),
+    ),
+    child: Column(
+      children: [
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w900,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 10.5, color: BrandColors.muted),
+        ),
+      ],
+    ),
+  );
 }
 
 class _PurchaseOrderTile extends ConsumerWidget {

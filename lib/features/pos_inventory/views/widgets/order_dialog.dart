@@ -315,9 +315,16 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   // Partial-udhaar slider — how much of the order goes on credit.
   // Initialised to the full order total when Udhaar is chosen.
   double _udhaarAmount = 0;
-  // Repayment deadline for the credit. Defaults to 30 Jun 2026 (the same
-  // default applied to existing udhaars) and is editable by the shopkeeper.
-  DateTime _udhaarDueDate = DateTime(2026, 6, 30);
+  // Repayment deadline for the credit. Defaults to a month from today and
+  // is editable by the shopkeeper.
+  DateTime _udhaarDueDate = DateTime.now().add(const Duration(days: 30));
+
+  // Manual whole-bill discount typed at checkout (e.g. 2% goodwill on a
+  // random cart). Percent or flat ₹; applied after coupon/points. Nothing
+  // extra is persisted — the discounted grand total is what's recorded.
+  final _discountCtrl = TextEditingController();
+  bool _discountIsPct = true;
+  double _discountInput = 0;
 
   // M1 — coupon + points redeemed at checkout.
   final _couponCtrl = TextEditingController();
@@ -334,15 +341,28 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
   @override
   void dispose() {
     _couponCtrl.dispose();
+    _discountCtrl.dispose();
     super.dispose();
   }
 
-  /// Bill after referral discount, coupon and redeemed points, plus any billed
-  /// appointment charge (O2).
+  /// ₹ value of the manual whole-bill discount, computed on the bill after
+  /// referral/coupon/points and capped so the total can't go negative.
+  double _manualDiscountValue(PosState state) {
+    if (_discountInput <= 0) return 0;
+    final base = (state.discountedSubtotal - _couponDiscount - _redeemValue)
+        .clamp(0, double.infinity)
+        .toDouble();
+    final v = _discountIsPct ? base * _discountInput / 100 : _discountInput;
+    return v.clamp(0, base).toDouble();
+  }
+
+  /// Bill after referral discount, coupon, redeemed points and manual
+  /// discount, plus any billed appointment charge (O2).
   double _effectiveTotal(PosState state) =>
       (state.discountedSubtotal -
               _couponDiscount -
-              _redeemValue +
+              _redeemValue -
+              _manualDiscountValue(state) +
               _deepLinks.appointmentCharge)
           .clamp(0, double.infinity)
           .toDouble();
@@ -579,6 +599,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
           couponDiscount: _couponOk ? _couponDiscount : 0,
           redeemPoints: _redeemPoints,
           redeemValue: _redeemValue,
+          manualDiscount: _manualDiscountValue(ref.read(posProvider)),
           // POS deep-links (M4/M7/M9)
           serialItems: serialItems.isEmpty ? null : serialItems,
           membershipId: _deepLinks.membershipId,
@@ -600,7 +621,9 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
       await Future.delayed(const Duration(milliseconds: 600));
       if (mounted) {
         final enriched = Map<String, dynamic>.from(result);
-        enriched['auto_print'] = _autoPrint;
+        // Auto-print only means something with a live printer connection.
+        enriched['auto_print'] =
+            _autoPrint && ref.read(printerProvider).isConnected;
         enriched['payment_method'] = _paymentMethod;
         // Persist the split so OrderDetailsScreen can show the breakdown
         // even in the same session before backend returns the fields.
@@ -856,6 +879,64 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                     // ── Billed by (M5) — attributes sales + commission to staff ───────
                     _buildBilledBySelector(),
 
+                    // ── Custom discount — % or ₹ off the whole bill ───────────────────
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.discount_outlined,
+                          size: 16,
+                          color: BrandColors.muted,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _discountCtrl,
+                            enabled: !_placing && !_success,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              labelText: l10n.posCustomDiscount,
+                              hintText: '0',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onChanged: (v) => setState(
+                              () => _discountInput = double.tryParse(v) ?? 0,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ToggleButtons(
+                          isSelected: [_discountIsPct, !_discountIsPct],
+                          onPressed: _placing || _success
+                              ? null
+                              : (i) =>
+                                    setState(() => _discountIsPct = i == 0),
+                          borderRadius: BorderRadius.circular(10),
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
+                          children: const [Text('%'), Text('₹')],
+                        ),
+                        if (_manualDiscountValue(state) > 0) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            '−${_fmt(_manualDiscountValue(state))}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: BrandColors.success,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
                     // ── Billed appointment charge (O2) ────────────────────────────────
                     if (_deepLinks.appointmentCharge > 0) ...[
                       Row(
@@ -1027,7 +1108,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                           Icon(
                             Icons.print_rounded,
                             size: 18,
-                            color: _autoPrint
+                            color: _autoPrint && printerState.isConnected
                                 ? printerState.statusColor
                                 : BrandColors.muted,
                           ),
@@ -1045,16 +1126,14 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                                   ),
                                 ),
                                 Text(
-                                  _autoPrint
-                                      ? (printerState.isConnected
-                                            ? l10n.posWillPrintAfter
-                                            : l10n.posPrinterStatus(
-                                                printerState.statusLabel,
-                                              ))
+                                  !printerState.isConnected
+                                      ? l10n.posConnectPrinterToEnable
+                                      : _autoPrint
+                                      ? l10n.posWillPrintAfter
                                       : l10n.posAutoPrintDisabled,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: _autoPrint
+                                    color: _autoPrint && printerState.isConnected
                                         ? printerState.statusColor
                                         : BrandColors.muted,
                                     fontWeight: FontWeight.w500,
@@ -1064,8 +1143,14 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                             ),
                           ),
                           Switch.adaptive(
-                            value: _autoPrint,
-                            onChanged: _placing || _success
+                            // Off (and locked) until a Bluetooth printer is
+                            // actually connected — printing without one can't
+                            // work, so don't pretend it will.
+                            value: _autoPrint && printerState.isConnected,
+                            onChanged:
+                                _placing ||
+                                    _success ||
+                                    !printerState.isConnected
                                 ? null
                                 : (v) => setState(() => _autoPrint = v),
                             activeThumbColor: BrandColors.primary,
