@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/tutorial/tutorial_controller.dart';
+import '../../../core/tutorial/tutorial_keys.dart';
+import '../../../core/tutorial/tutorial_overlay.dart';
 import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../vision/views/onboarding_stockin_screen.dart';
@@ -77,14 +80,48 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
     showEditProductSheet(context, ref, item);
   }
 
+  /// Guided add-product flow, step 1: the owner must tap the + button — the
+  /// same button he'll use forever after. Tapping it opens the add sheet.
+  void _maybeAddFabTutorial() {
+    if (!mounted) return;
+    final c = ref.read(tutorialProvider.notifier);
+    if (!c.shouldShow(Tut.apFab, flow: Tut.flowAddProduct)) return;
+    final l10n = AppLocalizations.of(context);
+    showTutorialSegment(
+      context,
+      ref,
+      id: Tut.apFab,
+      flow: Tut.flowAddProduct,
+      steps: [
+        TutStep(
+          targetKey: TutorialKeys.invAddFab,
+          title: l10n.tutApFabTitle,
+          body: l10n.tutApFabBody,
+          tapTarget: true,
+          onTapTarget: () => showAddProductSheet(context, ref),
+          shape: ShapeLightFocus.Circle,
+          align: ContentAlign.top,
+        ),
+      ],
+      tapHint: l10n.tutTapHere,
+      skipLabel: l10n.tutSkip,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final asyncData = ref.watch(inventoryProvider);
 
+    ref.watch(tutorialProvider.select((s) => (s.activeFlow, s.loaded)));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 350), _maybeAddFabTutorial);
+    });
+
     return Scaffold(
       backgroundColor: BrandColors.background,
       floatingActionButton: FloatingActionButton(
+        key: TutorialKeys.invAddFab,
         heroTag: 'add_product_fab',
         onPressed: () => showAddProductSheet(context, ref),
         backgroundColor: BrandColors.primary,

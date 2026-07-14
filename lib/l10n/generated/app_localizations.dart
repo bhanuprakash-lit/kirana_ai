@@ -5316,6 +5316,318 @@ abstract class AppLocalizations {
   /// **'Not placed in any rack yet.'**
   String get rackNoneForProduct;
 
+  /// No description provided for @tutNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tutNext;
+
+  /// No description provided for @tutDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get tutDone;
+
+  /// No description provided for @tutSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get tutSkip;
+
+  /// No description provided for @tutTapHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the highlighted button to continue'**
+  String get tutTapHere;
+
+  /// No description provided for @tutDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get tutDismiss;
+
+  /// No description provided for @tutChecklistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting started'**
+  String get tutChecklistTitle;
+
+  /// No description provided for @tutChecklistSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done — tap a step to do it'**
+  String tutChecklistSubtitle(int done, int total);
+
+  /// No description provided for @tutStepAddProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first product'**
+  String get tutStepAddProduct;
+
+  /// No description provided for @tutStepFirstSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Make your first bill'**
+  String get tutStepFirstSale;
+
+  /// No description provided for @tutStepUdhaar.
+  ///
+  /// In en, this message translates to:
+  /// **'Record an udhaar (pay later)'**
+  String get tutStepUdhaar;
+
+  /// No description provided for @tutStepReport.
+  ///
+  /// In en, this message translates to:
+  /// **'See today\'s business'**
+  String get tutStepReport;
+
+  /// No description provided for @tutStepLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get tutStepLanguage;
+
+  /// No description provided for @tutWelcomeHomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get tutWelcomeHomeTitle;
+
+  /// No description provided for @tutWelcomeHomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your day at a glance — sales, profit and alerts live here.'**
+  String get tutWelcomeHomeBody;
+
+  /// No description provided for @tutWelcomeKhataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Khata'**
+  String get tutWelcomeKhataTitle;
+
+  /// No description provided for @tutWelcomeKhataBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your udhaar book. Every credit and collection in one place.'**
+  String get tutWelcomeKhataBody;
+
+  /// No description provided for @tutWelcomeBillingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing & Stock'**
+  String get tutWelcomeBillingTitle;
+
+  /// No description provided for @tutWelcomeBillingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Make bills and manage your products here.'**
+  String get tutWelcomeBillingBody;
+
+  /// No description provided for @tutWelcomeVisionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision AI'**
+  String get tutWelcomeVisionTitle;
+
+  /// No description provided for @tutWelcomeVisionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Count stock with your camera — scan shelves, count items.'**
+  String get tutWelcomeVisionBody;
+
+  /// No description provided for @tutWelcomeChecklistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start here'**
+  String get tutWelcomeChecklistTitle;
+
+  /// No description provided for @tutWelcomeChecklistBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Five small steps to set up your shop. Tap any step and we\'ll do it together.'**
+  String get tutWelcomeChecklistBody;
+
+  /// No description provided for @tutReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s business'**
+  String get tutReportTitle;
+
+  /// No description provided for @tutReportBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This card shows what you sold today and what you earned. Check it every evening.'**
+  String get tutReportBody;
+
+  /// No description provided for @tutFsSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the product'**
+  String get tutFsSearchTitle;
+
+  /// No description provided for @tutFsSearchBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the product\'s name here, then tap it to add it to the bill.'**
+  String get tutFsSearchBody;
+
+  /// No description provided for @tutFsCustomerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the customer'**
+  String get tutFsCustomerTitle;
+
+  /// No description provided for @tutFsCustomerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to pick the customer who is buying — or add a new one with just a name and phone.'**
+  String get tutFsCustomerBody;
+
+  /// No description provided for @tutFsChargeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take payment'**
+  String get tutFsChargeTitle;
+
+  /// No description provided for @tutFsChargeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The bill is ready. Tap here to choose how they pay and finish it.'**
+  String get tutFsChargeBody;
+
+  /// No description provided for @tutFsPaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How are they paying?'**
+  String get tutFsPaymentTitle;
+
+  /// No description provided for @tutFsPaymentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash now — or Udhaar to collect later. Udhaar goes straight into your Khata book.'**
+  String get tutFsPaymentBody;
+
+  /// No description provided for @tutFsConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish the bill'**
+  String get tutFsConfirmTitle;
+
+  /// No description provided for @tutFsConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap this button to complete your sale.'**
+  String get tutFsConfirmBody;
+
+  /// No description provided for @tutApFabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a product'**
+  String get tutApFabTitle;
+
+  /// No description provided for @tutApFabBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to put your first product in the shop.'**
+  String get tutApFabBody;
+
+  /// No description provided for @tutApSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search the catalog'**
+  String get tutApSearchTitle;
+
+  /// No description provided for @tutApSearchBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the product\'s name and pick it from the list — name, photo and details fill in by themselves.'**
+  String get tutApSearchBody;
+
+  /// No description provided for @tutApPriceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your selling price'**
+  String get tutApPriceTitle;
+
+  /// No description provided for @tutApPriceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the price you sell this at in your shop.'**
+  String get tutApPriceBody;
+
+  /// No description provided for @tutApStockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How many do you have?'**
+  String get tutApStockTitle;
+
+  /// No description provided for @tutApStockBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter how many are on your shelf right now.'**
+  String get tutApStockBody;
+
+  /// No description provided for @tutApSaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save it'**
+  String get tutApSaveTitle;
+
+  /// No description provided for @tutApSaveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Save — the product is ready to sell.'**
+  String get tutApSaveBody;
+
+  /// No description provided for @learnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn'**
+  String get learnTitle;
+
+  /// No description provided for @learnSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Short guides that show you around the app. Replay any of them, any time.'**
+  String get learnSubtitle;
+
+  /// No description provided for @learnReplayWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'App tour'**
+  String get learnReplayWelcome;
+
+  /// No description provided for @learnFlowAddProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'How to add a product'**
+  String get learnFlowAddProduct;
+
+  /// No description provided for @learnFlowFirstSale.
+  ///
+  /// In en, this message translates to:
+  /// **'How to make a bill'**
+  String get learnFlowFirstSale;
+
+  /// No description provided for @learnReplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Show me'**
+  String get learnReplay;
+
+  /// No description provided for @learnShowTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Show tips'**
+  String get learnShowTips;
+
+  /// No description provided for @learnShowTipsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Guided tips on screens you open for the first time'**
+  String get learnShowTipsDesc;
+
   /// No description provided for @procExchangeInstead.
   ///
   /// In en, this message translates to:

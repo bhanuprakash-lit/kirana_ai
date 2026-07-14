@@ -64,7 +64,9 @@ class _OrderFooter extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: selectedCustomer != null
+                child: KeyedSubtree(
+                  key: TutorialKeys.posCustomer,
+                  child: selectedCustomer != null
                     ? GestureDetector(
                         onTap: onSelectCustomer,
                         child: Container(
@@ -144,6 +146,7 @@ class _OrderFooter extends StatelessWidget {
                           ),
                         ),
                       ),
+                ),
               ),
               const SizedBox(width: 12),
               Column(
@@ -180,6 +183,7 @@ class _OrderFooter extends StatelessWidget {
           const SizedBox(height: 8),
           // Row 2: Place Order button
           SizedBox(
+            key: TutorialKeys.posOrder,
             width: double.infinity,
             height: 44,
             child: ElevatedButton(

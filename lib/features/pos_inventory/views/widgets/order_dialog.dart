@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../core/tutorial/tutorial_controller.dart';
+import '../../../../core/tutorial/tutorial_keys.dart';
+import '../../../../core/tutorial/tutorial_overlay.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/action_widgets.dart';
 import '../../providers/pos_provider.dart';
@@ -30,6 +33,10 @@ Future<void> showOrderDialog(BuildContext context, WidgetRef ref) async {
   );
 
   if (result != null && context.mounted) {
+    // Getting-started checklist + guided first-sale flow: a real bill exists.
+    ref
+        .read(tutorialProvider.notifier)
+        .onSaleCompleted(result['payment_method'] as String?);
     // Pro + udhaar → capture the customer's spoken consent while they're still
     // at the counter. The clip uploads via a persistent background queue, so
     // this step is quick and skippable and never blocks the sale.
@@ -623,6 +630,43 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
     final cart = state.cart;
     final printerState = ref.watch(printerProvider);
 
+    // Guided first-sale flow: explain the payment choices (this is where the
+    // owner learns Udhaar = pay later → Khata), then point at the button that
+    // completes his first bill.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final c = ref.read(tutorialProvider.notifier);
+      if (!c.shouldShow(Tut.fsPayment, flow: Tut.flowFirstSale)) return;
+      // Short delay only — the overlay itself waits for the sheet's entrance
+      // animation to settle, and firing early beats a fast tap on the real
+      // confirm button (which would pop the sheet under the tour).
+      Future.delayed(const Duration(milliseconds: 120), () {
+        if (!mounted) return;
+        showTutorialSegment(
+          context,
+          ref,
+          id: Tut.fsPayment,
+          flow: Tut.flowFirstSale,
+          steps: [
+            TutStep(
+              targetKey: TutorialKeys.payMethods,
+              title: l10n.tutFsPaymentTitle,
+              body: l10n.tutFsPaymentBody,
+            ),
+            TutStep(
+              targetKey: TutorialKeys.payConfirm,
+              title: l10n.tutFsConfirmTitle,
+              body: l10n.tutFsConfirmBody,
+              align: ContentAlign.top,
+            ),
+          ],
+          nextLabel: l10n.tutNext,
+          doneLabel: l10n.tutDone,
+          skipLabel: l10n.tutSkip,
+        );
+      });
+    });
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -897,6 +941,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
                     ),
                     const SizedBox(height: 12),
                     Row(
+                      key: TutorialKeys.payMethods,
                       children: [
                         _PaymentOption(
                           icon: Icons.payments_rounded,
@@ -1034,6 +1079,7 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
 
                     const SizedBox(height: 28),
                     SizedBox(
+                      key: TutorialKeys.payConfirm,
                       width: double.infinity,
                       height: 56,
                       child: LoadingButton(

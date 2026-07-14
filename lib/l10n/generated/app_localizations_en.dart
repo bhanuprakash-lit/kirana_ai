@@ -3057,6 +3057,178 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rackNoneForProduct => 'Not placed in any rack yet.';
 
   @override
+  String get tutNext => 'Next';
+
+  @override
+  String get tutDone => 'Got it';
+
+  @override
+  String get tutSkip => 'Skip';
+
+  @override
+  String get tutTapHere => 'Tap the highlighted button to continue';
+
+  @override
+  String get tutDismiss => 'Hide';
+
+  @override
+  String get tutChecklistTitle => 'Getting started';
+
+  @override
+  String tutChecklistSubtitle(int done, int total) {
+    return '$done of $total done — tap a step to do it';
+  }
+
+  @override
+  String get tutStepAddProduct => 'Add your first product';
+
+  @override
+  String get tutStepFirstSale => 'Make your first bill';
+
+  @override
+  String get tutStepUdhaar => 'Record an udhaar (pay later)';
+
+  @override
+  String get tutStepReport => 'See today\'s business';
+
+  @override
+  String get tutStepLanguage => 'Choose your language';
+
+  @override
+  String get tutWelcomeHomeTitle => 'Home';
+
+  @override
+  String get tutWelcomeHomeBody =>
+      'Your day at a glance — sales, profit and alerts live here.';
+
+  @override
+  String get tutWelcomeKhataTitle => 'Khata';
+
+  @override
+  String get tutWelcomeKhataBody =>
+      'Your udhaar book. Every credit and collection in one place.';
+
+  @override
+  String get tutWelcomeBillingTitle => 'Billing & Stock';
+
+  @override
+  String get tutWelcomeBillingBody =>
+      'Make bills and manage your products here.';
+
+  @override
+  String get tutWelcomeVisionTitle => 'Vision AI';
+
+  @override
+  String get tutWelcomeVisionBody =>
+      'Count stock with your camera — scan shelves, count items.';
+
+  @override
+  String get tutWelcomeChecklistTitle => 'Start here';
+
+  @override
+  String get tutWelcomeChecklistBody =>
+      'Five small steps to set up your shop. Tap any step and we\'ll do it together.';
+
+  @override
+  String get tutReportTitle => 'Today\'s business';
+
+  @override
+  String get tutReportBody =>
+      'This card shows what you sold today and what you earned. Check it every evening.';
+
+  @override
+  String get tutFsSearchTitle => 'Find the product';
+
+  @override
+  String get tutFsSearchBody =>
+      'Type the product\'s name here, then tap it to add it to the bill.';
+
+  @override
+  String get tutFsCustomerTitle => 'Add the customer';
+
+  @override
+  String get tutFsCustomerBody =>
+      'Tap here to pick the customer who is buying — or add a new one with just a name and phone.';
+
+  @override
+  String get tutFsChargeTitle => 'Take payment';
+
+  @override
+  String get tutFsChargeBody =>
+      'The bill is ready. Tap here to choose how they pay and finish it.';
+
+  @override
+  String get tutFsPaymentTitle => 'How are they paying?';
+
+  @override
+  String get tutFsPaymentBody =>
+      'Cash now — or Udhaar to collect later. Udhaar goes straight into your Khata book.';
+
+  @override
+  String get tutFsConfirmTitle => 'Finish the bill';
+
+  @override
+  String get tutFsConfirmBody => 'Tap this button to complete your sale.';
+
+  @override
+  String get tutApFabTitle => 'Add a product';
+
+  @override
+  String get tutApFabBody =>
+      'Tap the + button to put your first product in the shop.';
+
+  @override
+  String get tutApSearchTitle => 'Search the catalog';
+
+  @override
+  String get tutApSearchBody =>
+      'Type the product\'s name and pick it from the list — name, photo and details fill in by themselves.';
+
+  @override
+  String get tutApPriceTitle => 'Your selling price';
+
+  @override
+  String get tutApPriceBody => 'Enter the price you sell this at in your shop.';
+
+  @override
+  String get tutApStockTitle => 'How many do you have?';
+
+  @override
+  String get tutApStockBody => 'Enter how many are on your shelf right now.';
+
+  @override
+  String get tutApSaveTitle => 'Save it';
+
+  @override
+  String get tutApSaveBody => 'Tap Save — the product is ready to sell.';
+
+  @override
+  String get learnTitle => 'Learn';
+
+  @override
+  String get learnSubtitle =>
+      'Short guides that show you around the app. Replay any of them, any time.';
+
+  @override
+  String get learnReplayWelcome => 'App tour';
+
+  @override
+  String get learnFlowAddProduct => 'How to add a product';
+
+  @override
+  String get learnFlowFirstSale => 'How to make a bill';
+
+  @override
+  String get learnReplay => 'Show me';
+
+  @override
+  String get learnShowTips => 'Show tips';
+
+  @override
+  String get learnShowTipsDesc =>
+      'Guided tips on screens you open for the first time';
+
+  @override
   String get procExchangeInstead => 'Exchange (customer takes another item)';
 
   @override
