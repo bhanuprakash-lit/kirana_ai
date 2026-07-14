@@ -1247,6 +1247,32 @@ class AppLocalizationsMr extends AppLocalizations {
       'अक्षम — ऑर्डर तपशीलांमधून स्वतः प्रिंट करा';
 
   @override
+  String get posConnectPrinterToEnable =>
+      'हे सुरू करण्यासाठी ब्लूटूथ प्रिंटर कनेक्ट करा';
+
+  @override
+  String get posCustomDiscount => 'सूट (संपूर्ण बिलावर)';
+
+  @override
+  String get procPayFirst => 'आधी द्या';
+
+  @override
+  String get procUnpaid => 'थकबाकी';
+
+  @override
+  String get procNextDue => 'पुढील देय';
+
+  @override
+  String get procProductsSupplied => 'हे पुरवत असलेली उत्पादने';
+
+  @override
+  String get procTagProduct => 'उत्पादन टॅग करा';
+
+  @override
+  String get procNoTaggedProducts =>
+      'अजून कोणतीही उत्पादने टॅग केलेली नाहीत. यांच्याकडून जे घेता ते टॅग करा — खरेदी ऑर्डर मिळाल्यावर हे आपोआपही भरले जाते.';
+
+  @override
   String get posHowMuchUdhaar => 'किती उधारीवर जाते?';
 
   @override
@@ -4638,6 +4664,9 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get profAreaAssociation => 'क्षेत्र / संघटना';
+
+  @override
+  String get profAddNewArea => 'नवीन एरिया जोडा…';
 
   @override
   String get profUnableToLoadAreas => 'क्षेत्रे लोड करण्यात अक्षम';

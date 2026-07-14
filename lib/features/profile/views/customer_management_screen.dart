@@ -10,6 +10,9 @@ import '../../../../shared/widgets/shimmer_widgets.dart';
 import '../../finance/providers/finance_provider.dart';
 import '../providers/customer_provider.dart';
 import '../models/customer_model.dart';
+import '../../associations/models/association_model.dart';
+import '../../associations/providers/association_provider.dart';
+import '../../associations/views/association_screen.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/locale/locale_provider.dart';
 
@@ -636,6 +639,10 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
   bool _isSaving = false;
   DateTime? _birthday;
   DateTime? _anniversary;
+  int? _associationId; // area/association this customer belongs to
+
+  // Sentinel dropdown value for the inline "add a new area" action.
+  static const int _kAddAreaSentinel = -2;
 
   AppLocalizations get _l10n =>
       lookupAppLocalizations(ref.read(localeProvider));
@@ -650,6 +657,7 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
       _householdController.text = widget.customer!.householdSize.toString();
       _birthday = widget.customer!.birthday;
       _anniversary = widget.customer!.anniversary;
+      _associationId = widget.customer!.associationId;
     }
   }
 
@@ -701,10 +709,12 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
           24,
           MediaQuery.of(context).viewInsets.bottom + 32,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        // Scrolls when the keyboard (or a small screen) squeezes the form.
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -721,6 +731,27 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
                   ),
                 ),
                 const SizedBox(width: 8),
+                // Prefill name + phone from the phone book.
+                IconButton(
+                  onPressed: () async {
+                    final contact = await ContactService.pickContact();
+                    if (contact != null && mounted) {
+                      setState(() {
+                        _nameController.text =
+                            contact.name?.first.toString() ?? '';
+                        if (contact.phones.isNotEmpty) {
+                          _phoneController.text = ContactService.formatPhone(
+                            contact.phones.first.number,
+                          );
+                        }
+                      });
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.contacts_rounded,
+                    color: BrandColors.primary,
+                  ),
+                ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close_rounded),
@@ -757,6 +788,8 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
                 hintText: '+91 XXXXX XXXXX',
               ),
             ),
+            const SizedBox(height: 16),
+            _buildAreaDropdown(l10n),
             const SizedBox(height: 16),
             TextField(
               controller: _emailController,
@@ -821,9 +854,91 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
                       ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  /// Area / association dropdown with an inline "add new area" action —
+  /// tag where the customer comes from without leaving the form.
+  Widget _buildAreaDropdown(AppLocalizations l10n) {
+    final associations =
+        ref.watch(associationProvider).asData?.value ?? const [];
+    final active = associations.where((a) => a.isActive).toList();
+    // Guard against a stale id (area deleted while the form is open).
+    final validId = active.any((a) => a.associationId == _associationId)
+        ? _associationId
+        : null;
+    return DropdownButtonFormField<int?>(
+      initialValue: validId,
+      decoration: InputDecoration(
+        labelText: l10n.profAreaAssociation,
+        prefixIcon: const Icon(Icons.location_city_rounded),
+      ),
+      items: [
+        DropdownMenuItem<int?>(
+          value: null,
+          child: Text(
+            l10n.profNone,
+            style: const TextStyle(color: BrandColors.muted),
+          ),
+        ),
+        ...active.map(
+          (a) => DropdownMenuItem<int?>(
+            value: a.associationId,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(a.areaType.emoji),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    a.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        DropdownMenuItem<int?>(
+          value: _kAddAreaSentinel,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.add_circle_outline_rounded,
+                size: 18,
+                color: BrandColors.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l10n.profAddNewArea,
+                style: const TextStyle(
+                  color: BrandColors.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+      onChanged: (v) async {
+        if (v == _kAddAreaSentinel) {
+          final prev = _associationId;
+          final created = await showAddAssociationSheet(context, ref);
+          if (mounted) {
+            setState(
+              () => _associationId = created?.associationId ?? prev,
+            );
+          }
+          return;
+        }
+        setState(() => _associationId = v);
+      },
     );
   }
 
@@ -858,11 +973,15 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
       'household_size': int.tryParse(_householdController.text) ?? 4,
       'birthday': _birthday != null ? _isoDate(_birthday!) : null,
       'anniversary': _anniversary != null ? _isoDate(_anniversary!) : null,
+      'association_id': _associationId,
     };
 
     bool success;
+    Customer? created;
     if (widget.customer == null) {
-      success = await ref.read(customerProvider.notifier).createCustomer(data);
+      // Return the record so picker flows (e.g. POS sale) can select it.
+      created = await ref.read(customerProvider.notifier).createAndReturn(data);
+      success = created != null;
     } else {
       success = await ref
           .read(customerProvider.notifier)
@@ -872,7 +991,7 @@ class _CustomerFormSheetState extends ConsumerState<CustomerFormSheet> {
     if (mounted) {
       setState(() => _isSaving = false);
       if (success) {
-        Navigator.pop(context);
+        Navigator.pop(context, created);
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(_l10n.profCustomerSaved)));

@@ -105,7 +105,9 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
         in ((pricingRes['rows'] as List<dynamic>?) ?? [])
             .cast<Map<String, dynamic>>()) {
       final id = (row['product_id'] as num?)?.toInt();
-      if (id != null) pricingMap[id] = row;
+      if (id != null && isNewerPricingRow(row, pricingMap[id])) {
+        pricingMap[id] = row;
+      }
     }
 
     final items = (productsRes ?? []).cast<Map<String, dynamic>>().map((p) {
@@ -481,25 +483,16 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
           },
           filters: {'product_id': productId.toString()},
         ),
-        client.patchOltp(
-          'pricing',
-          {
-            'selling_price': sellingPrice,
-            'mrp': mrp,
-            // Also reset valid_from to "now" (UTC, backdated 1 min) so older
-            // pricing rows that were written with a future-dated valid_from
-            // become active immediately. Without this, edits keep the row
-            // future-dated and the POS layer sees price as 0.
-            'valid_from': DateTime.now()
-                .toUtc()
-                .subtract(const Duration(minutes: 1))
-                .toIso8601String(),
-          },
-          filters: {
-            'store_id': storeId.toString(),
-            'product_id': productId.toString(),
-          },
-        ),
+        // Price rows are windowed history (valid_from/valid_to): write through
+        // the dedicated price endpoint, which closes any open rows and opens a
+        // fresh one. A raw PATCH on /oltp/pricing trips the backend's
+        // ambiguous-update 409 guard as soon as a product has more than one
+        // price row (pricing has no variant_id column to narrow on).
+        client.post('/kirana/inventory/price', {
+          'product_id': productId,
+          'price': sellingPrice,
+          'mrp': mrp,
+        }),
         if (stockQuantity != null)
           client.patchOltp(
             'inventory',
@@ -507,6 +500,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
             filters: {
               'store_id': storeId.toString(),
               'product_id': productId.toString(),
+              'variant_id': '__null__',
             },
           ),
       ]);
@@ -549,6 +543,7 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
         filters: {
           'store_id': storeId.toString(),
           'product_id': productId.toString(),
+          'variant_id': '__null__',
         },
       );
       await refresh();
@@ -592,6 +587,23 @@ class InventoryNotifier extends AsyncNotifier<InventoryData> {
       return false;
     }
   }
+}
+
+/// Pricing rows are windowed history (valid_from/valid_to). When a product
+/// has several rows, the CURRENT price is the open window (valid_to null)
+/// with the latest valid_from — not whichever row the backend happened to
+/// return last.
+bool isNewerPricingRow(Map<String, dynamic> row, Map<String, dynamic>? current) {
+  if (current == null) return true;
+  final rowOpen = row['valid_to'] == null;
+  final curOpen = current['valid_to'] == null;
+  if (rowOpen != curOpen) return rowOpen;
+  final rowFrom =
+      DateTime.tryParse(row['valid_from'] as String? ?? '') ?? DateTime(1970);
+  final curFrom =
+      DateTime.tryParse(current['valid_from'] as String? ?? '') ??
+      DateTime(1970);
+  return rowFrom.isAfter(curFrom);
 }
 
 final inventoryProvider =

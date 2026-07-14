@@ -5,12 +5,16 @@ class _SetCustomerPriceSheet extends StatefulWidget {
   final String customerName;
   final bool hasPin;
   final double initial;
+  // When set, replaces the "Price for <customer>" heading — used by the
+  // one-time (no customer) price edit.
+  final String? titleOverride;
 
   const _SetCustomerPriceSheet({
     required this.product,
     required this.customerName,
     required this.hasPin,
     required this.initial,
+    this.titleOverride,
   });
 
   @override
@@ -78,7 +82,7 @@ class _SetCustomerPriceSheetState extends State<_SetCustomerPriceSheet> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Price for ${widget.customerName}',
+              widget.titleOverride ?? 'Price for ${widget.customerName}',
               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 2),

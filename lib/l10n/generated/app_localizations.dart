@@ -2250,6 +2250,54 @@ abstract class AppLocalizations {
   /// **'Disabled — print manually from order details'**
   String get posAutoPrintDisabled;
 
+  /// No description provided for @posConnectPrinterToEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect a Bluetooth printer to enable this'**
+  String get posConnectPrinterToEnable;
+
+  /// No description provided for @posCustomDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount (whole bill)'**
+  String get posCustomDiscount;
+
+  /// No description provided for @procPayFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay first'**
+  String get procPayFirst;
+
+  /// No description provided for @procUnpaid.
+  ///
+  /// In en, this message translates to:
+  /// **'unpaid'**
+  String get procUnpaid;
+
+  /// No description provided for @procNextDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due'**
+  String get procNextDue;
+
+  /// No description provided for @procProductsSupplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Products they supply'**
+  String get procProductsSupplied;
+
+  /// No description provided for @procTagProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag product'**
+  String get procTagProduct;
+
+  /// No description provided for @procNoTaggedProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'No products tagged yet. Tag what you buy from them — it also fills in automatically when you receive a purchase order.'**
+  String get procNoTaggedProducts;
+
   /// No description provided for @posHowMuchUdhaar.
   ///
   /// In en, this message translates to:
@@ -8164,6 +8212,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Area / Association'**
   String get profAreaAssociation;
+
+  /// No description provided for @profAddNewArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new area…'**
+  String get profAddNewArea;
 
   /// No description provided for @profUnableToLoadAreas.
   ///

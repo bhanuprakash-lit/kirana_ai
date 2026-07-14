@@ -171,6 +171,15 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
           final mlFlags =
               ref.watch(inventoryFlagsProvider).asData?.value ??
               const <int, List<String>>{};
+          // Rack placements — answer "where is it?" right on the list row.
+          final rackPlacements =
+              ref.watch(rackPlacementsProvider).asData?.value ??
+              const <RackPlacement>[];
+          final Map<int, Set<String>> racksByProduct = {};
+          for (final p in rackPlacements) {
+            if (p.rack.isEmpty) continue;
+            (racksByProduct[p.productId] ??= {}).add(p.rack);
+          }
           // Only offer tag filters for flags that actually occur in this store.
           final availableFlags = [
             for (final f in _flagOrder)
@@ -501,6 +510,10 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                             item: entry.value[i],
                             mlFlags:
                                 mlFlags[entry.value[i].productId] ?? const [],
+                            racks:
+                                racksByProduct[entry.value[i].productId]
+                                    ?.toList() ??
+                                const [],
                             onTap: () => _showEditProduct(entry.value[i]),
                             onLongPress: () => showProductRacksSheet(
                               context,
@@ -848,11 +861,13 @@ class _InventoryTile extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
   final List<String> mlFlags;
+  final List<String> racks;
   const _InventoryTile({
     required this.item,
     required this.onTap,
     this.onLongPress,
     this.mlFlags = const [],
+    this.racks = const [],
   });
 
   Color _categoryColor(String? cat) {
@@ -981,6 +996,30 @@ class _InventoryTile extends StatelessWidget {
                 ),
               ],
             ),
+            if (racks.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.shelves,
+                    size: 12,
+                    color: BrandColors.muted,
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      racks.join(', '),
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: BrandColors.muted,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             if (mlFlags.isNotEmpty) ...[
               const SizedBox(height: 4),
               _MlFlagChips(flags: mlFlags),

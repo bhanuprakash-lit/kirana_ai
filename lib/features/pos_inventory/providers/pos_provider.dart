@@ -222,7 +222,10 @@ class PosNotifier extends Notifier<PosState> {
           in ((pricingRes['rows'] as List<dynamic>?) ?? [])
               .cast<Map<String, dynamic>>()) {
         final id = (row['product_id'] as num?)?.toInt();
-        if (id != null) pricingMap[id] = row;
+        // Keep the open/most recent price window, not the last row returned.
+        if (id != null && isNewerPricingRow(row, pricingMap[id])) {
+          pricingMap[id] = row;
+        }
       }
 
       final products = res.cast<Map<String, dynamic>>().map((j) {
@@ -463,6 +466,25 @@ class PosNotifier extends Notifier<PosState> {
     state = state.copyWith(customerPricesDismissed: true);
   }
 
+  /// One-time price override for a single cart line (no customer attached).
+  /// Lives only on the cart line — clearing the cart, removing the line, or
+  /// abandoning the sale discards it; nothing is persisted anywhere.
+  void setLinePrice(String lineKey, double? price) {
+    state = state.copyWith(
+      cart: state.cart
+          .map(
+            (i) => i.lineKey == lineKey
+                ? i.copyWith(
+                    unitPriceOverride: price,
+                    clearOverride: price == null,
+                  )
+                : i,
+          )
+          .toList(),
+    );
+    _schedulePing();
+  }
+
   /// Set a customer-specific price for this cart only.
   ///
   /// The backend write is deferred until an order is placed. If the cart is
@@ -630,6 +652,7 @@ class PosNotifier extends Notifier<PosState> {
     double couponDiscount = 0,
     double redeemPoints = 0,
     double redeemValue = 0, // ₹ value of the redeemed points
+    double manualDiscount = 0, // shopkeeper's custom whole-bill discount (₹)
     // POS deep-links — link module records to this sale (best-effort on backend).
     List<String>?
     serials, // M7 serial/IMEI sold on this bill (legacy flat list)
@@ -660,11 +683,13 @@ class PosNotifier extends Notifier<PosState> {
     final baseTotal = discountPct > 0
         ? subtotal * (1 - discountPct / 100)
         : subtotal;
-    // M1 — apply coupon discount + redeemed-points value to the bill.
+    // M1 — apply coupon discount + redeemed-points value to the bill, plus
+    // the shopkeeper's manual whole-bill discount typed at checkout.
     // M4/O2 — add any billed appointment's service charge on top.
-    final totalAmount = (baseTotal - couponDiscount - redeemValue + extraCharge)
-        .clamp(0, double.infinity)
-        .toDouble();
+    final totalAmount =
+        (baseTotal - couponDiscount - redeemValue - manualDiscount + extraCharge)
+            .clamp(0, double.infinity)
+            .toDouble();
 
     try {
       final body = <String, dynamic>{

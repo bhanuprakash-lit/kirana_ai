@@ -926,78 +926,21 @@ class _PosTabState extends ConsumerState<PosTab> {
     );
   }
 
-  void _showAddCustomerDialog() {
-    final nameCtrl = TextEditingController();
-    final phoneCtrl = TextEditingController();
-
-    showDialog(
+  /// Add a customer from POS using the SAME full form as the Customer
+  /// Relations page (name, phone, area, birthday …) — one form everywhere,
+  /// then select the new customer on the bill.
+  Future<void> _showAddCustomerDialog() async {
+    final created = await showModalBottomSheet<Customer>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  _l10n.posAddNewCustomer,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              IconButton(
-                onPressed: () async {
-                  final contact = await ContactService.pickContact();
-                  if (contact != null) {
-                    setModalState(() {
-                      nameCtrl.text = contact.name!.first.toString();
-                      if (contact.phones.isNotEmpty) {
-                        phoneCtrl.text = ContactService.formatPhone(
-                          contact.phones.first.number,
-                        );
-                      }
-                    });
-                  }
-                },
-                icon: const Icon(
-                  Icons.contacts_rounded,
-                  color: BrandColors.primary,
-                ),
-                tooltip: _l10n.posSelectFromContacts,
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtrl,
-                decoration: InputDecoration(labelText: _l10n.posCustomerName),
-              ),
-              TextField(
-                controller: phoneCtrl,
-                decoration: InputDecoration(labelText: _l10n.posPhoneNumber),
-                keyboardType: TextInputType.phone,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(_l10n.posCommonCancel),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (nameCtrl.text.isEmpty || phoneCtrl.text.isEmpty) return;
-                await ref
-                    .read(posProvider.notifier)
-                    .createCustomer(nameCtrl.text, phoneCtrl.text);
-                if (ctx.mounted) Navigator.pop(ctx);
-              },
-              child: Text(_l10n.posSaveAndSelect),
-            ),
-          ],
-        ),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const CustomerFormSheet(),
     );
+    if (created != null && mounted) {
+      ref
+          .read(posProvider.notifier)
+          .setCustomer(created.customerId, created.name);
+    }
   }
 
   /// Guided first-sale flow (Getting started → "Make your first bill").

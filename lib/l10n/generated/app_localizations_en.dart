@@ -1240,6 +1240,32 @@ class AppLocalizationsEn extends AppLocalizations {
       'Disabled — print manually from order details';
 
   @override
+  String get posConnectPrinterToEnable =>
+      'Connect a Bluetooth printer to enable this';
+
+  @override
+  String get posCustomDiscount => 'Discount (whole bill)';
+
+  @override
+  String get procPayFirst => 'Pay first';
+
+  @override
+  String get procUnpaid => 'unpaid';
+
+  @override
+  String get procNextDue => 'Next due';
+
+  @override
+  String get procProductsSupplied => 'Products they supply';
+
+  @override
+  String get procTagProduct => 'Tag product';
+
+  @override
+  String get procNoTaggedProducts =>
+      'No products tagged yet. Tag what you buy from them — it also fills in automatically when you receive a purchase order.';
+
+  @override
   String get posHowMuchUdhaar => 'How much goes on Udhaar?';
 
   @override
@@ -4633,6 +4659,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profAreaAssociation => 'Area / Association';
+
+  @override
+  String get profAddNewArea => 'Add new area…';
 
   @override
   String get profUnableToLoadAreas => 'Unable to load areas';

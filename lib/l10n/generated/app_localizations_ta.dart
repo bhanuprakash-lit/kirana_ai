@@ -1262,6 +1262,32 @@ class AppLocalizationsTa extends AppLocalizations {
       'முடக்கப்பட்டது — ஆர்டர் விவரங்களிலிருந்து கைமுறையாக அச்சிடு';
 
   @override
+  String get posConnectPrinterToEnable =>
+      'இதை இயக்க புளூடூத் பிரிண்டரை இணைக்கவும்';
+
+  @override
+  String get posCustomDiscount => 'தள்ளுபடி (முழு பில்)';
+
+  @override
+  String get procPayFirst => 'முதலில் செலுத்து';
+
+  @override
+  String get procUnpaid => 'நிலுவை';
+
+  @override
+  String get procNextDue => 'அடுத்த தவணை';
+
+  @override
+  String get procProductsSupplied => 'இவர்கள் வழங்கும் பொருட்கள்';
+
+  @override
+  String get procTagProduct => 'பொருளை இணை';
+
+  @override
+  String get procNoTaggedProducts =>
+      'இன்னும் பொருட்கள் இணைக்கப்படவில்லை. இவர்களிடம் வாங்குவதை இணைக்கவும் — கொள்முதல் ஆர்டர் பெறும்போது தானாகவும் நிரம்பும்.';
+
+  @override
   String get posHowMuchUdhaar => 'எவ்வளவு உதாரில் செல்கிறது?';
 
   @override
@@ -4691,6 +4717,9 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get profAreaAssociation => 'பகுதி / தொடர்பு';
+
+  @override
+  String get profAddNewArea => 'புதிய பகுதியைச் சேர்…';
 
   @override
   String get profUnableToLoadAreas => 'பகுதிகளை ஏற்ற முடியவில்லை';

@@ -731,6 +731,14 @@
     }
   },
   "posAutoPrintDisabled": "Disabled — print manually from order details",
+  "posConnectPrinterToEnable": "Connect a Bluetooth printer to enable this",
+  "posCustomDiscount": "Discount (whole bill)",
+  "procPayFirst": "Pay first",
+  "procUnpaid": "unpaid",
+  "procNextDue": "Next due",
+  "procProductsSupplied": "Products they supply",
+  "procTagProduct": "Tag product",
+  "procNoTaggedProducts": "No products tagged yet. Tag what you buy from them — it also fills in automatically when you receive a purchase order.",
   "posHowMuchUdhaar": "How much goes on Udhaar?",
   "posCashNow": "Cash now",
   "posOnUdhaar": "On Udhaar",
@@ -2754,6 +2762,7 @@
     }
   },
   "profAreaAssociation": "Area / Association",
+  "profAddNewArea": "Add new area…",
   "profUnableToLoadAreas": "Unable to load areas",
   "profNoAreasTapToAdd": "No areas — tap to add one",
   "profNone": "None",

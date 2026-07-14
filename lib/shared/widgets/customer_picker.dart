@@ -5,6 +5,8 @@ import '../../core/theme/brand_theme.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../features/profile/models/customer_model.dart';
 import '../../features/profile/providers/customer_provider.dart';
+import '../../features/profile/views/customer_management_screen.dart'
+    show CustomerFormSheet;
 
 /// Shared customer selector. Search the store's customers or add a new one
 /// inline (name + phone); returns the chosen [Customer], or null if dismissed.
@@ -30,31 +32,25 @@ class _CustomerPicker extends ConsumerStatefulWidget {
 
 class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
   final _searchCtrl = TextEditingController();
-  final _nameCtrl = TextEditingController();
-  final _phoneCtrl = TextEditingController();
   String _query = '';
-  bool _adding = false;
-  bool _saving = false;
 
   @override
   void dispose() {
     _searchCtrl.dispose();
-    _nameCtrl.dispose();
-    _phoneCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _save() async {
-    final name = _nameCtrl.text.trim();
-    final phone = _phoneCtrl.text.trim();
-    if (name.isEmpty) return;
-    setState(() => _saving = true);
-    final created = await ref
-        .read(customerProvider.notifier)
-        .createAndReturn(name, phone);
-    if (!mounted) return;
-    setState(() => _saving = false);
-    if (created != null) Navigator.pop(context, created);
+  /// "Add new" opens the SAME full customer form used everywhere else
+  /// (name, phone, area, birthday …); the created customer is returned
+  /// as this picker's selection.
+  Future<void> _addNew() async {
+    final created = await showModalBottomSheet<Customer>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const CustomerFormSheet(),
+    );
+    if (created != null && mounted) Navigator.pop(context, created);
   }
 
   @override
@@ -110,52 +106,39 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
                       ),
                     ),
                     TextButton.icon(
-                      onPressed: () => setState(() => _adding = !_adding),
-                      icon: Icon(
-                        _adding ? Icons.close_rounded : Icons.person_add_alt_1,
-                        size: 18,
-                      ),
-                      label: Text(
-                        _adding ? l10n.posCommonCancel : l10n.posAddNewCustomer,
-                      ),
+                      onPressed: _addNew,
+                      icon: const Icon(Icons.person_add_alt_1, size: 18),
+                      label: Text(l10n.posAddNewCustomer),
                     ),
                   ],
                 ),
               ),
-              if (_adding)
-                _AddForm(
-                  nameCtrl: _nameCtrl,
-                  phoneCtrl: _phoneCtrl,
-                  saving: _saving,
-                  onSave: _save,
-                )
-              else
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: TextField(
-                    controller: _searchCtrl,
-                    autofocus: true,
-                    onChanged: (v) => setState(() => _query = v),
-                    decoration: InputDecoration(
-                      hintText: l10n.finSearchByNameOrPhone,
-                      prefixIcon: const Icon(
-                        Icons.search_rounded,
-                        size: 20,
-                        color: BrandColors.muted,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextField(
+                  controller: _searchCtrl,
+                  autofocus: true,
+                  onChanged: (v) => setState(() => _query = v),
+                  decoration: InputDecoration(
+                    hintText: l10n.finSearchByNameOrPhone,
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      size: 20,
+                      color: BrandColors.muted,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
                   ),
                 ),
+              ),
               const SizedBox(height: 8),
               Expanded(
                 child: filtered.isEmpty
@@ -218,74 +201,3 @@ class _CustomerPickerState extends ConsumerState<_CustomerPicker> {
   }
 }
 
-class _AddForm extends StatelessWidget {
-  final TextEditingController nameCtrl;
-  final TextEditingController phoneCtrl;
-  final bool saving;
-  final VoidCallback onSave;
-
-  const _AddForm({
-    required this.nameCtrl,
-    required this.phoneCtrl,
-    required this.saving,
-    required this.onSave,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-      child: Column(
-        children: [
-          TextField(
-            controller: nameCtrl,
-            autofocus: true,
-            textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(
-              labelText: l10n.posCustomerName,
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: phoneCtrl,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              labelText: l10n.posPhoneNumber,
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: FilledButton(
-              onPressed: saving ? null : onSave,
-              child: saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(l10n.posSaveAndSelect),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

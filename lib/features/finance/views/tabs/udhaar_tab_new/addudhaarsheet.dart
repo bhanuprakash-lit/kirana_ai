@@ -26,7 +26,8 @@ class _AddUdhaarSheetState extends ConsumerState<_AddUdhaarSheet> {
   Customer? _selectedCustomer;
   // Repayment deadline; defaults to 30 Jun 2026 (same default as the backend
   // backfill) and is editable.
-  DateTime _dueDate = DateTime(2026, 6, 30);
+  // Repayment deadline — defaults to a month from today, editable below.
+  DateTime _dueDate = DateTime.now().add(const Duration(days: 30));
 
   void _fillFromCustomer(Customer c) {
     setState(() {

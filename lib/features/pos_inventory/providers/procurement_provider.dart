@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/api_client.dart';
 import '../../../core/store/store_scope.dart';
 import '../models/procurement_models.dart';
+import 'inventory_provider.dart';
+import 'pos_provider.dart';
 
 class ProcurementData {
   final List<Supplier> suppliers;
@@ -178,6 +180,7 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
       );
 
       await refresh();
+      ref.invalidate(supplierOverviewProvider);
     } catch (e) {
       rethrow;
     }
@@ -186,12 +189,14 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
   Future<void> markAsReceived(int purchaseId) async {
     final client = ref.read(apiClientProvider);
     try {
-      await client.patchOltp(
-        'purchases',
-        {'status': 'received'},
-        filters: {'purchase_id': purchaseId.toString()},
-      );
+      // Transactional receive: flips the status AND adds the ordered
+      // quantities to inventory (plus movement + supplier-cost records).
+      await client.post('/kirana/purchases/$purchaseId/receive', {});
       await refresh();
+      // Stock changed — refresh the inventory list and POS product cache.
+      ref.invalidate(inventoryProvider);
+      ref.invalidate(supplierOverviewProvider);
+      ref.read(posProvider.notifier).reloadProducts();
     } catch (e) {
       rethrow;
     }
@@ -206,9 +211,33 @@ class ProcurementNotifier extends AsyncNotifier<ProcurementData> {
         filters: {'purchase_id': purchaseId.toString()},
       );
       await refresh();
+      ref.invalidate(supplierOverviewProvider);
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// Tag a product to a supplier (drives the supplier dashboard's
+  /// "products they sell us" list).
+  Future<void> tagProductToSupplier(
+    int supplierId,
+    int productId, {
+    double? costPrice,
+  }) async {
+    final client = ref.read(apiClientProvider);
+    await client.post('/kirana/suppliers/$supplierId/products', {
+      'product_id': productId,
+      'cost_price': ?costPrice,
+    });
+    ref.invalidate(supplierProductsProvider(supplierId));
+    ref.invalidate(supplierOverviewProvider);
+  }
+
+  Future<void> untagProductFromSupplier(int supplierId, int productId) async {
+    final client = ref.read(apiClientProvider);
+    await client.delete('/kirana/suppliers/$supplierId/products/$productId');
+    ref.invalidate(supplierProductsProvider(supplierId));
+    ref.invalidate(supplierOverviewProvider);
   }
 
   Future<List<PurchaseItem>> fetchPurchaseItems(int purchaseId) async {
@@ -233,3 +262,34 @@ final procurementProvider =
     AsyncNotifierProvider<ProcurementNotifier, ProcurementData>(
       ProcurementNotifier.new,
     );
+
+// ── Supplier dashboard ────────────────────────────────────────────────────────
+
+/// Per-supplier dues/products rollup, keyed by supplier id. Iteration order
+/// preserves the backend's payment-priority ordering (whom to pay first).
+final supplierOverviewProvider = FutureProvider<Map<int, SupplierOverview>>((
+  ref,
+) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
+  final res = await ref.read(apiClientProvider).get('/kirana/suppliers/overview');
+  final list = (res is Map ? res['suppliers'] : null) as List<dynamic>? ?? [];
+  final map = <int, SupplierOverview>{};
+  for (final j in list.whereType<Map>()) {
+    final o = SupplierOverview.fromJson(j.cast<String, dynamic>());
+    map[o.supplierId] = o;
+  }
+  return map;
+});
+
+/// Products tagged to one supplier.
+final supplierProductsProvider = FutureProvider.autoDispose
+    .family<List<SupplierProduct>, int>((ref, supplierId) async {
+      final res = await ref
+          .read(apiClientProvider)
+          .get('/kirana/suppliers/$supplierId/products');
+      final list = (res is Map ? res['products'] : null) as List<dynamic>? ?? [];
+      return list
+          .whereType<Map>()
+          .map((j) => SupplierProduct.fromJson(j.cast<String, dynamic>()))
+          .toList();
+    });
