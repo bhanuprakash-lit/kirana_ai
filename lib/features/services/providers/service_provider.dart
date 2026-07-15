@@ -32,6 +32,19 @@ final appointmentsProvider = FutureProvider.family<List<Appointment>, String>((
       .toList();
 });
 
+/// All memberships for the store (V3 — memberships tab in the services
+/// screen). The checkout deep-link keeps its own per-customer fetch.
+final membershipsProvider = FutureProvider<List<Membership>>((ref) async {
+  ref.watch(storeScopeProvider); // refetch when the active store changes
+  final data = await ref.read(apiClientProvider).get('/kirana/memberships');
+  final list =
+      (data is Map ? data['memberships'] : null) as List<dynamic>? ?? [];
+  return list
+      .whereType<Map>()
+      .map((e) => Membership.fromJson(e.cast<String, dynamic>()))
+      .toList();
+});
+
 class ServiceActions {
   ServiceActions(this.ref);
   final Ref ref;
@@ -55,6 +68,30 @@ class ServiceActions {
   Future<void> setStatus(int appointmentId, String status, String day) async {
     await _c.patch('/kirana/appointments/$appointmentId', {'status': status});
     ref.invalidate(appointmentsProvider(day));
+  }
+
+  /// Sell a prepaid session bundle to a customer (V3).
+  Future<void> createMembership({
+    required int customerId,
+    required String name,
+    required int totalSessions, // 0 = unlimited
+    required double price,
+    String? validUntil, // yyyy-mm-dd
+  }) async {
+    await _c.post('/kirana/memberships', {
+      'customer_id': customerId,
+      'name': name,
+      'total_sessions': totalSessions,
+      'price': price,
+      'valid_until': ?validUntil,
+    });
+    ref.invalidate(membershipsProvider);
+  }
+
+  /// Consume one session (backend deactivates when the bundle is exhausted).
+  Future<void> useMembershipSession(int membershipId) async {
+    await _c.post('/kirana/memberships/$membershipId/use', {});
+    ref.invalidate(membershipsProvider);
   }
 }
 
