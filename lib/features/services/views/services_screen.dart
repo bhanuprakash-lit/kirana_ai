@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../shared/widgets/shimmer_widgets.dart';
 import '../../profile/models/customer_model.dart';
 import '../../../shared/widgets/customer_picker.dart';
 import '../models/service_models.dart';
@@ -17,7 +18,7 @@ class ServicesScreen extends ConsumerStatefulWidget {
 
 class _ServicesScreenState extends ConsumerState<ServicesScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tabs = TabController(length: 2, vsync: this);
+  late final TabController _tabs = TabController(length: 3, vsync: this);
   DateTime _day = DateTime.now();
 
   String get _dayKey =>
@@ -40,13 +41,68 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
           tabs: const [
             Tab(text: 'Appointments'),
             Tab(text: 'Services'),
+            Tab(text: 'Memberships'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabs,
-        children: [_appointmentsTab(), _servicesTab()],
+        children: [_appointmentsTab(), _servicesTab(), _membershipsTab()],
       ),
+    );
+  }
+
+  // ── Memberships (V3) — prepaid session bundles ─────────────────────────────
+  Widget _membershipsTab() {
+    final async = ref.watch(membershipsProvider);
+    return Stack(
+      children: [
+        async.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.all(16),
+            child: ListShimmer(itemCount: 4),
+          ),
+          error: (e, _) => Center(
+            child: Text('$e', style: const TextStyle(color: BrandColors.muted)),
+          ),
+          data: (items) {
+            if (items.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Text(
+                    'No memberships yet.\nSell a prepaid bundle (e.g. 10 sessions) — '
+                    'redeem one session per visit at checkout or right here.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: BrandColors.muted, height: 1.5),
+                  ),
+                ),
+              );
+            }
+            return ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
+              itemCount: items.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (_, i) => _MembershipCard(m: items[i]),
+            );
+          },
+        ),
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton.extended(
+            heroTag: 'addMembership',
+            onPressed: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const _MembershipEditor(),
+            ),
+            icon: const Icon(Icons.card_membership_rounded),
+            label: const Text('New membership'),
+          ),
+        ),
+      ],
     );
   }
 
@@ -640,6 +696,323 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Membership card (V3) ──────────────────────────────────────────────────────
+class _MembershipCard extends ConsumerWidget {
+  final Membership m;
+  const _MembershipCard({required this.m});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unlimited = m.totalSessions <= 0;
+    final exhausted = !unlimited && m.remaining == 0;
+    final color = !m.isActive || exhausted
+        ? BrandColors.muted
+        : BrandColors.primary;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.card_membership_rounded, color: color, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  m.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                Text(
+                  '${m.customerName ?? "Customer #${m.customerId}"}'
+                  ' · ₹${m.price.toStringAsFixed(0)}'
+                  ' · ${unlimited ? "Unlimited" : "${m.usedSessions}/${m.totalSessions} used"}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: BrandColors.muted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (m.isActive && !exhausted)
+            FilledButton.tonal(
+              onPressed: () async {
+                try {
+                  await ref
+                      .read(serviceActionsProvider)
+                      .useMembershipSession(m.membershipId);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Session used')),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text('$e')));
+                  }
+                }
+              },
+              child: const Text('Use session'),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: BrandColors.muted.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                exhausted ? 'Used up' : 'Inactive',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: BrandColors.muted,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── New-membership editor (V3) ────────────────────────────────────────────────
+class _MembershipEditor extends ConsumerStatefulWidget {
+  const _MembershipEditor();
+
+  @override
+  ConsumerState<_MembershipEditor> createState() => _MembershipEditorState();
+}
+
+class _MembershipEditorState extends ConsumerState<_MembershipEditor> {
+  final _nameCtrl = TextEditingController();
+  final _sessionsCtrl = TextEditingController(text: '10');
+  final _priceCtrl = TextEditingController();
+  Customer? _customer;
+  DateTime? _validUntil;
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _sessionsCtrl.dispose();
+    _priceCtrl.dispose();
+    super.dispose();
+  }
+
+  String _iso(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Future<void> _save() async {
+    final name = _nameCtrl.text.trim();
+    final price = double.tryParse(_priceCtrl.text.trim());
+    if (_customer == null || name.isEmpty || price == null) {
+      setState(
+        () => _error = 'Pick a customer and fill the name and price.',
+      );
+      return;
+    }
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(serviceActionsProvider)
+          .createMembership(
+            customerId: _customer!.customerId,
+            name: name,
+            totalSessions: int.tryParse(_sessionsCtrl.text.trim()) ?? 0,
+            price: price,
+            validUntil: _validUntil != null ? _iso(_validUntil!) : null,
+          );
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+          _error = '$e';
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: BrandColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'New membership',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 16),
+            // Customer — the bundle belongs to someone.
+            OutlinedButton.icon(
+              onPressed: _saving
+                  ? null
+                  : () async {
+                      final c = await showCustomerPicker(context, ref);
+                      if (c != null && mounted) {
+                        setState(() => _customer = c);
+                      }
+                    },
+              icon: const Icon(Icons.person_rounded, size: 18),
+              label: Text(
+                _customer?.name ?? 'Pick customer',
+                overflow: TextOverflow.ellipsis,
+              ),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                alignment: Alignment.centerLeft,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _nameCtrl,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Membership name (e.g. 10-session gym pass)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _sessionsCtrl,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: const InputDecoration(
+                      labelText: 'Sessions (0 = unlimited)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _priceCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Price',
+                      prefixText: '₹ ',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _saving
+                  ? null
+                  : () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate:
+                            _validUntil ??
+                            DateTime.now().add(const Duration(days: 90)),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(
+                          const Duration(days: 365 * 3),
+                        ),
+                      );
+                      if (picked != null && mounted) {
+                        setState(() => _validUntil = picked);
+                      }
+                    },
+              icon: const Icon(Icons.event_rounded, size: 18),
+              label: Text(
+                _validUntil == null
+                    ? 'Valid until (optional)'
+                    : '${_validUntil!.day}/${_validUntil!.month}/${_validUntil!.year}',
+              ),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                alignment: Alignment.centerLeft,
+              ),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                _error!,
+                style: const TextStyle(
+                  color: BrandColors.error,
+                  fontSize: 12.5,
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: _saving ? null : _save,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(52),
+              ),
+              child: _saving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text('Sell membership'),
+            ),
+          ],
+        ),
       ),
     );
   }

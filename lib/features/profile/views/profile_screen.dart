@@ -172,11 +172,15 @@ class ProfileScreen extends ConsumerWidget {
                     label: l10n.profCustomerRelations,
                     onTap: () => context.push('/profile/customers'),
                   ),
-                  _CompactRow(
-                    icon: Icons.location_city_rounded,
-                    label: l10n.profAreaAssociations,
-                    onTap: () => context.push('/profile/associations'),
-                  ),
+                  // V3 — apartment/hostel catchment marketing is a
+                  // grocery-family play; salons/electronics don't run it.
+                  if (const {'grocery', 'general'}
+                      .contains(verticalConfigOf(ref).verticalCode))
+                    _CompactRow(
+                      icon: Icons.location_city_rounded,
+                      label: l10n.profAreaAssociations,
+                      onTap: () => context.push('/profile/associations'),
+                    ),
                 ],
               ),
 
@@ -235,11 +239,15 @@ class ProfileScreen extends ConsumerWidget {
               _SectionLabel(l10n.profSectionSalesMarketing),
               _GroupCard(
                 rows: [
-                  _CompactRow(
-                    icon: Icons.shopping_basket_rounded,
-                    label: l10n.profMyBaskets,
-                    onTap: () => context.push('/profile/baskets'),
-                  ),
+                  // V3 — combo/bundle tiers are grocery-family marketing;
+                  // hidden for services/electronics/apparel/optical.
+                  if (const {'grocery', 'general'}
+                      .contains(verticalConfigOf(ref).verticalCode))
+                    _CompactRow(
+                      icon: Icons.shopping_basket_rounded,
+                      label: l10n.profMyBaskets,
+                      onTap: () => context.push('/profile/baskets'),
+                    ),
                   _CompactRow(
                     icon: Icons.card_giftcard_rounded,
                     label: l10n.profLoyalty,
