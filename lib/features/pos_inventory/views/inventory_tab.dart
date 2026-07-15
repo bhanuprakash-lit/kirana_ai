@@ -141,6 +141,10 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
           if (data.items.isEmpty) {
             return _EmptyInventory(
               onAdd: () => showAddProductSheet(context, ref),
+              // Vision recognises grocery catalogues only for now — don't
+              // route other verticals into a scan flow that can't read
+              // their shelves (the Vision tab explains it's coming).
+              showSnapShelves: !verticalConfigOf(ref).isOff('vision'),
               onSnapShelves: () async {
                 final added = await Navigator.push<bool>(
                   context,
@@ -1126,11 +1130,13 @@ class _PendingTile extends StatelessWidget {
 class _EmptyInventory extends StatelessWidget {
   final VoidCallback onAdd;
   final VoidCallback onSnapShelves;
+  final bool showSnapShelves;
   final String title;
   final String hint;
   const _EmptyInventory({
     required this.onAdd,
     required this.onSnapShelves,
+    this.showSnapShelves = true,
     required this.title,
     required this.hint,
   });
@@ -1174,8 +1180,10 @@ class _EmptyInventory extends StatelessWidget {
               label: Text(l10n.invAddFirstProduct),
             ),
             const SizedBox(height: 20),
-            // Bulk stock-in: photograph shelves instead of adding items one by one.
-            Container(
+            // Bulk stock-in: photograph shelves instead of adding items one by
+            // one. Hidden for verticals Vision doesn't cover yet.
+            if (showSnapShelves)
+              Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: BrandColors.purple.withValues(alpha: 0.06),

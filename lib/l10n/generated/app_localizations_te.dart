@@ -1241,6 +1241,49 @@ class AppLocalizationsTe extends AppLocalizations {
   String get vcopyServicesAddTitle => 'ఐటమ్ జోడించండి';
 
   @override
+  String get visionComingSoonTitle => 'విజన్ AI మీ దుకాణానికి వస్తోంది';
+
+  @override
+  String get dashForYourStore => 'మీ దుకాణం కోసం';
+
+  @override
+  String get qaCustomers => 'కస్టమర్లు';
+
+  @override
+  String get qaBookAppointment => 'అపాయింట్‌మెంట్ బుక్ చేయండి';
+
+  @override
+  String get qaMemberships => 'మెంబర్‌షిప్‌లు';
+
+  @override
+  String get qaNewJobCard => 'కొత్త జాబ్ కార్డ్';
+
+  @override
+  String get qaCheckWarranty => 'వారంటీ చూడండి';
+
+  @override
+  String get qaNewEstimate => 'కొత్త ఎస్టిమేట్';
+
+  @override
+  String get qaReturns => 'రిటర్న్స్';
+
+  @override
+  String get qaAddProduct => 'ఐటమ్ జోడించండి';
+
+  @override
+  String get qaAddUdhaar => 'ఉధార్ జోడించండి';
+
+  @override
+  String get qaScanShelves => 'షెల్ఫ్ స్కాన్ చేయండి';
+
+  @override
+  String get visionComingSoonBody =>
+      'విజన్ AI ఫోటో నుండి షెల్ఫ్‌లను చదువుతుంది — ప్రస్తుతం ఇది కిరాణా వస్తువులను గుర్తిస్తుంది, మీ దుకాణ ఉత్పత్తుల కోసం శిక్షణ జరుగుతోంది. మీ వస్తువులకు మద్దతు రాగానే స్కానింగ్, అప్‌లోడ్‌లు, కౌంటర్ కెమెరా ఇక్కడ ఆటోమేటిక్‌గా ఆన్ అవుతాయి.';
+
+  @override
+  String get visionComingSoonBadge => 'మీ వస్తువుల కోసం త్వరలో';
+
+  @override
   String get vcopyServicesSearchHint => 'ఐటమ్స్ వెతకండి…';
 
   @override

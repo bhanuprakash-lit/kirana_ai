@@ -1233,6 +1233,49 @@ class AppLocalizationsHi extends AppLocalizations {
   String get vcopyServicesAddTitle => 'आइटम जोड़ें';
 
   @override
+  String get visionComingSoonTitle => 'विज़न AI आपकी दुकान पर आ रहा है';
+
+  @override
+  String get dashForYourStore => 'आपकी दुकान के लिए';
+
+  @override
+  String get qaCustomers => 'ग्राहक';
+
+  @override
+  String get qaBookAppointment => 'अपॉइंटमेंट बुक करें';
+
+  @override
+  String get qaMemberships => 'मेंबरशिप';
+
+  @override
+  String get qaNewJobCard => 'नया जॉब कार्ड';
+
+  @override
+  String get qaCheckWarranty => 'वारंटी देखें';
+
+  @override
+  String get qaNewEstimate => 'नया एस्टीमेट';
+
+  @override
+  String get qaReturns => 'रिटर्न';
+
+  @override
+  String get qaAddProduct => 'आइटम जोड़ें';
+
+  @override
+  String get qaAddUdhaar => 'उधार जोड़ें';
+
+  @override
+  String get qaScanShelves => 'शेल्फ स्कैन करें';
+
+  @override
+  String get visionComingSoonBody =>
+      'विज़न AI फोटो से शेल्फ पढ़ता है — अभी यह किराना आइटम पहचानता है, और आपकी दुकान के प्रोडक्ट्स की ट्रेनिंग चल रही है। जैसे ही आपके आइटम सपोर्ट होंगे, स्कैनिंग, अपलोड और काउंटर कैमरा यहां अपने आप चालू हो जाएंगे।';
+
+  @override
+  String get visionComingSoonBadge => 'आपके आइटम के लिए जल्द आ रहा है';
+
+  @override
   String get vcopyServicesSearchHint => 'आइटम खोजें…';
 
   @override

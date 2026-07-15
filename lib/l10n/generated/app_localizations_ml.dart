@@ -1271,6 +1271,49 @@ class AppLocalizationsMl extends AppLocalizations {
   String get vcopyServicesAddTitle => 'ഇനം ചേർക്കുക';
 
   @override
+  String get visionComingSoonTitle => 'വിഷൻ AI നിങ്ങളുടെ കടയിലേക്ക് വരുന്നു';
+
+  @override
+  String get dashForYourStore => 'നിങ്ങളുടെ കടയ്ക്കായി';
+
+  @override
+  String get qaCustomers => 'ഉപഭോക്താക്കൾ';
+
+  @override
+  String get qaBookAppointment => 'അപ്പോയിന്റ്മെന്റ് ബുക്ക് ചെയ്യുക';
+
+  @override
+  String get qaMemberships => 'മെമ്പർഷിപ്പുകൾ';
+
+  @override
+  String get qaNewJobCard => 'പുതിയ ജോബ് കാർഡ്';
+
+  @override
+  String get qaCheckWarranty => 'വാറന്റി പരിശോധിക്കുക';
+
+  @override
+  String get qaNewEstimate => 'പുതിയ എസ്റ്റിമേറ്റ്';
+
+  @override
+  String get qaReturns => 'റിട്ടേണുകൾ';
+
+  @override
+  String get qaAddProduct => 'ഇനം ചേർക്കുക';
+
+  @override
+  String get qaAddUdhaar => 'കടം ചേർക്കുക';
+
+  @override
+  String get qaScanShelves => 'ഷെൽഫ് സ്കാൻ ചെയ്യുക';
+
+  @override
+  String get visionComingSoonBody =>
+      'വിഷൻ AI ഫോട്ടോയിൽ നിന്ന് ഷെൽഫുകൾ വായിക്കുന്നു — ഇന്ന് അത് പലചരക്ക് ഇനങ്ങൾ തിരിച്ചറിയുന്നു, നിങ്ങളുടെ കടയിലെ ഉൽപ്പന്നങ്ങൾക്കായുള്ള പരിശീലനം നടക്കുന്നു. നിങ്ങളുടെ ഇനങ്ങൾക്ക് പിന്തുണ ലഭിച്ചാലുടൻ സ്കാനിംഗ്, അപ്‌ലോഡുകൾ, കൗണ്ടർ ക്യാമറ ഇവിടെ സ്വയമേവ ഓൺ ആകും.';
+
+  @override
+  String get visionComingSoonBadge => 'നിങ്ങളുടെ ഇനങ്ങൾക്കായി ഉടൻ വരുന്നു';
+
+  @override
   String get vcopyServicesSearchHint => 'ഇനങ്ങൾ തിരയുക…';
 
   @override

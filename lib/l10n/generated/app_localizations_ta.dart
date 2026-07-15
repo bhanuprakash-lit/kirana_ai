@@ -1272,6 +1272,49 @@ class AppLocalizationsTa extends AppLocalizations {
   String get vcopyServicesAddTitle => 'பொருளைச் சேர்';
 
   @override
+  String get visionComingSoonTitle => 'விஷன் AI உங்கள் கடைக்கு வருகிறது';
+
+  @override
+  String get dashForYourStore => 'உங்கள் கடைக்காக';
+
+  @override
+  String get qaCustomers => 'வாடிக்கையாளர்கள்';
+
+  @override
+  String get qaBookAppointment => 'அப்பாயின்ட்மென்ட் பதிவு';
+
+  @override
+  String get qaMemberships => 'மெம்பர்ஷிப்';
+
+  @override
+  String get qaNewJobCard => 'புதிய ஜாப் கார்டு';
+
+  @override
+  String get qaCheckWarranty => 'வாரண்டி பார்';
+
+  @override
+  String get qaNewEstimate => 'புதிய எஸ்டிமேட்';
+
+  @override
+  String get qaReturns => 'ரிட்டர்ன்';
+
+  @override
+  String get qaAddProduct => 'பொருளைச் சேர்';
+
+  @override
+  String get qaAddUdhaar => 'கடன் சேர்';
+
+  @override
+  String get qaScanShelves => 'அலமாரி ஸ்கேன்';
+
+  @override
+  String get visionComingSoonBody =>
+      'விஷன் AI புகைப்படத்திலிருந்து அலமாரிகளைப் படிக்கிறது — இன்று அது மளிகைப் பொருட்களை அடையாளம் காண்கிறது, உங்கள் கடையின் பொருட்களுக்கான பயிற்சி நடந்து வருகிறது. உங்கள் பொருட்கள் ஆதரிக்கப்பட்டவுடன் ஸ்கேனிங், பதிவேற்றம், கவுண்டர் கேமரா இங்கே தானாக இயங்கும்.';
+
+  @override
+  String get visionComingSoonBadge => 'உங்கள் பொருட்களுக்கு விரைவில்';
+
+  @override
   String get vcopyServicesSearchHint => 'பொருட்களைத் தேடு…';
 
   @override
