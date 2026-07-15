@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kirana_ai/core/vertical/nav_preset.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -165,7 +166,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'overview_pos_fab',
         onPressed: () {
-          ref.read(dashboardTabProvider.notifier).switchTab(2);
+          switchToNavTab(ref, NavTabId.billing);
           ref.read(dashboardSubTabProvider.notifier).setSubTab(0);
         },
         backgroundColor: BrandColors.primary,
@@ -277,7 +278,7 @@ class _MorningBriefingRibbon extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        ref.read(dashboardTabProvider.notifier).switchTab(2);
+        switchToNavTab(ref, NavTabId.billing);
         ref
             .read(dashboardSubTabProvider.notifier)
             .setSubTab(1); // Go to Inventory
@@ -481,8 +482,8 @@ class _QuickActionsRow extends ConsumerWidget {
     AppLocalizations l10n,
     String verticalCode,
   ) {
-    void goTab(int tab, int sub) {
-      ref.read(dashboardTabProvider.notifier).switchTab(tab);
+    void goTab(NavTabId tab, int sub) {
+      switchToNavTab(ref, tab);
       ref.read(dashboardSubTabProvider.notifier).setSubTab(sub);
     }
 
@@ -517,7 +518,7 @@ class _QuickActionsRow extends ConsumerWidget {
           _QuickAction(
             Icons.add_box_rounded,
             l10n.qaAddProduct,
-            () => goTab(2, 1),
+            () => goTab(NavTabId.billing, 1),
           ),
           customers,
         ];
@@ -555,13 +556,13 @@ class _QuickActionsRow extends ConsumerWidget {
           _QuickAction(
             Icons.add_box_rounded,
             l10n.qaAddProduct,
-            () => goTab(2, 1),
+            () => goTab(NavTabId.billing, 1),
           ),
           _QuickAction(
             Icons.menu_book_rounded,
             l10n.qaAddUdhaar,
             () {
-              ref.read(dashboardTabProvider.notifier).switchTab(1);
+              switchToNavTab(ref, NavTabId.khata);
               ref.read(financeSubTabProvider.notifier).setSubTab(1);
             },
           ),
@@ -570,13 +571,13 @@ class _QuickActionsRow extends ConsumerWidget {
       default: // grocery + unknown
         return [
           _QuickAction(Icons.menu_book_rounded, l10n.qaAddUdhaar, () {
-            ref.read(dashboardTabProvider.notifier).switchTab(1);
+            switchToNavTab(ref, NavTabId.khata);
             ref.read(financeSubTabProvider.notifier).setSubTab(1);
           }),
           _QuickAction(
             Icons.center_focus_strong_rounded,
             l10n.qaScanShelves,
-            () => ref.read(dashboardTabProvider.notifier).switchTab(3),
+            () => switchToNavTab(ref, NavTabId.vision),
           ),
           customers,
         ];
@@ -773,7 +774,7 @@ class _MetricCard extends ConsumerWidget {
     return GestureDetector(
           onTap: () {
             if (metric.id == 'customer') {
-              ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
+              switchToNavTab(ref, NavTabId.khata); // Finance
               ref
                   .read(financeSubTabProvider.notifier)
                   .setSubTab(1); // Customer Udhaar
@@ -1295,18 +1296,18 @@ class _ProAlertsStrip extends ConsumerWidget {
   void _navigate(BuildContext context, WidgetRef ref, BusinessAlert alert) {
     switch (alert.type) {
       case AlertType.udhaar:
-        ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
+        switchToNavTab(ref, NavTabId.khata); // Finance
         ref
             .read(financeSubTabProvider.notifier)
             .setSubTab(1); // Customer Udhaar tab
       case AlertType.performance:
-        ref.read(dashboardTabProvider.notifier).switchTab(1); // Finance
+        switchToNavTab(ref, NavTabId.khata); // Finance
         ref
             .read(financeSubTabProvider.notifier)
             .setSubTab(2); // Supplier Udhaar tab
       case AlertType.lowStock:
       case AlertType.expiry:
-        ref.read(dashboardTabProvider.notifier).switchTab(2); // POS/Inventory
+        switchToNavTab(ref, NavTabId.billing); // POS/Inventory
         ref
             .read(dashboardSubTabProvider.notifier)
             .setSubTab(1); // Inventory sub-tab

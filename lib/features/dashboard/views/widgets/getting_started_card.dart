@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kirana_ai/core/vertical/nav_preset.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/tutorial/tutorial_controller.dart';
 import '../../../../core/tutorial/tutorial_keys.dart';
@@ -108,7 +109,7 @@ class GettingStartedCard extends ConsumerWidget {
               ref
                   .read(tutorialProvider.notifier)
                   .startFlow(Tut.flowAddProduct);
-              ref.read(dashboardTabProvider.notifier).switchTab(2);
+              switchToNavTab(ref, NavTabId.billing);
               ref.read(dashboardSubTabProvider.notifier).setSubTab(1);
             },
           ),
@@ -120,7 +121,7 @@ class GettingStartedCard extends ConsumerWidget {
             label: l10n.tutStepFirstSale,
             onTap: () {
               ref.read(tutorialProvider.notifier).startFlow(Tut.flowFirstSale);
-              ref.read(dashboardTabProvider.notifier).switchTab(2);
+              switchToNavTab(ref, NavTabId.billing);
               ref.read(dashboardSubTabProvider.notifier).setSubTab(0);
             },
           ),
@@ -133,7 +134,7 @@ class GettingStartedCard extends ConsumerWidget {
             onTap: () {
               // Same guided sale — the payment step teaches choosing Udhaar.
               ref.read(tutorialProvider.notifier).startFlow(Tut.flowFirstSale);
-              ref.read(dashboardTabProvider.notifier).switchTab(2);
+              switchToNavTab(ref, NavTabId.billing);
               ref.read(dashboardSubTabProvider.notifier).setSubTab(0);
             },
           ),

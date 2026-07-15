@@ -1256,6 +1256,15 @@ class AppLocalizationsTe extends AppLocalizations {
   String get posBarScan => 'స్కాన్';
 
   @override
+  String get navAppointments => 'బుకింగ్స్';
+
+  @override
+  String get navRepairs => 'రిపేర్లు';
+
+  @override
+  String get navOrders => 'ఆర్డర్లు';
+
+  @override
   String get posBarVoice => 'వాయిస్';
 
   @override

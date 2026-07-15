@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/api_client.dart';
 import '../../../core/tutorial/tutorial_keys.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/vertical/nav_preset.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
@@ -13,6 +15,9 @@ import '../../vision/providers/vision_provider.dart';
 import '../../vision/views/onboarding_stockin_screen.dart';
 import '../../vision/views/vision_screen.dart';
 import '../../finance/views/finance_screen.dart';
+import '../../services/views/services_screen.dart';
+import '../../jobcards/jobcards.dart';
+import '../../fulfilment/fulfilment.dart';
 import '../../auth/providers/user_provider.dart';
 import '../../subscription/providers/subscription_provider.dart';
 import '../../support/providers/notification_provider.dart';
@@ -30,6 +35,17 @@ class TabNotifier extends Notifier<int> {
 final dashboardTabProvider = NotifierProvider<TabNotifier, int>(
   TabNotifier.new,
 );
+
+/// Switch the bottom nav to a tab by its semantic id, resolving the index
+/// through the active vertical's preset (V1 — tab positions differ per
+/// vertical, so nothing may address a tab by hardcoded index anymore).
+/// Unknown/absent tab → Home.
+void switchToNavTab(WidgetRef ref, NavTabId id) {
+  final code =
+      ref.read(verticalConfigProvider).asData?.value.verticalCode ?? 'grocery';
+  final i = navPresetFor(code).indexOf(id);
+  ref.read(dashboardTabProvider.notifier).switchTab(i < 0 ? 0 : i);
+}
 
 class SubTabNotifier extends Notifier<int> {
   @override
@@ -132,11 +148,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final route = nav['route'];
     final action = nav['action'];
 
-    // 1) Switch the bottom-nav tab (0=Overview, 1=Finance, 2=POS/Inventory).
+    // 1) Switch the bottom-nav tab. Deep links address tabs by NAME; the
+    //    index depends on the active vertical's preset (V1), so resolve it
+    //    here — the one place names become positions.
+    final code =
+        ref.read(verticalConfigProvider).asData?.value.verticalCode ??
+        'grocery';
+    final preset = navPresetFor(code);
+    int? idx(NavTabId id) {
+      final i = preset.indexOf(id);
+      return i < 0 ? null : i;
+    }
+
     final tabIndex = switch (tab) {
-      'finance' => 1,
-      'pos' => 2,
-      'vision' => 3,
+      'finance' || 'khata' => idx(NavTabId.khata),
+      'pos' || 'billing' => idx(NavTabId.billing),
+      'vision' => idx(NavTabId.vision),
+      'appointments' => idx(NavTabId.appointments),
+      'repairs' => idx(NavTabId.repairs),
+      'orders' => idx(NavTabId.orders),
       'home' || 'overview' => 0,
       _ => null,
     };
@@ -175,13 +205,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
     // 5) Vision AI widget / notification — open the Vision tab.
     if (action == 'vision' || action == 'open_vision') {
-      ref.read(dashboardTabProvider.notifier).switchTab(3);
+      final i = idx(NavTabId.vision);
+      if (i != null) ref.read(dashboardTabProvider.notifier).switchTab(i);
     }
 
     // 6) Bulk stock-in results ready — open the onboarding review for that session.
     if (action == 'open_onboarding_review') {
       final sessionId = int.tryParse(nav['session_id'] ?? '');
-      ref.read(dashboardTabProvider.notifier).switchTab(2); // POS/Inventory
+      final i = idx(NavTabId.billing);
+      if (i != null) ref.read(dashboardTabProvider.notifier).switchTab(i);
       Future.delayed(const Duration(milliseconds: 300), () {
         if (!mounted) return;
         Navigator.of(context).push(
@@ -225,18 +257,87 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     );
   }
 
+  /// The screen a nav tab id hosts. New verticals reuse existing module
+  /// screens directly — they're self-contained Scaffolds and show no back
+  /// button when hosted as tab children (nothing to pop).
+  Widget _tabScreen(NavTabId id) {
+    switch (id) {
+      case NavTabId.home:
+        return const OverviewTab();
+      case NavTabId.khata:
+        return const FinanceScreen();
+      case NavTabId.billing:
+        return const PosInventoryScreen();
+      case NavTabId.vision:
+        return const VisionScreen();
+      case NavTabId.appointments:
+        return const ServicesScreen();
+      case NavTabId.repairs:
+        return const JobCardsScreen();
+      case NavTabId.orders:
+        return const FulfilmentScreen();
+    }
+  }
+
+  NavigationDestination _tabDestination(NavTabId id, AppLocalizations l10n) {
+    switch (id) {
+      case NavTabId.home:
+        return NavigationDestination(
+          key: TutorialKeys.navHome,
+          icon: const Icon(Icons.home_outlined),
+          selectedIcon: const Icon(Icons.home_rounded),
+          label: l10n.dashNavHome,
+        );
+      case NavTabId.khata:
+        return NavigationDestination(
+          key: TutorialKeys.navKhata,
+          icon: const Icon(Icons.menu_book_outlined),
+          selectedIcon: const Icon(Icons.menu_book_rounded),
+          label: l10n.dashNavKhata,
+        );
+      case NavTabId.billing:
+        return NavigationDestination(
+          key: TutorialKeys.navBilling,
+          icon: const Icon(Icons.storefront_outlined),
+          selectedIcon: const Icon(Icons.storefront_rounded),
+          label: l10n.dashNavBilling,
+        );
+      case NavTabId.vision:
+        return NavigationDestination(
+          key: TutorialKeys.navVision,
+          icon: const Icon(Icons.center_focus_weak_outlined),
+          selectedIcon: const Icon(Icons.center_focus_strong_rounded),
+          label: l10n.visionNavLabel,
+        );
+      case NavTabId.appointments:
+        return NavigationDestination(
+          icon: const Icon(Icons.event_available_outlined),
+          selectedIcon: const Icon(Icons.event_available_rounded),
+          label: l10n.navAppointments,
+        );
+      case NavTabId.repairs:
+        return NavigationDestination(
+          icon: const Icon(Icons.build_circle_outlined),
+          selectedIcon: const Icon(Icons.build_circle_rounded),
+          label: l10n.navRepairs,
+        );
+      case NavTabId.orders:
+        return NavigationDestination(
+          icon: const Icon(Icons.receipt_long_outlined),
+          selectedIcon: const Icon(Icons.receipt_long_rounded),
+          label: l10n.navOrders,
+        );
+    }
+  }
+
   Widget _buildDashboard(int currentTab) {
     final l10n = AppLocalizations.of(context);
-    // Vision AI is for every vertical — the tab always shows. Verticals the
-    // detector doesn't cover yet get a coming-soon screen inside VisionScreen
-    // (no scan/upload/counter) instead of a hidden tab, so owners know it's
-    // on the way and it lights up without them hunting for it.
-    final tabs = <Widget>[
-      const OverviewTab(),
-      const FinanceScreen(),
-      const PosInventoryScreen(),
-      const VisionScreen(),
-    ];
+    // V1 — the tab set comes from the vertical's nav preset: a salon leads
+    // with Appointments, electronics with Repairs, a boutique with Orders.
+    // Vision shows for every vertical (coming-soon screen inside where the
+    // detector doesn't cover the catalogue yet).
+    final preset = navPresetFor(verticalConfigOf(ref).verticalCode);
+    final tabs = <Widget>[for (final id in preset) _tabScreen(id)];
     final safeIndex = currentTab.clamp(0, tabs.length - 1);
     _visitedTabs.add(safeIndex);
     // Unvisited tabs render as an empty box (not mounted) so their providers
@@ -251,32 +352,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         selectedIndex: safeIndex,
         onDestinationSelected: (i) =>
             ref.read(dashboardTabProvider.notifier).switchTab(i),
-        destinations: [
-          NavigationDestination(
-            key: TutorialKeys.navHome,
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: const Icon(Icons.home_rounded),
-            label: l10n.dashNavHome,
-          ),
-          NavigationDestination(
-            key: TutorialKeys.navKhata,
-            icon: const Icon(Icons.menu_book_outlined),
-            selectedIcon: const Icon(Icons.menu_book_rounded),
-            label: l10n.dashNavKhata,
-          ),
-          NavigationDestination(
-            key: TutorialKeys.navBilling,
-            icon: const Icon(Icons.storefront_outlined),
-            selectedIcon: const Icon(Icons.storefront_rounded),
-            label: l10n.dashNavBilling,
-          ),
-          NavigationDestination(
-            key: TutorialKeys.navVision,
-            icon: const Icon(Icons.center_focus_weak_outlined),
-            selectedIcon: const Icon(Icons.center_focus_strong_rounded),
-            label: l10n.visionNavLabel,
-          ),
-        ],
+        destinations: [for (final id in preset) _tabDestination(id, l10n)],
       ),
     );
   }

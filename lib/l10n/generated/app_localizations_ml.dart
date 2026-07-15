@@ -1286,6 +1286,15 @@ class AppLocalizationsMl extends AppLocalizations {
   String get posBarScan => 'സ്കാൻ';
 
   @override
+  String get navAppointments => 'ബുക്കിംഗ്';
+
+  @override
+  String get navRepairs => 'റിപ്പയർ';
+
+  @override
+  String get navOrders => 'ഓർഡറുകൾ';
+
+  @override
   String get posBarVoice => 'വോയ്സ്';
 
   @override

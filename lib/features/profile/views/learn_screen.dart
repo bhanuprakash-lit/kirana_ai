@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kirana_ai/core/vertical/nav_preset.dart';
 
 import '../../../core/theme/brand_theme.dart';
 import '../../../core/tutorial/tutorial_controller.dart';
@@ -38,7 +39,7 @@ class LearnScreen extends ConsumerWidget {
             onReplay: () {
               // Re-arm and land on Home, where the tour fires.
               c.replaySegment(Tut.welcome);
-              ref.read(dashboardTabProvider.notifier).switchTab(0);
+              switchToNavTab(ref, NavTabId.home);
               context.go('/home');
             },
           ),
@@ -49,7 +50,7 @@ class LearnScreen extends ConsumerWidget {
             replayLabel: l10n.learnReplay,
             onReplay: () {
               c.startFlow(Tut.flowAddProduct);
-              ref.read(dashboardTabProvider.notifier).switchTab(2);
+              switchToNavTab(ref, NavTabId.billing);
               ref.read(dashboardSubTabProvider.notifier).setSubTab(1);
               context.go('/home');
             },
@@ -61,7 +62,7 @@ class LearnScreen extends ConsumerWidget {
             replayLabel: l10n.learnReplay,
             onReplay: () {
               c.startFlow(Tut.flowFirstSale);
-              ref.read(dashboardTabProvider.notifier).switchTab(2);
+              switchToNavTab(ref, NavTabId.billing);
               ref.read(dashboardSubTabProvider.notifier).setSubTab(0);
               context.go('/home');
             },

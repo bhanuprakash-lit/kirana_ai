@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kirana_ai/core/vertical/nav_preset.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/locale/locale_provider.dart';
@@ -555,7 +556,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
       onTap = () {
         Navigator.pop(context); // Close bottom sheet
         context.go('/home');
-        ref.read(dashboardTabProvider.notifier).switchTab(2);
+        switchToNavTab(ref, NavTabId.billing);
         ref.read(dashboardSubTabProvider.notifier).setSubTab(1);
       };
     } else if (endpoint.contains('udhar') ||
@@ -570,7 +571,7 @@ class _KpiDetailBottomSheetState extends ConsumerState<_KpiDetailBottomSheet> {
       onTap = () {
         Navigator.pop(context); // Close bottom sheet
         context.go('/home');
-        ref.read(dashboardTabProvider.notifier).switchTab(2);
+        switchToNavTab(ref, NavTabId.billing);
         ref.read(dashboardSubTabProvider.notifier).setSubTab(0);
       };
     }
