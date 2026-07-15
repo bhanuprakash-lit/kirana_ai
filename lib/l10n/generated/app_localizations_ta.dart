@@ -1290,6 +1290,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get navAppointments => 'புக்கிங்';
 
   @override
+  String get posServiceChip => 'சேவை';
+
+  @override
   String get navRepairs => 'ரிப்பேர்';
 
   @override

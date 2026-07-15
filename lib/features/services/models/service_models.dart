@@ -14,6 +14,10 @@ class ServiceItem {
   final String? category;
   final bool isActive;
 
+  /// V2 — the linked is_service product row this service sells through at
+  /// POS (order_item FK, revenue, KPIs). Null on older backends.
+  final int? productId;
+
   const ServiceItem({
     required this.serviceId,
     required this.name,
@@ -21,6 +25,7 @@ class ServiceItem {
     required this.durationMin,
     this.category,
     this.isActive = true,
+    this.productId,
   });
 
   factory ServiceItem.fromJson(Map<String, dynamic> j) => ServiceItem(
@@ -30,6 +35,7 @@ class ServiceItem {
     durationMin: _i(j['duration_min'], 30),
     category: j['category'] as String?,
     isActive: j['is_active'] != false,
+    productId: j['product_id'] == null ? null : _i(j['product_id']),
   );
 }
 

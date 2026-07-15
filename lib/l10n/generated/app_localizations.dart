@@ -2304,6 +2304,12 @@ abstract class AppLocalizations {
   /// **'Bookings'**
   String get navAppointments;
 
+  /// No description provided for @posServiceChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get posServiceChip;
+
   /// No description provided for @navRepairs.
   ///
   /// In en, this message translates to:

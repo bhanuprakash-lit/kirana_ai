@@ -1268,6 +1268,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navAppointments => 'Bookings';
 
   @override
+  String get posServiceChip => 'Service';
+
+  @override
   String get navRepairs => 'Repairs';
 
   @override

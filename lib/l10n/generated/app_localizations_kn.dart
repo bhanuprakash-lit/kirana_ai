@@ -1277,6 +1277,9 @@ class AppLocalizationsKn extends AppLocalizations {
   String get navAppointments => 'ಬುಕಿಂಗ್';
 
   @override
+  String get posServiceChip => 'ಸೇವೆ';
+
+  @override
   String get navRepairs => 'ರಿಪೇರಿ';
 
   @override
