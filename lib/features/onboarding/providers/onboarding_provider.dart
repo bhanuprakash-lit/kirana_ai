@@ -249,16 +249,21 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
       // Frames/lenses: variants + warranty + appointments
       case 'optical':
         return 'optical';
-      // Appointment-driven (Services pack lands later)
+      // Appointment-driven
       case 'salon':
-      case 'sports_fitness':
         return 'services';
-      // Plain retail, no expiry/loose/variants
+      // V0.6 — a sports shop sells shoes/apparel/equipment: it needs size
+      // variants far more than appointments, so it maps to apparel now.
+      case 'sports_fitness':
+        return 'apparel';
+      // Plain retail, no expiry/loose/variants. 'other' (unknown trade)
+      // gets the neutral profile, NOT the most grocery-specific app.
       case 'fancy_gift':
       case 'stationery':
+      case 'other':
         return 'general';
       // kirana, general, supermarket, mini_supermarket, provision,
-      // fruits_vegetables, pharmacy, bakery, other
+      // fruits_vegetables, bakery
       default:
         return 'grocery';
     }

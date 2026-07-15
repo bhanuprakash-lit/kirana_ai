@@ -1277,6 +1277,27 @@ class AppLocalizationsMl extends AppLocalizations {
   String get dashForYourStore => 'നിങ്ങളുടെ കടയ്ക്കായി';
 
   @override
+  String get profGstRegistered => 'GST രജിസ്റ്റർ ചെയ്തത്';
+
+  @override
+  String get profGstRegisteredHint => 'ഈ കടയ്ക്കുള്ള GST റിപ്പോർട്ട് കാണിക്കുക';
+
+  @override
+  String get posBarScan => 'സ്കാൻ';
+
+  @override
+  String get posBarVoice => 'വോയ്സ്';
+
+  @override
+  String get posBarWrite => 'എഴുതുക';
+
+  @override
+  String get posBarAppointments => 'അപ്പോയിന്റ്മെന്റുകൾ';
+
+  @override
+  String get posBarPrescription => 'പ്രിസ്ക്രിപ്ഷൻ';
+
+  @override
   String get qaCustomers => 'ഉപഭോക്താക്കൾ';
 
   @override

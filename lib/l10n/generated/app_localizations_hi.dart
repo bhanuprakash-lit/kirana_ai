@@ -1239,6 +1239,27 @@ class AppLocalizationsHi extends AppLocalizations {
   String get dashForYourStore => 'आपकी दुकान के लिए';
 
   @override
+  String get profGstRegistered => 'GST रजिस्टर्ड';
+
+  @override
+  String get profGstRegisteredHint => 'इस दुकान के लिए GST रिपोर्ट दिखाएं';
+
+  @override
+  String get posBarScan => 'स्कैन';
+
+  @override
+  String get posBarVoice => 'वॉइस';
+
+  @override
+  String get posBarWrite => 'लिखें';
+
+  @override
+  String get posBarAppointments => 'अपॉइंटमेंट';
+
+  @override
+  String get posBarPrescription => 'प्रिस्क्रिप्शन';
+
+  @override
   String get qaCustomers => 'ग्राहक';
 
   @override

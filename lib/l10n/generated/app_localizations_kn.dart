@@ -1265,6 +1265,27 @@ class AppLocalizationsKn extends AppLocalizations {
   String get dashForYourStore => 'ನಿಮ್ಮ ಅಂಗಡಿಗಾಗಿ';
 
   @override
+  String get profGstRegistered => 'GST ನೋಂದಾಯಿತ';
+
+  @override
+  String get profGstRegisteredHint => 'ಈ ಅಂಗಡಿಗೆ GST ವರದಿಯನ್ನು ತೋರಿಸಿ';
+
+  @override
+  String get posBarScan => 'ಸ್ಕ್ಯಾನ್';
+
+  @override
+  String get posBarVoice => 'ವಾಯ್ಸ್';
+
+  @override
+  String get posBarWrite => 'ಬರೆಯಿರಿ';
+
+  @override
+  String get posBarAppointments => 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್';
+
+  @override
+  String get posBarPrescription => 'ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್';
+
+  @override
   String get qaCustomers => 'ಗ್ರಾಹಕರು';
 
   @override
