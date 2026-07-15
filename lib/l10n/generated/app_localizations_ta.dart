@@ -1287,6 +1287,15 @@ class AppLocalizationsTa extends AppLocalizations {
   String get posBarScan => 'ஸ்கேன்';
 
   @override
+  String get navAppointments => 'புக்கிங்';
+
+  @override
+  String get navRepairs => 'ரிப்பேர்';
+
+  @override
+  String get navOrders => 'ஆர்டர்கள்';
+
+  @override
   String get posBarVoice => 'வாய்ஸ்';
 
   @override

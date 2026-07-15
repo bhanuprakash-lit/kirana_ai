@@ -2298,6 +2298,24 @@ abstract class AppLocalizations {
   /// **'Scan'**
   String get posBarScan;
 
+  /// No description provided for @navAppointments.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookings'**
+  String get navAppointments;
+
+  /// No description provided for @navRepairs.
+  ///
+  /// In en, this message translates to:
+  /// **'Repairs'**
+  String get navRepairs;
+
+  /// No description provided for @navOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get navOrders;
+
   /// No description provided for @posBarVoice.
   ///
   /// In en, this message translates to:

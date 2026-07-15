@@ -1265,6 +1265,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posBarScan => 'Scan';
 
   @override
+  String get navAppointments => 'Bookings';
+
+  @override
+  String get navRepairs => 'Repairs';
+
+  @override
+  String get navOrders => 'Orders';
+
+  @override
   String get posBarVoice => 'Voice';
 
   @override

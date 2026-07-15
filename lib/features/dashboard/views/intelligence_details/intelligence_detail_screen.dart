@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kirana_ai/core/vertical/nav_preset.dart';
 import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../l10n/generated/app_localizations.dart';
@@ -397,7 +398,7 @@ class _RecommendationTile extends ConsumerWidget {
                           ),
                         );
                     Navigator.of(context).pop();
-                    ref.read(dashboardTabProvider.notifier).switchTab(2);
+                    switchToNavTab(ref, NavTabId.billing);
                     ref.read(dashboardSubTabProvider.notifier).setSubTab(2);
                   },
                   icon: Icon(

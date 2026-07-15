@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kirana_ai/core/vertical/nav_preset.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/services/api_client.dart';
@@ -469,7 +470,7 @@ class _EstimateDetailState extends ConsumerState<_EstimateDetail> {
     await _setStatus('accepted');
     if (!mounted) return;
     // Land on the POS billing tab with the cart populated.
-    ref.read(dashboardTabProvider.notifier).switchTab(2);
+    switchToNavTab(ref, NavTabId.billing);
     ref.read(dashboardSubTabProvider.notifier).setSubTab(0);
     Navigator.of(context)
       ..pop() // detail sheet

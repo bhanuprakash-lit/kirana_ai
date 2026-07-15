@@ -1272,6 +1272,15 @@ class AppLocalizationsMr extends AppLocalizations {
   String get posBarScan => 'स्कॅन';
 
   @override
+  String get navAppointments => 'बुकिंग';
+
+  @override
+  String get navRepairs => 'दुरुस्ती';
+
+  @override
+  String get navOrders => 'ऑर्डर';
+
+  @override
   String get posBarVoice => 'व्हॉइस';
 
   @override
