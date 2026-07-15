@@ -1247,6 +1247,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posCustomDiscount => 'Discount (whole bill)';
 
   @override
+  String get vcopyServicesAddTitle => 'Add item';
+
+  @override
+  String get vcopyServicesSearchHint => 'Search items…';
+
+  @override
+  String get vcopyServicesEmptyTitle => 'No retail items yet';
+
+  @override
+  String get vcopyServicesEmptyHint =>
+      'Add products you sell over the counter (shampoo, supplements). Your services are managed under Services & Appointments.';
+
+  @override
+  String get vcopyServicesInvTab => 'Items';
+
+  @override
+  String get vcopyElectronicsAddTitle => 'Add device or accessory';
+
+  @override
+  String get vcopyElectronicsSearchHint => 'Search by name, model or barcode…';
+
+  @override
+  String get vcopyElectronicsEmptyTitle => 'No stock yet';
+
+  @override
+  String get vcopyElectronicsEmptyHint =>
+      'Add your phones, accessories and appliances — with model variants, IMEI/serial and warranty.';
+
+  @override
+  String get vcopyElectronicsInvTab => 'Stock';
+
+  @override
+  String get vcopyApparelAddTitle => 'Add article';
+
+  @override
+  String get vcopyApparelSearchHint => 'Search articles (name, size, colour)…';
+
+  @override
+  String get vcopyApparelEmptyTitle => 'No articles yet';
+
+  @override
+  String get vcopyApparelEmptyHint =>
+      'Add your articles with size and colour variants — each size/colour keeps its own stock.';
+
+  @override
+  String get vcopyApparelInvTab => 'Articles';
+
+  @override
+  String get vcopyOpticalAddTitle => 'Add frame / lens';
+
+  @override
+  String get vcopyOpticalSearchHint => 'Search frames, lenses, solutions…';
+
+  @override
+  String get vcopyOpticalEmptyTitle => 'No frames or lenses yet';
+
+  @override
+  String get vcopyOpticalEmptyHint =>
+      'Add frames, lenses and solutions — with variants and warranty where they apply.';
+
+  @override
+  String get vcopyOpticalInvTab => 'Stock';
+
+  @override
+  String get vcopyGeneralAddTitle => 'Add item';
+
+  @override
+  String get vcopyGeneralSearchHint => 'Search items…';
+
+  @override
+  String get vcopyGeneralEmptyTitle => 'No items yet';
+
+  @override
+  String get vcopyGeneralEmptyHint =>
+      'Add the items you sell to start billing.';
+
+  @override
+  String get vcopyGeneralInvTab => 'Items';
+
+  @override
   String get procPayFirst => 'Pay first';
 
   @override

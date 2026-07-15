@@ -1230,6 +1230,86 @@ class AppLocalizationsHi extends AppLocalizations {
   String get posCustomDiscount => 'छूट (पूरे बिल पर)';
 
   @override
+  String get vcopyServicesAddTitle => 'आइटम जोड़ें';
+
+  @override
+  String get vcopyServicesSearchHint => 'आइटम खोजें…';
+
+  @override
+  String get vcopyServicesEmptyTitle => 'अभी कोई रिटेल आइटम नहीं';
+
+  @override
+  String get vcopyServicesEmptyHint =>
+      'काउंटर पर बिकने वाले प्रोडक्ट जोड़ें (शैम्पू, सप्लीमेंट)। आपकी सेवाएं सर्विसेज़ और अपॉइंटमेंट में मैनेज होती हैं।';
+
+  @override
+  String get vcopyServicesInvTab => 'आइटम';
+
+  @override
+  String get vcopyElectronicsAddTitle => 'डिवाइस या एक्सेसरी जोड़ें';
+
+  @override
+  String get vcopyElectronicsSearchHint => 'नाम, मॉडल या बारकोड से खोजें…';
+
+  @override
+  String get vcopyElectronicsEmptyTitle => 'अभी कोई स्टॉक नहीं';
+
+  @override
+  String get vcopyElectronicsEmptyHint =>
+      'अपने फोन, एक्सेसरी और उपकरण जोड़ें — मॉडल वेरिएंट, IMEI/सीरियल और वारंटी के साथ।';
+
+  @override
+  String get vcopyElectronicsInvTab => 'स्टॉक';
+
+  @override
+  String get vcopyApparelAddTitle => 'आर्टिकल जोड़ें';
+
+  @override
+  String get vcopyApparelSearchHint => 'आर्टिकल खोजें (नाम, साइज़, रंग)…';
+
+  @override
+  String get vcopyApparelEmptyTitle => 'अभी कोई आर्टिकल नहीं';
+
+  @override
+  String get vcopyApparelEmptyHint =>
+      'साइज़ और रंग वेरिएंट के साथ अपने आर्टिकल जोड़ें — हर साइज़/रंग का अपना स्टॉक रहता है।';
+
+  @override
+  String get vcopyApparelInvTab => 'आर्टिकल';
+
+  @override
+  String get vcopyOpticalAddTitle => 'फ्रेम/लेंस जोड़ें';
+
+  @override
+  String get vcopyOpticalSearchHint => 'फ्रेम, लेंस, सॉल्यूशन खोजें…';
+
+  @override
+  String get vcopyOpticalEmptyTitle => 'अभी कोई फ्रेम या लेंस नहीं';
+
+  @override
+  String get vcopyOpticalEmptyHint =>
+      'फ्रेम, लेंस और सॉल्यूशन जोड़ें — जरूरत के हिसाब से वेरिएंट और वारंटी के साथ।';
+
+  @override
+  String get vcopyOpticalInvTab => 'स्टॉक';
+
+  @override
+  String get vcopyGeneralAddTitle => 'आइटम जोड़ें';
+
+  @override
+  String get vcopyGeneralSearchHint => 'आइटम खोजें…';
+
+  @override
+  String get vcopyGeneralEmptyTitle => 'अभी कोई आइटम नहीं';
+
+  @override
+  String get vcopyGeneralEmptyHint =>
+      'बिलिंग शुरू करने के लिए अपनी बिकने वाली चीज़ें जोड़ें।';
+
+  @override
+  String get vcopyGeneralInvTab => 'आइटम';
+
+  @override
   String get procPayFirst => 'पहले चुकाएं';
 
   @override

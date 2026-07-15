@@ -1268,6 +1268,87 @@ class AppLocalizationsMl extends AppLocalizations {
   String get posCustomDiscount => 'കിഴിവ് (മുഴുവൻ ബില്ലിന്)';
 
   @override
+  String get vcopyServicesAddTitle => 'ഇനം ചേർക്കുക';
+
+  @override
+  String get vcopyServicesSearchHint => 'ഇനങ്ങൾ തിരയുക…';
+
+  @override
+  String get vcopyServicesEmptyTitle => 'ഇതുവരെ റീട്ടെയിൽ ഇനങ്ങളില്ല';
+
+  @override
+  String get vcopyServicesEmptyHint =>
+      'കൗണ്ടറിൽ വിൽക്കുന്ന ഉൽപ്പന്നങ്ങൾ ചേർക്കുക (ഷാംപൂ, സപ്ലിമെന്റുകൾ). നിങ്ങളുടെ സേവനങ്ങൾ സർവീസസ് & അപ്പോയിന്റ്മെന്റ്സിൽ കൈകാര്യം ചെയ്യുന്നു.';
+
+  @override
+  String get vcopyServicesInvTab => 'ഇനങ്ങൾ';
+
+  @override
+  String get vcopyElectronicsAddTitle => 'ഉപകരണമോ ആക്സസറിയോ ചേർക്കുക';
+
+  @override
+  String get vcopyElectronicsSearchHint =>
+      'പേര്, മോഡൽ അല്ലെങ്കിൽ ബാർകോഡ് ഉപയോഗിച്ച് തിരയുക…';
+
+  @override
+  String get vcopyElectronicsEmptyTitle => 'ഇതുവരെ സ്റ്റോക്കില്ല';
+
+  @override
+  String get vcopyElectronicsEmptyHint =>
+      'നിങ്ങളുടെ ഫോണുകൾ, ആക്സസറികൾ, ഉപകരണങ്ങൾ ചേർക്കുക — മോഡൽ വേരിയന്റുകൾ, IMEI/സീരിയൽ, വാറന്റി സഹിതം.';
+
+  @override
+  String get vcopyElectronicsInvTab => 'സ്റ്റോക്ക്';
+
+  @override
+  String get vcopyApparelAddTitle => 'ഇനം ചേർക്കുക';
+
+  @override
+  String get vcopyApparelSearchHint => 'ഇനങ്ങൾ തിരയുക (പേര്, സൈസ്, നിറം)…';
+
+  @override
+  String get vcopyApparelEmptyTitle => 'ഇതുവരെ ഇനങ്ങളില്ല';
+
+  @override
+  String get vcopyApparelEmptyHint =>
+      'സൈസ്, നിറം വേരിയന്റുകളോടെ നിങ്ങളുടെ ഇനങ്ങൾ ചേർക്കുക — ഓരോ സൈസ്/നിറത്തിനും സ്വന്തം സ്റ്റോക്ക്.';
+
+  @override
+  String get vcopyApparelInvTab => 'ഇനങ്ങൾ';
+
+  @override
+  String get vcopyOpticalAddTitle => 'ഫ്രെയിം/ലെൻസ് ചേർക്കുക';
+
+  @override
+  String get vcopyOpticalSearchHint => 'ഫ്രെയിം, ലെൻസ്, സൊല്യൂഷൻ തിരയുക…';
+
+  @override
+  String get vcopyOpticalEmptyTitle => 'ഇതുവരെ ഫ്രെയിമുകളോ ലെൻസുകളോ ഇല്ല';
+
+  @override
+  String get vcopyOpticalEmptyHint =>
+      'ഫ്രെയിം, ലെൻസ്, സൊല്യൂഷൻ ചേർക്കുക — ആവശ്യമുള്ളിടത്ത് വേരിയന്റും വാറന്റിയും സഹിതം.';
+
+  @override
+  String get vcopyOpticalInvTab => 'സ്റ്റോക്ക്';
+
+  @override
+  String get vcopyGeneralAddTitle => 'ഇനം ചേർക്കുക';
+
+  @override
+  String get vcopyGeneralSearchHint => 'ഇനങ്ങൾ തിരയുക…';
+
+  @override
+  String get vcopyGeneralEmptyTitle => 'ഇതുവരെ ഇനങ്ങളില്ല';
+
+  @override
+  String get vcopyGeneralEmptyHint =>
+      'ബില്ലിംഗ് തുടങ്ങാൻ നിങ്ങൾ വിൽക്കുന്ന ഇനങ്ങൾ ചേർക്കുക.';
+
+  @override
+  String get vcopyGeneralInvTab => 'ഇനങ്ങൾ';
+
+  @override
   String get procPayFirst => 'ആദ്യം അടയ്ക്കുക';
 
   @override

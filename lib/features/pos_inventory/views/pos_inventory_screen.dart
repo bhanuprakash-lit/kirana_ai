@@ -5,6 +5,8 @@ import 'package:kirana_ai/shared/widgets/notification_bell.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
+import '../../../core/vertical/vertical_copy.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../providers/pos_provider.dart';
@@ -280,7 +282,9 @@ class _PosInventoryScreenState extends ConsumerState<PosInventoryScreen>
             ),
             Tab(
               icon: const Icon(Icons.inventory_2_rounded),
-              text: l10n.posTabStock,
+              // Vertical wording: "Articles" for apparel, "Items" for
+              // services/general, "Stock" elsewhere.
+              text: vcopy(l10n, verticalConfigOf(ref), VSlot.inventoryTab),
             ),
             Tab(
               icon: const Icon(Icons.local_shipping_rounded),

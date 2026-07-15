@@ -8,6 +8,7 @@ import '../../../core/tutorial/tutorial_controller.dart';
 import '../../../core/tutorial/tutorial_keys.dart';
 import '../../../core/tutorial/tutorial_overlay.dart';
 import '../../../core/vertical/vertical_config_provider.dart';
+import '../../../core/vertical/vertical_copy.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../vision/views/onboarding_stockin_screen.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
@@ -151,9 +152,15 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                   await ref.read(inventoryProvider.notifier).refresh();
                 }
               },
-              title: verticalConfigOf(ref).copy(
-                'empty_inventory',
-                AppLocalizations.of(context).invNoInventoryYet,
+              title: vcopy(
+                AppLocalizations.of(context),
+                verticalConfigOf(ref),
+                VSlot.emptyInventoryTitle,
+              ),
+              hint: vcopy(
+                AppLocalizations.of(context),
+                verticalConfigOf(ref),
+                VSlot.emptyInventoryHint,
               ),
             );
           }
@@ -229,7 +236,12 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                             controller: _searchCtrl,
                             onChanged: (v) => setState(() => _searchQuery = v),
                             decoration: InputDecoration(
-                              hintText: l10n.invSearchItemsOrCategories,
+                              hintText: vcopy(
+                                l10n,
+                                verticalConfigOf(ref),
+                                VSlot.searchHint,
+                                fallback: l10n.invSearchItemsOrCategories,
+                              ),
                               prefixIcon: const Icon(
                                 Icons.search_rounded,
                                 size: 20,
@@ -1115,10 +1127,12 @@ class _EmptyInventory extends StatelessWidget {
   final VoidCallback onAdd;
   final VoidCallback onSnapShelves;
   final String title;
+  final String hint;
   const _EmptyInventory({
     required this.onAdd,
     required this.onSnapShelves,
     required this.title,
+    required this.hint,
   });
 
   @override
@@ -1147,7 +1161,7 @@ class _EmptyInventory extends StatelessWidget {
             Text(title, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
             Text(
-              l10n.invNoInventoryHint,
+              hint,
               textAlign: TextAlign.center,
               style: Theme.of(
                 context,
