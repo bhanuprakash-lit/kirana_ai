@@ -213,7 +213,16 @@ class ProfileScreen extends ConsumerWidget {
                       label: l10n.profWarranty,
                       onTap: () => context.push('/profile/warranty'),
                     ),
-                  if (verticalConfigOf(ref).verticalCode != 'grocery')
+                  // GST is a store fact, not a vertical trait — registered
+                  // kiranas file GST too. Non-grocery verticals keep it on by
+                  // default (back-compat); grocery opts in via Store Settings.
+                  if (verticalConfigOf(ref).verticalCode != 'grocery' ||
+                      (ref
+                              .watch(storeSettingsProvider)
+                              .asData
+                              ?.value
+                              .gstEnabled ??
+                          false))
                     _CompactRow(
                       icon: Icons.receipt_long_rounded,
                       label: l10n.profGstReport,

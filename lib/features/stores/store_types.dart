@@ -21,7 +21,10 @@ const List<StoreTypeOption> kStoreTypeOptions = [
   StoreTypeOption('boutique', 'Boutique', 'apparel'),
   StoreTypeOption('salon', 'Salon & Parlour', 'services'),
   StoreTypeOption('fancy_gift', 'Fancy & Gift Store', 'general'),
-  StoreTypeOption('sports_fitness', 'Sports & Fitness', 'services'),
+  // V0.6 — sports shops sell shoes/apparel/equipment: size variants matter
+  // more than appointments, so this maps to apparel (kept in sync with
+  // onboarding's _mapVertical).
+  StoreTypeOption('sports_fitness', 'Sports & Fitness', 'apparel'),
   StoreTypeOption('footwear', 'Footwear Shop', 'footwear'),
   StoreTypeOption('optical', 'Optical Store', 'optical'),
   StoreTypeOption('bakery', 'Bakery & Sweet Shop', 'grocery'),

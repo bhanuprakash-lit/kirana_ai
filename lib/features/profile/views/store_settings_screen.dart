@@ -39,6 +39,9 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
     'general',
   ];
 
+  // V0.5 — store-level GST registration (drives the GST report row).
+  bool _gstEnabled = false;
+
   bool _isSaving = false;
 
   AppLocalizations get _l10n =>
@@ -70,6 +73,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
       if (p.verticalCode != null && _verticals.contains(p.verticalCode)) {
         _verticalCode = p.verticalCode!;
       }
+      _gstEnabled = p.gstEnabled;
     }
   }
 
@@ -171,6 +175,40 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                           .toList(),
                       onChanged: (v) =>
                           setState(() => _verticalCode = v ?? 'grocery'),
+                    ),
+                  ),
+                  // V0.5 — GST registration is a store fact, not a vertical
+                  // trait: a registered kirana files GST too. Turning this on
+                  // shows the GST report on the profile screen.
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: BrandColors.border),
+                    ),
+                    child: SwitchListTile.adaptive(
+                      value: _gstEnabled,
+                      onChanged: (v) => setState(() => _gstEnabled = v),
+                      title: Text(
+                        l10n.profGstRegistered,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      subtitle: Text(
+                        l10n.profGstRegisteredHint,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: BrandColors.muted,
+                        ),
+                      ),
+                      secondary: const Icon(
+                        Icons.receipt_long_rounded,
+                        size: 20,
+                        color: BrandColors.muted,
+                      ),
+                      activeThumbColor: BrandColors.primary,
                     ),
                   ),
 
@@ -305,6 +343,7 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
         region: _regionCtrl.text,
         city: _cityCtrl.text.trim().isEmpty ? null : _cityCtrl.text.trim(),
         verticalCode: _verticalCode,
+        gstEnabled: _gstEnabled,
       );
 
       await ref.read(storeSettingsProvider.notifier).updateStore(updated);

@@ -2280,6 +2280,48 @@ abstract class AppLocalizations {
   /// **'For your store'**
   String get dashForYourStore;
 
+  /// No description provided for @profGstRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'GST registered'**
+  String get profGstRegistered;
+
+  /// No description provided for @profGstRegisteredHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the GST report for this store'**
+  String get profGstRegisteredHint;
+
+  /// No description provided for @posBarScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get posBarScan;
+
+  /// No description provided for @posBarVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get posBarVoice;
+
+  /// No description provided for @posBarWrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get posBarWrite;
+
+  /// No description provided for @posBarAppointments.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointments'**
+  String get posBarAppointments;
+
+  /// No description provided for @posBarPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Prescription'**
+  String get posBarPrescription;
+
   /// No description provided for @qaCustomers.
   ///
   /// In en, this message translates to:

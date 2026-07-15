@@ -17,6 +17,7 @@ class _PosBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final subInfo = ref.watch(subInfoProvider);
     final isPro = subInfo.effectiveTier == SubTier.pro;
     final limits = ref.watch(usageLimitsProvider).value;
@@ -43,7 +44,7 @@ class _PosBottomBar extends ConsumerWidget {
           Expanded(
             child: _BottomAction(
               icon: Icons.qr_code_scanner_rounded,
-              label: 'Scan',
+              label: l10n.posBarScan,
               color: BrandColors.primary,
               filled: true,
               onTap: onScan,
@@ -55,13 +56,15 @@ class _PosBottomBar extends ConsumerWidget {
             child: showAppointments
                 ? _BottomAction(
                     icon: Icons.event_available_rounded,
-                    label: 'Appointments',
+                    label: l10n.posBarAppointments,
                     color: BrandColors.primary,
                     onTap: onAppointments,
                   )
                 : _BottomAction(
                     icon: Icons.mic_rounded,
-                    label: isPro ? 'Voice $voiceRemaining' : 'Voice',
+                    label: isPro
+                        ? '${l10n.posBarVoice} $voiceRemaining'
+                        : l10n.posBarVoice,
                     color: isPro && voiceRemaining == 0
                         ? BrandColors.error
                         : BrandColors.primary,
@@ -75,13 +78,15 @@ class _PosBottomBar extends ConsumerWidget {
             child: showPrescription
                 ? _BottomAction(
                     icon: Icons.visibility_rounded,
-                    label: 'Prescription',
+                    label: l10n.posBarPrescription,
                     color: BrandColors.purple,
                     onTap: onPrescription,
                   )
                 : _BottomAction(
                     icon: Icons.draw_rounded,
-                    label: isPro ? 'Write $handwriteRemaining' : 'Write',
+                    label: isPro
+                        ? '${l10n.posBarWrite} $handwriteRemaining'
+                        : l10n.posBarWrite,
                     color: isPro && handwriteRemaining == 0
                         ? BrandColors.error
                         : BrandColors.purple,

@@ -1278,6 +1278,27 @@ class AppLocalizationsTa extends AppLocalizations {
   String get dashForYourStore => 'உங்கள் கடைக்காக';
 
   @override
+  String get profGstRegistered => 'GST பதிவு';
+
+  @override
+  String get profGstRegisteredHint => 'இந்தக் கடைக்கு GST அறிக்கையைக் காட்டு';
+
+  @override
+  String get posBarScan => 'ஸ்கேன்';
+
+  @override
+  String get posBarVoice => 'வாய்ஸ்';
+
+  @override
+  String get posBarWrite => 'எழுது';
+
+  @override
+  String get posBarAppointments => 'அப்பாயின்ட்மென்ட்';
+
+  @override
+  String get posBarPrescription => 'பிரிஸ்கிரிப்ஷன்';
+
+  @override
   String get qaCustomers => 'வாடிக்கையாளர்கள்';
 
   @override

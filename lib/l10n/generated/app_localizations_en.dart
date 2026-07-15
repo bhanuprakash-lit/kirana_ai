@@ -1256,6 +1256,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashForYourStore => 'For your store';
 
   @override
+  String get profGstRegistered => 'GST registered';
+
+  @override
+  String get profGstRegisteredHint => 'Show the GST report for this store';
+
+  @override
+  String get posBarScan => 'Scan';
+
+  @override
+  String get posBarVoice => 'Voice';
+
+  @override
+  String get posBarWrite => 'Write';
+
+  @override
+  String get posBarAppointments => 'Appointments';
+
+  @override
+  String get posBarPrescription => 'Prescription';
+
+  @override
   String get qaCustomers => 'Customers';
 
   @override

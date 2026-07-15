@@ -1247,6 +1247,27 @@ class AppLocalizationsTe extends AppLocalizations {
   String get dashForYourStore => 'మీ దుకాణం కోసం';
 
   @override
+  String get profGstRegistered => 'GST రిజిస్టర్డ్';
+
+  @override
+  String get profGstRegisteredHint => 'ఈ దుకాణానికి GST రిపోర్ట్ చూపించండి';
+
+  @override
+  String get posBarScan => 'స్కాన్';
+
+  @override
+  String get posBarVoice => 'వాయిస్';
+
+  @override
+  String get posBarWrite => 'రాయండి';
+
+  @override
+  String get posBarAppointments => 'అపాయింట్‌మెంట్లు';
+
+  @override
+  String get posBarPrescription => 'ప్రిస్క్రిప్షన్';
+
+  @override
   String get qaCustomers => 'కస్టమర్లు';
 
   @override

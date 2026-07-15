@@ -9,6 +9,7 @@ class StoreProfile {
   final String? region;
   final String? city; // M2 — zone/city rollup
   final String? verticalCode; // F1 — current vertical (switchable)
+  final bool gstEnabled; // V0.5 — store is GST-registered (store-level fact)
 
   const StoreProfile({
     required this.storeId,
@@ -21,9 +22,14 @@ class StoreProfile {
     this.region,
     this.city,
     this.verticalCode,
+    this.gstEnabled = false,
   });
 
-  StoreProfile copyWith({String? city, String? verticalCode}) => StoreProfile(
+  StoreProfile copyWith({
+    String? city,
+    String? verticalCode,
+    bool? gstEnabled,
+  }) => StoreProfile(
     storeId: storeId,
     name: name,
     type: type,
@@ -34,6 +40,7 @@ class StoreProfile {
     region: region,
     city: city ?? this.city,
     verticalCode: verticalCode ?? this.verticalCode,
+    gstEnabled: gstEnabled ?? this.gstEnabled,
   );
 
   factory StoreProfile.fromJson(Map<String, dynamic> j) => StoreProfile(
@@ -47,6 +54,7 @@ class StoreProfile {
     region: j['region'] as String?,
     city: j['city'] as String?,
     verticalCode: j['vertical_code'] as String?,
+    gstEnabled: j['gst_enabled'] as bool? ?? false,
   );
 
   Map<String, dynamic> toJson() => {
@@ -59,5 +67,6 @@ class StoreProfile {
     'region': region,
     if (city != null) 'city': city,
     if (verticalCode != null) 'vertical_code': verticalCode,
+    'gst_enabled': gstEnabled,
   };
 }
