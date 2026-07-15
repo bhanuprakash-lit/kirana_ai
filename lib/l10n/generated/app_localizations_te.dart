@@ -1262,6 +1262,36 @@ class AppLocalizationsTe extends AppLocalizations {
   String get posServiceChip => 'సేవ';
 
   @override
+  String get posBillBreakdown => 'బిల్ వివరాలు';
+
+  @override
+  String get posBreakdownCatalogValue => 'కేటలాగ్ విలువ';
+
+  @override
+  String get posBreakdownBasketDiscount => 'బాస్కెట్ డిస్కౌంట్';
+
+  @override
+  String get posBreakdownPriceAdjust => 'ప్రత్యేక ధర సర్దుబాటు';
+
+  @override
+  String get posBreakdownItemsTotal => 'ఐటమ్స్ మొత్తం';
+
+  @override
+  String get posBreakdownCoupon => 'కూపన్';
+
+  @override
+  String get posBreakdownPoints => 'పాయింట్లు రిడీమ్';
+
+  @override
+  String get posBreakdownBillDiscount => 'బిల్ డిస్కౌంట్';
+
+  @override
+  String get posBreakdownOther => 'ఇతర డిస్కౌంట్';
+
+  @override
+  String get posBreakdownTotalPaid => 'మొత్తం చెల్లింపు';
+
+  @override
   String get navRepairs => 'రిపేర్లు';
 
   @override

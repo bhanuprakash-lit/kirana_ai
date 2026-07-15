@@ -535,7 +535,12 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
+
+          // ── Bill breakdown: items total → every discount → paid ───────────
+          _BillBreakdownCard(order: widget.order, total: total),
+
+          const SizedBox(height: 16),
 
           // ── GST breakup (only when the bill has taxable items) ────────────
           _GstBreakupCard(order: widget.order, total: total),
@@ -1437,6 +1442,178 @@ class _PlayButton extends StatelessWidget {
                 color: color,
                 size: 20,
               ),
+      ),
+    );
+  }
+}
+
+/// Full cost breakdown of the bill: items total → basket pricing → each
+/// bill-level discount → what was actually paid. Every rupee between the
+/// items total and the paid total is accounted for; anything the order
+/// doesn't itemize (orders placed before discounts were persisted, referral
+/// % off) reconciles into one "other discount" line. Hidden when there is
+/// nothing to explain (items total == paid total, no basket).
+class _BillBreakdownCard extends StatelessWidget {
+  final Map<String, dynamic> order;
+  final double total;
+
+  const _BillBreakdownCard({required this.order, required this.total});
+
+  String _fmt(double v) => '₹${v.toStringAsFixed(2)}';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final items = (order['items'] as List<dynamic>?) ?? [];
+    double itemsTotal = 0;
+    for (final item in items) {
+      final qty = ((item as Map)['quantity'] as num?)?.toDouble() ?? 0;
+      final price = (item['unit_price'] as num?)?.toDouble() ?? 0;
+      itemsTotal += qty * price;
+    }
+
+    final basketGross = (order['basket_gross'] as num?)?.toDouble();
+    final basketSavings = (order['basket_savings'] as num?)?.toDouble();
+    final coupon = (order['coupon_discount'] as num?)?.toDouble() ?? 0;
+    final redeem = (order['redeem_value'] as num?)?.toDouble() ?? 0;
+    final manual = (order['manual_discount'] as num?)?.toDouble() ?? 0;
+
+    // Basket line prices are already discounted in the items, so the basket
+    // rows above the items total are informational; the reconciliation runs
+    // from the items total down. Special per-customer prices show up as the
+    // gap between the basket price and the items total.
+    final basketPrice = basketGross != null && basketSavings != null
+        ? basketGross - basketSavings
+        : null;
+    final priceAdjust = basketPrice != null ? basketPrice - itemsTotal : 0.0;
+
+    // Whatever the itemized discounts don't explain (old orders, referral %).
+    final residual = itemsTotal - coupon - redeem - manual - total;
+
+    bool visible(double v) => v.abs() >= 0.01;
+
+    final hasAnything =
+        basketGross != null ||
+        visible(coupon) ||
+        visible(redeem) ||
+        visible(manual) ||
+        visible(residual);
+    if (!hasAnything) return const SizedBox.shrink();
+
+    Widget row(
+      String label,
+      String value, {
+      Color? color,
+      bool bold = false,
+    }) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
+                color: bold ? BrandColors.ink : BrandColors.muted,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: bold ? 15 : 13,
+              fontWeight: bold ? FontWeight.w900 : FontWeight.w700,
+              color: color ?? (bold ? BrandColors.ink : BrandColors.ink),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: BrandColors.ink.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.receipt_long_rounded,
+                size: 18,
+                color: BrandColors.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                l10n.posBillBreakdown,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: BrandColors.ink,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (basketGross != null && basketSavings != null) ...[
+            row(l10n.posBreakdownCatalogValue, _fmt(basketGross)),
+            row(
+              '${l10n.posBreakdownBasketDiscount}'
+              '${order['basket_name'] != null ? ' (${order['basket_name']})' : ''}',
+              '−${_fmt(basketSavings)}',
+              color: BrandColors.success,
+            ),
+            if (visible(priceAdjust))
+              row(
+                l10n.posBreakdownPriceAdjust,
+                priceAdjust > 0
+                    ? '−${_fmt(priceAdjust)}'
+                    : '+${_fmt(-priceAdjust)}',
+                color: BrandColors.accent,
+              ),
+          ],
+          row(l10n.posBreakdownItemsTotal, _fmt(itemsTotal)),
+          if (visible(coupon))
+            row(
+              l10n.posBreakdownCoupon,
+              '−${_fmt(coupon)}',
+              color: BrandColors.success,
+            ),
+          if (visible(redeem))
+            row(
+              l10n.posBreakdownPoints,
+              '−${_fmt(redeem)}',
+              color: BrandColors.success,
+            ),
+          if (visible(manual))
+            row(
+              l10n.posBreakdownBillDiscount,
+              '−${_fmt(manual)}',
+              color: BrandColors.success,
+            ),
+          if (visible(residual))
+            row(
+              l10n.posBreakdownOther,
+              residual > 0 ? '−${_fmt(residual)}' : '+${_fmt(-residual)}',
+              color: BrandColors.success,
+            ),
+          Divider(height: 18, color: BrandColors.border.withValues(alpha: 0.6)),
+          row(l10n.posBreakdownTotalPaid, _fmt(total), bold: true),
+        ],
       ),
     );
   }

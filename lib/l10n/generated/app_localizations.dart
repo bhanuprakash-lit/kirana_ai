@@ -2310,6 +2310,66 @@ abstract class AppLocalizations {
   /// **'Service'**
   String get posServiceChip;
 
+  /// No description provided for @posBillBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill breakdown'**
+  String get posBillBreakdown;
+
+  /// No description provided for @posBreakdownCatalogValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalog value'**
+  String get posBreakdownCatalogValue;
+
+  /// No description provided for @posBreakdownBasketDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Basket discount'**
+  String get posBreakdownBasketDiscount;
+
+  /// No description provided for @posBreakdownPriceAdjust.
+  ///
+  /// In en, this message translates to:
+  /// **'Special price adjustment'**
+  String get posBreakdownPriceAdjust;
+
+  /// No description provided for @posBreakdownItemsTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Items total'**
+  String get posBreakdownItemsTotal;
+
+  /// No description provided for @posBreakdownCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon'**
+  String get posBreakdownCoupon;
+
+  /// No description provided for @posBreakdownPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Points redeemed'**
+  String get posBreakdownPoints;
+
+  /// No description provided for @posBreakdownBillDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill discount'**
+  String get posBreakdownBillDiscount;
+
+  /// No description provided for @posBreakdownOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other discount'**
+  String get posBreakdownOther;
+
+  /// No description provided for @posBreakdownTotalPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Total paid'**
+  String get posBreakdownTotalPaid;
+
   /// No description provided for @navRepairs.
   ///
   /// In en, this message translates to:

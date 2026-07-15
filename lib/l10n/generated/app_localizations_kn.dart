@@ -1280,6 +1280,36 @@ class AppLocalizationsKn extends AppLocalizations {
   String get posServiceChip => 'ಸೇವೆ';
 
   @override
+  String get posBillBreakdown => 'ಬಿಲ್ ವಿವರ';
+
+  @override
+  String get posBreakdownCatalogValue => 'ಕ್ಯಾಟಲಾಗ್ ಮೌಲ್ಯ';
+
+  @override
+  String get posBreakdownBasketDiscount => 'ಬಾಸ್ಕೆಟ್ ರಿಯಾಯಿತಿ';
+
+  @override
+  String get posBreakdownPriceAdjust => 'ವಿಶೇಷ ಬೆಲೆ ಹೊಂದಾಣಿಕೆ';
+
+  @override
+  String get posBreakdownItemsTotal => 'ಐಟಂ ಒಟ್ಟು';
+
+  @override
+  String get posBreakdownCoupon => 'ಕೂಪನ್';
+
+  @override
+  String get posBreakdownPoints => 'ಪಾಯಿಂಟ್ ರಿಡೀಮ್';
+
+  @override
+  String get posBreakdownBillDiscount => 'ಬಿಲ್ ರಿಯಾಯಿತಿ';
+
+  @override
+  String get posBreakdownOther => 'ಇತರ ರಿಯಾಯಿತಿ';
+
+  @override
+  String get posBreakdownTotalPaid => 'ಒಟ್ಟು ಪಾವತಿ';
+
+  @override
   String get navRepairs => 'ರಿಪೇರಿ';
 
   @override

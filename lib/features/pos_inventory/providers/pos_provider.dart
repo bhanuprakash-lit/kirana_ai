@@ -699,6 +699,10 @@ class PosNotifier extends Notifier<PosState> {
         'coupon_id': ?couponId,
         if (couponDiscount > 0) 'coupon_discount': couponDiscount,
         if (redeemPoints > 0) 'redeem_points': redeemPoints,
+        // Persisted so order history can explain the paid total (bill
+        // breakdown): ₹ value of redeemed points + custom bill discount.
+        if (redeemValue > 0) 'redeem_value': redeemValue,
+        if (manualDiscount > 0) 'manual_discount': manualDiscount,
         // POS deep-links (M4/M7/M9)
         if (serials != null && serials.isNotEmpty) 'serials': serials,
         if (serialItems != null && serialItems.isNotEmpty)

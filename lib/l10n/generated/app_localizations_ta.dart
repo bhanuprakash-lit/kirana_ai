@@ -1293,6 +1293,36 @@ class AppLocalizationsTa extends AppLocalizations {
   String get posServiceChip => 'சேவை';
 
   @override
+  String get posBillBreakdown => 'பில் விவரம்';
+
+  @override
+  String get posBreakdownCatalogValue => 'கேட்டலாக் மதிப்பு';
+
+  @override
+  String get posBreakdownBasketDiscount => 'பாஸ்கெட் தள்ளுபடி';
+
+  @override
+  String get posBreakdownPriceAdjust => 'சிறப்பு விலை மாற்றம்';
+
+  @override
+  String get posBreakdownItemsTotal => 'பொருட்கள் மொத்தம்';
+
+  @override
+  String get posBreakdownCoupon => 'கூப்பன்';
+
+  @override
+  String get posBreakdownPoints => 'பாயின்ட் ரிடீம்';
+
+  @override
+  String get posBreakdownBillDiscount => 'பில் தள்ளுபடி';
+
+  @override
+  String get posBreakdownOther => 'மற்ற தள்ளுபடி';
+
+  @override
+  String get posBreakdownTotalPaid => 'மொத்தம் செலுத்தியது';
+
+  @override
   String get navRepairs => 'ரிப்பேர்';
 
   @override

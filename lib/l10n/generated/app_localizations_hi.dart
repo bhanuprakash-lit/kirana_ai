@@ -1254,6 +1254,36 @@ class AppLocalizationsHi extends AppLocalizations {
   String get posServiceChip => 'सेवा';
 
   @override
+  String get posBillBreakdown => 'बिल का ब्रेकडाउन';
+
+  @override
+  String get posBreakdownCatalogValue => 'कैटलॉग कीमत';
+
+  @override
+  String get posBreakdownBasketDiscount => 'बास्केट छूट';
+
+  @override
+  String get posBreakdownPriceAdjust => 'स्पेशल कीमत एडजस्टमेंट';
+
+  @override
+  String get posBreakdownItemsTotal => 'आइटम कुल';
+
+  @override
+  String get posBreakdownCoupon => 'कूपन';
+
+  @override
+  String get posBreakdownPoints => 'पॉइंट्स रिडीम';
+
+  @override
+  String get posBreakdownBillDiscount => 'बिल छूट';
+
+  @override
+  String get posBreakdownOther => 'अन्य छूट';
+
+  @override
+  String get posBreakdownTotalPaid => 'कुल भुगतान';
+
+  @override
   String get navRepairs => 'रिपेयर';
 
   @override
