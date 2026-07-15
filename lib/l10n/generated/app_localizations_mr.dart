@@ -1278,6 +1278,36 @@ class AppLocalizationsMr extends AppLocalizations {
   String get posServiceChip => 'सेवा';
 
   @override
+  String get posBillBreakdown => 'बिलाचा तपशील';
+
+  @override
+  String get posBreakdownCatalogValue => 'कॅटलॉग किंमत';
+
+  @override
+  String get posBreakdownBasketDiscount => 'बास्केट सूट';
+
+  @override
+  String get posBreakdownPriceAdjust => 'विशेष किंमत समायोजन';
+
+  @override
+  String get posBreakdownItemsTotal => 'आयटम एकूण';
+
+  @override
+  String get posBreakdownCoupon => 'कूपन';
+
+  @override
+  String get posBreakdownPoints => 'पॉइंट्स रिडीम';
+
+  @override
+  String get posBreakdownBillDiscount => 'बिल सूट';
+
+  @override
+  String get posBreakdownOther => 'इतर सूट';
+
+  @override
+  String get posBreakdownTotalPaid => 'एकूण भरले';
+
+  @override
   String get navRepairs => 'दुरुस्ती';
 
   @override

@@ -1292,6 +1292,36 @@ class AppLocalizationsMl extends AppLocalizations {
   String get posServiceChip => 'സേവനം';
 
   @override
+  String get posBillBreakdown => 'ബിൽ വിശദാംശം';
+
+  @override
+  String get posBreakdownCatalogValue => 'കാറ്റലോഗ് മൂല്യം';
+
+  @override
+  String get posBreakdownBasketDiscount => 'ബാസ്കറ്റ് കിഴിവ്';
+
+  @override
+  String get posBreakdownPriceAdjust => 'പ്രത്യേക വില ക്രമീകരണം';
+
+  @override
+  String get posBreakdownItemsTotal => 'ഇനങ്ങളുടെ ആകെ';
+
+  @override
+  String get posBreakdownCoupon => 'കൂപ്പൺ';
+
+  @override
+  String get posBreakdownPoints => 'പോയിന്റ് റിഡീം';
+
+  @override
+  String get posBreakdownBillDiscount => 'ബിൽ കിഴിവ്';
+
+  @override
+  String get posBreakdownOther => 'മറ്റ് കിഴിവ്';
+
+  @override
+  String get posBreakdownTotalPaid => 'ആകെ അടച്ചത്';
+
+  @override
   String get navRepairs => 'റിപ്പയർ';
 
   @override

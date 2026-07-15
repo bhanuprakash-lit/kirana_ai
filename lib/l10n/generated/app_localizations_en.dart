@@ -1271,6 +1271,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posServiceChip => 'Service';
 
   @override
+  String get posBillBreakdown => 'Bill breakdown';
+
+  @override
+  String get posBreakdownCatalogValue => 'Catalog value';
+
+  @override
+  String get posBreakdownBasketDiscount => 'Basket discount';
+
+  @override
+  String get posBreakdownPriceAdjust => 'Special price adjustment';
+
+  @override
+  String get posBreakdownItemsTotal => 'Items total';
+
+  @override
+  String get posBreakdownCoupon => 'Coupon';
+
+  @override
+  String get posBreakdownPoints => 'Points redeemed';
+
+  @override
+  String get posBreakdownBillDiscount => 'Bill discount';
+
+  @override
+  String get posBreakdownOther => 'Other discount';
+
+  @override
+  String get posBreakdownTotalPaid => 'Total paid';
+
+  @override
   String get navRepairs => 'Repairs';
 
   @override

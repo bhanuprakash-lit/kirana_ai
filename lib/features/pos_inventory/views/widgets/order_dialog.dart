@@ -625,6 +625,15 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
         enriched['auto_print'] =
             _autoPrint && ref.read(printerProvider).isConnected;
         enriched['payment_method'] = _paymentMethod;
+        // Bill-level discounts for the order-details breakdown — also set
+        // locally so the same-session details screen shows them even against
+        // a backend that doesn't echo the fields yet.
+        final manualDiscount = _manualDiscountValue(ref.read(posProvider));
+        if (_couponOk && _couponDiscount > 0) {
+          enriched['coupon_discount'] = _couponDiscount;
+        }
+        if (_redeemValue > 0) enriched['redeem_value'] = _redeemValue;
+        if (manualDiscount > 0) enriched['manual_discount'] = manualDiscount;
         // Persist the split so OrderDetailsScreen can show the breakdown
         // even in the same session before backend returns the fields.
         if (_paymentMethod == 'udhaar' && udhaarAmt != null) {
