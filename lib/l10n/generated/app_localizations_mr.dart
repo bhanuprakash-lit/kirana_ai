@@ -1275,6 +1275,9 @@ class AppLocalizationsMr extends AppLocalizations {
   String get navAppointments => 'बुकिंग';
 
   @override
+  String get posServiceChip => 'सेवा';
+
+  @override
   String get navRepairs => 'दुरुस्ती';
 
   @override

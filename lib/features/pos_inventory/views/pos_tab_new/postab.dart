@@ -34,7 +34,7 @@ class _PosTabState extends ConsumerState<PosTab> {
     final products = ref.read(posProvider).products;
     if (_query.isEmpty) return products;
     final q = _query.toLowerCase();
-    return products
+    final matches = products
         .where(
           (p) =>
               p.name.toLowerCase().contains(q) ||
@@ -42,6 +42,46 @@ class _PosTabState extends ConsumerState<PosTab> {
               (p.barcode?.contains(q) ?? false),
         )
         .toList();
+    // V2 — services sell at POS too: a haircut is searched and billed like
+    // any item. Service matches ride their linked is_service product row
+    // (no stock; the sale trigger skips inventory for them).
+    matches.addAll(_serviceMatches(q));
+    return matches;
+  }
+
+  /// Active catalogue services matching the query, as sellable pseudo
+  /// products. Empty for verticals without the appointments feature or on
+  /// older backends that don't link services to products yet.
+  List<PosProduct> _serviceMatches(String q) {
+    if (!verticalConfigOf(ref).has('appointments')) return const [];
+    final services = ref.read(servicesProvider).asData?.value ?? const [];
+    return [
+      for (final s in services)
+        if (s.productId != null &&
+            s.isActive &&
+            s.name.toLowerCase().contains(q))
+          PosProduct(
+            productId: s.productId!,
+            name: s.name,
+            unit: 'service',
+            isPerishable: false,
+            isLoose: false,
+            categoryId: 0,
+            price: s.price,
+            stockQuantity: 0,
+          ),
+    ];
+  }
+
+  /// Product ids that are services — the search list uses this to swap the
+  /// stock line for a "Service" chip.
+  Set<int> get _serviceProductIds {
+    if (!verticalConfigOf(ref).has('appointments')) return const {};
+    final services = ref.read(servicesProvider).asData?.value ?? const [];
+    return {
+      for (final s in services)
+        if (s.productId != null) s.productId!,
+    };
   }
 
   // F2 — variant verticals: resolve the size/colour/model (its price + stock)
@@ -1028,6 +1068,12 @@ class _PosTabState extends ConsumerState<PosTab> {
     final isSearching = _query.isNotEmpty;
     final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
+    // V2 — keep the service catalogue loaded so search can offer services
+    // alongside products (no-op for verticals without appointments).
+    if (verticalConfigOf(ref).has('appointments')) {
+      ref.watch(servicesProvider);
+    }
+
     // Guided first-sale flow reacts to the live bill state on every rebuild.
     ref.watch(tutorialProvider.select((s) => (s.activeFlow, s.loaded)));
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1135,6 +1181,7 @@ class _PosTabState extends ConsumerState<PosTab> {
           if (isSearching)
             _SearchResults(
               products: _filtered,
+              serviceIds: _serviceProductIds,
               isLoading: state.isLoadingProducts,
               onAdd: (p) {
                 _handleProductAdd(p);

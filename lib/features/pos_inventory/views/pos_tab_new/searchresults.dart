@@ -5,10 +5,15 @@ class _SearchResults extends StatelessWidget {
   final bool isLoading;
   final ValueChanged<PosProduct> onAdd;
 
+  /// V2 — product ids that are actually services (linked is_service rows):
+  /// they show a "Service" chip instead of a stock count.
+  final Set<int> serviceIds;
+
   const _SearchResults({
     required this.products,
     required this.isLoading,
     required this.onAdd,
+    this.serviceIds = const {},
   });
 
   @override
@@ -46,20 +51,35 @@ class _SearchResults extends StatelessWidget {
               separatorBuilder: (_, _) => const Divider(height: 1, indent: 16),
               itemBuilder: (_, i) {
                 final p = products[i];
+                final isService = serviceIds.contains(p.productId);
                 return ListTile(
                   dense: true,
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: p.imageUrl != null
-                        ? Image.network(
-                            p.imageUrl!,
-                            width: 36,
-                            height: 36,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, _, _) => _posIconBox(36),
-                          )
-                        : _posIconBox(36),
-                  ),
+                  leading: isService
+                      ? Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: BrandColors.purple.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.design_services_rounded,
+                            size: 18,
+                            color: BrandColors.purple,
+                          ),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: p.imageUrl != null
+                              ? Image.network(
+                                  p.imageUrl!,
+                                  width: 36,
+                                  height: 36,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, _, _) => _posIconBox(36),
+                                )
+                              : _posIconBox(36),
+                        ),
                   title: Text(
                     p.displayName,
                     style: const TextStyle(
@@ -70,10 +90,13 @@ class _SearchResults extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Text(
-                    '${p.priceLabel} · Stock: ${p.stockLabel}',
-                    style: const TextStyle(
+                    isService
+                        ? '${p.priceLabel} · ${AppLocalizations.of(context).posServiceChip}'
+                        : '${p.priceLabel} · Stock: ${p.stockLabel}',
+                    style: TextStyle(
                       fontSize: 11,
-                      color: BrandColors.muted,
+                      color: isService ? BrandColors.purple : BrandColors.muted,
+                      fontWeight: isService ? FontWeight.w700 : FontWeight.w400,
                     ),
                   ),
                   trailing: GestureDetector(

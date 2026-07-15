@@ -1259,6 +1259,9 @@ class AppLocalizationsTe extends AppLocalizations {
   String get navAppointments => 'బుకింగ్స్';
 
   @override
+  String get posServiceChip => 'సేవ';
+
+  @override
   String get navRepairs => 'రిపేర్లు';
 
   @override

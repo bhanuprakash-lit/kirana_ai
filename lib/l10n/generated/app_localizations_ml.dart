@@ -1289,6 +1289,9 @@ class AppLocalizationsMl extends AppLocalizations {
   String get navAppointments => 'ബുക്കിംഗ്';
 
   @override
+  String get posServiceChip => 'സേവനം';
+
+  @override
   String get navRepairs => 'റിപ്പയർ';
 
   @override
