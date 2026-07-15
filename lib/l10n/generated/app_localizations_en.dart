@@ -1250,6 +1250,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vcopyServicesAddTitle => 'Add item';
 
   @override
+  String get visionComingSoonTitle => 'Vision AI is coming to your store';
+
+  @override
+  String get dashForYourStore => 'For your store';
+
+  @override
+  String get qaCustomers => 'Customers';
+
+  @override
+  String get qaBookAppointment => 'Book appointment';
+
+  @override
+  String get qaMemberships => 'Memberships';
+
+  @override
+  String get qaNewJobCard => 'New job card';
+
+  @override
+  String get qaCheckWarranty => 'Check warranty';
+
+  @override
+  String get qaNewEstimate => 'New estimate';
+
+  @override
+  String get qaReturns => 'Returns';
+
+  @override
+  String get qaAddProduct => 'Add item';
+
+  @override
+  String get qaAddUdhaar => 'Add udhaar';
+
+  @override
+  String get qaScanShelves => 'Scan shelves';
+
+  @override
+  String get visionComingSoonBody =>
+      'Vision AI reads shelves from a photo — today it recognises grocery items, and support for your store\'s products is being trained now. Scanning, uploads and the counter camera will switch on here automatically the moment your items are supported.';
+
+  @override
+  String get visionComingSoonBadge => 'Coming soon for your items';
+
+  @override
   String get vcopyServicesSearchHint => 'Search items…';
 
   @override

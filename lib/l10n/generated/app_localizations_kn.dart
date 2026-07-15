@@ -1259,6 +1259,49 @@ class AppLocalizationsKn extends AppLocalizations {
   String get vcopyServicesAddTitle => 'ಐಟಂ ಸೇರಿಸಿ';
 
   @override
+  String get visionComingSoonTitle => 'ವಿಷನ್ AI ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಬರುತ್ತಿದೆ';
+
+  @override
+  String get dashForYourStore => 'ನಿಮ್ಮ ಅಂಗಡಿಗಾಗಿ';
+
+  @override
+  String get qaCustomers => 'ಗ್ರಾಹಕರು';
+
+  @override
+  String get qaBookAppointment => 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಮಾಡಿ';
+
+  @override
+  String get qaMemberships => 'ಮೆಂಬರ್‌ಶಿಪ್';
+
+  @override
+  String get qaNewJobCard => 'ಹೊಸ ಜಾಬ್ ಕಾರ್ಡ್';
+
+  @override
+  String get qaCheckWarranty => 'ವಾರಂಟಿ ನೋಡಿ';
+
+  @override
+  String get qaNewEstimate => 'ಹೊಸ ಎಸ್ಟಿಮೇಟ್';
+
+  @override
+  String get qaReturns => 'ರಿಟರ್ನ್ಸ್';
+
+  @override
+  String get qaAddProduct => 'ಐಟಂ ಸೇರಿಸಿ';
+
+  @override
+  String get qaAddUdhaar => 'ಉಧಾರ್ ಸೇರಿಸಿ';
+
+  @override
+  String get qaScanShelves => 'ಶೆಲ್ಫ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ';
+
+  @override
+  String get visionComingSoonBody =>
+      'ವಿಷನ್ AI ಫೋಟೋದಿಂದ ಶೆಲ್ಫ್‌ಗಳನ್ನು ಓದುತ್ತದೆ — ಇಂದು ಅದು ಕಿರಾಣಿ ವಸ್ತುಗಳನ್ನು ಗುರುತಿಸುತ್ತದೆ, ನಿಮ್ಮ ಅಂಗಡಿಯ ಉತ್ಪನ್ನಗಳಿಗೆ ತರಬೇತಿ ನಡೆಯುತ್ತಿದೆ. ನಿಮ್ಮ ವಸ್ತುಗಳಿಗೆ ಬೆಂಬಲ ಸಿಕ್ಕ ಕೂಡಲೇ ಸ್ಕ್ಯಾನಿಂಗ್, ಅಪ್‌ಲೋಡ್ ಮತ್ತು ಕೌಂಟರ್ ಕ್ಯಾಮೆರಾ ಇಲ್ಲಿ ತಾನಾಗಿ ಆನ್ ಆಗುತ್ತವೆ.';
+
+  @override
+  String get visionComingSoonBadge => 'ನಿಮ್ಮ ವಸ್ತುಗಳಿಗೆ ಶೀಘ್ರದಲ್ಲೇ';
+
+  @override
   String get vcopyServicesSearchHint => 'ಐಟಂಗಳನ್ನು ಹುಡುಕಿ…';
 
   @override

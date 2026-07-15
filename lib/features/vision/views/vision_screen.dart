@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../subscription/providers/subscription_provider.dart';
@@ -53,6 +54,15 @@ class _VisionScreenState extends ConsumerState<VisionScreen>
       if (next != _tab.index) _tab.animateTo(next);
     });
 
+    // Vision AI currently recognises grocery/kirana catalogues only. Every
+    // vertical sees the tab (it's coming for all of them), but until the
+    // detector covers their items, non-grocery stores get a coming-soon
+    // screen instead of scan/upload/counter — checked BEFORE the Pro gate so
+    // nobody is upsold into a feature that can't read their shelves yet.
+    if (verticalConfigOf(ref).isOff('vision')) {
+      return const _VisionComingSoon();
+    }
+
     final isPro = ref.watch(subInfoProvider).canAccessVendorManagement;
     if (!isPro) return const _VisionProGate();
 
@@ -72,6 +82,82 @@ class _VisionScreenState extends ConsumerState<VisionScreen>
       body: TabBarView(
         controller: _tab,
         children: const [_ShelfTab(), _ResultsTab(), CounterScreen()],
+      ),
+    );
+  }
+}
+
+// ── Coming soon (verticals the detector doesn't cover yet) ──────────────────
+
+class _VisionComingSoon extends StatelessWidget {
+  const _VisionComingSoon();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      backgroundColor: BrandColors.background,
+      appBar: AppBar(title: Text(l10n.visionTitle)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: BrandColors.purple.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  size: 52,
+                  color: BrandColors.purple,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n.visionComingSoonTitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w900,
+                  color: BrandColors.ink,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                l10n.visionComingSoonBody,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  height: 1.5,
+                  color: BrandColors.muted,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: BrandColors.purple.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  l10n.visionComingSoonBadge,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: BrandColors.purple,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

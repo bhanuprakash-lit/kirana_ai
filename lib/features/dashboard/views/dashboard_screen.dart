@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/api_client.dart';
 import '../../../core/tutorial/tutorial_keys.dart';
 import '../../../core/theme/brand_theme.dart';
-import '../../../core/vertical/vertical_config_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../pos_inventory/views/pos_inventory_screen.dart';
@@ -228,14 +227,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
   Widget _buildDashboard(int currentTab) {
     final l10n = AppLocalizations.of(context);
-    // F4 — Vision is grocery-tuned; verticals can opt out (vision:false). Absent
-    // flag (legacy/grocery) keeps it on. Drop the tab + nav entry when off.
-    final showVision = !verticalConfigOf(ref).isOff('vision');
+    // Vision AI is for every vertical — the tab always shows. Verticals the
+    // detector doesn't cover yet get a coming-soon screen inside VisionScreen
+    // (no scan/upload/counter) instead of a hidden tab, so owners know it's
+    // on the way and it lights up without them hunting for it.
     final tabs = <Widget>[
       const OverviewTab(),
       const FinanceScreen(),
       const PosInventoryScreen(),
-      if (showVision) const VisionScreen(),
+      const VisionScreen(),
     ];
     final safeIndex = currentTab.clamp(0, tabs.length - 1);
     _visitedTabs.add(safeIndex);
@@ -270,13 +270,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             selectedIcon: const Icon(Icons.storefront_rounded),
             label: l10n.dashNavBilling,
           ),
-          if (showVision)
-            NavigationDestination(
-              key: TutorialKeys.navVision,
-              icon: const Icon(Icons.center_focus_weak_outlined),
-              selectedIcon: const Icon(Icons.center_focus_strong_rounded),
-              label: l10n.visionNavLabel,
-            ),
+          NavigationDestination(
+            key: TutorialKeys.navVision,
+            icon: const Icon(Icons.center_focus_weak_outlined),
+            selectedIcon: const Icon(Icons.center_focus_strong_rounded),
+            label: l10n.visionNavLabel,
+          ),
         ],
       ),
     );

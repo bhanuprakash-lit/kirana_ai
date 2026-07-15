@@ -10,6 +10,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/theme/brand_theme.dart';
+import '../../../../core/vertical/vertical_config_provider.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../shared/models/alert_model.dart';
 import '../../../../shared/widgets/shimmer_widgets.dart';
@@ -197,6 +198,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                   data: (data) => SliverList(
                     delegate: SliverChildListDelegate([
                       const GettingStartedCard(),
+                      const _QuickActionsRow(),
                       _MorningBriefingRibbon(reco: data.recommendations),
                       ForecastStrip(storeId: data.store.storeId),
                       const _ProAlertsStrip(),
@@ -208,7 +210,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                       ),
                       const SizedBox(height: 16),
                       const _KpiSummaryRow(),
-                      // const _VerticalKpiSection(),
+                      const _VerticalKpiSection(),
                       const SizedBox(height: 16),
                       _StoreOverviewCard(store: data.store),
                       const SizedBox(height: 100),
@@ -248,7 +250,7 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
                         ),
                         const SizedBox(height: 16),
                         const _KpiSummaryRow(),
-                        // const _VerticalKpiSection(),
+                        const _VerticalKpiSection(),
                         const SizedBox(height: 16),
                         _StoreOverviewCard(store: data.store),
                         const SizedBox(height: 100),
@@ -452,6 +454,189 @@ class _GreetingHeader extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Quick actions (per vertical) ──────────────────────────────────────────────
+
+class _QuickAction {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _QuickAction(this.icon, this.label, this.onTap);
+}
+
+/// V0.4 — the vertical's daily verbs, one tap from home: a salon books an
+/// appointment, an electronics store opens a job card or checks a warranty,
+/// a boutique writes an estimate. "New sale" stays on the FAB — these cover
+/// what the FAB doesn't.
+class _QuickActionsRow extends ConsumerWidget {
+  const _QuickActionsRow();
+
+  List<_QuickAction> _actionsFor(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    String verticalCode,
+  ) {
+    void goTab(int tab, int sub) {
+      ref.read(dashboardTabProvider.notifier).switchTab(tab);
+      ref.read(dashboardSubTabProvider.notifier).setSubTab(sub);
+    }
+
+    final customers = _QuickAction(
+      Icons.people_alt_rounded,
+      l10n.qaCustomers,
+      () => context.push('/profile/customers'),
+    );
+
+    switch (verticalCode) {
+      case 'services':
+        return [
+          _QuickAction(
+            Icons.event_available_rounded,
+            l10n.qaBookAppointment,
+            () => context.push('/profile/services'),
+          ),
+          _QuickAction(
+            Icons.card_membership_rounded,
+            l10n.qaMemberships,
+            () => context.push('/profile/services'),
+          ),
+          customers,
+        ];
+      case 'optical':
+        return [
+          _QuickAction(
+            Icons.event_available_rounded,
+            l10n.qaBookAppointment,
+            () => context.push('/profile/services'),
+          ),
+          _QuickAction(
+            Icons.add_box_rounded,
+            l10n.qaAddProduct,
+            () => goTab(2, 1),
+          ),
+          customers,
+        ];
+      case 'electronics':
+        return [
+          _QuickAction(
+            Icons.build_circle_rounded,
+            l10n.qaNewJobCard,
+            () => context.push('/profile/job-cards'),
+          ),
+          _QuickAction(
+            Icons.verified_user_rounded,
+            l10n.qaCheckWarranty,
+            () => context.push('/profile/warranty'),
+          ),
+          customers,
+        ];
+      case 'apparel':
+      case 'footwear':
+        return [
+          _QuickAction(
+            Icons.request_quote_rounded,
+            l10n.qaNewEstimate,
+            () => context.push('/profile/fulfilment'),
+          ),
+          _QuickAction(
+            Icons.assignment_return_rounded,
+            l10n.qaReturns,
+            () => context.push('/profile/fulfilment'),
+          ),
+          customers,
+        ];
+      case 'general':
+        return [
+          _QuickAction(
+            Icons.add_box_rounded,
+            l10n.qaAddProduct,
+            () => goTab(2, 1),
+          ),
+          _QuickAction(
+            Icons.menu_book_rounded,
+            l10n.qaAddUdhaar,
+            () {
+              ref.read(dashboardTabProvider.notifier).switchTab(1);
+              ref.read(financeSubTabProvider.notifier).setSubTab(1);
+            },
+          ),
+          customers,
+        ];
+      default: // grocery + unknown
+        return [
+          _QuickAction(Icons.menu_book_rounded, l10n.qaAddUdhaar, () {
+            ref.read(dashboardTabProvider.notifier).switchTab(1);
+            ref.read(financeSubTabProvider.notifier).setSubTab(1);
+          }),
+          _QuickAction(
+            Icons.center_focus_strong_rounded,
+            l10n.qaScanShelves,
+            () => ref.read(dashboardTabProvider.notifier).switchTab(3),
+          ),
+          customers,
+        ];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final vc = verticalConfigOf(ref);
+    final actions = _actionsFor(context, ref, l10n, vc.verticalCode);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Row(
+        children: [
+          for (var i = 0; i < actions.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            Expanded(
+              child: Material(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                child: InkWell(
+                  onTap: actions[i].onTap,
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: BrandColors.border),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          actions[i].icon,
+                          size: 20,
+                          color: BrandColors.primary,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          actions[i].label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: BrandColors.ink,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -1439,101 +1624,102 @@ class _KpiSummaryRowState extends ConsumerState<_KpiSummaryRow> {
 /// Vertical-specific KPI cards (apparel sell-through, electronics attach-rate,
 /// optical Rx-renewal, salon service-revenue, …). Renders nothing for grocery /
 /// general, which have no pack.
-// class _VerticalKpiSection extends ConsumerWidget {
-//   const _VerticalKpiSection();
+class _VerticalKpiSection extends ConsumerWidget {
+  const _VerticalKpiSection();
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final async = ref.watch(verticalKpiCardsProvider);
-//     return async.maybeWhen(
-//       data: (cards) {
-//         if (cards.isEmpty) return const SizedBox.shrink();
-//         return Padding(
-//           padding: const EdgeInsets.only(top: 16),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               const Padding(
-//                 padding: EdgeInsets.fromLTRB(22, 0, 22, 10),
-//                 child: Row(
-//                   children: [
-//                     Icon(
-//                       Icons.insights_rounded,
-//                       size: 16,
-//                       color: BrandColors.primary,
-//                     ),
-//                     SizedBox(width: 6),
-//                     Text(
-//                       'For your store',
-//                       style: TextStyle(
-//                         fontSize: 14,
-//                         fontWeight: FontWeight.w800,
-//                         color: BrandColors.ink,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.symmetric(horizontal: 22),
-//                 child: Wrap(
-//                   spacing: 10,
-//                   runSpacing: 10,
-//                   children: cards
-//                       .map((c) => _VerticalKpiCardTile(card: c))
-//                       .toList(),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         );
-//       },
-//       orElse: () => const SizedBox.shrink(),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final async = ref.watch(verticalKpiCardsProvider);
+    return async.maybeWhen(
+      data: (cards) {
+        if (cards.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 0, 22, 10),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.insights_rounded,
+                      size: 16,
+                      color: BrandColors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.dashForYourStore,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: BrandColors.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                child: Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: cards
+                      .map((c) => _VerticalKpiCardTile(card: c))
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
+}
 
-// class _VerticalKpiCardTile extends StatelessWidget {
-//   final VerticalKpiCard card;
-//   const _VerticalKpiCardTile({required this.card});
+class _VerticalKpiCardTile extends StatelessWidget {
+  final VerticalKpiCard card;
+  const _VerticalKpiCardTile({required this.card});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 150,
-//       padding: const EdgeInsets.all(14),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(16),
-//         border: Border.all(color: BrandColors.border),
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             card.value,
-//             style: const TextStyle(
-//               fontSize: 20,
-//               fontWeight: FontWeight.w900,
-//               color: BrandColors.ink,
-//             ),
-//           ),
-//           const SizedBox(height: 2),
-//           Text(
-//             card.name,
-//             maxLines: 2,
-//             overflow: TextOverflow.ellipsis,
-//             style: const TextStyle(
-//               fontSize: 11,
-//               fontWeight: FontWeight.w600,
-//               color: BrandColors.muted,
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 150,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: BrandColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            card.value,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: BrandColors.ink,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            card.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: BrandColors.muted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _KpiMiniCard extends StatelessWidget {
   final KpiCard card;

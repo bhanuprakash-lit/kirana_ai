@@ -2268,6 +2268,90 @@ abstract class AppLocalizations {
   /// **'Add item'**
   String get vcopyServicesAddTitle;
 
+  /// No description provided for @visionComingSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision AI is coming to your store'**
+  String get visionComingSoonTitle;
+
+  /// No description provided for @dashForYourStore.
+  ///
+  /// In en, this message translates to:
+  /// **'For your store'**
+  String get dashForYourStore;
+
+  /// No description provided for @qaCustomers.
+  ///
+  /// In en, this message translates to:
+  /// **'Customers'**
+  String get qaCustomers;
+
+  /// No description provided for @qaBookAppointment.
+  ///
+  /// In en, this message translates to:
+  /// **'Book appointment'**
+  String get qaBookAppointment;
+
+  /// No description provided for @qaMemberships.
+  ///
+  /// In en, this message translates to:
+  /// **'Memberships'**
+  String get qaMemberships;
+
+  /// No description provided for @qaNewJobCard.
+  ///
+  /// In en, this message translates to:
+  /// **'New job card'**
+  String get qaNewJobCard;
+
+  /// No description provided for @qaCheckWarranty.
+  ///
+  /// In en, this message translates to:
+  /// **'Check warranty'**
+  String get qaCheckWarranty;
+
+  /// No description provided for @qaNewEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'New estimate'**
+  String get qaNewEstimate;
+
+  /// No description provided for @qaReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Returns'**
+  String get qaReturns;
+
+  /// No description provided for @qaAddProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item'**
+  String get qaAddProduct;
+
+  /// No description provided for @qaAddUdhaar.
+  ///
+  /// In en, this message translates to:
+  /// **'Add udhaar'**
+  String get qaAddUdhaar;
+
+  /// No description provided for @qaScanShelves.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan shelves'**
+  String get qaScanShelves;
+
+  /// No description provided for @visionComingSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision AI reads shelves from a photo — today it recognises grocery items, and support for your store\'s products is being trained now. Scanning, uploads and the counter camera will switch on here automatically the moment your items are supported.'**
+  String get visionComingSoonBody;
+
+  /// No description provided for @visionComingSoonBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon for your items'**
+  String get visionComingSoonBadge;
+
   /// No description provided for @vcopyServicesSearchHint.
   ///
   /// In en, this message translates to:
