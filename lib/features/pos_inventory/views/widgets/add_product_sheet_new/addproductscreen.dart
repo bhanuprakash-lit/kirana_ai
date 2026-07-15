@@ -498,7 +498,7 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
         elevation: 0,
         title: Text(
           _stage == _Stage.search
-              ? verticalConfigOf(ref).copy('add_title', l10n.invAddProduct)
+              ? vcopy(l10n, verticalConfigOf(ref), VSlot.addTitle)
               : (_linked != null ? l10n.invAddFromCatalog : l10n.invNewProduct),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
@@ -562,9 +562,11 @@ class _AddProductScreenState extends ConsumerState<_AddProductScreen> {
                   controller: _searchCtrl,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: verticalConfigOf(
-                      ref,
-                    ).copy('search_hint', l10n.invSearchProductName),
+                    hintText: vcopy(
+                      l10n,
+                      verticalConfigOf(ref),
+                      VSlot.searchHint,
+                    ),
                     prefixIcon: const Icon(
                       Icons.search_rounded,
                       color: BrandColors.muted,

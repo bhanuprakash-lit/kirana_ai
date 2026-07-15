@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/locale/locale_provider.dart';
 import '../../../../core/services/api_client.dart';
 import '../../../../core/vertical/vertical_config_provider.dart';
+import '../../../../core/vertical/vertical_copy.dart';
 import '../../../../core/theme/brand_theme.dart';
 import '../../../../core/tutorial/tutorial_controller.dart';
 import '../../../../core/tutorial/tutorial_keys.dart';

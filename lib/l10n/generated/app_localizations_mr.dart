@@ -1254,6 +1254,86 @@ class AppLocalizationsMr extends AppLocalizations {
   String get posCustomDiscount => 'सूट (संपूर्ण बिलावर)';
 
   @override
+  String get vcopyServicesAddTitle => 'आयटम जोडा';
+
+  @override
+  String get vcopyServicesSearchHint => 'आयटम शोधा…';
+
+  @override
+  String get vcopyServicesEmptyTitle => 'अजून रिटेल आयटम नाहीत';
+
+  @override
+  String get vcopyServicesEmptyHint =>
+      'काउंटरवर विकली जाणारी उत्पादने जोडा (शॅम्पू, सप्लिमेंट). तुमच्या सेवा सर्व्हिसेस आणि अपॉइंटमेंटमध्ये व्यवस्थापित होतात.';
+
+  @override
+  String get vcopyServicesInvTab => 'आयटम';
+
+  @override
+  String get vcopyElectronicsAddTitle => 'डिव्हाइस किंवा अ‍ॅक्सेसरी जोडा';
+
+  @override
+  String get vcopyElectronicsSearchHint => 'नाव, मॉडेल किंवा बारकोडने शोधा…';
+
+  @override
+  String get vcopyElectronicsEmptyTitle => 'अजून स्टॉक नाही';
+
+  @override
+  String get vcopyElectronicsEmptyHint =>
+      'तुमचे फोन, अ‍ॅक्सेसरी आणि उपकरणे जोडा — मॉडेल व्हेरिएंट, IMEI/सीरियल आणि वॉरंटीसह.';
+
+  @override
+  String get vcopyElectronicsInvTab => 'स्टॉक';
+
+  @override
+  String get vcopyApparelAddTitle => 'आर्टिकल जोडा';
+
+  @override
+  String get vcopyApparelSearchHint => 'आर्टिकल शोधा (नाव, साइज, रंग)…';
+
+  @override
+  String get vcopyApparelEmptyTitle => 'अजून आर्टिकल नाहीत';
+
+  @override
+  String get vcopyApparelEmptyHint =>
+      'साइज आणि रंग व्हेरिएंटसह तुमचे आर्टिकल जोडा — प्रत्येक साइज/रंगाचा स्वतःचा स्टॉक असतो.';
+
+  @override
+  String get vcopyApparelInvTab => 'आर्टिकल';
+
+  @override
+  String get vcopyOpticalAddTitle => 'फ्रेम/लेन्स जोडा';
+
+  @override
+  String get vcopyOpticalSearchHint => 'फ्रेम, लेन्स, सोल्यूशन शोधा…';
+
+  @override
+  String get vcopyOpticalEmptyTitle => 'अजून फ्रेम किंवा लेन्स नाहीत';
+
+  @override
+  String get vcopyOpticalEmptyHint =>
+      'फ्रेम, लेन्स आणि सोल्यूशन जोडा — गरजेनुसार व्हेरिएंट आणि वॉरंटीसह.';
+
+  @override
+  String get vcopyOpticalInvTab => 'स्टॉक';
+
+  @override
+  String get vcopyGeneralAddTitle => 'आयटम जोडा';
+
+  @override
+  String get vcopyGeneralSearchHint => 'आयटम शोधा…';
+
+  @override
+  String get vcopyGeneralEmptyTitle => 'अजून आयटम नाहीत';
+
+  @override
+  String get vcopyGeneralEmptyHint =>
+      'बिलिंग सुरू करण्यासाठी तुम्ही विकत असलेले आयटम जोडा.';
+
+  @override
+  String get vcopyGeneralInvTab => 'आयटम';
+
+  @override
   String get procPayFirst => 'आधी द्या';
 
   @override

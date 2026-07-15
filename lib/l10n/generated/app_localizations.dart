@@ -2262,6 +2262,156 @@ abstract class AppLocalizations {
   /// **'Discount (whole bill)'**
   String get posCustomDiscount;
 
+  /// No description provided for @vcopyServicesAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item'**
+  String get vcopyServicesAddTitle;
+
+  /// No description provided for @vcopyServicesSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search items…'**
+  String get vcopyServicesSearchHint;
+
+  /// No description provided for @vcopyServicesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No retail items yet'**
+  String get vcopyServicesEmptyTitle;
+
+  /// No description provided for @vcopyServicesEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add products you sell over the counter (shampoo, supplements). Your services are managed under Services & Appointments.'**
+  String get vcopyServicesEmptyHint;
+
+  /// No description provided for @vcopyServicesInvTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get vcopyServicesInvTab;
+
+  /// No description provided for @vcopyElectronicsAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add device or accessory'**
+  String get vcopyElectronicsAddTitle;
+
+  /// No description provided for @vcopyElectronicsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, model or barcode…'**
+  String get vcopyElectronicsSearchHint;
+
+  /// No description provided for @vcopyElectronicsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No stock yet'**
+  String get vcopyElectronicsEmptyTitle;
+
+  /// No description provided for @vcopyElectronicsEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your phones, accessories and appliances — with model variants, IMEI/serial and warranty.'**
+  String get vcopyElectronicsEmptyHint;
+
+  /// No description provided for @vcopyElectronicsInvTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get vcopyElectronicsInvTab;
+
+  /// No description provided for @vcopyApparelAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add article'**
+  String get vcopyApparelAddTitle;
+
+  /// No description provided for @vcopyApparelSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search articles (name, size, colour)…'**
+  String get vcopyApparelSearchHint;
+
+  /// No description provided for @vcopyApparelEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No articles yet'**
+  String get vcopyApparelEmptyTitle;
+
+  /// No description provided for @vcopyApparelEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your articles with size and colour variants — each size/colour keeps its own stock.'**
+  String get vcopyApparelEmptyHint;
+
+  /// No description provided for @vcopyApparelInvTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Articles'**
+  String get vcopyApparelInvTab;
+
+  /// No description provided for @vcopyOpticalAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add frame / lens'**
+  String get vcopyOpticalAddTitle;
+
+  /// No description provided for @vcopyOpticalSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search frames, lenses, solutions…'**
+  String get vcopyOpticalSearchHint;
+
+  /// No description provided for @vcopyOpticalEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No frames or lenses yet'**
+  String get vcopyOpticalEmptyTitle;
+
+  /// No description provided for @vcopyOpticalEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add frames, lenses and solutions — with variants and warranty where they apply.'**
+  String get vcopyOpticalEmptyHint;
+
+  /// No description provided for @vcopyOpticalInvTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get vcopyOpticalInvTab;
+
+  /// No description provided for @vcopyGeneralAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add item'**
+  String get vcopyGeneralAddTitle;
+
+  /// No description provided for @vcopyGeneralSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search items…'**
+  String get vcopyGeneralSearchHint;
+
+  /// No description provided for @vcopyGeneralEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No items yet'**
+  String get vcopyGeneralEmptyTitle;
+
+  /// No description provided for @vcopyGeneralEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the items you sell to start billing.'**
+  String get vcopyGeneralEmptyHint;
+
+  /// No description provided for @vcopyGeneralInvTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get vcopyGeneralInvTab;
+
   /// No description provided for @procPayFirst.
   ///
   /// In en, this message translates to:

@@ -1238,6 +1238,88 @@ class AppLocalizationsTe extends AppLocalizations {
   String get posCustomDiscount => 'డిస్కౌంట్ (మొత్తం బిల్లుపై)';
 
   @override
+  String get vcopyServicesAddTitle => 'ఐటమ్ జోడించండి';
+
+  @override
+  String get vcopyServicesSearchHint => 'ఐటమ్స్ వెతకండి…';
+
+  @override
+  String get vcopyServicesEmptyTitle => 'ఇంకా రిటైల్ ఐటమ్స్ లేవు';
+
+  @override
+  String get vcopyServicesEmptyHint =>
+      'కౌంటర్ వద్ద అమ్మే వస్తువులను జోడించండి (షాంపూ, సప్లిమెంట్స్). మీ సేవలు సర్వీసెస్ & అపాయింట్‌మెంట్స్‌లో నిర్వహించబడతాయి.';
+
+  @override
+  String get vcopyServicesInvTab => 'ఐటమ్స్';
+
+  @override
+  String get vcopyElectronicsAddTitle => 'పరికరం లేదా యాక్సెసరీ జోడించండి';
+
+  @override
+  String get vcopyElectronicsSearchHint =>
+      'పేరు, మోడల్ లేదా బార్‌కోడ్‌తో వెతకండి…';
+
+  @override
+  String get vcopyElectronicsEmptyTitle => 'ఇంకా స్టాక్ లేదు';
+
+  @override
+  String get vcopyElectronicsEmptyHint =>
+      'మీ ఫోన్లు, యాక్సెసరీలు, ఉపకరణాలను జోడించండి — మోడల్ వేరియంట్లు, IMEI/సీరియల్, వారంటీతో.';
+
+  @override
+  String get vcopyElectronicsInvTab => 'స్టాక్';
+
+  @override
+  String get vcopyApparelAddTitle => 'వస్తువు జోడించండి';
+
+  @override
+  String get vcopyApparelSearchHint => 'వస్తువులు వెతకండి (పేరు, సైజ్, రంగు)…';
+
+  @override
+  String get vcopyApparelEmptyTitle => 'ఇంకా వస్తువులు లేవు';
+
+  @override
+  String get vcopyApparelEmptyHint =>
+      'సైజ్ మరియు రంగు వేరియంట్లతో మీ వస్తువులను జోడించండి — ప్రతి సైజ్/రంగుకు దాని సొంత స్టాక్ ఉంటుంది.';
+
+  @override
+  String get vcopyApparelInvTab => 'వస్తువులు';
+
+  @override
+  String get vcopyOpticalAddTitle => 'ఫ్రేమ్/లెన్స్ జోడించండి';
+
+  @override
+  String get vcopyOpticalSearchHint =>
+      'ఫ్రేమ్స్, లెన్స్‌లు, సొల్యూషన్స్ వెతకండి…';
+
+  @override
+  String get vcopyOpticalEmptyTitle => 'ఇంకా ఫ్రేమ్స్ లేదా లెన్స్‌లు లేవు';
+
+  @override
+  String get vcopyOpticalEmptyHint =>
+      'ఫ్రేమ్స్, లెన్స్‌లు, సొల్యూషన్స్ జోడించండి — అవసరమైన చోట వేరియంట్లు, వారంటీతో.';
+
+  @override
+  String get vcopyOpticalInvTab => 'స్టాక్';
+
+  @override
+  String get vcopyGeneralAddTitle => 'ఐటమ్ జోడించండి';
+
+  @override
+  String get vcopyGeneralSearchHint => 'ఐటమ్స్ వెతకండి…';
+
+  @override
+  String get vcopyGeneralEmptyTitle => 'ఇంకా ఐటమ్స్ లేవు';
+
+  @override
+  String get vcopyGeneralEmptyHint =>
+      'బిల్లింగ్ ప్రారంభించడానికి మీరు అమ్మే వస్తువులను జోడించండి.';
+
+  @override
+  String get vcopyGeneralInvTab => 'ఐటమ్స్';
+
+  @override
   String get procPayFirst => 'ముందుగా చెల్లించండి';
 
   @override
