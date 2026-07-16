@@ -1274,6 +1274,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get posBillBreakdown => 'Bill breakdown';
 
   @override
+  String get profVerticalLockedHint =>
+      'Set during onboarding — contact support to change it';
+
+  @override
   String get posBreakdownCatalogValue => 'Catalog value';
 
   @override

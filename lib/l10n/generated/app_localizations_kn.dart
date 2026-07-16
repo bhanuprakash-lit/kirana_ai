@@ -1283,6 +1283,10 @@ class AppLocalizationsKn extends AppLocalizations {
   String get posBillBreakdown => 'ಬಿಲ್ ವಿವರ';
 
   @override
+  String get profVerticalLockedHint =>
+      'ಆನ್‌ಬೋರ್ಡಿಂಗ್‌ನಲ್ಲಿ ಹೊಂದಿಸಲಾಗುತ್ತದೆ — ಬದಲಾಯಿಸಲು ಸಪೋರ್ಟ್ ಸಂಪರ್ಕಿಸಿ';
+
+  @override
   String get posBreakdownCatalogValue => 'ಕ್ಯಾಟಲಾಗ್ ಮೌಲ್ಯ';
 
   @override

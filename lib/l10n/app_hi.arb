@@ -365,6 +365,7 @@
   "navAppointments": "बुकिंग",
   "posServiceChip": "सेवा",
   "posBillBreakdown": "बिल का ब्रेकडाउन",
+  "profVerticalLockedHint": "ऑनबोर्डिंग में सेट होता है — बदलने के लिए सपोर्ट से संपर्क करें",
   "posBreakdownCatalogValue": "कैटलॉग कीमत",
   "posBreakdownBasketDiscount": "बास्केट छूट",
   "posBreakdownPriceAdjust": "स्पेशल कीमत एडजस्टमेंट",

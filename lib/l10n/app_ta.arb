@@ -365,6 +365,7 @@
   "navAppointments": "புக்கிங்",
   "posServiceChip": "சேவை",
   "posBillBreakdown": "பில் விவரம்",
+  "profVerticalLockedHint": "ஆன்போர்டிங்கில் அமைக்கப்படுகிறது — மாற்ற சப்போர்ட்டை தொடர்பு கொள்ளவும்",
   "posBreakdownCatalogValue": "கேட்டலாக் மதிப்பு",
   "posBreakdownBasketDiscount": "பாஸ்கெட் தள்ளுபடி",
   "posBreakdownPriceAdjust": "சிறப்பு விலை மாற்றம்",

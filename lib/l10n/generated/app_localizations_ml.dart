@@ -1295,6 +1295,10 @@ class AppLocalizationsMl extends AppLocalizations {
   String get posBillBreakdown => 'ബിൽ വിശദാംശം';
 
   @override
+  String get profVerticalLockedHint =>
+      'ഓൺബോർഡിംഗിൽ സജ്ജമാക്കുന്നു — മാറ്റാൻ സപ്പോർട്ടിനെ ബന്ധപ്പെടുക';
+
+  @override
   String get posBreakdownCatalogValue => 'കാറ്റലോഗ് മൂല്യം';
 
   @override

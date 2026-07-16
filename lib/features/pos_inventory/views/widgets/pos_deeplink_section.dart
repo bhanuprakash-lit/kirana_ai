@@ -100,6 +100,10 @@ class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
   final Map<String, TextEditingController> _serialCtrls = {};
   String? _serialError;
 
+  // Manual service charge for appointments booked without a price — the
+  // biller types the amount here and it lands on the bill total.
+  final _apptChargeCtrl = TextEditingController();
+
   TextEditingController _ctrlFor(String lineKey) =>
       _serialCtrls.putIfAbsent(lineKey, () => TextEditingController());
 
@@ -108,6 +112,7 @@ class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
     for (final c in _serialCtrls.values) {
       c.dispose();
     }
+    _apptChargeCtrl.dispose();
     super.dispose();
   }
 
@@ -290,6 +295,7 @@ class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
                     setState(() {
                       widget.links.appointmentId = v;
                       widget.links.appointmentCharge = appt?.price ?? 0;
+                      _apptChargeCtrl.clear();
                     });
                     widget.onChanged();
                   },
@@ -304,6 +310,32 @@ class _PosDeepLinkSectionState extends ConsumerState<PosDeepLinkSection> {
                         fontWeight: FontWeight.w700,
                         color: BrandColors.success,
                       ),
+                    ),
+                  ),
+                // Appointment booked without a price: don't silently add ₹0 —
+                // let the biller type the service charge right here.
+                if (selectedAppt != null &&
+                    (selectedAppt.price == null || selectedAppt.price == 0))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: TextField(
+                      controller: _apptChargeCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        labelText: 'Service charge (added to bill)',
+                        prefixText: '₹ ',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onChanged: (v) {
+                        widget.links.appointmentCharge =
+                            double.tryParse(v.trim()) ?? 0;
+                        widget.onChanged();
+                      },
                     ),
                   ),
               ],

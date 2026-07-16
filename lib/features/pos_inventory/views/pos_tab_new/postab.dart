@@ -651,22 +651,26 @@ class _PosTabState extends ConsumerState<PosTab> {
   /// Optical bar action: capture/update the selected customer's prescription.
   /// Reuses the Customer 360 detail screen (which owns the Rx editor). Requires
   /// a customer to be selected first.
-  void _openPrescription() {
-    final state = ref.read(posProvider);
-    final id = state.selectedCustomerId;
+  Future<void> _openPrescription() async {
+    var id = ref.read(posProvider).selectedCustomerId;
     if (id == null) {
+      // A prescription belongs to a customer — pick one first, then continue
+      // straight into their Rx editor (previously this dead-ended at the
+      // picker, which read as "prescription opens the customer sheet").
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Select a customer first to add their prescription'),
+          content: Text('Pick the customer whose prescription this is'),
           duration: Duration(milliseconds: 2000),
         ),
       );
-      _showCustomerSearchSheet();
-      return;
+      await _showCustomerSearchSheet();
+      if (!mounted) return;
+      id = ref.read(posProvider).selectedCustomerId;
+      if (id == null) return; // picker dismissed without choosing
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => CustomerDetailScreen(customerId: id)),
+      MaterialPageRoute(builder: (_) => CustomerDetailScreen(customerId: id!)),
     );
   }
 
@@ -850,13 +854,13 @@ class _PosTabState extends ConsumerState<PosTab> {
     }
   }
 
-  void _showCustomerSearchSheet() {
+  Future<void> _showCustomerSearchSheet() {
     final searchCtrl = TextEditingController();
     // Load all customers once when sheet opens; text changes only filter locally
     // (avoids a fresh network/DB call on every keystroke).
     final allFuture = ref.read(posProvider.notifier).searchCustomers('');
 
-    showModalBottomSheet(
+    return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(

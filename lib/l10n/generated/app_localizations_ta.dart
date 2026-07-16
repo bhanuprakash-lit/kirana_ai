@@ -1296,6 +1296,10 @@ class AppLocalizationsTa extends AppLocalizations {
   String get posBillBreakdown => 'பில் விவரம்';
 
   @override
+  String get profVerticalLockedHint =>
+      'ஆன்போர்டிங்கில் அமைக்கப்படுகிறது — மாற்ற சப்போர்ட்டை தொடர்பு கொள்ளவும்';
+
+  @override
   String get posBreakdownCatalogValue => 'கேட்டலாக் மதிப்பு';
 
   @override

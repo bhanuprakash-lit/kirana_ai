@@ -742,6 +742,7 @@
   "navAppointments": "Bookings",
   "posServiceChip": "Service",
   "posBillBreakdown": "Bill breakdown",
+  "profVerticalLockedHint": "Set during onboarding — contact support to change it",
   "posBreakdownCatalogValue": "Catalog value",
   "posBreakdownBasketDiscount": "Basket discount",
   "posBreakdownPriceAdjust": "Special price adjustment",

@@ -538,8 +538,17 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
   late DateTime _date = widget.day;
   int? _serviceId;
   TimeOfDay _time = const TimeOfDay(hour: 10, minute: 0);
+  // Explicit price so billing the appointment later adds a real amount —
+  // prefilled from the picked service, editable for walk-in negotiation.
+  final _bookPriceCtrl = TextEditingController();
   bool _saving = false;
   String? _error;
+
+  @override
+  void dispose() {
+    _bookPriceCtrl.dispose();
+    super.dispose();
+  }
 
   String _keyFor(DateTime d) =>
       '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -556,12 +565,16 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
     final d = _date;
     final startsAt = DateTime(d.year, d.month, d.day, _time.hour, _time.minute);
     try {
+      final price = double.tryParse(_bookPriceCtrl.text.trim());
       await ref.read(serviceActionsProvider).createAppointment({
         'starts_at': startsAt.toUtc().toIso8601String(),
         'customer_id': _customer!.customerId,
         'customer_name': _customer!.name,
         if (_customer!.phone.isNotEmpty) 'customer_phone': _customer!.phone,
         'service_id': ?_serviceId,
+        // Explicit price wins; the backend falls back to the service's price
+        // when omitted (and NULL when there's no service either).
+        if (price != null && price > 0) 'price': price,
       }, _keyFor(_date));
       if (mounted) Navigator.pop(context);
     } catch (e) {
@@ -654,7 +667,27 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
                   ),
                 )
                 .toList(),
-            onChanged: (v) => setState(() => _serviceId = v),
+            onChanged: (v) {
+              setState(() {
+                _serviceId = v;
+                // Prefill the price from the service; stays editable.
+                final svc = services
+                    .where((s) => s.serviceId == v)
+                    .firstOrNull;
+                if (svc != null && svc.price > 0) {
+                  _bookPriceCtrl.text = svc.price.toStringAsFixed(0);
+                }
+              });
+            },
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _bookPriceCtrl,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(
+              labelText: 'Price (charged when billed)',
+              prefixText: '₹ ',
+            ),
           ),
           const SizedBox(height: 12),
           InkWell(

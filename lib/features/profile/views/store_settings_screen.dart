@@ -138,11 +138,12 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                     l10n.profStoreType,
                     Icons.category_rounded,
                   ),
-                  // F1 — switch the coarse vertical (changes which features show).
+                  // The vertical is fixed at onboarding: switching it live
+                  // re-gates tabs/fields mid-flight and orphans vertical data,
+                  // so owners see it read-only (support can change it).
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20),
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _verticalCode,
+                    child: InputDecorator(
                       decoration: InputDecoration(
                         labelText: l10n.profBusinessVertical,
                         prefixIcon: const Icon(
@@ -150,6 +151,12 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                           size: 20,
                           color: BrandColors.muted,
                         ),
+                        suffixIcon: const Icon(
+                          Icons.lock_outline_rounded,
+                          size: 18,
+                          color: BrandColors.muted,
+                        ),
+                        helperText: l10n.profVerticalLockedHint,
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
@@ -165,16 +172,11 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
                           ),
                         ),
                       ),
-                      items: _verticals
-                          .map(
-                            (v) => DropdownMenuItem(
-                              value: v,
-                              child: Text(v[0].toUpperCase() + v.substring(1)),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (v) =>
-                          setState(() => _verticalCode = v ?? 'grocery'),
+                      child: Text(
+                        _verticalCode[0].toUpperCase() +
+                            _verticalCode.substring(1),
+                        style: const TextStyle(color: BrandColors.muted),
+                      ),
                     ),
                   ),
                   // V0.5 — GST registration is a store fact, not a vertical
@@ -342,7 +344,9 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
         location: _locationCtrl.text,
         region: _regionCtrl.text,
         city: _cityCtrl.text.trim().isEmpty ? null : _cityCtrl.text.trim(),
-        verticalCode: _verticalCode,
+        // Deliberately NOT sent: the vertical is read-only for owners (the
+        // toJson omits it when null, so the PATCH never touches it).
+        verticalCode: null,
         gstEnabled: _gstEnabled,
       );
 
