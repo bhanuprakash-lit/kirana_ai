@@ -1257,6 +1257,10 @@ class AppLocalizationsHi extends AppLocalizations {
   String get posBillBreakdown => 'बिल का ब्रेकडाउन';
 
   @override
+  String get profVerticalLockedHint =>
+      'ऑनबोर्डिंग में सेट होता है — बदलने के लिए सपोर्ट से संपर्क करें';
+
+  @override
   String get posBreakdownCatalogValue => 'कैटलॉग कीमत';
 
   @override

@@ -1265,6 +1265,10 @@ class AppLocalizationsTe extends AppLocalizations {
   String get posBillBreakdown => 'బిల్ వివరాలు';
 
   @override
+  String get profVerticalLockedHint =>
+      'ఆన్‌బోర్డింగ్‌లో సెట్ అవుతుంది — మార్చడానికి సపోర్ట్‌ను సంప్రదించండి';
+
+  @override
   String get posBreakdownCatalogValue => 'కేటలాగ్ విలువ';
 
   @override

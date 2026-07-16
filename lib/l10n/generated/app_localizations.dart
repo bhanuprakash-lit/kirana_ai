@@ -2316,6 +2316,12 @@ abstract class AppLocalizations {
   /// **'Bill breakdown'**
   String get posBillBreakdown;
 
+  /// No description provided for @profVerticalLockedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set during onboarding — contact support to change it'**
+  String get profVerticalLockedHint;
+
   /// No description provided for @posBreakdownCatalogValue.
   ///
   /// In en, this message translates to:
