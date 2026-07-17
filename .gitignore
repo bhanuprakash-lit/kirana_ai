@@ -59,8 +59,12 @@ lib/core/config/secrets.dart
 coverage/
 
 firebase.json
-./android/app/google-services.json
-./ios/Runner/GoogleService-Info.plist
+# Firebase config carries API keys — keep it out of the repo. (The leading "./"
+# on these patterns previously made them no-ops, so the plists were tracked.)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+# macOS "copy" duplicates of the Firebase plist (e.g. "GoogleService-Info 2.plist")
+ios/Runner/GoogleService-Info*.plist
 
 /lib/firebase_remote_config_test.dart
 # Common editor / OS junk

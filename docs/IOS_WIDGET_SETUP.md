@@ -9,6 +9,14 @@ Three widgets are defined: **KiranaMediumWidget** (4-stat glance, data-driven),
 **KiranaNewSaleWidget** (small — opens scanner), **KiranaVisionWidget** (small —
 "coming soon" toast).
 
+> **Already wired in source** (nothing to write): deep-link URLs carry the
+> `homeWidget` marker; `kiranaai` URL scheme registered in `Info.plist`; App
+> Group added to `ios/Runner/Runner.entitlements`; the widget extension's
+> `ios/KiranaWidget/Info.plist` and `ios/KiranaWidget/KiranaWidgetExtension.entitlements`
+> are provided. **Remaining = Xcode GUI only:** create the Widget Extension
+> target, add both files to it, add the App Group capability to both targets
+> (registers it in your Apple Developer portal), and build. Steps 1–2 below.
+
 ## Prerequisites
 - macOS + Xcode.
 - An Apple Developer account (the App Group capability needs it).
@@ -41,49 +49,28 @@ Add the **same** App Group to **both** targets:
 > The id must exactly match `_appGroupId` in
 > `lib/core/services/home_widget_service.dart` (`group.com.lohiya.kiranaAi`).
 
-## 3. Deep links (widget tap → app screen)
-Widget taps open `kiranaai://w?...` URLs. The app already parses these in
-`HomeWidgetService._handleUri` (→ `setPendingNavigation` → dashboard). We just need
-the URL delivered to the `home_widget` plugin. This app uses a **SceneDelegate**,
-so forward URL contexts:
+## 3. Deep links (widget tap → app screen) — ✅ DONE in source
+Widget taps open `kiranaai://w?homeWidget=1&...` URLs, parsed by
+`HomeWidgetService._handleUri` (→ `setPendingNavigation` → dashboard). This is
+already wired in the committed source — no Swift to write:
 
-```swift
-// ios/Runner/SceneDelegate.swift
-import home_widget   // module name may be `home_widget` (underscored)
+- **`homeWidget` marker** — every deep link in `KiranaWidget.swift` is built via
+  `deepLink(...)`, which prepends `homeWidget=1`. The `home_widget` plugin's
+  `isWidgetUrl()` only treats a URL as a widget tap when it carries a `homeWidget`
+  query item; without the marker `HomeWidget.widgetClicked` never fires.
+- **URL delivery** — `SceneDelegate` is a plain `FlutterSceneDelegate` subclass
+  and needs no manual forwarding. On this Flutter version `FlutterSceneDelegate`
+  implements `scene(_:openURLContexts:)` / `scene(_:willConnectTo:)` and bridges
+  those to legacy `application(_:open:)` plugins (via
+  `sceneFallbackOpenURLContexts:`), which is exactly where `home_widget` 0.7
+  listens. (The older hand-written scene-forwarding snippet is obsolete — do not
+  re-add it, it would double-handle the tap.)
+- **URL scheme** — `kiranaai` is registered under `CFBundleURLTypes` in
+  `ios/Runner/Info.plist` so iOS routes the scheme to the app.
 
-func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
-           options connectionOptions: UIScene.ConnectionOptions) {
-    // ... existing setup ...
-    if let url = connectionOptions.urlContexts.first?.url {
-        HomeWidgetPlugin.shared?.handleWidgetClicked(url)  // see note below
-    }
-}
-
-func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-    if let url = URLContexts.first?.url {
-        HomeWidgetPlugin.shared?.handleWidgetClicked(url)
-    }
-}
-```
-
-> **Validate this against the `home_widget` 0.7 iOS API.** The exact forwarding
-> entry point varies by version — some versions hook `application(_:open:)` in
-> AppDelegate automatically (non-scene apps), others need the scene forwarding
-> above. If `HomeWidget.widgetClicked` / `initiallyLaunchedFromHomeWidget()` don't
-> fire on tap, this is the place to fix. As a fallback, register the URL scheme so
-> the app receives the URL at all:
-
-Optionally register the scheme in `ios/Runner/Info.plist`:
-
-```xml
-<key>CFBundleURLTypes</key>
-<array>
-  <dict>
-    <key>CFBundleURLSchemes</key>
-    <array><string>kiranaai</string></array>
-  </dict>
-</array>
-```
+> Cold-launch nuance: warm taps (app already running) navigate reliably. If a
+> tap that cold-launches the app ever fails to route, that's the one spot to
+> revisit `HomeWidget.initiallyLaunchedFromHomeWidget()` timing.
 
 ## 4. Build & run
 1. `cd ios && pod install`

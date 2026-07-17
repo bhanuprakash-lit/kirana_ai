@@ -11,7 +11,7 @@ class AppUpdateService {
   /// iOS App Store ID for Outlet AI — the numeric Apple ID found in the
   /// App Store Connect URL (e.g. 123456789). Until the app is live this stays
   /// as the placeholder and the iOS check is skipped.
-  static const String _iosAppStoreId = 'TODO_REPLACE_WITH_YOUR_APP_ID';
+  static const String _iosAppStoreId = '6786605527';
   static final InAppUpdateFlutter _plugin = InAppUpdateFlutter();
   static StreamSubscription<InstallStateAndroid>? _installStateSubscription;
 
@@ -74,7 +74,7 @@ class AppUpdateService {
   }
 
   static Future<void> _checkIosUpdates() async {
-    if (_iosAppStoreId == 'TODO_REPLACE_WITH_YOUR_APP_ID') {
+    if (_iosAppStoreId == '6786605527') {
       debugPrint('AppUpdateService: iOS App Store ID not configured.');
       return;
     }

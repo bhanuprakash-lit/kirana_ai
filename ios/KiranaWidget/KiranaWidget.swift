@@ -23,6 +23,13 @@ private func str(_ key: String, _ fallback: String = "") -> String {
 }
 private func flag(_ key: String) -> Bool { str(key) == "true" }
 
+/// Build a widget deep link. The `homeWidget` marker is REQUIRED: the
+/// `home_widget` plugin only treats an incoming URL as a widget tap when it
+/// carries a query item named `homeWidget` (see its `isWidgetUrl`). Without it,
+/// `HomeWidget.widgetClicked` never fires and taps don't navigate on iOS. The
+/// app's HomeWidgetService._handleUri ignores this marker and reads tab/subtab/action.
+private func deepLink(_ query: String) -> String { "kiranaai://w?homeWidget=1&\(query)" }
+
 // MARK: - Brand colors
 
 private extension Color {
@@ -121,7 +128,7 @@ private struct KiranaMediumView: View {
             }
         }
         .kBackground()
-        .widgetURL(URL(string: "kiranaai://w?tab=overview"))
+        .widgetURL(URL(string: deepLink("tab=overview")))
     }
 
     private var content: some View {
@@ -134,17 +141,17 @@ private struct KiranaMediumView: View {
             }
             HStack(spacing: 12) {
                 cell(snap.salesValue, snap.salesLabel, snap.salesSub, false,
-                     "kiranaai://w?tab=overview")
+                     deepLink("tab=overview"))
                 cell(snap.udhaarValue, snap.udhaarLabel, snap.udhaarSub, snap.udhaarAlert,
-                     "kiranaai://w?tab=finance&subtab=0")
+                     deepLink("tab=finance&subtab=0"))
             }
             HStack(spacing: 12) {
                 cell(snap.stockValue, snap.stockLabel, snap.stockSub, snap.stockAlert,
-                     "kiranaai://w?tab=pos&subtab=1")
+                     deepLink("tab=pos&subtab=1"))
                 cell(snap.supplierValue, snap.supplierLabel, snap.supplierSub, snap.supplierAlert,
-                     "kiranaai://w?tab=finance&subtab=1")
+                     deepLink("tab=finance&subtab=1"))
             }
-            linkWrap("kiranaai://w?tab=pos&subtab=0&action=scan") {
+            linkWrap(deepLink("tab=pos&subtab=0&action=scan")) {
                 Text(snap.newbillLabel)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(.kNavy)
@@ -234,7 +241,7 @@ struct KiranaNewSaleWidget: Widget {
         StaticConfiguration(kind: kind, provider: ActionProvider()) { _ in
             ActionTile(systemIcon: "qrcode.viewfinder", iconColor: .white,
                        label: "New Sale", labelColor: .kAmber,
-                       url: "kiranaai://w?tab=pos&subtab=0&action=scan")
+                       url: deepLink("tab=pos&subtab=0&action=scan"))
         }
         .configurationDisplayName("New Sale")
         .description("Start a new sale — opens the item scanner.")
@@ -248,7 +255,7 @@ struct KiranaVisionWidget: Widget {
         StaticConfiguration(kind: kind, provider: ActionProvider()) { _ in
             ActionTile(systemIcon: "sparkles", iconColor: .kAmber,
                        label: "Vision AI", labelColor: .white,
-                       url: "kiranaai://w?tab=overview&action=vision")
+                       url: deepLink("tab=overview&action=vision"))
         }
         .configurationDisplayName("Vision AI")
         .description("Vision AI — scan and recognise products (coming soon).")
