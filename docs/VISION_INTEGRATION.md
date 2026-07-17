@@ -54,7 +54,8 @@ New or existing stores photograph shelves → detect → confirm quantities → 
 | Bulk stock-in / onboarding (+ restock add-on) | ✅ done |
 | Review-screen crop thumbnails | ✅ done |
 | Durable Blob storage for shelf photos | ✅ done |
-| iOS CoreML export for counter | ⏸ pending (needs Mac) |
+| iOS counter: Dart platform-aware wiring (CoreML path + availability gate) | ✅ done |
+| iOS CoreML export for counter (the `.mlpackage` binary) | ⏸ pending (needs the trained `.pt` weights + `yolo export`) |
 | v7 class-map curation (397 need_review rows) | ⏸ pending (optional) |
 | Counter → POS/basket + price guess | ⏸ deferred |
 
@@ -62,7 +63,15 @@ New or existing stores photograph shelves → detect → confirm quantities → 
 
 ## Pending / follow-ups
 
-1. **iOS CoreML export** for the counter model (`yolo export format=coreml` on a Mac); bundle the `.mlpackage`.
+1. **iOS CoreML export** for the counter model. The Dart side is now
+   platform-aware (`CounterModel.path` → `counter_model` on iOS; the availability
+   gate checks the CoreML model via the plugin's native resolver instead of the
+   `.tflite`, which iOS can't load). What remains is producing + bundling the
+   binary: from the trained YOLO weights run `yolo export model=counter.pt
+   format=coreml nms=True`, then drag `counter_model.mlpackage` into the **Runner**
+   target (Target Membership = Runner). Blocked here because the `.pt` weights
+   live in the uncommitted `vision-ai` R&D repo (not on the build machine) — only
+   the Android `.tflite` is committed under `assets/models/`.
 2. **v7 class-map curation** — `kirana_v7_class_map.json` is generated (11 confirmed / 431 need_review). The 431 fall through to safe fuzzy matching; a human curating them (set `product_id` + `confirmed:true`) makes YOLO mapping deterministic. Optional.
 3. **Look-alike products (v8 retrain)** — text-first matching shipped (see below); the deeper fix (65–90%) needs labelled per-variant crops + a retrain. Plan: `vision-ai/LOOKALIKE_PLAN.md`.
 4. **Gemini billing** — the free-tier key hits the 20-req quota; YOLO covers scans regardless. For a paid Gemini fallback funded by GCP free-trial credits, switch `call_gemini` to **Vertex AI** (the free-trial credit reliably covers Vertex, not the AI-Studio key). Optional.

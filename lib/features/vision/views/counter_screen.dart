@@ -229,7 +229,7 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
       fit: StackFit.expand,
       children: [
         YOLOView(
-          modelPath: CounterModel.tfliteAsset,
+          modelPath: CounterModel.path,
           task: YOLOTask.detect,
           controller: _controller,
           confidenceThreshold: CounterModel.defaultConfidence,
