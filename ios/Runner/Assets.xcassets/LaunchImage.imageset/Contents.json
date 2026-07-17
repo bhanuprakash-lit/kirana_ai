@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "kirana_ai_foreground_1024.png",
+      "filename" : "launchscreen 1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "kirana_ai_foreground_1024 1.png",
+      "filename" : "launchscreen 2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "kirana_ai_foreground_1024 2.png",
+      "filename" : "launchscreen 3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

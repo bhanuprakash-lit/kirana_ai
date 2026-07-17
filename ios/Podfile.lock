@@ -2,6 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
+  - home_widget (0.0.1):
+    - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
   - print_bluetooth_thermal (0.0.1):
@@ -12,6 +14,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - print_bluetooth_thermal (from `.symlinks/plugins/print_bluetooth_thermal/ios`)
   - record_darwin (from `.symlinks/plugins/record_darwin/ios`)
@@ -21,6 +24,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  home_widget:
+    :path: ".symlinks/plugins/home_widget/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   print_bluetooth_thermal:
@@ -31,10 +36,11 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
+  home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   print_bluetooth_thermal: 107a8766575107295e9d343a7389c78a1cb9dc63
   record_darwin: fb1f375f1d9603714f55b8708a903bbb91ffdb0a
 
-PODFILE CHECKSUM: 5d9d5ec442906d1f6cc8416c76549109272e3fb4
+PODFILE CHECKSUM: 6e5f171984a06b0a7a83c45cd31c2ba93e188a27
 
 COCOAPODS: 1.16.2
