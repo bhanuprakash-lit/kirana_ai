@@ -32,8 +32,13 @@ class AppConfig {
   /// until the real value is fetched from Firebase (source of truth).
   static String get defaultBaseUrl {
     switch (env) {
+      // The old dev container app (purpleglacier) is decommissioned — its
+      // whole resource group is being deleted. Both hosted envs now point at
+      // the UAT backend, which is the single live environment.
+      // NOTE: Firebase Remote Config `backend_url_dev` overrides this at
+      // runtime, so it must also be set to the UAT URL (or cleared) or an
+      // old value will still route builds to the dead dev host.
       case 'dev':
-        return 'https://ca-lohiya-outlet.purpleglacier-c71fadea.centralindia.azurecontainerapps.io';
       case 'prod':
         return 'https://ca-lohiya-outlet-uat.ambitiouspond-d8177a23.centralindia.azurecontainerapps.io';
       default:
