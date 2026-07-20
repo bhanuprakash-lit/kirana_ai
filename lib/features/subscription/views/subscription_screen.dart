@@ -11,6 +11,12 @@ import '../providers/iap_provider.dart';
 import '../providers/subscription_provider.dart';
 import '../widgets/trial_countdown_widget.dart';
 
+/// Legal links required on the subscription purchase page (App Store
+/// guideline 3.1.2(c) — must be functional and persistently available).
+const String kPrivacyPolicyUrl = 'https://lohiyaai.com/outlet/privacy.html';
+const String kTermsOfUseUrl =
+    'https://lohiyaai.com/outlet/terms-and-conditions.html';
+
 class SubscriptionScreen extends ConsumerWidget {
   const SubscriptionScreen({super.key});
 
@@ -215,6 +221,10 @@ class _SubscriptionBodyState extends ConsumerState<_SubscriptionBody> {
               ),
             ),
             const SizedBox(height: 8),
+
+            // Auto-renewal disclosure + Terms/Privacy links (App Store 3.1.2c).
+            const _LegalFooter(),
+            const SizedBox(height: 16),
 
             // Contact
             Container(
@@ -611,6 +621,57 @@ class _PlanCard extends StatelessWidget {
         ],
       ),
     ).animate().fadeIn(duration: 300.ms);
+  }
+}
+
+// ── Legal footer (auto-renewal disclosure + Terms/Privacy) ────────────────────
+
+class _LegalFooter extends StatelessWidget {
+  const _LegalFooter();
+
+  Future<void> _open(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const muted = TextStyle(color: BrandColors.muted, fontSize: 11, height: 1.5);
+    final link = TextStyle(
+      color: BrandColors.primary,
+      fontSize: 11,
+      height: 1.5,
+      fontWeight: FontWeight.w700,
+      decoration: TextDecoration.underline,
+    );
+    return Column(
+      children: [
+        const Text(
+          'Subscriptions are billed monthly and renew automatically until '
+          'cancelled. Your subscription can be managed and cancelled anytime '
+          'in your device account settings.',
+          textAlign: TextAlign.center,
+          style: muted,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () => _open(kTermsOfUseUrl),
+              child: Text('Terms of Use', style: link),
+            ),
+            const Text('   •   ', style: muted),
+            GestureDetector(
+              onTap: () => _open(kPrivacyPolicyUrl),
+              child: Text('Privacy Policy', style: link),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 

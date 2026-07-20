@@ -10,7 +10,7 @@ import 'subscription_provider.dart';
 // ── State ─────────────────────────────────────────────────────────────────────
 
 class IapState {
-  final bool isAvailable; // Play Billing available on device
+  final bool isAvailable; // store billing available on device
   final bool isProcessing; // purchase in flight
   final String? error;
 
@@ -68,12 +68,12 @@ class IapNotifier extends Notifier<IapState> {
 
   // ── Public API ───────────────────────────────────────────────────────────────
 
-  /// Initiates a Play Store purchase for [tier] ('basic' or 'pro').
+  /// Initiates a store purchase for [tier] ('basic' or 'pro').
   Future<void> purchase(String tier) async {
     final service = _service;
     if (service == null || !state.isAvailable) {
       state = state.copyWith(
-        error: 'Play Billing not available on this device.',
+        error: 'In-app purchases are not available on this device.',
       );
       return;
     }
@@ -85,8 +85,8 @@ class IapNotifier extends Notifier<IapState> {
     if (product == null) {
       state = state.copyWith(
         isProcessing: false,
-        error:
-            'Product not found in Play Store. Ensure product IDs are configured in Play Console.',
+        error: 'This subscription is not available right now. '
+            'Please try again later.',
       );
       return;
     }
@@ -119,6 +119,10 @@ class IapNotifier extends Notifier<IapState> {
         'tier': tier,
         'product_id': purchase.productID,
         'purchase_token': token,
+        // Routes server-side verification to the right store (Apple vs Google).
+        'platform': defaultTargetPlatform == TargetPlatform.iOS
+            ? 'ios'
+            : 'android',
       });
       await ref.read(subscriptionProvider.notifier).refresh();
       state = state.copyWith(isProcessing: false, clearError: true);

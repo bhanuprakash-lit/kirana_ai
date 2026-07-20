@@ -17,16 +17,18 @@ class SubscriptionNotifier extends AsyncNotifier<SubscriptionInfo> {
 
   Future<SubscriptionInfo> _fetch() async {
     final client = ref.read(apiClientProvider);
-    try {
-      final res =
-          await client.get('/kirana/subscription') as Map<String, dynamic>;
-      final hasActive = res['has_active'] as bool? ?? false;
-      if (!hasActive) return SubscriptionInfo.none;
-      final info = SubscriptionInfo.fromJson(res);
-      return info;
-    } catch (_) {
-      return SubscriptionInfo.none;
-    }
+    // NOTE: only a *successful* response saying `has_active == false` means the
+    // user genuinely has no subscription (→ SubscriptionInfo.none). A thrown
+    // error (backend unreachable, timeout, 5xx, parse failure) must NOT be
+    // collapsed to `none` — doing so kicks an active/trial user to the
+    // Request-Trial screen on any network blip. Instead we rethrow so the
+    // provider enters AsyncError and the dashboard's fail-open `error:` branch
+    // shows the app normally (per-feature gates fall back to `none` safely).
+    final res =
+        await client.get('/kirana/subscription') as Map<String, dynamic>;
+    final hasActive = res['has_active'] as bool? ?? false;
+    if (!hasActive) return SubscriptionInfo.none;
+    return SubscriptionInfo.fromJson(res);
   }
 
   Future<void> refresh() async {
