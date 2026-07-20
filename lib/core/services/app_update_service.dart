@@ -8,9 +8,9 @@ import 'package:in_app_update_flutter/in_app_update_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AppUpdateService {
-  /// iOS App Store ID for Outlet AI — the numeric Apple ID found in the
-  /// App Store Connect URL (e.g. 123456789). Until the app is live this stays
-  /// as the placeholder and the iOS check is skipped.
+  /// iOS App Store ID for Outlet AI — the numeric Apple ID from the App Store
+  /// URL (apps.apple.com/in/app/outlet-ai/id6786605527). The iOS update check
+  /// is skipped only when this is empty (unconfigured).
   static const String _iosAppStoreId = '6786605527';
   static final InAppUpdateFlutter _plugin = InAppUpdateFlutter();
   static StreamSubscription<InstallStateAndroid>? _installStateSubscription;
@@ -74,7 +74,7 @@ class AppUpdateService {
   }
 
   static Future<void> _checkIosUpdates() async {
-    if (_iosAppStoreId == '6786605527') {
+    if (_iosAppStoreId.isEmpty) {
       debugPrint('AppUpdateService: iOS App Store ID not configured.');
       return;
     }
