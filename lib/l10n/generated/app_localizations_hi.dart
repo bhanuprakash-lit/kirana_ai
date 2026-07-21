@@ -3158,6 +3158,69 @@ class AppLocalizationsHi extends AppLocalizations {
   String get learnShowTipsDesc => 'पहली बार खुलने वाली स्क्रीन पर मदद की टिप्स';
 
   @override
+  String get tutKhataUdhaarTitle => 'ग्राहक उधार';
+
+  @override
+  String get tutKhataUdhaarBody =>
+      'हर ग्राहक जिस पर आपका पैसा है — कितना और कब से। देखने या वसूलने के लिए ग्राहक पर टैप करें।';
+
+  @override
+  String get tutKhataCashflowTitle => 'नकदी';
+
+  @override
+  String get tutKhataCashflowBody => 'रोज़ का आना-जाना पैसा, दिन के हिसाब से।';
+
+  @override
+  String get tutKhataSupplierTitle => 'सप्लायर उधार';
+
+  @override
+  String get tutKhataSupplierBody =>
+      'आप डिस्ट्रीब्यूटर को कितना देना है — ताकि कोई चौंकाए नहीं।';
+
+  @override
+  String get tutRackSearchTitle => 'कोई भी सामान ढूंढें';
+
+  @override
+  String get tutRackSearchBody =>
+      'प्रोडक्ट का नाम लिखें — हम बताएंगे वह किस रैक में है।';
+
+  @override
+  String get tutRackPlaceTitle => 'सामान रखें';
+
+  @override
+  String get tutRackPlaceBody =>
+      'एक बार प्रोडक्ट को रैक में रखें, फिर कभी दुकान में ढूंढना नहीं पड़ेगा।';
+
+  @override
+  String get tutVisionShelfTitle => 'शेल्फ स्कैन';
+
+  @override
+  String get tutVisionShelfBody => 'सुबह और शाम अपनी शेल्फ की फोटो लें।';
+
+  @override
+  String get tutVisionResultsTitle => 'नतीजे';
+
+  @override
+  String get tutVisionResultsBody =>
+      'हम दोनों स्कैन मिलाकर बताते हैं आज क्या बिका।';
+
+  @override
+  String get tutVisionCounterTitle => 'काउंटर';
+
+  @override
+  String get tutVisionCounterBody =>
+      'कैमरा काउंटर की ओर रखें — सामान गुज़रते ही गिना जाएगा।';
+
+  @override
+  String get learnTourKhata => 'अपना खाता समझें';
+
+  @override
+  String get learnTourRacks => 'रैक से सामान ढूंढें';
+
+  @override
+  String get learnTourVision => 'विज़न AI की सैर';
+
+  @override
   String get procExchangeInstead => 'एक्सचेंज (ग्राहक दूसरी वस्तु लेता है)';
 
   @override

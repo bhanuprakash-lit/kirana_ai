@@ -27,6 +27,7 @@ import '../../providers/overview_provider.dart';
 import '../../../../core/tutorial/tutorial_controller.dart';
 import '../../../../core/tutorial/tutorial_keys.dart';
 import '../../../../core/tutorial/tutorial_overlay.dart';
+import '../../../../core/tutorial/whats_new.dart';
 import '../dashboard_screen.dart';
 import '../widgets/getting_started_card.dart';
 import '../widgets/forecast_strip.dart';
@@ -144,7 +145,14 @@ class _OverviewTabState extends ConsumerState<OverviewTab> {
     // delay lets the checklist card and nav bar lay out before spotlighting.
     ref.watch(tutorialProvider.select((s) => s.loaded));
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 400), _maybeWelcome);
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (!mounted) return;
+        _maybeWelcome();
+        // Release announcements (no-op unless whatsNewEntries has an unseen
+        // one); the overlayActive guard keeps it off the welcome tour's toes.
+        // State.context is safe here — the mounted check above guards it.
+        maybeShowWhatsNew(this.context, ref);
+      });
     });
 
     return Scaffold(

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/tutorial/tutorial_controller.dart';
+import '../../../core/tutorial/tutorial_keys.dart';
+import '../../../core/tutorial/tutorial_overlay.dart';
 import '../../../features/dashboard/views/dashboard_screen.dart'
     show financeSubTabProvider;
 import '../models/finance_models.dart';
@@ -48,8 +51,47 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
     super.dispose();
   }
 
+  /// First-visit orientation: what the three khata tabs mean. Replayable
+  /// from the ? button above and the Learn screen.
+  void _maybeIntroTour() {
+    if (!mounted) return;
+    final c = ref.read(tutorialProvider.notifier);
+    if (!c.shouldShow(Tut.khataIntro)) return;
+    final l10n = AppLocalizations.of(context);
+    showTutorialSegment(
+      context,
+      ref,
+      id: Tut.khataIntro,
+      steps: [
+        TutStep(
+          targetKey: TutorialKeys.finTabUdhaar,
+          title: l10n.tutKhataUdhaarTitle,
+          body: l10n.tutKhataUdhaarBody,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.finTabCashflow,
+          title: l10n.tutKhataCashflowTitle,
+          body: l10n.tutKhataCashflowBody,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.finTabSupplier,
+          title: l10n.tutKhataSupplierTitle,
+          body: l10n.tutKhataSupplierBody,
+        ),
+      ],
+      nextLabel: l10n.tutNext,
+      doneLabel: l10n.tutDone,
+      skipLabel: l10n.tutSkip,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.watch(tutorialProvider.select((s) => s.loaded));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 400), _maybeIntroTour);
+    });
+
     final asyncData = ref.watch(financeProvider);
     final l10n = AppLocalizations.of(context);
 
@@ -63,7 +105,20 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         title: Text(l10n.dashNavKhata),
-        actions: const [NotificationBell(), SizedBox(width: 8)],
+        actions: [
+          IconButton(
+            tooltip: l10n.learnTitle,
+            icon: const Icon(Icons.help_outline_rounded),
+            onPressed: () {
+              ref
+                  .read(tutorialProvider.notifier)
+                  .replaySegment(Tut.khataIntro);
+              _maybeIntroTour();
+            },
+          ),
+          const NotificationBell(),
+          const SizedBox(width: 8),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(92),
           child: Column(
@@ -94,8 +149,12 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                 unselectedLabelStyle: const TextStyle(fontSize: 12),
                 labelPadding: const EdgeInsets.symmetric(horizontal: 8),
                 tabs: [
-                  Tab(text: l10n.finTabCashflow),
                   Tab(
+                    key: TutorialKeys.finTabCashflow,
+                    text: l10n.finTabCashflow,
+                  ),
+                  Tab(
+                    key: TutorialKeys.finTabUdhaar,
                     height: 44,
                     child: Text(
                       l10n.finTabCustomerUdhaar,
@@ -103,7 +162,10 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen>
                       style: const TextStyle(fontSize: 12, height: 1.2),
                     ),
                   ),
-                  Tab(text: l10n.finTabSupplierUdhaar),
+                  Tab(
+                    key: TutorialKeys.finTabSupplier,
+                    text: l10n.finTabSupplierUdhaar,
+                  ),
                 ],
               ),
             ],

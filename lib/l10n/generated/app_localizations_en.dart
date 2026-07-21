@@ -3229,6 +3229,71 @@ class AppLocalizationsEn extends AppLocalizations {
       'Guided tips on screens you open for the first time';
 
   @override
+  String get tutKhataUdhaarTitle => 'Customer udhaar';
+
+  @override
+  String get tutKhataUdhaarBody =>
+      'Every customer who owes you — how much and since when. Tap a customer to see or collect.';
+
+  @override
+  String get tutKhataCashflowTitle => 'Cashflow';
+
+  @override
+  String get tutKhataCashflowBody =>
+      'Money coming in and going out, day by day.';
+
+  @override
+  String get tutKhataSupplierTitle => 'Supplier udhaar';
+
+  @override
+  String get tutKhataSupplierBody =>
+      'What you owe your distributors — so nothing surprises you.';
+
+  @override
+  String get tutRackSearchTitle => 'Find any item';
+
+  @override
+  String get tutRackSearchBody =>
+      'Type a product\'s name — we\'ll show which rack it sits in.';
+
+  @override
+  String get tutRackPlaceTitle => 'Place stock';
+
+  @override
+  String get tutRackPlaceBody =>
+      'Put a product in a rack once, and you\'ll never hunt the shop for it again.';
+
+  @override
+  String get tutVisionShelfTitle => 'Shelf scan';
+
+  @override
+  String get tutVisionShelfBody =>
+      'Photograph your shelves in the morning and again in the evening.';
+
+  @override
+  String get tutVisionResultsTitle => 'Results';
+
+  @override
+  String get tutVisionResultsBody =>
+      'We compare the two scans and show you what sold today.';
+
+  @override
+  String get tutVisionCounterTitle => 'Counter';
+
+  @override
+  String get tutVisionCounterBody =>
+      'Point the camera at your counter — items are counted as they pass.';
+
+  @override
+  String get learnTourKhata => 'Know your khata';
+
+  @override
+  String get learnTourRacks => 'Find items with racks';
+
+  @override
+  String get learnTourVision => 'Vision AI tour';
+
+  @override
   String get procExchangeInstead => 'Exchange (customer takes another item)';
 
   @override

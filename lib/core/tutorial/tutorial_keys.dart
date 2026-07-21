@@ -35,4 +35,18 @@ class TutorialKeys {
   static final invPrice = GlobalKey(debugLabel: 'tut_inv_price');
   static final invStock = GlobalKey(debugLabel: 'tut_inv_stock');
   static final invSave = GlobalKey(debugLabel: 'tut_inv_save');
+
+  // Khata / Finance screen (finance_screen.dart)
+  static final finTabCashflow = GlobalKey(debugLabel: 'tut_fin_cashflow');
+  static final finTabUdhaar = GlobalKey(debugLabel: 'tut_fin_udhaar');
+  static final finTabSupplier = GlobalKey(debugLabel: 'tut_fin_supplier');
+
+  // Stock racks (stock_racks_screen.dart)
+  static final rackSearch = GlobalKey(debugLabel: 'tut_rack_search');
+  static final rackPlaceFab = GlobalKey(debugLabel: 'tut_rack_place_fab');
+
+  // Vision screen (vision_screen.dart)
+  static final visionTabShelf = GlobalKey(debugLabel: 'tut_vision_shelf');
+  static final visionTabResults = GlobalKey(debugLabel: 'tut_vision_results');
+  static final visionTabCounter = GlobalKey(debugLabel: 'tut_vision_counter');
 }

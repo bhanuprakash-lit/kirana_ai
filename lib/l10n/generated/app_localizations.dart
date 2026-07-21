@@ -5628,6 +5628,120 @@ abstract class AppLocalizations {
   /// **'Guided tips on screens you open for the first time'**
   String get learnShowTipsDesc;
 
+  /// No description provided for @tutKhataUdhaarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer udhaar'**
+  String get tutKhataUdhaarTitle;
+
+  /// No description provided for @tutKhataUdhaarBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every customer who owes you — how much and since when. Tap a customer to see or collect.'**
+  String get tutKhataUdhaarBody;
+
+  /// No description provided for @tutKhataCashflowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cashflow'**
+  String get tutKhataCashflowTitle;
+
+  /// No description provided for @tutKhataCashflowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Money coming in and going out, day by day.'**
+  String get tutKhataCashflowBody;
+
+  /// No description provided for @tutKhataSupplierTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Supplier udhaar'**
+  String get tutKhataSupplierTitle;
+
+  /// No description provided for @tutKhataSupplierBody.
+  ///
+  /// In en, this message translates to:
+  /// **'What you owe your distributors — so nothing surprises you.'**
+  String get tutKhataSupplierBody;
+
+  /// No description provided for @tutRackSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find any item'**
+  String get tutRackSearchTitle;
+
+  /// No description provided for @tutRackSearchBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a product\'s name — we\'ll show which rack it sits in.'**
+  String get tutRackSearchBody;
+
+  /// No description provided for @tutRackPlaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Place stock'**
+  String get tutRackPlaceTitle;
+
+  /// No description provided for @tutRackPlaceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Put a product in a rack once, and you\'ll never hunt the shop for it again.'**
+  String get tutRackPlaceBody;
+
+  /// No description provided for @tutVisionShelfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf scan'**
+  String get tutVisionShelfTitle;
+
+  /// No description provided for @tutVisionShelfBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Photograph your shelves in the morning and again in the evening.'**
+  String get tutVisionShelfBody;
+
+  /// No description provided for @tutVisionResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Results'**
+  String get tutVisionResultsTitle;
+
+  /// No description provided for @tutVisionResultsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We compare the two scans and show you what sold today.'**
+  String get tutVisionResultsBody;
+
+  /// No description provided for @tutVisionCounterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter'**
+  String get tutVisionCounterTitle;
+
+  /// No description provided for @tutVisionCounterBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at your counter — items are counted as they pass.'**
+  String get tutVisionCounterBody;
+
+  /// No description provided for @learnTourKhata.
+  ///
+  /// In en, this message translates to:
+  /// **'Know your khata'**
+  String get learnTourKhata;
+
+  /// No description provided for @learnTourRacks.
+  ///
+  /// In en, this message translates to:
+  /// **'Find items with racks'**
+  String get learnTourRacks;
+
+  /// No description provided for @learnTourVision.
+  ///
+  /// In en, this message translates to:
+  /// **'Vision AI tour'**
+  String get learnTourVision;
+
   /// No description provided for @procExchangeInstead.
   ///
   /// In en, this message translates to:

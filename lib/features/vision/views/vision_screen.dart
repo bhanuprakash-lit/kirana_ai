@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../../../core/tutorial/tutorial_controller.dart';
+import '../../../core/tutorial/tutorial_keys.dart';
+import '../../../core/tutorial/tutorial_overlay.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../subscription/providers/subscription_provider.dart';
@@ -45,6 +48,40 @@ class _VisionScreenState extends ConsumerState<VisionScreen>
     super.dispose();
   }
 
+  /// First-visit orientation: shelf scan -> results -> counter, in one line
+  /// each. Replayable from the ? button and the Learn screen.
+  void _maybeIntroTour() {
+    if (!mounted) return;
+    final c = ref.read(tutorialProvider.notifier);
+    if (!c.shouldShow(Tut.visionIntro)) return;
+    final l10n = AppLocalizations.of(context);
+    showTutorialSegment(
+      context,
+      ref,
+      id: Tut.visionIntro,
+      steps: [
+        TutStep(
+          targetKey: TutorialKeys.visionTabShelf,
+          title: l10n.tutVisionShelfTitle,
+          body: l10n.tutVisionShelfBody,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.visionTabResults,
+          title: l10n.tutVisionResultsTitle,
+          body: l10n.tutVisionResultsBody,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.visionTabCounter,
+          title: l10n.tutVisionCounterTitle,
+          body: l10n.tutVisionCounterBody,
+        ),
+      ],
+      nextLabel: l10n.tutNext,
+      doneLabel: l10n.tutDone,
+      skipLabel: l10n.tutSkip,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -56,16 +93,41 @@ class _VisionScreenState extends ConsumerState<VisionScreen>
     final isPro = ref.watch(subInfoProvider).canAccessVendorManagement;
     if (!isPro) return const _VisionProGate();
 
+    // First-visit orientation for the Pro camera features. Only fires here --
+    // free stores never reach this branch, so they're never teased with it.
+    ref.watch(tutorialProvider.select((s) => s.loaded));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 400), _maybeIntroTour);
+    });
+
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
         title: Text(l10n.visionTitle),
+        actions: [
+          IconButton(
+            tooltip: l10n.learnTitle,
+            icon: const Icon(Icons.help_outline_rounded),
+            onPressed: () {
+              ref
+                  .read(tutorialProvider.notifier)
+                  .replaySegment(Tut.visionIntro);
+              _maybeIntroTour();
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tab,
           tabs: [
-            Tab(text: l10n.visionTabShelf),
-            Tab(text: l10n.visionTabResults),
-            Tab(text: l10n.visionTabCounter),
+            Tab(key: TutorialKeys.visionTabShelf, text: l10n.visionTabShelf),
+            Tab(
+              key: TutorialKeys.visionTabResults,
+              text: l10n.visionTabResults,
+            ),
+            Tab(
+              key: TutorialKeys.visionTabCounter,
+              text: l10n.visionTabCounter,
+            ),
           ],
         ),
       ),

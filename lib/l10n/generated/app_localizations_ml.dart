@@ -3270,6 +3270,70 @@ class AppLocalizationsMl extends AppLocalizations {
       'ആദ്യമായി തുറക്കുന്ന സ്ക്രീനുകളിൽ സഹായ നുറുങ്ങുകൾ';
 
   @override
+  String get tutKhataUdhaarTitle => 'ഉപഭോക്തൃ കടം';
+
+  @override
+  String get tutKhataUdhaarBody =>
+      'നിങ്ങൾക്ക് കടപ്പെട്ട ഓരോ ഉപഭോക്താവും — എത്ര, എന്നു മുതൽ. കാണാനോ വസൂലാക്കാനോ ഉപഭോക്താവിൽ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutKhataCashflowTitle => 'പണമൊഴുക്ക്';
+
+  @override
+  String get tutKhataCashflowBody => 'ദിവസവും വരുന്നതും പോകുന്നതുമായ പണം.';
+
+  @override
+  String get tutKhataSupplierTitle => 'സപ്ലയർ കടം';
+
+  @override
+  String get tutKhataSupplierBody =>
+      'നിങ്ങൾ വിതരണക്കാർക്ക് കൊടുക്കാനുള്ളത് — ഒന്നും അപ്രതീക്ഷിതമാകാതിരിക്കാൻ.';
+
+  @override
+  String get tutRackSearchTitle => 'ഏത് സാധനവും കണ്ടെത്തുക';
+
+  @override
+  String get tutRackSearchBody =>
+      'സാധനത്തിന്റെ പേര് ടൈപ്പ് ചെയ്യുക — അത് ഏത് റാക്കിലാണെന്ന് കാണിക്കാം.';
+
+  @override
+  String get tutRackPlaceTitle => 'സാധനം വയ്ക്കുക';
+
+  @override
+  String get tutRackPlaceBody =>
+      'ഒരിക്കൽ സാധനം റാക്കിൽ വച്ചാൽ, പിന്നെ കട മുഴുവൻ തിരയേണ്ടതില്ല.';
+
+  @override
+  String get tutVisionShelfTitle => 'ഷെൽഫ് സ്കാൻ';
+
+  @override
+  String get tutVisionShelfBody =>
+      'രാവിലെയും വൈകുന്നേരവും നിങ്ങളുടെ ഷെൽഫുകളുടെ ഫോട്ടോ എടുക്കുക.';
+
+  @override
+  String get tutVisionResultsTitle => 'ഫലങ്ങൾ';
+
+  @override
+  String get tutVisionResultsBody =>
+      'രണ്ട് സ്കാനുകളും താരതമ്യം ചെയ്ത് ഇന്ന് എന്ത് വിറ്റെന്ന് കാണിക്കുന്നു.';
+
+  @override
+  String get tutVisionCounterTitle => 'കൗണ്ടർ';
+
+  @override
+  String get tutVisionCounterBody =>
+      'ക്യാമറ കൗണ്ടറിന് നേരെ വയ്ക്കുക — സാധനങ്ങൾ കടന്നുപോകുമ്പോൾ തന്നെ എണ്ണപ്പെടും.';
+
+  @override
+  String get learnTourKhata => 'നിങ്ങളുടെ കണക്ക് അറിയുക';
+
+  @override
+  String get learnTourRacks => 'റാക്കുകളിൽ സാധനം കണ്ടെത്തുക';
+
+  @override
+  String get learnTourVision => 'വിഷൻ AI പര്യടനം';
+
+  @override
   String get procExchangeInstead =>
       'എക്സ്ചേഞ്ച് (ഉപഭോക്താവ് മറ്റൊരു സാധനം എടുക്കുന്നു)';
 

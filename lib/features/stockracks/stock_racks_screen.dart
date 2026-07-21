@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/api_client.dart';
 import '../../core/store/store_scope.dart';
 import '../../core/theme/brand_theme.dart';
+import '../../core/tutorial/tutorial_controller.dart';
+import '../../core/tutorial/tutorial_keys.dart';
+import '../../core/tutorial/tutorial_overlay.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../shared/widgets/product_picker.dart';
 
@@ -106,14 +109,63 @@ class StockRacksScreen extends ConsumerStatefulWidget {
 class _StockRacksScreenState extends ConsumerState<StockRacksScreen> {
   String _query = '';
 
+  /// First-visit orientation: find any item's rack; place stock so it's
+  /// findable. Replayable from the ? button and the Learn screen.
+  void _maybeIntroTour() {
+    if (!mounted) return;
+    final c = ref.read(tutorialProvider.notifier);
+    if (!c.shouldShow(Tut.racksIntro)) return;
+    final l10n = AppLocalizations.of(context);
+    showTutorialSegment(
+      context,
+      ref,
+      id: Tut.racksIntro,
+      steps: [
+        TutStep(
+          targetKey: TutorialKeys.rackSearch,
+          title: l10n.tutRackSearchTitle,
+          body: l10n.tutRackSearchBody,
+        ),
+        TutStep(
+          targetKey: TutorialKeys.rackPlaceFab,
+          title: l10n.tutRackPlaceTitle,
+          body: l10n.tutRackPlaceBody,
+          align: ContentAlign.top,
+        ),
+      ],
+      nextLabel: l10n.tutNext,
+      doneLabel: l10n.tutDone,
+      skipLabel: l10n.tutSkip,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(rackPlacementsProvider);
+    ref.watch(tutorialProvider.select((s) => s.loaded));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 400), _maybeIntroTour);
+    });
     return Scaffold(
       backgroundColor: BrandColors.background,
-      appBar: AppBar(title: Text(l10n.rackTitle)),
+      appBar: AppBar(
+        title: Text(l10n.rackTitle),
+        actions: [
+          IconButton(
+            tooltip: l10n.learnTitle,
+            icon: const Icon(Icons.help_outline_rounded),
+            onPressed: () {
+              ref
+                  .read(tutorialProvider.notifier)
+                  .replaySegment(Tut.racksIntro);
+              _maybeIntroTour();
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
+        key: TutorialKeys.rackPlaceFab,
         onPressed: () => _placeStock(),
         icon: const Icon(Icons.add_location_alt_outlined),
         label: Text(l10n.rackPlaceStock),
@@ -124,6 +176,7 @@ class _StockRacksScreenState extends ConsumerState<StockRacksScreen> {
             color: Colors.white,
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
             child: TextField(
+              key: TutorialKeys.rackSearch,
               onChanged: (v) => setState(() => _query = v),
               decoration: InputDecoration(
                 hintText: l10n.rackSearchHint,

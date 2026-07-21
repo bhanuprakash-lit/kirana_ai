@@ -3239,6 +3239,70 @@ class AppLocalizationsKn extends AppLocalizations {
   String get learnShowTipsDesc => 'ಮೊದಲ ಬಾರಿ ತೆರೆಯುವ ಪರದೆಗಳಲ್ಲಿ ಸಹಾಯ ಸಲಹೆಗಳು';
 
   @override
+  String get tutKhataUdhaarTitle => 'ಗ್ರಾಹಕರ ಉದ್ರಿ';
+
+  @override
+  String get tutKhataUdhaarBody =>
+      'ನಿಮಗೆ ಬಾಕಿ ಇರುವ ಪ್ರತಿ ಗ್ರಾಹಕ — ಎಷ್ಟು, ಯಾವಾಗಿನಿಂದ. ನೋಡಲು ಅಥವಾ ವಸೂಲಿಗೆ ಗ್ರಾಹಕರ ಮೇಲೆ ಒತ್ತಿರಿ.';
+
+  @override
+  String get tutKhataCashflowTitle => 'ಹಣದ ಹರಿವು';
+
+  @override
+  String get tutKhataCashflowBody => 'ದಿನದಿನವೂ ಬರುವ ಮತ್ತು ಹೋಗುವ ಹಣ.';
+
+  @override
+  String get tutKhataSupplierTitle => 'ಸಪ್ಲೈಯರ್ ಉದ್ರಿ';
+
+  @override
+  String get tutKhataSupplierBody =>
+      'ನೀವು ವಿತರಕರಿಗೆ ಕೊಡಬೇಕಾದದ್ದು — ಯಾವುದೂ ಅಚ್ಚರಿ ಮೂಡಿಸದಂತೆ.';
+
+  @override
+  String get tutRackSearchTitle => 'ಯಾವುದೇ ಸಾಮಾನು ಹುಡುಕಿ';
+
+  @override
+  String get tutRackSearchBody =>
+      'ಸಾಮಾನಿನ ಹೆಸರು ಟೈಪ್ ಮಾಡಿ — ಅದು ಯಾವ ರ್ಯಾಕ್‌ನಲ್ಲಿದೆ ಎಂದು ತೋರಿಸುತ್ತೇವೆ.';
+
+  @override
+  String get tutRackPlaceTitle => 'ಸಾಮಾನು ಇಡಿ';
+
+  @override
+  String get tutRackPlaceBody =>
+      'ಒಮ್ಮೆ ಸಾಮಾನನ್ನು ರ್ಯಾಕ್‌ನಲ್ಲಿ ಇಟ್ಟರೆ, ಮತ್ತೆ ಅಂಗಡಿಯಲ್ಲೆಲ್ಲ ಹುಡುಕಬೇಕಿಲ್ಲ.';
+
+  @override
+  String get tutVisionShelfTitle => 'ಶೆಲ್ಫ್ ಸ್ಕ್ಯಾನ್';
+
+  @override
+  String get tutVisionShelfBody =>
+      'ಬೆಳಿಗ್ಗೆ ಮತ್ತು ಸಂಜೆ ನಿಮ್ಮ ಶೆಲ್ಫ್‌ಗಳ ಫೋಟೋ ತೆಗೆಯಿರಿ.';
+
+  @override
+  String get tutVisionResultsTitle => 'ಫಲಿತಾಂಶಗಳು';
+
+  @override
+  String get tutVisionResultsBody =>
+      'ಎರಡೂ ಸ್ಕ್ಯಾನ್‌ಗಳನ್ನು ಹೋಲಿಸಿ ಇಂದು ಏನು ಮಾರಾಟವಾಯಿತು ಎಂದು ತೋರಿಸುತ್ತೇವೆ.';
+
+  @override
+  String get tutVisionCounterTitle => 'ಕೌಂಟರ್';
+
+  @override
+  String get tutVisionCounterBody =>
+      'ಕ್ಯಾಮೆರಾವನ್ನು ಕೌಂಟರ್ ಕಡೆ ಇರಿಸಿ — ಸಾಮಾನುಗಳು ಹಾದುಹೋಗುತ್ತಿದ್ದಂತೆ ಎಣಿಕೆಯಾಗುತ್ತವೆ.';
+
+  @override
+  String get learnTourKhata => 'ನಿಮ್ಮ ಖಾತೆ ತಿಳಿಯಿರಿ';
+
+  @override
+  String get learnTourRacks => 'ರ್ಯಾಕ್‌ಗಳಿಂದ ಸಾಮಾನು ಹುಡುಕಿ';
+
+  @override
+  String get learnTourVision => 'ವಿಷನ್ AI ಪ್ರವಾಸ';
+
+  @override
   String get procExchangeInstead =>
       'ವಿನಿಮಯ (ಗ್ರಾಹಕರು ಬೇರೆ ವಸ್ತು ತೆಗೆದುಕೊಳ್ಳುತ್ತಾರೆ)';
 

@@ -3271,6 +3271,71 @@ class AppLocalizationsTa extends AppLocalizations {
       'முதன்முறை திறக்கும் திரைகளில் உதவிக் குறிப்புகள்';
 
   @override
+  String get tutKhataUdhaarTitle => 'வாடிக்கையாளர் கடன்';
+
+  @override
+  String get tutKhataUdhaarBody =>
+      'உங்களுக்குக் கடன்பட்ட ஒவ்வொருவரும் — எவ்வளவு, எப்போதிலிருந்து. பார்க்க அல்லது வசூலிக்க வாடிக்கையாளரைத் தட்டவும்.';
+
+  @override
+  String get tutKhataCashflowTitle => 'பணப்புழக்கம்';
+
+  @override
+  String get tutKhataCashflowBody =>
+      'தினமும் வரும், போகும் பணம் — நாள் வாரியாக.';
+
+  @override
+  String get tutKhataSupplierTitle => 'சப்ளையர் கடன்';
+
+  @override
+  String get tutKhataSupplierBody =>
+      'நீங்கள் விநியோகஸ்தர்களுக்குத் தர வேண்டியது — எதுவும் திடீரெனத் திகைக்கவைக்காது.';
+
+  @override
+  String get tutRackSearchTitle => 'எந்தப் பொருளையும் கண்டுபிடி';
+
+  @override
+  String get tutRackSearchBody =>
+      'பொருளின் பெயரை எழுதுங்கள் — அது எந்த அலமாரியில் உள்ளது என்று காட்டுவோம்.';
+
+  @override
+  String get tutRackPlaceTitle => 'இருப்பை வைக்கவும்';
+
+  @override
+  String get tutRackPlaceBody =>
+      'ஒருமுறை பொருளை அலமாரியில் வைத்தால், மீண்டும் கடை முழுவதும் தேட வேண்டியதில்லை.';
+
+  @override
+  String get tutVisionShelfTitle => 'அலமாரி ஸ்கேன்';
+
+  @override
+  String get tutVisionShelfBody =>
+      'காலையிலும் மாலையிலும் உங்கள் அலமாரிகளைப் புகைப்படம் எடுங்கள்.';
+
+  @override
+  String get tutVisionResultsTitle => 'முடிவுகள்';
+
+  @override
+  String get tutVisionResultsBody =>
+      'இரண்டு ஸ்கேன்களையும் ஒப்பிட்டு இன்று என்ன விற்றது என்று காட்டுவோம்.';
+
+  @override
+  String get tutVisionCounterTitle => 'கவுண்டர்';
+
+  @override
+  String get tutVisionCounterBody =>
+      'கேமராவை கவுண்டர் நோக்கி வையுங்கள் — பொருட்கள் கடக்கும்போதே எண்ணப்படும்.';
+
+  @override
+  String get learnTourKhata => 'உங்கள் கணக்கை அறியுங்கள்';
+
+  @override
+  String get learnTourRacks => 'அலமாரிகளில் பொருள் தேடுங்கள்';
+
+  @override
+  String get learnTourVision => 'விஷன் AI சுற்றுலா';
+
+  @override
   String get procExchangeInstead =>
       'மாற்று (வாடிக்கையாளர் வேறு பொருள் எடுக்கிறார்)';
 

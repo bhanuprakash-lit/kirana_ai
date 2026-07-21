@@ -27,6 +27,12 @@ class Tut {
   static const apForm = 'ap_form';
   static const ckReportTour = 'ck_report';
 
+  // First-visit orientation tours (layer 3) — fire once when a screen is
+  // first opened, replayable from that screen's ? button or the Learn screen.
+  static const khataIntro = 'khata_intro';
+  static const racksIntro = 'racks_intro';
+  static const visionIntro = 'vision_intro';
+
   static const firstSaleSegments = [fsSearch, fsCustomer, fsCharge, fsPayment];
   static const addProductSegments = [apFab, apSearch, apForm];
 

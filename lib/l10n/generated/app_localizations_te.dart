@@ -3212,6 +3212,69 @@ class AppLocalizationsTe extends AppLocalizations {
   String get learnShowTipsDesc => 'మొదటిసారి తెరిచే స్క్రీన్‌లపై సహాయ చిట్కాలు';
 
   @override
+  String get tutKhataUdhaarTitle => 'కస్టమర్ అప్పు';
+
+  @override
+  String get tutKhataUdhaarBody =>
+      'మీకు బాకీ ఉన్న ప్రతి కస్టమర్ — ఎంత, ఎప్పటి నుంచి. చూడటానికి లేదా వసూలుకు కస్టమర్‌పై నొక్కండి.';
+
+  @override
+  String get tutKhataCashflowTitle => 'నగదు ప్రవాహం';
+
+  @override
+  String get tutKhataCashflowBody => 'రోజువారీగా వచ్చే, పోయే డబ్బు.';
+
+  @override
+  String get tutKhataSupplierTitle => 'సప్లయర్ అప్పు';
+
+  @override
+  String get tutKhataSupplierBody =>
+      'మీరు డిస్ట్రిబ్యూటర్లకు ఎంత ఇవ్వాలో — ఏదీ ఆశ్చర్యపరచకుండా.';
+
+  @override
+  String get tutRackSearchTitle => 'ఏ సరుకైనా వెతకండి';
+
+  @override
+  String get tutRackSearchBody =>
+      'సరుకు పేరు టైప్ చేయండి — అది ఏ ర్యాక్‌లో ఉందో చూపిస్తాం.';
+
+  @override
+  String get tutRackPlaceTitle => 'సరుకు పెట్టండి';
+
+  @override
+  String get tutRackPlaceBody =>
+      'ఒకసారి సరుకును ర్యాక్‌లో పెడితే, మళ్లీ దుకాణమంతా వెతకాల్సిన పని లేదు.';
+
+  @override
+  String get tutVisionShelfTitle => 'షెల్ఫ్ స్కాన్';
+
+  @override
+  String get tutVisionShelfBody => 'ఉదయం, సాయంత్రం మీ షెల్ఫ్‌ల ఫోటో తీయండి.';
+
+  @override
+  String get tutVisionResultsTitle => 'ఫలితాలు';
+
+  @override
+  String get tutVisionResultsBody =>
+      'రెండు స్కాన్‌లను పోల్చి ఈరోజు ఏమి అమ్ముడైందో చూపిస్తాం.';
+
+  @override
+  String get tutVisionCounterTitle => 'కౌంటర్';
+
+  @override
+  String get tutVisionCounterBody =>
+      'కెమెరాను కౌంటర్ వైపు పెట్టండి — సరుకులు దాటుతుండగానే లెక్కించబడతాయి.';
+
+  @override
+  String get learnTourKhata => 'మీ ఖాతా తెలుసుకోండి';
+
+  @override
+  String get learnTourRacks => 'ర్యాక్‌లతో సరుకు వెతకండి';
+
+  @override
+  String get learnTourVision => 'విజన్ AI పర్యటన';
+
+  @override
   String get procExchangeInstead =>
       'ఎక్స్చేంజ్ (కస్టమర్ వేరే వస్తువు తీసుకుంటారు)';
 

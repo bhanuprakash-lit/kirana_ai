@@ -66,6 +66,38 @@ class LearnScreen extends ConsumerWidget {
               context.go('/home');
             },
           ),
+          _tourTile(
+            context,
+            icon: Icons.menu_book_rounded,
+            title: l10n.learnTourKhata,
+            replayLabel: l10n.learnReplay,
+            onReplay: () {
+              c.replaySegment(Tut.khataIntro);
+              ref.read(dashboardTabProvider.notifier).switchTab(1);
+              context.go('/home');
+            },
+          ),
+          _tourTile(
+            context,
+            icon: Icons.shelves,
+            title: l10n.learnTourRacks,
+            replayLabel: l10n.learnReplay,
+            onReplay: () {
+              c.replaySegment(Tut.racksIntro);
+              context.push('/profile/stock-racks');
+            },
+          ),
+          _tourTile(
+            context,
+            icon: Icons.center_focus_strong_rounded,
+            title: l10n.learnTourVision,
+            replayLabel: l10n.learnReplay,
+            onReplay: () {
+              c.replaySegment(Tut.visionIntro);
+              ref.read(dashboardTabProvider.notifier).switchTab(3);
+              context.go('/home');
+            },
+          ),
           const SizedBox(height: 18),
           Container(
             decoration: BoxDecoration(
