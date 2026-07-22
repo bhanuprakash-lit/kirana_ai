@@ -11,6 +11,7 @@ import '../../pos_inventory/models/pos_product.dart';
 import '../../pos_inventory/providers/pos_provider.dart';
 import '../../subscription/providers/subscription_provider.dart';
 import '../../subscription/views/paywall_sheet.dart';
+import '../../../core/errors/friendly_error.dart';
 import '../models/basket_model.dart';
 import '../models/basket_tier_config.dart';
 import '../providers/basket_provider.dart';

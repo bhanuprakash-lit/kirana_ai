@@ -47,7 +47,12 @@ class _CustomerUdhaarCardState extends ConsumerState<_CustomerUdhaarCard> {
       await notifier.refresh();
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.finFailedSendReminder(e.toString()))),
+        SnackBar(
+          content: Text(
+            friendlyErrorOrNull(l10n, e) ??
+                l10n.finFailedSendReminder(e.toString()),
+          ),
+        ),
       );
     }
   }

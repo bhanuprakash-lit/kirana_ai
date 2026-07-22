@@ -10,9 +10,9 @@ import '../../../../shared/widgets/primary_button.dart';
 import '../../providers/onboarding_provider.dart';
 import '../../../support/providers/notification_provider.dart';
 
-const _kPrivacyPolicyUrl = 'https://lohiyaai.com/outlet/privacy';
+const _kPrivacyPolicyUrl = 'https://lohiyaai.com/outlet/privacy.html';
 const _kTermsAndConditionsUrl =
-    'https://lohiyaai.com/outlet/terms-and-conditions';
+    'https://lohiyaai.com/outlet/terms-and-conditions.html';
 
 Future<void> _openLink(String url) async {
   final uri = Uri.parse(url);

@@ -53,6 +53,11 @@ class _StoreSwitcherSheet extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
+      // Cap the sheet so a long store list scrolls inside it instead of
+      // overflowing and pushing "Add a store" off-screen (PAI-1).
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+      ),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -78,61 +83,66 @@ class _StoreSwitcherSheet extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          stores.when(
-            loading: () => const Padding(
-              padding: EdgeInsets.all(24),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (e, _) => Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Could not load stores\n$e',
-                style: const TextStyle(color: BrandColors.muted),
+          // Only the store list scrolls; "Add a store" stays pinned below it
+          // so it is reachable no matter how many stores the owner has.
+          Flexible(
+            child: stores.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, _) => Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Could not load stores\n$e',
+                  style: const TextStyle(color: BrandColors.muted),
+                ),
+              ),
+              data: (list) => ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: list.length,
+                itemBuilder: (_, i) => _StoreTile(
+                  store: list[i],
+                  onTap: () =>
+                      Navigator.pop(context, list[i].isActive ? null : list[i]),
+                ),
               ),
             ),
-            data: (list) => Column(
-              children: [
-                ...list.map(
-                  (s) => _StoreTile(
-                    store: s,
-                    onTap: () => Navigator.pop(context, s.isActive ? null : s),
-                  ),
+          ),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () => showAddStoreSheet(context, ref),
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 14,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: BrandColors.primary.withValues(alpha: 0.4),
                 ),
-                const SizedBox(height: 8),
-                InkWell(
-                  onTap: () => showAddStoreSheet(context, ref),
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: BrandColors.primary.withValues(alpha: 0.4),
-                      ),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(
-                          Icons.add_business_rounded,
-                          color: BrandColors.primary,
-                          size: 20,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Add a store',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: BrandColors.primary,
-                          ),
-                        ),
-                      ],
+              ),
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.add_business_rounded,
+                    color: BrandColors.primary,
+                    size: 20,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Add a store',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: BrandColors.primary,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

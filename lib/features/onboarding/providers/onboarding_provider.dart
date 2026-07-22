@@ -158,7 +158,10 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
             fullName: state.data.ownerName,
             storeName: state.data.storeName,
             storeType: _mapStoreType(state.data.businessType),
-            verticalCode: _mapVertical(state.data.businessType),
+            verticalCode: _mapVertical(
+              state.data.businessType,
+              monoBrandVertical: state.data.monoBrandVertical,
+            ),
             footfall: state.data.footfall,
             budget: state.data.budget,
             location: state.data.location.isNotEmpty
@@ -218,9 +221,12 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     const valid = {
       // grocery-family
       'kirana', 'general', 'supermarket', 'mini_supermarket',
-      'provision', 'fruits_vegetables', 'pharmacy', 'bakery',
+      // Pharmacy is deliberately absent — medical retail is out of scope
+      // (it has its own dedicated app); keep it out of the whitelist so a
+      // stale client can't register one.
+      'provision', 'fruits_vegetables', 'bakery',
       // fashion
-      'apparel', 'boutique', 'mono_brand', 'footwear',
+      'apparel', 'boutique', 'mono_brand', 'footwear', 'cosmetics',
       // electronics / optical
       'electronics', 'optical',
       // services
@@ -234,15 +240,29 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
   /// Maps the granular business type (store_type) to the coarse vertical switch
   /// (F1 `vertical_code`). Many store types collapse onto one behaviour profile;
   /// anything unknown falls back to grocery (the safe everything-on default).
-  String _mapVertical(String code) {
+  String _mapVertical(String code, {String? monoBrandVertical}) {
     switch (code) {
-      // Size×colour catalogues → apparel profile
-      case 'apparel':
-      case 'boutique':
+      // PAI-3 — a mono-brand outlet's behaviour comes from what it sells,
+      // asked as a follow-up at signup. Falls back to apparel (the historical
+      // mapping) if an older client didn't send the answer.
       case 'mono_brand':
+        return monoBrandVertical ?? 'apparel';
+      case 'apparel':
         return 'apparel';
       case 'footwear':
         return 'footwear';
+      // PAI-3 — split out of apparel/grocery so they can diverge: boutique
+      // leans on alterations + estimates, sports may need equipment serials,
+      // bakery is own-make (days-not-weeks turnover), cosmetics is the one
+      // trade needing expiry AND shade variants together.
+      case 'boutique':
+        return 'boutique';
+      case 'sports_fitness':
+        return 'sports_fitness';
+      case 'cosmetics':
+        return 'cosmetics';
+      case 'bakery':
+        return 'bakery';
       // Serial + warranty
       case 'electronics':
         return 'electronics';
@@ -252,18 +272,14 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
       // Appointment-driven
       case 'salon':
         return 'services';
-      // V0.6 — a sports shop sells shoes/apparel/equipment: it needs size
-      // variants far more than appointments, so it maps to apparel now.
-      case 'sports_fitness':
-        return 'apparel';
       // Plain retail, no expiry/loose/variants. 'other' (unknown trade)
       // gets the neutral profile, NOT the most grocery-specific app.
       case 'fancy_gift':
       case 'stationery':
       case 'other':
         return 'general';
-      // kirana, general, supermarket, mini_supermarket, provision,
-      // fruits_vegetables, bakery
+      // kirana, supermarket, mini_supermarket + the retired grocery-family
+      // codes (general, provision, fruits_vegetables) still held by live stores.
       default:
         return 'grocery';
     }

@@ -314,8 +314,9 @@ class BasketsScreen extends ConsumerWidget {
           msg = l10n.mktNoCustomersWithPhone;
           bg = BrandColors.muted;
         } else if (err != null && err.isNotEmpty) {
-          // Surface the real Meta/template error instead of a vague message.
-          msg = l10n.mktAlertFailed(err);
+          // Surface the real Meta/template error, unless it's an operator-side
+          // failure the owner can't act on (expired token → friendly copy).
+          msg = friendlyErrorOrNull(l10n, err) ?? l10n.mktAlertFailed(err);
           bg = BrandColors.error;
         } else {
           msg = l10n.mktWhatsAppNotActiveYet(total);
@@ -333,7 +334,9 @@ class BasketsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.mktAlertFailed(_msg(e))),
+            content: Text(
+              friendlyErrorOrNull(l10n, e) ?? l10n.mktAlertFailed(_msg(e)),
+            ),
             backgroundColor: BrandColors.error,
           ),
         );
