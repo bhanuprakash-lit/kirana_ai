@@ -23,8 +23,21 @@ class CounterModel {
   static const String iosCoreMlName = 'counter_model';
 
   /// The model path/name handed to [YOLOView], resolved for the current platform.
+  ///
+  /// PAI-15 — prefer `counterModelPathProvider`, which returns the downloaded
+  /// copy. This static path is the bundled-asset fallback used while the model
+  /// is still shipped in the build.
   static String get path =>
       defaultTargetPlatform == TargetPlatform.iOS ? iosCoreMlName : tfliteAsset;
+
+  /// Whether the `.tflite` is still bundled with the app.
+  ///
+  /// Flip to `false` in the same change that drops `assets/models/` from
+  /// pubspec — the provisioner then stops offering the asset as a fallback and
+  /// relies entirely on the authenticated download. Keep it `true` until
+  /// `scripts/upload_vision_model.py` has published a manifest, so an install
+  /// is never left with no model at all.
+  static const bool hasBundledAsset = true;
 
   /// Default detection confidence for the live feed. A touch higher than the
   /// plugin default (0.25) to cut counter noise; tunable in the UI later.

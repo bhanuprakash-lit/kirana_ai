@@ -11,6 +11,7 @@ import '../../../core/theme/brand_theme.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../counter/counter_engine.dart';
 import '../counter/counter_model.dart';
+import '../counter/model_provisioner.dart';
 import '../counter/simple_tracker.dart';
 import '../models/counter_models.dart';
 import '../providers/counter_provider.dart';
@@ -188,17 +189,20 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final modelAvailable = ref.watch(counterModelAvailableProvider);
+    // PAI-15 — the model is fetched, not bundled, so resolving its path is the
+    // availability check: null means neither a download nor a bundled copy.
+    // First launch shows the spinner while ~38 MB comes down, once.
+    final modelPath = ref.watch(counterModelPathProvider);
 
-    return modelAvailable.when(
+    return modelPath.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, _) => _CounterMessage(
         icon: Icons.videocam_off_rounded,
         title: l10n.visionCounterModelMissingTitle,
         message: l10n.visionCounterModelMissingDesc,
       ),
-      data: (available) {
-        if (!available) {
+      data: (path) {
+        if (path == null || path.isEmpty) {
           return _CounterMessage(
             icon: Icons.download_for_offline_outlined,
             title: l10n.visionCounterModelMissingTitle,
@@ -208,12 +212,16 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
         if (!_started) {
           return _CounterLanding(onStart: _beginSession);
         }
-        return _buildActive(context, l10n);
+        return _buildActive(context, l10n, path);
       },
     );
   }
 
-  Widget _buildActive(BuildContext context, AppLocalizations l10n) {
+  Widget _buildActive(
+    BuildContext context,
+    AppLocalizations l10n,
+    String modelPath,
+  ) {
     final perm = _camPerm;
     if (perm == null) {
       return const Center(child: CircularProgressIndicator());
@@ -229,7 +237,7 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
       fit: StackFit.expand,
       children: [
         YOLOView(
-          modelPath: CounterModel.path,
+          modelPath: modelPath,
           task: YOLOTask.detect,
           controller: _controller,
           confidenceThreshold: CounterModel.defaultConfidence,
