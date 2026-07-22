@@ -6219,4 +6219,200 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get forecastDataStale => 'ಡೇಟಾ ಹಳೆಯದಾಗಿರಬಹುದು';
+
+  @override
+  String get errWhatsAppUnavailable =>
+      'WhatsApp ಸಂದೇಶ ಸೇವೆ ಸದ್ಯ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get procNew => 'ಹೊಸದು';
+
+  @override
+  String get procCreateProductTitle => 'ಈ ವಸ್ತುವನ್ನು ನಿಮ್ಮ ಸ್ಟಾಕ್‌ಗೆ ಸೇರಿಸಿ';
+
+  @override
+  String get procCreateProductHint =>
+      'ಬಿಲ್‌ನಲ್ಲಿ ನೀವು ಪಾವತಿಸಿದ್ದು ಮಾತ್ರ ಇದೆ — ನಿಮ್ಮ ಮಾರಾಟ ಬೆಲೆ ನಮೂದಿಸಿ.';
+
+  @override
+  String get procProductNameLabel => 'ಉತ್ಪನ್ನದ ಹೆಸರು';
+
+  @override
+  String get procCategoryLabel => 'ವರ್ಗ';
+
+  @override
+  String get procSellingPriceLabel => 'ಮಾರಾಟ ಬೆಲೆ';
+
+  @override
+  String get procCreateAndLink => 'ರಚಿಸಿ ಮತ್ತು ಜೋಡಿಸಿ';
+
+  @override
+  String get procEnterNameAndPrice => 'ಹೆಸರು ಮತ್ತು ಮಾರಾಟ ಬೆಲೆ ನಮೂದಿಸಿ';
+
+  @override
+  String get procCouldNotCreateProduct =>
+      'ಮೊದಲು ವರ್ಗ ಸೇರಿಸಿ, ನಂತರ ಉತ್ಪನ್ನ ರಚಿಸಿ';
+
+  @override
+  String procCostFromInvoice(String cost) {
+    return 'ಪ್ರತಿ ಘಟಕಕ್ಕೆ ₹$cost ಪಾವತಿಸಿದ್ದೀರಿ';
+  }
+
+  @override
+  String procProductCreatedAndLinked(String name) {
+    return '$name ಸೇರಿಸಲಾಗಿದೆ ಮತ್ತು ಈ ಸಾಲಿಗೆ ಜೋಡಿಸಲಾಗಿದೆ';
+  }
+
+  @override
+  String get mktShareQrImage => 'ಗ್ರಾಹಕರಿಗೆ QR ಕಳುಹಿಸಿ';
+
+  @override
+  String get mktSendCodeAsText => 'ಬದಲಿಗೆ ಕೋಡ್ ಅನ್ನು ಪಠ್ಯವಾಗಿ ಕಳುಹಿಸಿ';
+
+  @override
+  String get mktQrShareFailed => 'QR ಚಿತ್ರವನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗಲಿಲ್ಲ';
+
+  @override
+  String get estPurpose =>
+      'ಅಂದಾಜು ಎಂದರೆ ಖರೀದಿಗೂ ಮೊದಲು ಗ್ರಾಹಕರಿಗೆ ನೀಡುವ ಲಿಖಿತ ಬೆಲೆ ಪಟ್ಟಿ. WhatsApp ನಲ್ಲಿ ಕಳುಹಿಸಿ, ಒಪ್ಪಿದ ಮೇಲೆ ಮಾರಾಟವಾಗಿ ಪರಿವರ್ತಿಸಿ.';
+
+  @override
+  String procPurchasesCount(int count) {
+    return '$count ಖರೀದಿಗಳು';
+  }
+
+  @override
+  String procLastOn(String date) {
+    return 'ಕೊನೆಯದು $date';
+  }
+
+  @override
+  String procToReceive(int count) {
+    return '$count ಸ್ವೀಕರಿಸಬೇಕಾಗಿದೆ';
+  }
+
+  @override
+  String get procDue => 'ಬಾಕಿ';
+
+  @override
+  String get procPaid => 'ಪಾವತಿಸಲಾಗಿದೆ';
+
+  @override
+  String get svcTitle => 'ಸೇವೆಗಳು ಮತ್ತು ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳು';
+
+  @override
+  String get svcTabAppointments => 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳು';
+
+  @override
+  String get svcTabServices => 'ಸೇವೆಗಳು';
+
+  @override
+  String get svcTabMemberships => 'ಸದಸ್ಯತ್ವಗಳು';
+
+  @override
+  String get svcNewMembership => 'ಹೊಸ ಸದಸ್ಯತ್ವ';
+
+  @override
+  String get svcNewService => 'ಹೊಸ ಸೇವೆ';
+
+  @override
+  String get svcBook => 'ಬುಕ್ ಮಾಡಿ';
+
+  @override
+  String get svcComplete => 'ಪೂರ್ಣಗೊಂಡಿದೆ';
+
+  @override
+  String get svcCancel => 'ರದ್ದುಗೊಳಿಸಿ';
+
+  @override
+  String get svcServiceName => 'ಸೇವೆಯ ಹೆಸರು';
+
+  @override
+  String get svcCategoryOptional => 'ವರ್ಗ (ಐಚ್ಛಿಕ)';
+
+  @override
+  String get svcCreateService => 'ಸೇವೆ ರಚಿಸಿ';
+
+  @override
+  String get svcCustomer => 'ಗ್ರಾಹಕ';
+
+  @override
+  String get svcDate => 'ದಿನಾಂಕ';
+
+  @override
+  String get svcService => 'ಸೇವೆ';
+
+  @override
+  String get svcTime => 'ಸಮಯ';
+
+  @override
+  String get svcPrice => 'ಬೆಲೆ';
+
+  @override
+  String get svcPriceWhenBilled => 'ಬೆಲೆ (ಬಿಲ್ ಮಾಡಿದಾಗ ವಿಧಿಸಲಾಗುತ್ತದೆ)';
+
+  @override
+  String get svcSessionUsed => 'ಒಂದು ಸೆಷನ್ ಬಳಸಲಾಗಿದೆ';
+
+  @override
+  String get svcUseSession => 'ಸೆಷನ್ ಬಳಸಿ';
+
+  @override
+  String get svcMembershipName => 'ಸದಸ್ಯತ್ವದ ಹೆಸರು (ಉದಾ. 10-ಸೆಷನ್ ಜಿಮ್ ಪಾಸ್)';
+
+  @override
+  String get svcSessionsHint => 'ಸೆಷನ್‌ಗಳು (0 = ಅಪರಿಮಿತ)';
+
+  @override
+  String get svcSellMembership => 'ಸದಸ್ಯತ್ವ ಮಾರಿ';
+
+  @override
+  String get svcNoMemberships =>
+      'ಇನ್ನೂ ಸದಸ್ಯತ್ವಗಳಿಲ್ಲ.\nಪ್ರೀಪೇಯ್ಡ್ ಬಂಡಲ್ ಮಾರಿ (ಉದಾ. 10 ಸೆಷನ್‌ಗಳು) — ಪ್ರತಿ ಭೇಟಿಗೆ ಬಿಲ್ಲಿಂಗ್ ಸಮಯದಲ್ಲಿ ಅಥವಾ ಇಲ್ಲಿಯೇ ಒಂದು ಸೆಷನ್ ಬಳಸಿ.';
+
+  @override
+  String get svcNoAppointments => 'ಈ ದಿನಕ್ಕೆ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳಿಲ್ಲ.';
+
+  @override
+  String get svcNoServices => 'ಇನ್ನೂ ಸೇವೆಗಳಿಲ್ಲ. ನೀವು ನೀಡುವ ಸೇವೆಗಳನ್ನು ಸೇರಿಸಿ.';
+
+  @override
+  String get stfAssignTo => 'ಯಾರಿಗೆ ವಹಿಸಬೇಕು (ಐಚ್ಛಿಕ)';
+
+  @override
+  String get stfUnassigned => 'ನಿಯೋಜಿಸಿಲ್ಲ';
+
+  @override
+  String get stfNoAttendance => 'ಇನ್ನೂ ಹಾಜರಾತಿ ದಾಖಲಾಗಿಲ್ಲ.';
+
+  @override
+  String get businessTypeCosmetics => 'ಕಾಸ್ಮೆಟಿಕ್ಸ್ ಮತ್ತು ಬ್ಯೂಟಿ';
+
+  @override
+  String get monoTradeLabel => 'ನೀವು ಮುಖ್ಯವಾಗಿ ಏನು ಮಾರುತ್ತೀರಿ?';
+
+  @override
+  String get monoTradeHint => 'ನಿಮ್ಮ ವ್ಯಾಪಾರ ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get monoTradeHelper =>
+      'ಇದು ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಸರಿಯಾದ ಕ್ಷೇತ್ರಗಳನ್ನು ಹೊಂದಿಸುತ್ತದೆ';
+
+  @override
+  String get monoTradeRequired => 'ದಯವಿಟ್ಟು ನೀವು ಏನು ಮಾರುತ್ತೀರಿ ಎಂದು ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get monoTradeClothing => 'ಬಟ್ಟೆ';
+
+  @override
+  String get monoTradeFootwear => 'ಪಾದರಕ್ಷೆಗಳು';
+
+  @override
+  String get monoTradeElectronics => 'ಮೊಬೈಲ್ ಮತ್ತು ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್';
+
+  @override
+  String get monoTradeCosmetics => 'ಕಾಸ್ಮೆಟಿಕ್ಸ್ ಮತ್ತು ಬ್ಯೂಟಿ';
+
+  @override
+  String get monoTradeOther => 'ಬೇರೆ ಏನಾದರೂ';
 }

@@ -6198,4 +6198,200 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get forecastDataStale => 'डेटा जुना असू शकतो';
+
+  @override
+  String get errWhatsAppUnavailable =>
+      'WhatsApp संदेश सेवा सध्या उपलब्ध नाही. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा.';
+
+  @override
+  String get procNew => 'नवीन';
+
+  @override
+  String get procCreateProductTitle => 'ही वस्तू तुमच्या स्टॉकमध्ये जोडा';
+
+  @override
+  String get procCreateProductHint =>
+      'बिलात फक्त खरेदी किंमत आहे — तुमची विक्री किंमत टाका.';
+
+  @override
+  String get procProductNameLabel => 'उत्पादनाचे नाव';
+
+  @override
+  String get procCategoryLabel => 'श्रेणी';
+
+  @override
+  String get procSellingPriceLabel => 'विक्री किंमत';
+
+  @override
+  String get procCreateAndLink => 'तयार करा आणि जोडा';
+
+  @override
+  String get procEnterNameAndPrice => 'नाव आणि विक्री किंमत टाका';
+
+  @override
+  String get procCouldNotCreateProduct =>
+      'आधी श्रेणी जोडा, मग उत्पादन तयार करा';
+
+  @override
+  String procCostFromInvoice(String cost) {
+    return 'तुम्ही प्रति नग ₹$cost दिले';
+  }
+
+  @override
+  String procProductCreatedAndLinked(String name) {
+    return '$name जोडले आणि या ओळीशी लिंक केले';
+  }
+
+  @override
+  String get mktShareQrImage => 'ग्राहकाला QR पाठवा';
+
+  @override
+  String get mktSendCodeAsText => 'त्याऐवजी कोड मजकूर म्हणून पाठवा';
+
+  @override
+  String get mktQrShareFailed => 'QR प्रतिमा तयार करता आली नाही';
+
+  @override
+  String get estPurpose =>
+      'अंदाजपत्रक म्हणजे खरेदीपूर्वी ग्राहकाला दिलेले लेखी किंमतपत्र. ते WhatsApp वर पाठवा आणि ग्राहक तयार झाल्यावर विक्रीत बदला.';
+
+  @override
+  String procPurchasesCount(int count) {
+    return '$count खरेदी';
+  }
+
+  @override
+  String procLastOn(String date) {
+    return 'शेवटची $date';
+  }
+
+  @override
+  String procToReceive(int count) {
+    return '$count स्वीकारायचे';
+  }
+
+  @override
+  String get procDue => 'थकीत';
+
+  @override
+  String get procPaid => 'दिले';
+
+  @override
+  String get svcTitle => 'सेवा आणि अपॉइंटमेंट';
+
+  @override
+  String get svcTabAppointments => 'अपॉइंटमेंट';
+
+  @override
+  String get svcTabServices => 'सेवा';
+
+  @override
+  String get svcTabMemberships => 'सदस्यत्वे';
+
+  @override
+  String get svcNewMembership => 'नवीन सदस्यत्व';
+
+  @override
+  String get svcNewService => 'नवीन सेवा';
+
+  @override
+  String get svcBook => 'बुक करा';
+
+  @override
+  String get svcComplete => 'पूर्ण';
+
+  @override
+  String get svcCancel => 'रद्द करा';
+
+  @override
+  String get svcServiceName => 'सेवेचे नाव';
+
+  @override
+  String get svcCategoryOptional => 'श्रेणी (पर्यायी)';
+
+  @override
+  String get svcCreateService => 'सेवा तयार करा';
+
+  @override
+  String get svcCustomer => 'ग्राहक';
+
+  @override
+  String get svcDate => 'तारीख';
+
+  @override
+  String get svcService => 'सेवा';
+
+  @override
+  String get svcTime => 'वेळ';
+
+  @override
+  String get svcPrice => 'किंमत';
+
+  @override
+  String get svcPriceWhenBilled => 'किंमत (बिल करताना आकारली जाईल)';
+
+  @override
+  String get svcSessionUsed => 'एक सत्र वापरले';
+
+  @override
+  String get svcUseSession => 'सत्र वापरा';
+
+  @override
+  String get svcMembershipName => 'सदस्यत्वाचे नाव (उदा. 10-सत्र जिम पास)';
+
+  @override
+  String get svcSessionsHint => 'सत्रे (0 = अमर्याद)';
+
+  @override
+  String get svcSellMembership => 'सदस्यत्व विका';
+
+  @override
+  String get svcNoMemberships =>
+      'अजून सदस्यत्वे नाहीत.\nप्रीपेड बंडल विका (उदा. 10 सत्रे) — प्रत्येक भेटीत बिलिंगच्या वेळी किंवा इथेच एक सत्र वापरा.';
+
+  @override
+  String get svcNoAppointments => 'या दिवसासाठी अपॉइंटमेंट नाहीत.';
+
+  @override
+  String get svcNoServices => 'अजून सेवा नाहीत. तुम्ही देत असलेल्या सेवा जोडा.';
+
+  @override
+  String get stfAssignTo => 'कोणाला द्यायचे (पर्यायी)';
+
+  @override
+  String get stfUnassigned => 'कोणालाही दिलेले नाही';
+
+  @override
+  String get stfNoAttendance => 'अजून हजेरी नोंदवलेली नाही.';
+
+  @override
+  String get businessTypeCosmetics => 'कॉस्मेटिक्स आणि ब्युटी';
+
+  @override
+  String get monoTradeLabel => 'तुम्ही मुख्यतः काय विकता?';
+
+  @override
+  String get monoTradeHint => 'तुमचा व्यवसाय निवडा';
+
+  @override
+  String get monoTradeHelper =>
+      'यामुळे तुमच्या दुकानासाठी योग्य पर्याय सेट होतील';
+
+  @override
+  String get monoTradeRequired => 'कृपया तुम्ही काय विकता ते निवडा';
+
+  @override
+  String get monoTradeClothing => 'कपडे';
+
+  @override
+  String get monoTradeFootwear => 'पादत्राणे';
+
+  @override
+  String get monoTradeElectronics => 'मोबाइल आणि इलेक्ट्रॉनिक्स';
+
+  @override
+  String get monoTradeCosmetics => 'कॉस्मेटिक्स आणि ब्युटी';
+
+  @override
+  String get monoTradeOther => 'इतर काही';
 }

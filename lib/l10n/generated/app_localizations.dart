@@ -10960,6 +10960,366 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Data may be outdated'**
   String get forecastDataStale;
+
+  /// Shown when the WhatsApp send path fails for an operator-side reason (expired token).
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp messaging is temporarily unavailable. Please try again later.'**
+  String get errWhatsAppUnavailable;
+
+  /// Button on an unmatched invoice line: create the product
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get procNew;
+
+  /// Title of the create-product-from-invoice sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Add this item to your stock'**
+  String get procCreateProductTitle;
+
+  /// No description provided for @procCreateProductHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The invoice only shows what you paid — set your selling price.'**
+  String get procCreateProductHint;
+
+  /// No description provided for @procProductNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Product name'**
+  String get procProductNameLabel;
+
+  /// No description provided for @procCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get procCategoryLabel;
+
+  /// No description provided for @procSellingPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selling price'**
+  String get procSellingPriceLabel;
+
+  /// No description provided for @procCreateAndLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Create & link'**
+  String get procCreateAndLink;
+
+  /// No description provided for @procEnterNameAndPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name and a selling price'**
+  String get procEnterNameAndPrice;
+
+  /// No description provided for @procCouldNotCreateProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a category first, then create the product'**
+  String get procCouldNotCreateProduct;
+
+  /// No description provided for @procCostFromInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'You paid ₹{cost} per unit'**
+  String procCostFromInvoice(String cost);
+
+  /// No description provided for @procProductCreatedAndLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added and linked to this invoice line'**
+  String procProductCreatedAndLinked(String name);
+
+  /// No description provided for @mktShareQrImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Share QR with customer'**
+  String get mktShareQrImage;
+
+  /// No description provided for @mktSendCodeAsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code as text instead'**
+  String get mktSendCodeAsText;
+
+  /// No description provided for @mktQrShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not prepare the QR image'**
+  String get mktQrShareFailed;
+
+  /// No description provided for @estPurpose.
+  ///
+  /// In en, this message translates to:
+  /// **'An estimate is a written price quote you give a customer before they buy. Share it on WhatsApp, and turn it into a sale when they accept.'**
+  String get estPurpose;
+
+  /// No description provided for @procPurchasesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} purchases'**
+  String procPurchasesCount(int count);
+
+  /// No description provided for @procLastOn.
+  ///
+  /// In en, this message translates to:
+  /// **'last {date}'**
+  String procLastOn(String date);
+
+  /// No description provided for @procToReceive.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} to receive'**
+  String procToReceive(int count);
+
+  /// No description provided for @procDue.
+  ///
+  /// In en, this message translates to:
+  /// **'due'**
+  String get procDue;
+
+  /// No description provided for @procPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'paid'**
+  String get procPaid;
+
+  /// No description provided for @svcTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Services & Appointments'**
+  String get svcTitle;
+
+  /// No description provided for @svcTabAppointments.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointments'**
+  String get svcTabAppointments;
+
+  /// No description provided for @svcTabServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get svcTabServices;
+
+  /// No description provided for @svcTabMemberships.
+  ///
+  /// In en, this message translates to:
+  /// **'Memberships'**
+  String get svcTabMemberships;
+
+  /// No description provided for @svcNewMembership.
+  ///
+  /// In en, this message translates to:
+  /// **'New membership'**
+  String get svcNewMembership;
+
+  /// No description provided for @svcNewService.
+  ///
+  /// In en, this message translates to:
+  /// **'New service'**
+  String get svcNewService;
+
+  /// No description provided for @svcBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Book'**
+  String get svcBook;
+
+  /// No description provided for @svcComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get svcComplete;
+
+  /// No description provided for @svcCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get svcCancel;
+
+  /// No description provided for @svcServiceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Service name'**
+  String get svcServiceName;
+
+  /// No description provided for @svcCategoryOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Category (optional)'**
+  String get svcCategoryOptional;
+
+  /// No description provided for @svcCreateService.
+  ///
+  /// In en, this message translates to:
+  /// **'Create service'**
+  String get svcCreateService;
+
+  /// No description provided for @svcCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get svcCustomer;
+
+  /// No description provided for @svcDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get svcDate;
+
+  /// No description provided for @svcService.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get svcService;
+
+  /// No description provided for @svcTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get svcTime;
+
+  /// No description provided for @svcPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get svcPrice;
+
+  /// No description provided for @svcPriceWhenBilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Price (charged when billed)'**
+  String get svcPriceWhenBilled;
+
+  /// No description provided for @svcSessionUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Session used'**
+  String get svcSessionUsed;
+
+  /// No description provided for @svcUseSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Use session'**
+  String get svcUseSession;
+
+  /// No description provided for @svcMembershipName.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership name (e.g. 10-session gym pass)'**
+  String get svcMembershipName;
+
+  /// No description provided for @svcSessionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions (0 = unlimited)'**
+  String get svcSessionsHint;
+
+  /// No description provided for @svcSellMembership.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell membership'**
+  String get svcSellMembership;
+
+  /// No description provided for @svcNoMemberships.
+  ///
+  /// In en, this message translates to:
+  /// **'No memberships yet.\nSell a prepaid bundle (e.g. 10 sessions) — redeem one session per visit at checkout or right here.'**
+  String get svcNoMemberships;
+
+  /// No description provided for @svcNoAppointments.
+  ///
+  /// In en, this message translates to:
+  /// **'No appointments for this day.'**
+  String get svcNoAppointments;
+
+  /// No description provided for @svcNoServices.
+  ///
+  /// In en, this message translates to:
+  /// **'No services yet. Add the services you offer.'**
+  String get svcNoServices;
+
+  /// No description provided for @stfAssignTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign to (optional)'**
+  String get stfAssignTo;
+
+  /// No description provided for @stfUnassigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned'**
+  String get stfUnassigned;
+
+  /// No description provided for @stfNoAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'No attendance recorded yet.'**
+  String get stfNoAttendance;
+
+  /// No description provided for @businessTypeCosmetics.
+  ///
+  /// In en, this message translates to:
+  /// **'Cosmetics & Beauty'**
+  String get businessTypeCosmetics;
+
+  /// No description provided for @monoTradeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you mainly sell?'**
+  String get monoTradeLabel;
+
+  /// No description provided for @monoTradeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your trade'**
+  String get monoTradeHint;
+
+  /// No description provided for @monoTradeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'This sets up the right fields for your shop'**
+  String get monoTradeHelper;
+
+  /// No description provided for @monoTradeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose what you sell'**
+  String get monoTradeRequired;
+
+  /// No description provided for @monoTradeClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Clothing'**
+  String get monoTradeClothing;
+
+  /// No description provided for @monoTradeFootwear.
+  ///
+  /// In en, this message translates to:
+  /// **'Footwear'**
+  String get monoTradeFootwear;
+
+  /// No description provided for @monoTradeElectronics.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile & electronics'**
+  String get monoTradeElectronics;
+
+  /// No description provided for @monoTradeCosmetics.
+  ///
+  /// In en, this message translates to:
+  /// **'Cosmetics & beauty'**
+  String get monoTradeCosmetics;
+
+  /// No description provided for @monoTradeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get monoTradeOther;
 }
 
 class _AppLocalizationsDelegate

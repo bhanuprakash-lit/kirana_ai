@@ -6189,4 +6189,199 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forecastDataStale => 'Data may be outdated';
+
+  @override
+  String get errWhatsAppUnavailable =>
+      'WhatsApp messaging is temporarily unavailable. Please try again later.';
+
+  @override
+  String get procNew => 'New';
+
+  @override
+  String get procCreateProductTitle => 'Add this item to your stock';
+
+  @override
+  String get procCreateProductHint =>
+      'The invoice only shows what you paid — set your selling price.';
+
+  @override
+  String get procProductNameLabel => 'Product name';
+
+  @override
+  String get procCategoryLabel => 'Category';
+
+  @override
+  String get procSellingPriceLabel => 'Selling price';
+
+  @override
+  String get procCreateAndLink => 'Create & link';
+
+  @override
+  String get procEnterNameAndPrice => 'Enter a name and a selling price';
+
+  @override
+  String get procCouldNotCreateProduct =>
+      'Add a category first, then create the product';
+
+  @override
+  String procCostFromInvoice(String cost) {
+    return 'You paid ₹$cost per unit';
+  }
+
+  @override
+  String procProductCreatedAndLinked(String name) {
+    return '$name added and linked to this invoice line';
+  }
+
+  @override
+  String get mktShareQrImage => 'Share QR with customer';
+
+  @override
+  String get mktSendCodeAsText => 'Send code as text instead';
+
+  @override
+  String get mktQrShareFailed => 'Could not prepare the QR image';
+
+  @override
+  String get estPurpose =>
+      'An estimate is a written price quote you give a customer before they buy. Share it on WhatsApp, and turn it into a sale when they accept.';
+
+  @override
+  String procPurchasesCount(int count) {
+    return '$count purchases';
+  }
+
+  @override
+  String procLastOn(String date) {
+    return 'last $date';
+  }
+
+  @override
+  String procToReceive(int count) {
+    return '$count to receive';
+  }
+
+  @override
+  String get procDue => 'due';
+
+  @override
+  String get procPaid => 'paid';
+
+  @override
+  String get svcTitle => 'Services & Appointments';
+
+  @override
+  String get svcTabAppointments => 'Appointments';
+
+  @override
+  String get svcTabServices => 'Services';
+
+  @override
+  String get svcTabMemberships => 'Memberships';
+
+  @override
+  String get svcNewMembership => 'New membership';
+
+  @override
+  String get svcNewService => 'New service';
+
+  @override
+  String get svcBook => 'Book';
+
+  @override
+  String get svcComplete => 'Complete';
+
+  @override
+  String get svcCancel => 'Cancel';
+
+  @override
+  String get svcServiceName => 'Service name';
+
+  @override
+  String get svcCategoryOptional => 'Category (optional)';
+
+  @override
+  String get svcCreateService => 'Create service';
+
+  @override
+  String get svcCustomer => 'Customer';
+
+  @override
+  String get svcDate => 'Date';
+
+  @override
+  String get svcService => 'Service';
+
+  @override
+  String get svcTime => 'Time';
+
+  @override
+  String get svcPrice => 'Price';
+
+  @override
+  String get svcPriceWhenBilled => 'Price (charged when billed)';
+
+  @override
+  String get svcSessionUsed => 'Session used';
+
+  @override
+  String get svcUseSession => 'Use session';
+
+  @override
+  String get svcMembershipName => 'Membership name (e.g. 10-session gym pass)';
+
+  @override
+  String get svcSessionsHint => 'Sessions (0 = unlimited)';
+
+  @override
+  String get svcSellMembership => 'Sell membership';
+
+  @override
+  String get svcNoMemberships =>
+      'No memberships yet.\nSell a prepaid bundle (e.g. 10 sessions) — redeem one session per visit at checkout or right here.';
+
+  @override
+  String get svcNoAppointments => 'No appointments for this day.';
+
+  @override
+  String get svcNoServices => 'No services yet. Add the services you offer.';
+
+  @override
+  String get stfAssignTo => 'Assign to (optional)';
+
+  @override
+  String get stfUnassigned => 'Unassigned';
+
+  @override
+  String get stfNoAttendance => 'No attendance recorded yet.';
+
+  @override
+  String get businessTypeCosmetics => 'Cosmetics & Beauty';
+
+  @override
+  String get monoTradeLabel => 'What do you mainly sell?';
+
+  @override
+  String get monoTradeHint => 'Choose your trade';
+
+  @override
+  String get monoTradeHelper => 'This sets up the right fields for your shop';
+
+  @override
+  String get monoTradeRequired => 'Please choose what you sell';
+
+  @override
+  String get monoTradeClothing => 'Clothing';
+
+  @override
+  String get monoTradeFootwear => 'Footwear';
+
+  @override
+  String get monoTradeElectronics => 'Mobile & electronics';
+
+  @override
+  String get monoTradeCosmetics => 'Cosmetics & beauty';
+
+  @override
+  String get monoTradeOther => 'Something else';
 }

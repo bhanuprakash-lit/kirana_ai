@@ -6266,4 +6266,203 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get forecastDataStale => 'தரவு பழையதாக இருக்கலாம்';
+
+  @override
+  String get errWhatsAppUnavailable =>
+      'WhatsApp செய்தி சேவை தற்போது கிடைக்கவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get procNew => 'புதியது';
+
+  @override
+  String get procCreateProductTitle =>
+      'இந்தப் பொருளை உங்கள் இருப்பில் சேர்க்கவும்';
+
+  @override
+  String get procCreateProductHint =>
+      'விலைப்பட்டியலில் நீங்கள் செலுத்தியது மட்டுமே — உங்கள் விற்பனை விலையை இடவும்.';
+
+  @override
+  String get procProductNameLabel => 'பொருளின் பெயர்';
+
+  @override
+  String get procCategoryLabel => 'வகை';
+
+  @override
+  String get procSellingPriceLabel => 'விற்பனை விலை';
+
+  @override
+  String get procCreateAndLink => 'உருவாக்கி இணை';
+
+  @override
+  String get procEnterNameAndPrice => 'பெயரையும் விற்பனை விலையையும் இடவும்';
+
+  @override
+  String get procCouldNotCreateProduct =>
+      'முதலில் ஒரு வகையைச் சேர்த்து, பிறகு பொருளை உருவாக்கவும்';
+
+  @override
+  String procCostFromInvoice(String cost) {
+    return 'ஒரு அலகுக்கு ₹$cost செலுத்தினீர்கள்';
+  }
+
+  @override
+  String procProductCreatedAndLinked(String name) {
+    return '$name சேர்க்கப்பட்டு இந்த வரிக்கு இணைக்கப்பட்டது';
+  }
+
+  @override
+  String get mktShareQrImage => 'வாடிக்கையாளருக்கு QR அனுப்பு';
+
+  @override
+  String get mktSendCodeAsText => 'மாறாக குறியீட்டை உரையாக அனுப்பு';
+
+  @override
+  String get mktQrShareFailed => 'QR படத்தைத் தயாரிக்க முடியவில்லை';
+
+  @override
+  String get estPurpose =>
+      'மதிப்பீடு என்பது வாங்குவதற்கு முன் வாடிக்கையாளருக்குத் தரும் எழுத்துப்பூர்வ விலைப் பட்டியல். WhatsApp-இல் அனுப்பி, அவர் ஒப்புக்கொண்டதும் விற்பனையாக மாற்றுங்கள்.';
+
+  @override
+  String procPurchasesCount(int count) {
+    return '$count கொள்முதல்';
+  }
+
+  @override
+  String procLastOn(String date) {
+    return 'கடைசி $date';
+  }
+
+  @override
+  String procToReceive(int count) {
+    return '$count பெற வேண்டியவை';
+  }
+
+  @override
+  String get procDue => 'நிலுவை';
+
+  @override
+  String get procPaid => 'செலுத்தப்பட்டது';
+
+  @override
+  String get svcTitle => 'சேவைகள் & சந்திப்புகள்';
+
+  @override
+  String get svcTabAppointments => 'சந்திப்புகள்';
+
+  @override
+  String get svcTabServices => 'சேவைகள்';
+
+  @override
+  String get svcTabMemberships => 'உறுப்பினர் திட்டங்கள்';
+
+  @override
+  String get svcNewMembership => 'புதிய உறுப்பினர் திட்டம்';
+
+  @override
+  String get svcNewService => 'புதிய சேவை';
+
+  @override
+  String get svcBook => 'பதிவு செய்';
+
+  @override
+  String get svcComplete => 'நிறைவு';
+
+  @override
+  String get svcCancel => 'ரத்து';
+
+  @override
+  String get svcServiceName => 'சேவையின் பெயர்';
+
+  @override
+  String get svcCategoryOptional => 'வகை (விருப்பம்)';
+
+  @override
+  String get svcCreateService => 'சேவையை உருவாக்கு';
+
+  @override
+  String get svcCustomer => 'வாடிக்கையாளர்';
+
+  @override
+  String get svcDate => 'தேதி';
+
+  @override
+  String get svcService => 'சேவை';
+
+  @override
+  String get svcTime => 'நேரம்';
+
+  @override
+  String get svcPrice => 'விலை';
+
+  @override
+  String get svcPriceWhenBilled => 'விலை (பில் போடும்போது வசூலிக்கப்படும்)';
+
+  @override
+  String get svcSessionUsed => 'ஒரு அமர்வு பயன்படுத்தப்பட்டது';
+
+  @override
+  String get svcUseSession => 'அமர்வைப் பயன்படுத்து';
+
+  @override
+  String get svcMembershipName =>
+      'உறுப்பினர் திட்டப் பெயர் (எ.கா. 10-அமர்வு ஜிம் பாஸ்)';
+
+  @override
+  String get svcSessionsHint => 'அமர்வுகள் (0 = வரம்பில்லா)';
+
+  @override
+  String get svcSellMembership => 'உறுப்பினர் திட்டத்தை விற்க';
+
+  @override
+  String get svcNoMemberships =>
+      'இதுவரை உறுப்பினர் திட்டங்கள் இல்லை.\nமுன்பணத் தொகுப்பை விற்கவும் (எ.கா. 10 அமர்வுகள்) — ஒவ்வொரு வருகையிலும் பில் போடும்போது அல்லது இங்கேயே ஒரு அமர்வைக் கழிக்கவும்.';
+
+  @override
+  String get svcNoAppointments => 'இந்த நாளுக்குச் சந்திப்புகள் இல்லை.';
+
+  @override
+  String get svcNoServices =>
+      'இதுவரை சேவைகள் இல்லை. நீங்கள் வழங்கும் சேவைகளைச் சேர்க்கவும்.';
+
+  @override
+  String get stfAssignTo => 'யாருக்கு ஒப்படைக்க (விருப்பம்)';
+
+  @override
+  String get stfUnassigned => 'ஒப்படைக்கப்படவில்லை';
+
+  @override
+  String get stfNoAttendance => 'இதுவரை வருகை பதிவு இல்லை.';
+
+  @override
+  String get businessTypeCosmetics => 'அழகுசாதனம் & பியூட்டி';
+
+  @override
+  String get monoTradeLabel => 'நீங்கள் முக்கியமாக என்ன விற்கிறீர்கள்?';
+
+  @override
+  String get monoTradeHint => 'உங்கள் வணிகத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get monoTradeHelper => 'இது உங்கள் கடைக்கு ஏற்ற புலங்களை அமைக்கும்';
+
+  @override
+  String get monoTradeRequired =>
+      'நீங்கள் என்ன விற்கிறீர்கள் என்பதைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get monoTradeClothing => 'ஆடைகள்';
+
+  @override
+  String get monoTradeFootwear => 'காலணிகள்';
+
+  @override
+  String get monoTradeElectronics => 'மொபைல் & மின்னணுவியல்';
+
+  @override
+  String get monoTradeCosmetics => 'அழகுசாதனம் & பியூட்டி';
+
+  @override
+  String get monoTradeOther => 'வேறு ஏதேனும்';
 }
