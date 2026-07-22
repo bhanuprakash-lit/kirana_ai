@@ -84,6 +84,60 @@ class LoyaltyActions {
     await _c.patch('/kirana/coupons/$couponId', {'is_active': isActive});
     ref.invalidate(couponsProvider);
   }
+
+  /// PAI-17 — edit an existing coupon. The backend refuses a `code` change
+  /// once the coupon has been redeemed (409), so its history stays readable.
+  Future<void> updateCoupon(int couponId, Map<String, dynamic> body) async {
+    await _c.patch('/kirana/coupons/$couponId', body);
+    ref.invalidate(couponsProvider);
+  }
+}
+
+/// PAI-16 — coupons this bill already qualifies for, best discount first.
+/// Keyed on the rounded bill amount so the POS refetches as the cart changes
+/// without hammering the endpoint on every paisa.
+final applicableCouponsProvider =
+    FutureProvider.family<List<ApplicableCoupon>, int>((ref, amountPaise) async {
+      ref.watch(storeScopeProvider);
+      final amount = amountPaise / 100.0;
+      if (amount <= 0) return const [];
+      try {
+        final data = await ref
+            .read(apiClientProvider)
+            .get('/kirana/coupons/applicable?amount=$amount');
+        final list = (data is Map ? data['coupons'] : null) as List<dynamic>? ?? [];
+        return list
+            .map((e) => ApplicableCoupon.fromJson((e as Map).cast<String, dynamic>()))
+            .toList();
+      } catch (_) {
+        // An older backend has no such route — the manual code box still works.
+        return const [];
+      }
+    });
+
+/// A coupon the current cart qualifies for, with the ₹ it would take off.
+class ApplicableCoupon {
+  final int couponId;
+  final String code;
+  final String discountType;
+  final double value;
+  final double discount;
+
+  const ApplicableCoupon({
+    required this.couponId,
+    required this.code,
+    required this.discountType,
+    required this.value,
+    required this.discount,
+  });
+
+  factory ApplicableCoupon.fromJson(Map<String, dynamic> j) => ApplicableCoupon(
+    couponId: (j['coupon_id'] as num?)?.toInt() ?? 0,
+    code: (j['code'] ?? '').toString(),
+    discountType: (j['discount_type'] ?? 'flat').toString(),
+    value: (j['value'] as num?)?.toDouble() ?? 0,
+    discount: (j['discount'] as num?)?.toDouble() ?? 0,
+  );
 }
 
 final loyaltyActionsProvider = Provider<LoyaltyActions>(LoyaltyActions.new);

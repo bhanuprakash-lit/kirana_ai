@@ -19,6 +19,7 @@ import '../../../subscription/views/credits_purchase_sheet.dart';
 import '../../models/invoice_extraction.dart';
 import '../../models/procurement_models.dart';
 import '../../models/pos_product.dart';
+import '../../providers/inventory_provider.dart';
 import '../../providers/pos_provider.dart';
 import '../../providers/procurement_provider.dart';
 import 'ai_gate_widgets.dart';
@@ -224,6 +225,76 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
           _ProductPickerSheet(products: products, initialQuery: query),
     );
     if (picked != null && mounted) _linkProduct(index, picked);
+  }
+
+  /// PAI-5 — create the catalog product an invoice line has no match for, then
+  /// link it so the line actually reaches the purchase order.
+  ///
+  /// Previously an unmatched line was silently dropped at PO time: the invoice
+  /// said "20 × Ashirvaad Atta 5kg", nothing in the catalog matched, and the
+  /// stock never arrived. The owner had to leave, add the product by hand and
+  /// rescan the whole invoice.
+  ///
+  /// We never create silently — the sheet asks for the selling price first,
+  /// because the invoice only tells us what we *paid*. Initial stock stays 0;
+  /// the quantity arrives when this PO is received, so it isn't counted twice.
+  Future<void> _createProductFor(int index) async {
+    final inv = _items[index].invoice;
+    final name = (inv.name ?? '').trim();
+    if (name.isEmpty) return;
+
+    final categories = ref.read(inventoryProvider).asData?.value.categories ?? const [];
+    if (categories.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_l10n.procCouldNotCreateProduct)),
+      );
+      return;
+    }
+
+    final confirmed = await showModalBottomSheet<_NewProductDraft>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _NewProductFromInvoiceSheet(
+        name: name,
+        unit: inv.unit,
+        costPrice: inv.effectiveCostPrice,
+        categories: categories.cast<Map<String, dynamic>>(),
+      ),
+    );
+    if (confirmed == null || !mounted) return;
+
+    final err = await ref
+        .read(inventoryProvider.notifier)
+        .addProduct(
+          name: confirmed.name,
+          categoryId: confirmed.categoryId,
+          sellingPrice: confirmed.sellingPrice,
+          initialStock: 0,
+          unit: confirmed.unit,
+          costPrice: confirmed.costPrice > 0 ? confirmed.costPrice : null,
+        );
+    if (!mounted) return;
+    if (err != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(err)));
+      return;
+    }
+
+    // Pull the refreshed catalog and link the row we just created.
+    await ref.read(posProvider.notifier).reloadProducts();
+    if (!mounted) return;
+    final created = _matchProduct(confirmed.name, ref.read(posProvider).products);
+    if (created != null) {
+      _linkProduct(index, created);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_l10n.procProductCreatedAndLinked(confirmed.name)),
+          backgroundColor: BrandColors.success,
+        ),
+      );
+    }
   }
 
   // ── Create Purchase Order ─────────────────────────────────────────────────
@@ -769,6 +840,7 @@ class _InvoiceScanSheetState extends ConsumerState<_InvoiceScanSheet> {
             _InvoiceItemTile(
               item: _items[i],
               onPick: () => _showProductPicker(i),
+              onCreate: () => _createProductFor(i),
             ),
             const SizedBox(height: 6),
           ],
@@ -957,10 +1029,183 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
+/// What the owner confirmed before we create a product from an invoice line.
+class _NewProductDraft {
+  final String name;
+  final int categoryId;
+  final double sellingPrice;
+  final double costPrice;
+  final String? unit;
+
+  const _NewProductDraft({
+    required this.name,
+    required this.categoryId,
+    required this.sellingPrice,
+    required this.costPrice,
+    this.unit,
+  });
+}
+
+/// Confirm sheet for creating a catalog product out of an unmatched invoice
+/// line (PAI-5). Everything is prefilled from the invoice except the selling
+/// price — the invoice only knows what the store *paid*, and guessing a retail
+/// price would put a zero-margin item on the till.
+class _NewProductFromInvoiceSheet extends StatefulWidget {
+  final String name;
+  final String? unit;
+  final double costPrice;
+  final List<Map<String, dynamic>> categories;
+
+  const _NewProductFromInvoiceSheet({
+    required this.name,
+    required this.unit,
+    required this.costPrice,
+    required this.categories,
+  });
+
+  @override
+  State<_NewProductFromInvoiceSheet> createState() =>
+      _NewProductFromInvoiceSheetState();
+}
+
+class _NewProductFromInvoiceSheetState
+    extends State<_NewProductFromInvoiceSheet> {
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _priceCtrl;
+  late int _categoryId;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController(text: widget.name);
+    _priceCtrl = TextEditingController();
+    _categoryId = (widget.categories.first['category_id'] as num).toInt();
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _priceCtrl.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final name = _nameCtrl.text.trim();
+    final price = double.tryParse(_priceCtrl.text.trim());
+    final l10n = AppLocalizations.of(context);
+    if (name.isEmpty || price == null || price <= 0) {
+      setState(() => _error = l10n.procEnterNameAndPrice);
+      return;
+    }
+    Navigator.pop(
+      context,
+      _NewProductDraft(
+        name: name,
+        categoryId: _categoryId,
+        sellingPrice: price,
+        costPrice: widget.costPrice,
+        unit: widget.unit,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        left: 20,
+        right: 20,
+        top: 16,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.procCreateProductTitle,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.procCreateProductHint,
+            style: const TextStyle(fontSize: 12, color: BrandColors.muted),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _nameCtrl,
+            decoration: InputDecoration(
+              labelText: l10n.procProductNameLabel,
+              isDense: true,
+            ),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            initialValue: _categoryId,
+            isDense: true,
+            decoration: InputDecoration(
+              labelText: l10n.procCategoryLabel,
+              isDense: true,
+            ),
+            items: [
+              for (final c in widget.categories)
+                DropdownMenuItem(
+                  value: (c['category_id'] as num).toInt(),
+                  child: Text((c['name'] ?? '').toString()),
+                ),
+            ],
+            onChanged: (v) => setState(() => _categoryId = v ?? _categoryId),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _priceCtrl,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              labelText: l10n.procSellingPriceLabel,
+              helperText: widget.costPrice > 0
+                  ? l10n.procCostFromInvoice(
+                      widget.costPrice.toStringAsFixed(2),
+                    )
+                  : null,
+              isDense: true,
+            ),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: const TextStyle(fontSize: 12, color: BrandColors.error),
+            ),
+          ],
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _submit,
+              child: Text(l10n.procCreateAndLink),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _InvoiceItemTile extends StatelessWidget {
   final _MappedItem item;
   final VoidCallback onPick;
-  const _InvoiceItemTile({required this.item, required this.onPick});
+  final VoidCallback onCreate;
+  const _InvoiceItemTile({
+    required this.item,
+    required this.onPick,
+    required this.onCreate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1027,7 +1272,24 @@ class _InvoiceItemTile extends StatelessWidget {
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
             ),
           if (!item.matched) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
+            // PAI-5 — nothing in the catalog matches this line. Rather than
+            // dropping it from the PO, let the owner create it right here.
+            TextButton(
+              onPressed: onCreate,
+              style: TextButton.styleFrom(
+                foregroundColor: BrandColors.success,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              ),
+              child: Text(
+                l10n.procNew,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
             TextButton(
               onPressed: onPick,
               style: TextButton.styleFrom(

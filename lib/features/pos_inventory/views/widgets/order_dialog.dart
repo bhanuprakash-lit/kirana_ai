@@ -394,6 +394,39 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
     }
   }
 
+  /// Chips for the coupons this cart already qualifies for. Silent when there
+  /// are none, when the bill is empty, or when the backend predates the route.
+  Widget _applicableCouponChips(PosState state) {
+    final amountPaise = (state.discountedSubtotal * 100).round();
+    if (amountPaise <= 0) return const SizedBox.shrink();
+    final list =
+        ref.watch(applicableCouponsProvider(amountPaise)).asData?.value ??
+        const <ApplicableCoupon>[];
+    if (list.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        children: [
+          for (final c in list.take(4))
+            ActionChip(
+              visualDensity: VisualDensity.compact,
+              avatar: const Icon(Icons.local_offer_rounded, size: 14),
+              label: Text(
+                '${c.code} · −${_fmt(c.discount)}',
+                style: const TextStyle(fontSize: 12),
+              ),
+              onPressed: () {
+                _couponCtrl.text = c.code;
+                _applyCoupon();
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLoyaltySection(PosState state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -414,6 +447,10 @@ class _OrderBottomSheetState extends ConsumerState<_OrderBottomSheet> {
             TextButton(onPressed: _applyCoupon, child: const Text('Apply')),
           ],
         ),
+        // PAI-16 — the code box alone meant the owner had to *remember* which
+        // of their coupons fits this bill. Offer the ones that already do,
+        // biggest saving first; tapping one runs the same apply path as typing.
+        if (!_couponOk) _applicableCouponChips(state),
         if (_couponMsg != null)
           Padding(
             padding: const EdgeInsets.only(left: 4, top: 2),

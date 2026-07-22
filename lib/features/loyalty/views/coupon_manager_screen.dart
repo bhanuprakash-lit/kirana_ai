@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/brand_theme.dart';
+import '../models/loyalty_models.dart';
 import '../providers/loyalty_provider.dart';
 
 class CouponManagerScreen extends ConsumerWidget {
@@ -48,6 +49,9 @@ class CouponManagerScreen extends ConsumerWidget {
                   border: Border.all(color: BrandColors.border),
                 ),
                 child: ListTile(
+                  // PAI-17 — coupons were create-and-toggle only; tapping a
+                  // row now opens the same editor in edit mode.
+                  onTap: () => _openEditor(context, ref, existing: c),
                   title: Text(
                     c.code,
                     style: const TextStyle(fontWeight: FontWeight.w800),
@@ -76,18 +80,20 @@ class CouponManagerScreen extends ConsumerWidget {
     );
   }
 
-  void _openEditor(BuildContext context, WidgetRef ref) {
+  void _openEditor(BuildContext context, WidgetRef ref, {Coupon? existing}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const _CouponEditor(),
+      builder: (_) => _CouponEditor(existing: existing),
     );
   }
 }
 
 class _CouponEditor extends ConsumerStatefulWidget {
-  const _CouponEditor();
+  /// Null = create a new coupon; non-null = edit that one.
+  final Coupon? existing;
+  const _CouponEditor({this.existing});
 
   @override
   ConsumerState<_CouponEditor> createState() => _CouponEditorState();
@@ -102,6 +108,31 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
   String _type = 'percent';
   bool _saving = false;
   String? _error;
+
+  Coupon? get _existing => widget.existing;
+  bool get _isEdit => _existing != null;
+
+  /// A redeemed coupon's code is frozen — it's how the owner recognises it in
+  /// redemption history, and the backend rejects the change anyway (409).
+  bool get _codeLocked => (_existing?.usedCount ?? 0) > 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final c = _existing;
+    if (c != null) {
+      _codeCtrl.text = c.code;
+      _valueCtrl.text = c.value.toStringAsFixed(
+        c.value == c.value.roundToDouble() ? 0 : 2,
+      );
+      if (c.minOrder > 0) _minCtrl.text = c.minOrder.toStringAsFixed(0);
+      if (c.maxDiscount != null) {
+        _maxCtrl.text = c.maxDiscount!.toStringAsFixed(0);
+      }
+      if (c.usageLimit != null) _limitCtrl.text = '${c.usageLimit}';
+      _type = c.discountType;
+    }
+  }
 
   @override
   void dispose() {
@@ -125,8 +156,7 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
       _error = null;
     });
     try {
-      await ref.read(loyaltyActionsProvider).createCoupon({
-        'code': code,
+      final body = <String, dynamic>{
         'discount_type': _type,
         'value': value,
         'min_order': double.tryParse(_minCtrl.text.trim()) ?? 0,
@@ -134,7 +164,16 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
           'max_discount': double.tryParse(_maxCtrl.text.trim()),
         if (_limitCtrl.text.trim().isNotEmpty)
           'usage_limit': int.tryParse(_limitCtrl.text.trim()),
-      });
+      };
+      final actions = ref.read(loyaltyActionsProvider);
+      if (_isEdit) {
+        // Only send the code when it's still editable, so a redeemed coupon
+        // can have its value/limits tuned without tripping the 409.
+        if (!_codeLocked) body['code'] = code;
+        await actions.updateCoupon(_existing!.couponId, body);
+      } else {
+        await actions.createCoupon({'code': code, ...body});
+      }
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
@@ -163,15 +202,19 @@ class _CouponEditorState extends ConsumerState<_CouponEditor> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'New coupon',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
+          Text(
+            _isEdit ? 'Edit coupon' : 'New coupon',
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _codeCtrl,
+            enabled: !_codeLocked,
             textCapitalization: TextCapitalization.characters,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              helperText: _codeLocked
+                  ? 'Already redeemed — the code is fixed'
+                  : null,
               labelText: 'Coupon code (e.g. SAVE10)',
             ),
           ),

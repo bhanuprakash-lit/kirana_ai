@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/api_client.dart';
 import '../services/usage_limits_service.dart';
+import '../store/store_scope.dart';
 
 class UsageLimitsState {
   final int voiceUsed;
@@ -105,7 +106,12 @@ class UsageLimitsState {
 
 class UsageLimitsNotifier extends AsyncNotifier<UsageLimitsState> {
   @override
-  Future<UsageLimitsState> build() => _fetch();
+  Future<UsageLimitsState> build() {
+    // The daily AI allowance is per (owner, store) since PAI-11/12 — without
+    // this the counts stay on the previous store's numbers after a switch.
+    ref.watch(storeScopeProvider);
+    return _fetch();
+  }
 
   Future<UsageLimitsState> _fetch() async {
     try {
