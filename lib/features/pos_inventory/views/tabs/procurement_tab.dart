@@ -12,6 +12,7 @@ import '../../providers/procurement_provider.dart';
 import '../../providers/inventory_provider.dart';
 import '../../providers/reorder_provider.dart';
 import '../widgets/invoice_scan_sheet.dart';
+import '../widgets/supplier_group.dart';
 
 class ProcurementTab extends ConsumerWidget {
   const ProcurementTab({super.key});
@@ -116,7 +117,11 @@ class ProcurementTab extends ConsumerWidget {
             if (data.purchases.isEmpty)
               _emptyState(l10n.procNoPurchaseOrdersYet)
             else
-              ...data.purchases.map((p) => _PurchaseOrderTile(order: p)),
+              ...groupPurchasesBySupplier(data.purchases).map(
+                (g) => g.orders.length == 1
+                    ? _PurchaseOrderTile(order: g.orders.first)
+                    : _SupplierPurchaseGroupTile(group: g),
+              ),
           ],
         ),
       ),
@@ -1661,9 +1666,53 @@ class _SupplierDashboardSheet extends ConsumerWidget {
   );
 }
 
+/// One supplier's purchases, collapsed behind an expandable header (PAI-6).
+class _SupplierPurchaseGroupTile extends StatelessWidget {
+  final SupplierPurchaseGroup group;
+  const _SupplierPurchaseGroupTile({required this.group});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final d = group.lastPurchase;
+    final outstanding = group.outstanding;
+    return SupplierGroupCard(
+      group: group,
+      // Open by default when something inside needs receiving, so the action
+      // isn't hidden behind a tap the owner doesn't know to make.
+      initiallyExpanded: group.awaitingReceipt > 0,
+      subtitle:
+          '${l10n.procPurchasesCount(group.orders.length)} · '
+          '${l10n.procLastOn('${d.day}/${d.month}/${d.year}')}'
+          '${group.awaitingReceipt > 0 ? ' · ${l10n.procToReceive(group.awaitingReceipt)}' : ''}',
+      trailing: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            '₹${(outstanding > 0 ? outstanding : group.total).toStringAsFixed(0)}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: outstanding > 0 ? BrandColors.error : BrandColors.ink,
+            ),
+          ),
+          Text(
+            outstanding > 0 ? l10n.procDue : l10n.procPaid,
+            style: const TextStyle(fontSize: 10, color: BrandColors.muted),
+          ),
+        ],
+      ),
+      rowBuilder: (o) => _PurchaseOrderTile(order: o, showSupplier: false),
+    );
+  }
+}
+
 class _PurchaseOrderTile extends ConsumerWidget {
   final PurchaseOrder order;
-  const _PurchaseOrderTile({required this.order});
+
+  /// False when the tile sits inside a supplier group, which already shows
+  /// the name — the date becomes the row's identity instead (PAI-6).
+  final bool showSupplier;
+  const _PurchaseOrderTile({required this.order, this.showSupplier = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1686,15 +1735,21 @@ class _PurchaseOrderTile extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      order.supplierName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    if (showSupplier)
+                      Text(
+                        order.supplierName,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     Text(
                       '${order.purchaseDate.day}/${order.purchaseDate.month}/${order.purchaseDate.year}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: BrandColors.muted,
+                      style: TextStyle(
+                        fontSize: showSupplier ? 12 : 13,
+                        fontWeight: showSupplier
+                            ? FontWeight.normal
+                            : FontWeight.w600,
+                        color: showSupplier
+                            ? BrandColors.muted
+                            : BrandColors.ink,
                       ),
                     ),
                   ],

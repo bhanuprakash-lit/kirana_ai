@@ -219,13 +219,13 @@ class _StaffScreenState extends ConsumerState<StaffScreen>
           StatefulBuilder(
             builder: (ctx, setState) => DropdownButtonFormField<int?>(
               initialValue: selectedStaffId,
-              decoration: const InputDecoration(
-                labelText: 'Assign to (optional)',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).stfAssignTo,
               ),
               items: [
-                const DropdownMenuItem<int?>(
+                DropdownMenuItem<int?>(
                   value: null,
-                  child: Text('Unassigned'),
+                  child: Text(AppLocalizations.of(context).stfUnassigned),
                 ),
                 ...staff.map(
                   (m) => DropdownMenuItem<int?>(
@@ -493,8 +493,10 @@ class _StaffCard extends ConsumerWidget {
                     const Divider(height: 20),
                     Expanded(
                       child: h.days.isEmpty
-                          ? const Center(
-                              child: Text('No attendance recorded yet.'),
+                          ? Center(
+                              child: Text(
+                                AppLocalizations.of(context).stfNoAttendance,
+                              ),
                             )
                           : ListView.builder(
                               controller: scrollController,

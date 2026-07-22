@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/api_client.dart';
 import '../../core/store/store_scope.dart';
 import '../../core/theme/brand_theme.dart';
+import '../../core/vertical/vertical_config_provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../pos_inventory/providers/pos_provider.dart';
 import '../pos_inventory/views/widgets/return_sheet.dart';
@@ -39,30 +40,50 @@ class FulfilmentScreen extends ConsumerStatefulWidget {
 }
 
 class _FulfilmentScreenState extends ConsumerState<FulfilmentScreen>
-    with SingleTickerProviderStateMixin {
-  late final _tabs = TabController(length: 2, vsync: this);
+    with TickerProviderStateMixin {
+  TabController? _tabs;
+  int _tabCount = 0;
+
+  /// PAI-18 — nobody hands a kirana a written quote; it's a boutique /
+  /// electronics / optical habit. Grocery keeps Returns (universal) and
+  /// loses the Estimates tab it would never use.
+  bool get _showEstimates =>
+      verticalConfigOf(ref).verticalCode != 'grocery';
+
   @override
   void dispose() {
-    _tabs.dispose();
+    _tabs?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final showEstimates = _showEstimates;
+    final count = showEstimates ? 2 : 1;
+    // The vertical config arrives asynchronously, so the tab count can change
+    // after first build — rebuild the controller when it does.
+    if (_tabs == null || _tabCount != count) {
+      _tabs?.dispose();
+      _tabs = TabController(length: count, vsync: this);
+      _tabCount = count;
+    }
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: Text(l10n.fulTitle),
+        title: Text(showEstimates ? l10n.fulTitle : l10n.fulTabReturns),
         bottom: TabBar(
           controller: _tabs,
           tabs: [
-            Tab(text: l10n.fulTabEstimates),
+            if (showEstimates) Tab(text: l10n.fulTabEstimates),
             Tab(text: l10n.fulTabReturns),
           ],
         ),
       ),
-      body: TabBarView(controller: _tabs, children: [_estimates(), _returns()]),
+      body: TabBarView(
+        controller: _tabs,
+        children: [if (showEstimates) _estimates(), _returns()],
+      ),
     );
   }
 
@@ -99,9 +120,13 @@ class _FulfilmentScreenState extends ConsumerState<FulfilmentScreen>
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
-                  itemCount: list.length,
+                  // +1 for the purpose banner: the empty state explained what
+                  // an estimate is for, but that text disappeared the moment
+                  // the owner had one (PAI-18).
+                  itemCount: list.length + 1,
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (_, i) => _EstimateTile(list[i]),
+                  itemBuilder: (_, i) =>
+                      i == 0 ? const _EstimatePurposeBanner() : _EstimateTile(list[i - 1]),
                 ),
         ),
         Positioned(
@@ -189,6 +214,48 @@ class _FulfilmentScreenState extends ConsumerState<FulfilmentScreen>
 }
 
 /// One estimate in the list — tap to open the detail (status / convert / share).
+/// One-line reminder of what estimates are for, kept above the list.
+///
+/// PAI-18: owners couldn't tell what the tab was. The explanation existed only
+/// in the empty state, so it vanished exactly when they had enough estimates to
+/// get confused about them.
+class _EstimatePurposeBanner extends StatelessWidget {
+  const _EstimatePurposeBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: BrandColors.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.info_outline_rounded,
+            size: 16,
+            color: BrandColors.primary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              l10n.estPurpose,
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.4,
+                color: BrandColors.ink,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _EstimateTile extends ConsumerWidget {
   final Map<String, dynamic> e;
   const _EstimateTile(this.e);

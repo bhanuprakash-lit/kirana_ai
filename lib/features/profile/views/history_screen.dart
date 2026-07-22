@@ -6,6 +6,7 @@ import 'package:kirana_ai/core/theme/brand_theme.dart';
 import 'package:kirana_ai/l10n/generated/app_localizations.dart';
 import 'package:kirana_ai/features/pos_inventory/models/procurement_models.dart';
 import 'package:kirana_ai/features/pos_inventory/providers/procurement_provider.dart';
+import 'package:kirana_ai/features/pos_inventory/views/widgets/supplier_group.dart';
 import 'package:kirana_ai/shared/widgets/shimmer_widgets.dart';
 // import '../../pos_inventory/providers/pos_provider.dart';
 
@@ -76,12 +77,17 @@ class _PurchaseHistoryList extends ConsumerWidget {
         if (data.purchases.isEmpty) {
           return Center(child: Text(l10n.psetNoPurchaseHistory));
         }
+        // PAI-13 — same grouping as Recent Purchases: one row per supplier,
+        // expanded to the individual bills on tap, so a supplier you buy from
+        // weekly doesn't repeat its name down the whole screen.
+        final groups = groupPurchasesBySupplier(data.purchases);
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: data.purchases.length,
+          itemCount: groups.length,
           itemBuilder: (ctx, index) {
-            final p = data.purchases[index];
-            return _PurchaseTile(order: p);
+            final g = groups[index];
+            if (g.orders.length == 1) return _PurchaseTile(order: g.orders.first);
+            return _SupplierHistoryGroup(group: g);
           },
         );
       },
@@ -89,9 +95,46 @@ class _PurchaseHistoryList extends ConsumerWidget {
   }
 }
 
+/// A supplier's purchase history, collapsed behind one header (PAI-13).
+class _SupplierHistoryGroup extends StatelessWidget {
+  final SupplierPurchaseGroup group;
+  const _SupplierHistoryGroup({required this.group});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final d = group.lastPurchase.toLocal();
+    final outstanding = group.outstanding;
+    return SupplierGroupCard(
+      group: group,
+      subtitle:
+          '${l10n.procPurchasesCount(group.orders.length)} · '
+          '${l10n.procLastOn(DateFormat('dd MMM yyyy').format(d))}',
+      trailing: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            '₹${group.total.toStringAsFixed(0)}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          if (outstanding > 0)
+            Text(
+              '₹${outstanding.toStringAsFixed(0)} ${l10n.procDue}',
+              style: const TextStyle(fontSize: 10, color: BrandColors.error),
+            ),
+        ],
+      ),
+      rowBuilder: (o) => _PurchaseTile(order: o, showSupplier: false),
+    );
+  }
+}
+
 class _PurchaseTile extends ConsumerWidget {
   final PurchaseOrder order;
-  const _PurchaseTile({required this.order});
+
+  /// Hidden inside a supplier group, which already names the supplier.
+  final bool showSupplier;
+  const _PurchaseTile({required this.order, this.showSupplier = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -116,18 +159,24 @@ class _PurchaseTile extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      order.supplierName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    if (showSupplier)
+                      Text(
+                        order.supplierName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
                     Text(
                       dateStr,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: BrandColors.muted,
+                      style: TextStyle(
+                        fontSize: showSupplier ? 12 : 14,
+                        fontWeight: showSupplier
+                            ? FontWeight.normal
+                            : FontWeight.bold,
+                        color: showSupplier
+                            ? BrandColors.muted
+                            : BrandColors.ink,
                       ),
                     ),
                   ],

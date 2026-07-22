@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/generated/app_localizations.dart';
+
 import '../../../core/theme/brand_theme.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../../profile/models/customer_model.dart';
@@ -35,13 +37,13 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
     return Scaffold(
       backgroundColor: BrandColors.background,
       appBar: AppBar(
-        title: const Text('Services & Appointments'),
+        title: Text(AppLocalizations.of(context).svcTitle),
         bottom: TabBar(
           controller: _tabs,
-          tabs: const [
-            Tab(text: 'Appointments'),
-            Tab(text: 'Services'),
-            Tab(text: 'Memberships'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context).svcTabAppointments),
+            Tab(text: AppLocalizations.of(context).svcTabServices),
+            Tab(text: AppLocalizations.of(context).svcTabMemberships),
           ],
         ),
       ),
@@ -67,14 +69,16 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
           ),
           data: (items) {
             if (items.isEmpty) {
-              return const Center(
+              return Center(
                 child: Padding(
-                  padding: EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(32),
                   child: Text(
-                    'No memberships yet.\nSell a prepaid bundle (e.g. 10 sessions) — '
-                    'redeem one session per visit at checkout or right here.',
+                    AppLocalizations.of(context).svcNoMemberships,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: BrandColors.muted, height: 1.5),
+                    style: const TextStyle(
+                      color: BrandColors.muted,
+                      height: 1.5,
+                    ),
                   ),
                 ),
               );
@@ -99,7 +103,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
               builder: (_) => const _MembershipEditor(),
             ),
             icon: const Icon(Icons.card_membership_rounded),
-            label: const Text('New membership'),
+            label: Text(AppLocalizations.of(context).svcNewMembership),
           ),
         ),
       ],
@@ -149,7 +153,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
             heroTag: 'bookAppt',
             onPressed: _book,
             icon: const Icon(Icons.event_available_rounded),
-            label: const Text('Book'),
+            label: Text(AppLocalizations.of(context).svcBook),
           ),
         ),
       ],
@@ -207,13 +211,13 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
           error: (e, _) => Center(child: Text('$e')),
           data: (list) {
             if (list.isEmpty) {
-              return const Center(
+              return Center(
                 child: Padding(
-                  padding: EdgeInsets.all(32),
+                  padding: const EdgeInsets.all(32),
                   child: Text(
-                    'No services yet. Add the services you offer.',
+                    AppLocalizations.of(context).svcNoServices,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: BrandColors.muted),
+                    style: const TextStyle(color: BrandColors.muted),
                   ),
                 ),
               );
@@ -262,7 +266,7 @@ class _ServicesScreenState extends ConsumerState<ServicesScreen>
             heroTag: 'addService',
             onPressed: _addService,
             icon: const Icon(Icons.add),
-            label: const Text('New service'),
+            label: Text(AppLocalizations.of(context).svcNewService),
           ),
         ),
       ],
@@ -369,16 +373,16 @@ class _AppointmentCard extends ConsumerWidget {
                   onPressed: () => ref
                       .read(serviceActionsProvider)
                       .setStatus(appt.appointmentId, 'cancelled', day),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(color: BrandColors.muted),
+                  child: Text(
+                    AppLocalizations.of(context).svcCancel,
+                    style: const TextStyle(color: BrandColors.muted),
                   ),
                 ),
                 FilledButton(
                   onPressed: () => ref
                       .read(serviceActionsProvider)
                       .setStatus(appt.appointmentId, 'completed', day),
-                  child: const Text('Complete'),
+                  child: Text(AppLocalizations.of(context).svcComplete),
                 ),
               ],
             ),
@@ -466,7 +470,9 @@ class _ServiceEditorState extends ConsumerState<_ServiceEditor> {
           const SizedBox(height: 16),
           TextField(
             controller: _nameCtrl,
-            decoration: const InputDecoration(labelText: 'Service name'),
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context).svcServiceName,
+            ),
           ),
           const SizedBox(height: 12),
           Row(
@@ -479,7 +485,9 @@ class _ServiceEditorState extends ConsumerState<_ServiceEditor> {
           const SizedBox(height: 12),
           TextField(
             controller: _catCtrl,
-            decoration: const InputDecoration(labelText: 'Category (optional)'),
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context).svcCategoryOptional,
+            ),
           ),
           if (_error != null) ...[
             const SizedBox(height: 12),
@@ -500,7 +508,7 @@ class _ServiceEditorState extends ConsumerState<_ServiceEditor> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Create service'),
+                  : Text(AppLocalizations.of(context).svcCreateService),
             ),
           ),
         ],
@@ -617,10 +625,10 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
               if (picked != null) setState(() => _customer = picked);
             },
             child: InputDecorator(
-              decoration: const InputDecoration(
-                labelText: 'Customer',
-                prefixIcon: Icon(Icons.person_outline_rounded),
-                suffixIcon: Icon(Icons.arrow_drop_down_rounded),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).svcCustomer,
+                prefixIcon: const Icon(Icons.person_outline_rounded),
+                suffixIcon: const Icon(Icons.arrow_drop_down_rounded),
               ),
               child: Text(
                 _customer == null
@@ -647,9 +655,9 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
               if (picked != null) setState(() => _date = picked);
             },
             child: InputDecorator(
-              decoration: const InputDecoration(
-                labelText: 'Date',
-                prefixIcon: Icon(Icons.calendar_today_rounded),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).svcDate,
+                prefixIcon: const Icon(Icons.calendar_today_rounded),
               ),
               child: Text('${_date.day}/${_date.month}/${_date.year}'),
             ),
@@ -658,7 +666,9 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
           DropdownButtonFormField<int>(
             initialValue: _serviceId,
             isExpanded: true,
-            decoration: const InputDecoration(labelText: 'Service'),
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context).svcService,
+            ),
             items: services
                 .map(
                   (s) => DropdownMenuItem(
@@ -671,9 +681,7 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
               setState(() {
                 _serviceId = v;
                 // Prefill the price from the service; stays editable.
-                final svc = services
-                    .where((s) => s.serviceId == v)
-                    .firstOrNull;
+                final svc = services.where((s) => s.serviceId == v).firstOrNull;
                 if (svc != null && svc.price > 0) {
                   _bookPriceCtrl.text = svc.price.toStringAsFixed(0);
                 }
@@ -684,8 +692,8 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
           TextField(
             controller: _bookPriceCtrl,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              labelText: 'Price (charged when billed)',
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context).svcPriceWhenBilled,
               prefixText: '₹ ',
             ),
           ),
@@ -699,9 +707,9 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
               if (t != null) setState(() => _time = t);
             },
             child: InputDecorator(
-              decoration: const InputDecoration(
-                labelText: 'Time',
-                prefixIcon: Icon(Icons.schedule_rounded),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).svcTime,
+                prefixIcon: const Icon(Icons.schedule_rounded),
               ),
               child: Text(_time.format(context)),
             ),
@@ -725,7 +733,7 @@ class _BookingSheetState extends ConsumerState<_BookingSheet> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Book'),
+                  : Text(AppLocalizations.of(context).svcBook),
             ),
           ),
         ],
@@ -799,7 +807,11 @@ class _MembershipCard extends ConsumerWidget {
                       .useMembershipSession(m.membershipId);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Session used')),
+                      SnackBar(
+                        content: Text(
+                          AppLocalizations.of(context).svcSessionUsed,
+                        ),
+                      ),
                     );
                   }
                 } catch (e) {
@@ -810,7 +822,7 @@ class _MembershipCard extends ConsumerWidget {
                   }
                 }
               },
-              child: const Text('Use session'),
+              child: Text(AppLocalizations.of(context).svcUseSession),
             )
           else
             Container(
@@ -866,9 +878,7 @@ class _MembershipEditorState extends ConsumerState<_MembershipEditor> {
     final name = _nameCtrl.text.trim();
     final price = double.tryParse(_priceCtrl.text.trim());
     if (_customer == null || name.isEmpty || price == null) {
-      setState(
-        () => _error = 'Pick a customer and fill the name and price.',
-      );
+      setState(() => _error = 'Pick a customer and fill the name and price.');
       return;
     }
     setState(() {
@@ -952,9 +962,9 @@ class _MembershipEditorState extends ConsumerState<_MembershipEditor> {
             TextField(
               controller: _nameCtrl,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Membership name (e.g. 10-session gym pass)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context).svcMembershipName,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
@@ -965,9 +975,9 @@ class _MembershipEditorState extends ConsumerState<_MembershipEditor> {
                     controller: _sessionsCtrl,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                      labelText: 'Sessions (0 = unlimited)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context).svcSessionsHint,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
@@ -978,10 +988,10 @@ class _MembershipEditorState extends ConsumerState<_MembershipEditor> {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    decoration: const InputDecoration(
-                      labelText: 'Price',
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context).svcPrice,
                       prefixText: '₹ ',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
@@ -1042,7 +1052,7 @@ class _MembershipEditorState extends ConsumerState<_MembershipEditor> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Sell membership'),
+                  : Text(AppLocalizations.of(context).svcSellMembership),
             ),
           ],
         ),
