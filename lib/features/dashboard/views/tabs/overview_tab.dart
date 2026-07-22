@@ -24,6 +24,7 @@ import '../../../subscription/widgets/trial_countdown_widget.dart';
 import '../../../stores/providers/stores_provider.dart';
 import '../../../stores/views/store_switcher_sheet.dart';
 import '../../models/overview_models.dart';
+import '../alert_navigation.dart';
 import '../../providers/kpi_provider.dart';
 import '../../providers/overview_provider.dart';
 import '../../../../core/tutorial/tutorial_controller.dart';
@@ -1293,28 +1294,8 @@ class _ProAlertsStrip extends ConsumerWidget {
     AlertType.subscription: Color(0xFF10B981),
   };
 
-  void _navigate(BuildContext context, WidgetRef ref, BusinessAlert alert) {
-    switch (alert.type) {
-      case AlertType.udhaar:
-        switchToNavTab(ref, NavTabId.khata); // Finance
-        ref
-            .read(financeSubTabProvider.notifier)
-            .setSubTab(1); // Customer Udhaar tab
-      case AlertType.performance:
-        switchToNavTab(ref, NavTabId.khata); // Finance
-        ref
-            .read(financeSubTabProvider.notifier)
-            .setSubTab(2); // Supplier Udhaar tab
-      case AlertType.lowStock:
-      case AlertType.expiry:
-        switchToNavTab(ref, NavTabId.billing); // POS/Inventory
-        ref
-            .read(dashboardSubTabProvider.notifier)
-            .setSubTab(1); // Inventory sub-tab
-      case AlertType.subscription:
-        context.push('/profile/subscription');
-    }
-  }
+  void _navigate(BuildContext context, WidgetRef ref, BusinessAlert alert) =>
+      openBusinessAlert(GoRouter.of(context), ref, alert);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1661,14 +1642,22 @@ class _VerticalKpiSection extends ConsumerWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: cards
-                      .map((c) => _VerticalKpiCardTile(card: c))
-                      .toList(),
+              // PAI-10 — one scrolling row instead of a Wrap. Wrapping pushed
+              // a vertical with several KPIs into 2–3 stacked rows, shoving
+              // everything below it off the fold; a horizontal strip keeps the
+              // home screen a fixed height however many cards land here.
+              SizedBox(
+                // Grows with the user's font scale so the card contents can't
+                // overflow a fixed strip at large accessibility sizes.
+                height:
+                    96 *
+                    MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.6),
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  itemCount: cards.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 10),
+                  itemBuilder: (_, i) => _VerticalKpiCardTile(card: cards[i]),
                 ),
               ),
             ],

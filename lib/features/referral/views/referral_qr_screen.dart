@@ -1,8 +1,13 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/brand_theme.dart';
@@ -177,6 +182,83 @@ class _QrView extends StatelessWidget {
 
   String get _qrData => 'KIRANA_REF:${token.tokenHash}';
 
+  String _message(AppLocalizations l10n) => l10n.mktReferralWhatsAppMessage(
+    customer.name,
+    token.tokenHash,
+    campaign.referralDiscountPct.toStringAsFixed(0),
+    campaign.milestoneEveryN,
+  );
+
+  /// Share the **QR image itself**, with the message as its caption.
+  ///
+  /// This used to send `token.tokenHash` as plain text — a 64-character hash
+  /// the customer can do nothing with, while the on-screen hint told the owner
+  /// to screenshot their own phone. The whole point of the screen is the code
+  /// the customer shows at the counter, so we render the QR to a PNG and send
+  /// that. The text still carries the code, so the referral survives even if a
+  /// recipient's client strips the attachment.
+  Future<void> _shareQr(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final painter = QrPainter(
+        data: _qrData,
+        version: QrVersions.auto,
+        gapless: true,
+        eyeStyle: const QrEyeStyle(
+          eyeShape: QrEyeShape.square,
+          color: Color(0xFF000000),
+        ),
+        dataModuleStyle: const QrDataModuleStyle(
+          dataModuleShape: QrDataModuleShape.square,
+          color: Color(0xFF000000),
+        ),
+      );
+
+      // Paint onto an opaque white card with a quiet zone. `toImageData` alone
+      // gives a transparent PNG, which renders as unscannable black-on-black
+      // in WhatsApp's dark mode, and scanners need the margin to lock on.
+      const qr = 1024.0;
+      const pad = 64.0;
+      const side = qr + pad * 2;
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      canvas.drawRect(
+        const Rect.fromLTWH(0, 0, side, side),
+        Paint()..color = const Color(0xFFFFFFFF),
+      );
+      canvas.translate(pad, pad);
+      painter.paint(canvas, const Size(qr, qr));
+      final image = await recorder.endRecording().toImage(
+        side.toInt(),
+        side.toInt(),
+      );
+      final picData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (picData == null) throw Exception('QR render failed');
+
+      final dir = await getTemporaryDirectory();
+      final safeName = customer.name.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '_');
+      final file = File('${dir.path}/referral_$safeName.png');
+      await file.writeAsBytes(picData.buffer.asUint8List(), flush: true);
+
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'image/png')],
+          text: _message(l10n),
+          subject: l10n.mktReferralQrCode,
+        ),
+      );
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.mktQrShareFailed)));
+      }
+    }
+  }
+
+  /// Text-only fallback straight into this customer's chat. Keeps the old
+  /// one-tap-to-the-right-contact behaviour, which the system share sheet
+  /// can't offer.
   Future<void> _sendWhatsApp(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     final phone = customer.phone.replaceAll(RegExp(r'\D'), '');
@@ -186,17 +268,11 @@ class _QrView extends StatelessWidget {
       ).showSnackBar(SnackBar(content: Text(l10n.mktNoPhoneForCustomer)));
       return;
     }
-    final message = Uri.encodeComponent(
-      l10n.mktReferralWhatsAppMessage(
-        customer.name,
-        token.tokenHash,
-        campaign.referralDiscountPct.toStringAsFixed(0),
-        campaign.milestoneEveryN,
-      ),
+    final uri = Uri.parse(
+      'https://wa.me/91$phone?text=${Uri.encodeComponent(_message(l10n))}',
     );
-    final uri = Uri.parse('whatsapp://send?phone=91$phone&text=$message');
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(
@@ -405,15 +481,26 @@ class _QrView extends StatelessWidget {
 
             const SizedBox(height: 28),
 
-            // Actions
+            // Actions — sharing the QR image is the primary path now.
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () => _sendWhatsApp(context),
-                icon: const Icon(Icons.send_rounded),
-                label: Text(l10n.mktSendViaWhatsApp),
+                onPressed: () => _shareQr(context),
+                icon: const Icon(Icons.ios_share_rounded),
+                label: Text(l10n.mktShareQrImage),
               ),
             ).animate(delay: 250.ms).fadeIn(),
+
+            const SizedBox(height: 8),
+
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: () => _sendWhatsApp(context),
+                icon: const Icon(Icons.send_rounded, size: 18),
+                label: Text(l10n.mktSendCodeAsText),
+              ),
+            ).animate(delay: 270.ms).fadeIn(),
 
             const SizedBox(height: 12),
 
