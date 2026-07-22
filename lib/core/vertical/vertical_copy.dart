@@ -73,7 +73,14 @@ String _genericString(AppLocalizations l10n, VSlot slot) {
 
 String? _verticalString(AppLocalizations l10n, String verticalCode, VSlot slot) {
   // Footwear shares apparel's trade language; grocery keeps the generics.
-  final code = verticalCode == 'footwear' ? 'apparel' : verticalCode;
+  // Trades that share apparel's shop-floor language, and bakery which speaks
+  // grocery's. Keeps one copy set per language family instead of per vertical.
+  const apparelFamily = {'footwear', 'boutique', 'sports_fitness', 'cosmetics'};
+  final code = apparelFamily.contains(verticalCode)
+      ? 'apparel'
+      : verticalCode == 'bakery'
+      ? 'grocery'
+      : verticalCode;
   switch (code) {
     case 'services':
       switch (slot) {

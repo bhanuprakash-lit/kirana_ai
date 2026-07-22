@@ -34,6 +34,10 @@ List<NavTabId> navPresetFor(String verticalCode) {
     // Estimates / returns are the boutique's paperwork.
     case 'apparel':
     case 'footwear':
+    // PAI-3 — split out of apparel; same day shape (sell, then paperwork).
+    case 'boutique':
+    case 'sports_fitness':
+    case 'cosmetics':
       return const [
         NavTabId.home,
         NavTabId.billing,
@@ -43,6 +47,15 @@ List<NavTabId> navPresetFor(String verticalCode) {
       ];
     // Plain retail: billing first, no extra module tab.
     case 'general':
+      return const [
+        NavTabId.home,
+        NavTabId.billing,
+        NavTabId.khata,
+        NavTabId.vision,
+      ];
+    // Bakery runs a grocery-shaped counter day, minus the shelf Vision that
+    // only recognises packaged kirana goods.
+    case 'bakery':
       return const [
         NavTabId.home,
         NavTabId.billing,

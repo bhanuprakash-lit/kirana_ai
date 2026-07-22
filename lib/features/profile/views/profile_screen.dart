@@ -174,7 +174,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   // V3 — apartment/hostel catchment marketing is a
                   // grocery-family play; salons/electronics don't run it.
-                  if (const {'grocery', 'general'}
+                  if (const {'grocery', 'general', 'bakery'}
                       .contains(verticalConfigOf(ref).verticalCode))
                     _CompactRow(
                       icon: Icons.location_city_rounded,
@@ -193,9 +193,13 @@ class ProfileScreen extends ConsumerWidget {
                     label: l10n.profStaff,
                     onTap: () => context.push('/profile/staff'),
                   ),
+                  // Grocery doesn't get the Estimates tab (PAI-18), so don't
+                  // promise it in the label either.
                   _CompactRow(
                     icon: Icons.receipt_long_outlined,
-                    label: l10n.profEstimatesReturns,
+                    label: verticalConfigOf(ref).verticalCode == 'grocery'
+                        ? l10n.fulTabReturns
+                        : l10n.profEstimatesReturns,
                     onTap: () => context.push('/profile/fulfilment'),
                   ),
                   _CompactRow(
@@ -241,7 +245,7 @@ class ProfileScreen extends ConsumerWidget {
                 rows: [
                   // V3 — combo/bundle tiers are grocery-family marketing;
                   // hidden for services/electronics/apparel/optical.
-                  if (const {'grocery', 'general'}
+                  if (const {'grocery', 'general', 'bakery'}
                       .contains(verticalConfigOf(ref).verticalCode))
                     _CompactRow(
                       icon: Icons.shopping_basket_rounded,

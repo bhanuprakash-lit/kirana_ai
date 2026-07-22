@@ -7,6 +7,10 @@ class OnboardingData {
   final String ownerName;
   final String storeName;
   final String businessType;
+
+  /// PAI-3 — for `mono_brand` only: which trade the outlet is in, which
+  /// becomes its `vertical_code`. Null for every other store type.
+  final String? monoBrandVertical;
   final int footfall;
   final double? budget; // owner's monthly sales target (₹); null = not provided
   final String address;
@@ -26,6 +30,7 @@ class OnboardingData {
     this.ownerName = '',
     this.storeName = '',
     this.businessType = '',
+    this.monoBrandVertical,
     this.footfall = 40,
     this.budget,
     this.address = '',
@@ -46,6 +51,7 @@ class OnboardingData {
     String? ownerName,
     String? storeName,
     String? businessType,
+    String? monoBrandVertical,
     int? footfall,
     double? budget,
     String? address,
@@ -64,6 +70,7 @@ class OnboardingData {
     ownerName: ownerName ?? this.ownerName,
     storeName: storeName ?? this.storeName,
     businessType: businessType ?? this.businessType,
+    monoBrandVertical: monoBrandVertical ?? this.monoBrandVertical,
     footfall: footfall ?? this.footfall,
     budget: budget ?? this.budget,
     address: address ?? this.address,

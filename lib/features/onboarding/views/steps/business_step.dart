@@ -11,23 +11,40 @@ import '../../providers/onboarding_provider.dart';
 /// Stable store-type codes (sent to the backend) paired with their localized
 /// label, resolved at build time. The stored value is always the code, so
 /// translating the label can never break the backend mapping.
+/// PAI-2 — "General Store", "Provision Store" and "Fruits & Vegetables" were
+/// removed: the first duplicated "Kirana / General Stores" and the others are
+/// the same grocery behaviour under different names, which only made the list
+/// harder to pick from. "Others" stays, so an unlisted trade still has a home.
 List<({String code, String label})> _businessTypes(AppLocalizations l10n) => [
   (code: 'kirana', label: l10n.businessTypeKirana),
   (code: 'supermarket', label: l10n.businessTypeSupermarket),
   (code: 'mini_supermarket', label: l10n.businessTypeMiniSupermarket),
-  (code: 'mono_brand', label: l10n.businessTypeMonoBrand),
+  (code: 'bakery', label: l10n.businessTypeBakery),
   (code: 'apparel', label: l10n.businessTypeApparel),
   (code: 'boutique', label: l10n.businessTypeBoutique),
-  (code: 'salon', label: l10n.businessTypeSalon),
-  (code: 'fancy_gift', label: l10n.businessTypeFancyGift),
-  (code: 'sports_fitness', label: l10n.businessTypeSportsFitness),
-  (code: 'electronics', label: l10n.businessTypeElectronics),
   (code: 'footwear', label: l10n.businessTypeFootwear),
+  (code: 'sports_fitness', label: l10n.businessTypeSportsFitness),
+  (code: 'cosmetics', label: l10n.businessTypeCosmetics),
+  (code: 'mono_brand', label: l10n.businessTypeMonoBrand),
+  (code: 'electronics', label: l10n.businessTypeElectronics),
   (code: 'optical', label: l10n.businessTypeOptical),
-  (code: 'bakery', label: l10n.businessTypeBakery),
+  (code: 'salon', label: l10n.businessTypeSalon),
   (code: 'stationery', label: l10n.businessTypeStationery),
-  (code: 'fruits_vegetables', label: l10n.businessTypeFruitsVeg),
+  (code: 'fancy_gift', label: l10n.businessTypeFancyGift),
   (code: 'other', label: l10n.businessTypeOthers),
+];
+
+/// PAI-3 — a mono-brand outlet can sell clothing, phones or cosmetics, so one
+/// fixed vertical is wrong in every direction. Asking what they sell keeps
+/// `store_type` as `mono_brand` while `vertical_code` carries the behaviour.
+List<({String vertical, String label})> _monoBrandTrades(
+  AppLocalizations l10n,
+) => [
+  (vertical: 'apparel', label: l10n.monoTradeClothing),
+  (vertical: 'footwear', label: l10n.monoTradeFootwear),
+  (vertical: 'electronics', label: l10n.monoTradeElectronics),
+  (vertical: 'cosmetics', label: l10n.monoTradeCosmetics),
+  (vertical: 'general', label: l10n.monoTradeOther),
 ];
 
 class BusinessStep extends ConsumerStatefulWidget {
@@ -56,6 +73,9 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
     super.dispose();
   }
 
+  /// Which trade a mono-brand store is in; drives `vertical_code`.
+  String? _monoTrade;
+
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     final notifier = ref.read(onboardingProvider.notifier);
@@ -68,6 +88,9 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
             storeName: _storeCtrl.text.trim(),
             email: _emailCtrl.text.trim(),
             businessType: _selectedType!,
+            monoBrandVertical: _selectedType == 'mono_brand'
+                ? _monoTrade
+                : null,
             footfall: int.tryParse(_footfallCtrl.text) ?? 40,
             budget: double.tryParse(_budgetCtrl.text.trim()),
           ),
@@ -154,13 +177,39 @@ class _BusinessStepState extends ConsumerState<BusinessStep> {
                         ),
                       )
                       .toList(),
-                  onChanged: (v) => setState(() => _selectedType = v),
+                  onChanged: (v) => setState(() {
+                    _selectedType = v;
+                    if (v != 'mono_brand') _monoTrade = null;
+                  }),
                   validator: (v) =>
                       v == null ? l10n.businessTypeRequired : null,
                 )
                 .animate(delay: 250.ms)
                 .fadeIn(duration: 400.ms)
                 .slideY(begin: 0.1, end: 0),
+            if (_selectedType == 'mono_brand') ...[
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                initialValue: _monoTrade,
+                decoration: InputDecoration(
+                  labelText: l10n.monoTradeLabel,
+                  helperText: l10n.monoTradeHelper,
+                ),
+                hint: Text(l10n.monoTradeHint),
+                isExpanded: true,
+                items: _monoBrandTrades(l10n)
+                    .map(
+                      (t) => DropdownMenuItem(
+                        value: t.vertical,
+                        child: Text(t.label),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (v) => setState(() => _monoTrade = v),
+                validator: (v) =>
+                    v == null ? l10n.monoTradeRequired : null,
+              ).animate().fadeIn(duration: 300.ms),
+            ],
             const SizedBox(height: 16),
             TextFormField(
                   controller: _footfallCtrl,

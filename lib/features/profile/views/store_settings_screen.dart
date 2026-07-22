@@ -29,6 +29,9 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
 
   // F1 — current vertical (switchable post-setup).
   String _verticalCode = 'grocery';
+  /// Must stay in sync with the `vertical_config` seed in the backend's
+  /// `_ensure_schema` — a code missing here silently falls back to grocery on
+  /// line 73, which is how an existing store would lose its profile.
   static const _verticals = <String>[
     'grocery',
     'apparel',
@@ -37,6 +40,11 @@ class _StoreSettingsScreenState extends ConsumerState<StoreSettingsScreen> {
     'optical',
     'services',
     'general',
+    // PAI-3
+    'bakery',
+    'boutique',
+    'sports_fitness',
+    'cosmetics',
   ];
 
   // V0.5 — store-level GST registration (drives the GST report row).
