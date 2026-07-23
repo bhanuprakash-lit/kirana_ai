@@ -12,7 +12,28 @@
           "package_name": "com.lohiya.kirana_ai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "335112026607-j1nb6bvsmutmbnqvo7l2piflps54avj7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lohiya.kirana_ai",
+            "certificate_hash": "bdcac1aa9623bac9d2a526c95e870bb5d7c2a2d3"
+          }
+        },
+        {
+          "client_id": "335112026607-jgmq9fugd58p9rbm14a4m2agi73huqr4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lohiya.kirana_ai",
+            "certificate_hash": "a8c41d067e8702f104e201e23f57b3e70de7d5a2"
+          }
+        },
+        {
+          "client_id": "335112026607-7au84tj75u4qs2vm690si1ohg3jfcsth.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBvdqBDVB6Wso_dX4cdSiQTuSfhWUrBcl0"
@@ -20,7 +41,20 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335112026607-7au84tj75u4qs2vm690si1ohg3jfcsth.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "335112026607-83kptffpj77ook9k3vk69edgskq9u51c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lohiya.kiranaAi",
+                "app_store_id": "6786605527"
+              }
+            }
+          ]
         }
       }
     }
