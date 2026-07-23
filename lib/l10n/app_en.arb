@@ -3641,5 +3641,12 @@
   "invGroupResetDefaults": "Reset to defaults",
   "invGroupSaved": "Groups updated",
   "invGroupNameHint": "Group name",
-  "invGroupPickCategories": "Pick categories"
+  "invGroupPickCategories": "Pick categories",
+  "forecastMetricRevenue": "Revenue",
+  "forecastMetricUnits": "Units",
+  "forecastMetricSkus": "Products",
+  "forecastMetricStockouts": "Stock-out risk",
+  "forecastShowProducts": "Show product list",
+  "forecastHideProducts": "Hide product list",
+  "forecastChartHint": "Tap a bar to see that period."
 }

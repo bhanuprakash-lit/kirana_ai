@@ -6493,4 +6493,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invGroupPickCategories => 'Pick categories';
+
+  @override
+  String get forecastMetricRevenue => 'Revenue';
+
+  @override
+  String get forecastMetricUnits => 'Units';
+
+  @override
+  String get forecastMetricSkus => 'Products';
+
+  @override
+  String get forecastMetricStockouts => 'Stock-out risk';
+
+  @override
+  String get forecastShowProducts => 'Show product list';
+
+  @override
+  String get forecastHideProducts => 'Hide product list';
+
+  @override
+  String get forecastChartHint => 'Tap a bar to see that period.';
 }

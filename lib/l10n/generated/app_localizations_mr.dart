@@ -6503,4 +6503,25 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get invGroupPickCategories => 'श्रेणी निवडा';
+
+  @override
+  String get forecastMetricRevenue => 'उत्पन्न';
+
+  @override
+  String get forecastMetricUnits => 'नग';
+
+  @override
+  String get forecastMetricSkus => 'उत्पादने';
+
+  @override
+  String get forecastMetricStockouts => 'स्टॉक संपण्याचा धोका';
+
+  @override
+  String get forecastShowProducts => 'उत्पादन यादी दाखवा';
+
+  @override
+  String get forecastHideProducts => 'उत्पादन यादी लपवा';
+
+  @override
+  String get forecastChartHint => 'तो कालावधी पाहण्यासाठी बारवर टॅप करा.';
 }

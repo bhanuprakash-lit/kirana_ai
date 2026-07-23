@@ -1905,5 +1905,12 @@
   "invGroupResetDefaults": "డిఫాల్ట్‌కి రీసెట్ చేయండి",
   "invGroupSaved": "గ్రూప్‌లు నవీకరించబడ్డాయి",
   "invGroupNameHint": "గ్రూప్ పేరు",
-  "invGroupPickCategories": "వర్గాలను ఎంచుకోండి"
+  "invGroupPickCategories": "వర్గాలను ఎంచుకోండి",
+  "forecastMetricRevenue": "ఆదాయం",
+  "forecastMetricUnits": "యూనిట్లు",
+  "forecastMetricSkus": "ఉత్పత్తులు",
+  "forecastMetricStockouts": "స్టాక్ అయిపోయే ప్రమాదం",
+  "forecastShowProducts": "ఉత్పత్తుల జాబితా చూపించు",
+  "forecastHideProducts": "ఉత్పత్తుల జాబితా దాచు",
+  "forecastChartHint": "ఆ కాలాన్ని చూడటానికి బార్‌ను నొక్కండి."
 }

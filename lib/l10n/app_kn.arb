@@ -1905,5 +1905,12 @@
   "invGroupResetDefaults": "ಡೀಫಾಲ್ಟ್‌ಗೆ ಮರುಹೊಂದಿಸಿ",
   "invGroupSaved": "ಗುಂಪುಗಳು ನವೀಕರಿಸಲಾಗಿದೆ",
   "invGroupNameHint": "ಗುಂಪಿನ ಹೆಸರು",
-  "invGroupPickCategories": "ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ"
+  "invGroupPickCategories": "ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+  "forecastMetricRevenue": "ಆದಾಯ",
+  "forecastMetricUnits": "ಘಟಕಗಳು",
+  "forecastMetricSkus": "ಉತ್ಪನ್ನಗಳು",
+  "forecastMetricStockouts": "ಸ್ಟಾಕ್ ಮುಗಿಯುವ ಅಪಾಯ",
+  "forecastShowProducts": "ಉತ್ಪನ್ನಗಳ ಪಟ್ಟಿ ತೋರಿಸಿ",
+  "forecastHideProducts": "ಉತ್ಪನ್ನಗಳ ಪಟ್ಟಿ ಮರೆಮಾಡಿ",
+  "forecastChartHint": "ಆ ಅವಧಿಯನ್ನು ನೋಡಲು ಬಾರ್ ಒತ್ತಿರಿ."
 }

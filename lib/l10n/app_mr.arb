@@ -1905,5 +1905,12 @@
   "invGroupResetDefaults": "डीफॉल्टवर रीसेट करा",
   "invGroupSaved": "गट अपडेट झाले",
   "invGroupNameHint": "गटाचे नाव",
-  "invGroupPickCategories": "श्रेणी निवडा"
+  "invGroupPickCategories": "श्रेणी निवडा",
+  "forecastMetricRevenue": "उत्पन्न",
+  "forecastMetricUnits": "नग",
+  "forecastMetricSkus": "उत्पादने",
+  "forecastMetricStockouts": "स्टॉक संपण्याचा धोका",
+  "forecastShowProducts": "उत्पादन यादी दाखवा",
+  "forecastHideProducts": "उत्पादन यादी लपवा",
+  "forecastChartHint": "तो कालावधी पाहण्यासाठी बारवर टॅप करा."
 }

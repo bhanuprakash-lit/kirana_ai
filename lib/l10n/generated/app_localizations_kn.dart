@@ -6525,4 +6525,25 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get invGroupPickCategories => 'ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ';
+
+  @override
+  String get forecastMetricRevenue => 'ಆದಾಯ';
+
+  @override
+  String get forecastMetricUnits => 'ಘಟಕಗಳು';
+
+  @override
+  String get forecastMetricSkus => 'ಉತ್ಪನ್ನಗಳು';
+
+  @override
+  String get forecastMetricStockouts => 'ಸ್ಟಾಕ್ ಮುಗಿಯುವ ಅಪಾಯ';
+
+  @override
+  String get forecastShowProducts => 'ಉತ್ಪನ್ನಗಳ ಪಟ್ಟಿ ತೋರಿಸಿ';
+
+  @override
+  String get forecastHideProducts => 'ಉತ್ಪನ್ನಗಳ ಪಟ್ಟಿ ಮರೆಮಾಡಿ';
+
+  @override
+  String get forecastChartHint => 'ಆ ಅವಧಿಯನ್ನು ನೋಡಲು ಬಾರ್ ಒತ್ತಿರಿ.';
 }

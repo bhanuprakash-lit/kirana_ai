@@ -11524,6 +11524,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick categories'**
   String get invGroupPickCategories;
+
+  /// No description provided for @forecastMetricRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue'**
+  String get forecastMetricRevenue;
+
+  /// No description provided for @forecastMetricUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Units'**
+  String get forecastMetricUnits;
+
+  /// No description provided for @forecastMetricSkus.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get forecastMetricSkus;
+
+  /// No description provided for @forecastMetricStockouts.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock-out risk'**
+  String get forecastMetricStockouts;
+
+  /// No description provided for @forecastShowProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Show product list'**
+  String get forecastShowProducts;
+
+  /// No description provided for @forecastHideProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide product list'**
+  String get forecastHideProducts;
+
+  /// No description provided for @forecastChartHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a bar to see that period.'**
+  String get forecastChartHint;
 }
 
 class _AppLocalizationsDelegate

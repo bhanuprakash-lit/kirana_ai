@@ -6494,4 +6494,25 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get invGroupPickCategories => 'వర్గాలను ఎంచుకోండి';
+
+  @override
+  String get forecastMetricRevenue => 'ఆదాయం';
+
+  @override
+  String get forecastMetricUnits => 'యూనిట్లు';
+
+  @override
+  String get forecastMetricSkus => 'ఉత్పత్తులు';
+
+  @override
+  String get forecastMetricStockouts => 'స్టాక్ అయిపోయే ప్రమాదం';
+
+  @override
+  String get forecastShowProducts => 'ఉత్పత్తుల జాబితా చూపించు';
+
+  @override
+  String get forecastHideProducts => 'ఉత్పత్తుల జాబితా దాచు';
+
+  @override
+  String get forecastChartHint => 'ఆ కాలాన్ని చూడటానికి బార్‌ను నొక్కండి.';
 }

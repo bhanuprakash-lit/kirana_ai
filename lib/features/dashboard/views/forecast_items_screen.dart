@@ -6,6 +6,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
 import '../models/forecast_model.dart';
 import '../providers/forecast_provider.dart';
+import 'widgets/forecast_horizon_chart.dart';
 
 class ForecastItemsScreen extends ConsumerStatefulWidget {
   final int storeId;
@@ -24,6 +25,11 @@ class ForecastItemsScreen extends ConsumerStatefulWidget {
 
 class _ForecastItemsScreenState extends ConsumerState<ForecastItemsScreen> {
   late int _horizonDays;
+  ForecastMetric _metric = ForecastMetric.revenue;
+
+  /// Collapsed by default — the chart answers the common question, and the
+  /// list is what made this screen unusable on a deep catalog.
+  bool _showProducts = false;
 
   static const _horizons = [1, 3, 5, 7, 14, 30];
 
@@ -54,6 +60,29 @@ class _ForecastItemsScreenState extends ConsumerState<ForecastItemsScreen> {
     if (v >= 100000) return '₹${(v / 100000).toStringAsFixed(1)}L';
     if (v >= 1000) return '₹${(v / 1000).toStringAsFixed(1)}K';
     return '₹${v.toStringAsFixed(0)}';
+  }
+
+  /// Short axis label — the chart has six columns on a phone, so "Tomorrow"
+  /// doesn't fit.
+  String _barLabel(AppLocalizations l10n, int days) =>
+      days == 1 ? l10n.forecastHorizonTomorrow.split(' ').first : '${days}d';
+
+  /// The bar height for a horizon, per the selected metric. A horizon that
+  /// hasn't loaded contributes 0 and is drawn as a ghost bar.
+  double _metricValue(ForecastItemsPage? page) {
+    if (page == null) return 0;
+    return switch (_metric) {
+      ForecastMetric.revenue => page.totalPredictedRevenue,
+      ForecastMetric.units => page.totalPredictedUnits,
+      ForecastMetric.skus => page.totalItems.toDouble(),
+      ForecastMetric.stockouts => page.itemsAtOosRisk.toDouble(),
+    };
+  }
+
+  String _metricLabel(ForecastMetric metric, double v) {
+    if (metric == ForecastMetric.revenue) return _fmt(v);
+    if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}K';
+    return v.round().toString();
   }
 
   @override
@@ -101,6 +130,20 @@ class _ForecastItemsScreenState extends ConsumerState<ForecastItemsScreen> {
                 if (page.items.isEmpty) {
                   return _EmptyState(message: l10n.forecastNoData);
                 }
+
+                // Every horizon is already in memory (they're all watched
+                // above), so the chart is a re-read of fetched data — changing
+                // metric or horizon costs no request.
+                final bars = [
+                  for (final h in _horizons)
+                    ForecastBar(
+                      horizonDays: h,
+                      label: _barLabel(l10n, h),
+                      value: _metricValue(allAsync[h]!.asData?.value),
+                      hasData: allAsync[h]!.asData?.value != null,
+                    ),
+                ];
+
                 return RefreshIndicator.adaptive(
                   onRefresh: () => ref.refresh(
                     forecastItemsProvider((
@@ -109,25 +152,75 @@ class _ForecastItemsScreenState extends ConsumerState<ForecastItemsScreen> {
                     )).future,
                   ),
                   color: BrandColors.success,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                    itemCount: page.items.length + 1,
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
-                    itemBuilder: (context, i) {
-                      if (i == 0) {
-                        return _SummaryHeader(
-                          page: page,
-                          fmt: _fmt,
-                          l10n: l10n,
-                        );
-                      }
-                      return _ForecastItemTile(
-                        item: page.items[i - 1],
-                        horizonDays: _horizonDays,
-                        fmt: _fmt,
-                        l10n: l10n,
-                      );
-                    },
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        sliver: SliverList.list(
+                          children: [
+                            ForecastMetricChips(
+                              selected: _metric,
+                              onSelect: (m) => setState(() => _metric = m),
+                            ),
+                            const SizedBox(height: 10),
+                            ForecastHorizonChart(
+                              bars: bars,
+                              metric: _metric,
+                              selectedHorizon: _horizonDays,
+                              onSelect: (d) =>
+                                  setState(() => _horizonDays = d),
+                              format: _metricLabel,
+                            ),
+                            const SizedBox(height: 6),
+                            Center(
+                              child: Text(
+                                l10n.forecastChartHint,
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  color: BrandColors.muted,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _SummaryHeader(page: page, fmt: _fmt, l10n: l10n),
+                            const SizedBox(height: 12),
+                            // The list is the expensive part — a store with a
+                            // deep catalog can't usefully scroll it, and it
+                            // buried the numbers it was meant to support. It
+                            // stays one tap away rather than being the default.
+                            _ExpandProductsButton(
+                              expanded: _showProducts,
+                              count: page.items.length,
+                              label: _showProducts
+                                  ? l10n.forecastHideProducts
+                                  : l10n.forecastShowProducts,
+                              onTap: () => setState(
+                                () => _showProducts = !_showProducts,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_showProducts)
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                          // Built lazily: expanding must not construct every
+                          // tile at once.
+                          sliver: SliverList.separated(
+                            itemCount: page.items.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (context, i) => _ForecastItemTile(
+                              item: page.items[i],
+                              horizonDays: _horizonDays,
+                              fmt: _fmt,
+                              l10n: l10n,
+                            ),
+                          ),
+                        )
+                      else
+                        const SliverToBoxAdapter(child: SizedBox(height: 90)),
+                    ],
                   ),
                 );
               },
@@ -816,6 +909,67 @@ class _EmptyState extends StatelessWidget {
                 color: BrandColors.muted,
                 fontWeight: FontWeight.w500,
                 height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Expand / collapse the product list ───────────────────────────────────────
+
+class _ExpandProductsButton extends StatelessWidget {
+  final bool expanded;
+  final int count;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ExpandProductsButton({
+    required this.expanded,
+    required this.count,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: BrandColors.border),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              expanded
+                  ? Icons.keyboard_arrow_up_rounded
+                  : Icons.format_list_bulleted_rounded,
+              size: 20,
+              color: BrandColors.primary,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13.5,
+                ),
+              ),
+            ),
+            Text(
+              '$count',
+              style: const TextStyle(
+                color: BrandColors.muted,
+                fontWeight: FontWeight.w600,
+                fontSize: 12.5,
               ),
             ),
           ],

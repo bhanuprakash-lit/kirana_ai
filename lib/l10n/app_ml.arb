@@ -1905,5 +1905,12 @@
   "invGroupResetDefaults": "ഡിഫോൾട്ടിലേക്ക് പുനഃസജ്ജമാക്കുക",
   "invGroupSaved": "ഗ്രൂപ്പുകൾ പുതുക്കി",
   "invGroupNameHint": "ഗ്രൂപ്പിന്റെ പേര്",
-  "invGroupPickCategories": "വിഭാഗങ്ങൾ തിരഞ്ഞെടുക്കുക"
+  "invGroupPickCategories": "വിഭാഗങ്ങൾ തിരഞ്ഞെടുക്കുക",
+  "forecastMetricRevenue": "വരുമാനം",
+  "forecastMetricUnits": "യൂണിറ്റുകൾ",
+  "forecastMetricSkus": "ഉൽപ്പന്നങ്ങൾ",
+  "forecastMetricStockouts": "സ്റ്റോക്ക് തീരാനുള്ള സാധ്യത",
+  "forecastShowProducts": "ഉൽപ്പന്ന പട്ടിക കാണിക്കുക",
+  "forecastHideProducts": "ഉൽപ്പന്ന പട്ടിക മറയ്ക്കുക",
+  "forecastChartHint": "ആ കാലയളവ് കാണാൻ ബാറിൽ ടാപ്പ് ചെയ്യുക."
 }

@@ -6575,4 +6575,26 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get invGroupPickCategories => 'பிரிவுகளைத் தேர்ந்தெடு';
+
+  @override
+  String get forecastMetricRevenue => 'வருவாய்';
+
+  @override
+  String get forecastMetricUnits => 'அலகுகள்';
+
+  @override
+  String get forecastMetricSkus => 'பொருட்கள்';
+
+  @override
+  String get forecastMetricStockouts => 'இருப்பு தீரும் அபாயம்';
+
+  @override
+  String get forecastShowProducts => 'பொருட்கள் பட்டியலைக் காட்டு';
+
+  @override
+  String get forecastHideProducts => 'பொருட்கள் பட்டியலை மறை';
+
+  @override
+  String get forecastChartHint =>
+      'அந்தக் காலத்தைப் பார்க்க பட்டியைத் தட்டவும்.';
 }

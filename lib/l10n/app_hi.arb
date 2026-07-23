@@ -1905,5 +1905,12 @@
   "invGroupResetDefaults": "डिफ़ॉल्ट पर लौटें",
   "invGroupSaved": "समूह अपडेट हो गए",
   "invGroupNameHint": "समूह का नाम",
-  "invGroupPickCategories": "श्रेणियाँ चुनें"
+  "invGroupPickCategories": "श्रेणियाँ चुनें",
+  "forecastMetricRevenue": "आमदनी",
+  "forecastMetricUnits": "मात्रा",
+  "forecastMetricSkus": "उत्पाद",
+  "forecastMetricStockouts": "स्टॉक खत्म होने का जोखिम",
+  "forecastShowProducts": "उत्पाद सूची दिखाएँ",
+  "forecastHideProducts": "उत्पाद सूची छिपाएँ",
+  "forecastChartHint": "किसी बार पर टैप करके वह अवधि देखें।"
 }

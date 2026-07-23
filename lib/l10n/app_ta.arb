@@ -1905,5 +1905,12 @@
   "invGroupResetDefaults": "இயல்புநிலைக்கு மீட்டமை",
   "invGroupSaved": "குழுக்கள் புதுப்பிக்கப்பட்டன",
   "invGroupNameHint": "குழுவின் பெயர்",
-  "invGroupPickCategories": "பிரிவுகளைத் தேர்ந்தெடு"
+  "invGroupPickCategories": "பிரிவுகளைத் தேர்ந்தெடு",
+  "forecastMetricRevenue": "வருவாய்",
+  "forecastMetricUnits": "அலகுகள்",
+  "forecastMetricSkus": "பொருட்கள்",
+  "forecastMetricStockouts": "இருப்பு தீரும் அபாயம்",
+  "forecastShowProducts": "பொருட்கள் பட்டியலைக் காட்டு",
+  "forecastHideProducts": "பொருட்கள் பட்டியலை மறை",
+  "forecastChartHint": "அந்தக் காலத்தைப் பார்க்க பட்டியைத் தட்டவும்."
 }

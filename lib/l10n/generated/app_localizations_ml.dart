@@ -6572,4 +6572,25 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get invGroupPickCategories => 'വിഭാഗങ്ങൾ തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get forecastMetricRevenue => 'വരുമാനം';
+
+  @override
+  String get forecastMetricUnits => 'യൂണിറ്റുകൾ';
+
+  @override
+  String get forecastMetricSkus => 'ഉൽപ്പന്നങ്ങൾ';
+
+  @override
+  String get forecastMetricStockouts => 'സ്റ്റോക്ക് തീരാനുള്ള സാധ്യത';
+
+  @override
+  String get forecastShowProducts => 'ഉൽപ്പന്ന പട്ടിക കാണിക്കുക';
+
+  @override
+  String get forecastHideProducts => 'ഉൽപ്പന്ന പട്ടിക മറയ്ക്കുക';
+
+  @override
+  String get forecastChartHint => 'ആ കാലയളവ് കാണാൻ ബാറിൽ ടാപ്പ് ചെയ്യുക.';
 }
