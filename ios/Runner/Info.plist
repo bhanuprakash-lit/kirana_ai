@@ -30,6 +30,38 @@
 				<string>kiranaai</string>
 			</array>
 		</dict>
+		<!--
+		  Firebase Phone Auth callback scheme (REVERSED_CLIENT_ID). FirebaseAuth's
+		  verifyPhoneNumber() calls fatalError() up front unless its callback scheme
+		  is registered here. With an iOS OAuth client present in
+		  GoogleService-Info.plist it uses the reversed client ID; this must match
+		  REVERSED_CLIENT_ID exactly.
+		-->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>firebase-reversed-client-id</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.335112026607-83kptffpj77ook9k3vk69edgskq9u51c</string>
+			</array>
+		</dict>
+		<!--
+		  Fallback callback scheme "app-<GOOGLE_APP_ID with colons dashed>", used by
+		  FirebaseAuth if no OAuth client / reversed client ID is available. Kept as a
+		  safety net so phone auth never fatal-errors even if the plist loses CLIENT_ID.
+		-->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>firebase-phone-auth-fallback</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-335112026607-ios-6f8e8fde83cbdcfb1ede1a</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
@@ -51,6 +83,8 @@
 	<string>Camera is required to scan barcodes and invoices.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>We need access to your contacts to add udhaar entries</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location is used to verify store transactions and delivery tracking.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Location is used to verify store transactions and delivery tracking.</string>
 	<key>NSMicrophoneUsageDescription</key>
