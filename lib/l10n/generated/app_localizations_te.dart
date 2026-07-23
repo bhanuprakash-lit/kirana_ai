@@ -6428,4 +6428,70 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get visionModelSettingUp => 'మీ కౌంటర్ సిద్ధం చేస్తున్నాం';
+
+  @override
+  String get catGroupStaplesCooking => 'నిత్యావసరాలు & వంట';
+
+  @override
+  String get catGroupKidsTreats => 'పిల్లలు & స్నాక్స్';
+
+  @override
+  String get catGroupSnacksNamkeen => 'స్నాక్స్ & నమ్కీన్';
+
+  @override
+  String get catGroupBeverages => 'పానీయాలు';
+
+  @override
+  String get catGroupPersonalCare => 'వ్యక్తిగత సంరక్షణ';
+
+  @override
+  String get catGroupBreakfastInstant => 'అల్పాహారం & ఇన్‌స్టంట్';
+
+  @override
+  String get catGroupHouseholdNeeds => 'గృహ అవసరాలు';
+
+  @override
+  String get catGroupDairyBakery => 'పాల ఉత్పత్తులు & బేకరీ';
+
+  @override
+  String get catGroupFreshProduce => 'తాజా కూరగాయలు & పండ్లు';
+
+  @override
+  String get catGroupSaucesSpreads => 'సాస్‌లు & స్ప్రెడ్‌లు';
+
+  @override
+  String get invGroupAll => 'అన్నీ';
+
+  @override
+  String get invGroupOther => 'ఇతర';
+
+  @override
+  String get invManageGroups => 'గ్రూప్‌లను నిర్వహించండి';
+
+  @override
+  String get invGroupsTitle => 'వర్గ గ్రూప్‌లు';
+
+  @override
+  String get invGroupsHint => 'మీ షెల్ఫ్‌లను మీకు నచ్చినట్టు గ్రూప్ చేసుకోండి.';
+
+  @override
+  String get invGroupRename => 'పేరు మార్చండి';
+
+  @override
+  String get invGroupDelete => 'గ్రూప్ తొలగించండి';
+
+  @override
+  String get invGroupNew => 'కొత్త గ్రూప్';
+
+  @override
+  String get invGroupResetDefaults => 'డిఫాల్ట్‌కి రీసెట్ చేయండి';
+
+  @override
+  String get invGroupSaved => 'గ్రూప్‌లు నవీకరించబడ్డాయి';
+
+  @override
+  String get invGroupNameHint => 'గ్రూప్ పేరు';
+
+  @override
+  String get invGroupPickCategories => 'వర్గాలను ఎంచుకోండి';
 }

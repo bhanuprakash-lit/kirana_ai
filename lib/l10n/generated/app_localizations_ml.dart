@@ -6505,4 +6505,71 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get visionModelSettingUp => 'നിങ്ങളുടെ കൗണ്ടർ സജ്ജമാക്കുന്നു';
+
+  @override
+  String get catGroupStaplesCooking => 'പലവ്യഞ്ജനം & പാചകം';
+
+  @override
+  String get catGroupKidsTreats => 'കുട്ടികൾ & പലഹാരം';
+
+  @override
+  String get catGroupSnacksNamkeen => 'സ്നാക്ക്സ് & നംകീൻ';
+
+  @override
+  String get catGroupBeverages => 'പാനീയങ്ങൾ';
+
+  @override
+  String get catGroupPersonalCare => 'വ്യക്തിഗത പരിചരണം';
+
+  @override
+  String get catGroupBreakfastInstant => 'പ്രഭാതഭക്ഷണം & ഇൻസ്റ്റന്റ്';
+
+  @override
+  String get catGroupHouseholdNeeds => 'വീട്ടാവശ്യങ്ങൾ';
+
+  @override
+  String get catGroupDairyBakery => 'പാൽ ഉൽപ്പന്നം & ബേക്കറി';
+
+  @override
+  String get catGroupFreshProduce => 'പച്ചക്കറി & പഴം';
+
+  @override
+  String get catGroupSaucesSpreads => 'സോസ് & സ്പ്രെഡ്';
+
+  @override
+  String get invGroupAll => 'എല്ലാം';
+
+  @override
+  String get invGroupOther => 'മറ്റുള്ളവ';
+
+  @override
+  String get invManageGroups => 'ഗ്രൂപ്പുകൾ കൈകാര്യം ചെയ്യുക';
+
+  @override
+  String get invGroupsTitle => 'വിഭാഗ ഗ്രൂപ്പുകൾ';
+
+  @override
+  String get invGroupsHint =>
+      'നിങ്ങളുടെ ഷെൽഫുകൾ നിങ്ങൾക്ക് ഇഷ്ടമുള്ളതുപോലെ ഗ്രൂപ്പ് ചെയ്യുക.';
+
+  @override
+  String get invGroupRename => 'പേര് മാറ്റുക';
+
+  @override
+  String get invGroupDelete => 'ഗ്രൂപ്പ് ഇല്ലാതാക്കുക';
+
+  @override
+  String get invGroupNew => 'പുതിയ ഗ്രൂപ്പ്';
+
+  @override
+  String get invGroupResetDefaults => 'ഡിഫോൾട്ടിലേക്ക് പുനഃസജ്ജമാക്കുക';
+
+  @override
+  String get invGroupSaved => 'ഗ്രൂപ്പുകൾ പുതുക്കി';
+
+  @override
+  String get invGroupNameHint => 'ഗ്രൂപ്പിന്റെ പേര്';
+
+  @override
+  String get invGroupPickCategories => 'വിഭാഗങ്ങൾ തിരഞ്ഞെടുക്കുക';
 }

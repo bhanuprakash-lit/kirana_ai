@@ -6508,4 +6508,71 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get visionModelSettingUp => 'உங்கள் கவுண்டர் தயார் செய்யப்படுகிறது';
+
+  @override
+  String get catGroupStaplesCooking => 'மளிகை & சமையல்';
+
+  @override
+  String get catGroupKidsTreats => 'குழந்தைகள் & இனிப்புகள்';
+
+  @override
+  String get catGroupSnacksNamkeen => 'தின்பண்டங்கள் & நம்கீன்';
+
+  @override
+  String get catGroupBeverages => 'பானங்கள்';
+
+  @override
+  String get catGroupPersonalCare => 'தனிநபர் பராமரிப்பு';
+
+  @override
+  String get catGroupBreakfastInstant => 'காலை உணவு & இன்ஸ்டன்ட்';
+
+  @override
+  String get catGroupHouseholdNeeds => 'வீட்டுத் தேவைகள்';
+
+  @override
+  String get catGroupDairyBakery => 'பால் & பேக்கரி';
+
+  @override
+  String get catGroupFreshProduce => 'புதிய காய்கறி & பழம்';
+
+  @override
+  String get catGroupSaucesSpreads => 'சாஸ் & ஸ்ப்ரெட்';
+
+  @override
+  String get invGroupAll => 'அனைத்தும்';
+
+  @override
+  String get invGroupOther => 'மற்றவை';
+
+  @override
+  String get invManageGroups => 'குழுக்களை நிர்வகி';
+
+  @override
+  String get invGroupsTitle => 'பிரிவு குழுக்கள்';
+
+  @override
+  String get invGroupsHint =>
+      'உங்கள் அலமாரிகளை நீங்கள் நினைப்பது போல் தொகுக்கவும்.';
+
+  @override
+  String get invGroupRename => 'பெயர் மாற்று';
+
+  @override
+  String get invGroupDelete => 'குழுவை நீக்கு';
+
+  @override
+  String get invGroupNew => 'புதிய குழு';
+
+  @override
+  String get invGroupResetDefaults => 'இயல்புநிலைக்கு மீட்டமை';
+
+  @override
+  String get invGroupSaved => 'குழுக்கள் புதுப்பிக்கப்பட்டன';
+
+  @override
+  String get invGroupNameHint => 'குழுவின் பெயர்';
+
+  @override
+  String get invGroupPickCategories => 'பிரிவுகளைத் தேர்ந்தெடு';
 }

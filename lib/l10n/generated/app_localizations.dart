@@ -11392,6 +11392,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Setting up your counter'**
   String get visionModelSettingUp;
+
+  /// No description provided for @catGroupStaplesCooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Staples & cooking'**
+  String get catGroupStaplesCooking;
+
+  /// No description provided for @catGroupKidsTreats.
+  ///
+  /// In en, this message translates to:
+  /// **'Kids & treats'**
+  String get catGroupKidsTreats;
+
+  /// No description provided for @catGroupSnacksNamkeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Snacks & namkeen'**
+  String get catGroupSnacksNamkeen;
+
+  /// No description provided for @catGroupBeverages.
+  ///
+  /// In en, this message translates to:
+  /// **'Beverages'**
+  String get catGroupBeverages;
+
+  /// No description provided for @catGroupPersonalCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal care'**
+  String get catGroupPersonalCare;
+
+  /// No description provided for @catGroupBreakfastInstant.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast & instant'**
+  String get catGroupBreakfastInstant;
+
+  /// No description provided for @catGroupHouseholdNeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Household needs'**
+  String get catGroupHouseholdNeeds;
+
+  /// No description provided for @catGroupDairyBakery.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy & bakery'**
+  String get catGroupDairyBakery;
+
+  /// No description provided for @catGroupFreshProduce.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh produce'**
+  String get catGroupFreshProduce;
+
+  /// No description provided for @catGroupSaucesSpreads.
+  ///
+  /// In en, this message translates to:
+  /// **'Sauces & spreads'**
+  String get catGroupSaucesSpreads;
+
+  /// No description provided for @invGroupAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get invGroupAll;
+
+  /// No description provided for @invGroupOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get invGroupOther;
+
+  /// No description provided for @invManageGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage groups'**
+  String get invManageGroups;
+
+  /// No description provided for @invGroupsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Category groups'**
+  String get invGroupsTitle;
+
+  /// No description provided for @invGroupsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Group your shelves the way you think of them.'**
+  String get invGroupsHint;
+
+  /// No description provided for @invGroupRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get invGroupRename;
+
+  /// No description provided for @invGroupDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group'**
+  String get invGroupDelete;
+
+  /// No description provided for @invGroupNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get invGroupNew;
+
+  /// No description provided for @invGroupResetDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to defaults'**
+  String get invGroupResetDefaults;
+
+  /// No description provided for @invGroupSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups updated'**
+  String get invGroupSaved;
+
+  /// No description provided for @invGroupNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get invGroupNameHint;
+
+  /// No description provided for @invGroupPickCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick categories'**
+  String get invGroupPickCategories;
 }
 
 class _AppLocalizationsDelegate

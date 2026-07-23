@@ -6427,4 +6427,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get visionModelSettingUp => 'Setting up your counter';
+
+  @override
+  String get catGroupStaplesCooking => 'Staples & cooking';
+
+  @override
+  String get catGroupKidsTreats => 'Kids & treats';
+
+  @override
+  String get catGroupSnacksNamkeen => 'Snacks & namkeen';
+
+  @override
+  String get catGroupBeverages => 'Beverages';
+
+  @override
+  String get catGroupPersonalCare => 'Personal care';
+
+  @override
+  String get catGroupBreakfastInstant => 'Breakfast & instant';
+
+  @override
+  String get catGroupHouseholdNeeds => 'Household needs';
+
+  @override
+  String get catGroupDairyBakery => 'Dairy & bakery';
+
+  @override
+  String get catGroupFreshProduce => 'Fresh produce';
+
+  @override
+  String get catGroupSaucesSpreads => 'Sauces & spreads';
+
+  @override
+  String get invGroupAll => 'All';
+
+  @override
+  String get invGroupOther => 'Other';
+
+  @override
+  String get invManageGroups => 'Manage groups';
+
+  @override
+  String get invGroupsTitle => 'Category groups';
+
+  @override
+  String get invGroupsHint => 'Group your shelves the way you think of them.';
+
+  @override
+  String get invGroupRename => 'Rename';
+
+  @override
+  String get invGroupDelete => 'Delete group';
+
+  @override
+  String get invGroupNew => 'New group';
+
+  @override
+  String get invGroupResetDefaults => 'Reset to defaults';
+
+  @override
+  String get invGroupSaved => 'Groups updated';
+
+  @override
+  String get invGroupNameHint => 'Group name';
+
+  @override
+  String get invGroupPickCategories => 'Pick categories';
 }

@@ -6437,4 +6437,70 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get visionModelSettingUp => 'तुमचा काउंटर तयार केला जात आहे';
+
+  @override
+  String get catGroupStaplesCooking => 'किराणा आणि स्वयंपाक';
+
+  @override
+  String get catGroupKidsTreats => 'मुलांसाठी';
+
+  @override
+  String get catGroupSnacksNamkeen => 'स्नॅक्स आणि नमकीन';
+
+  @override
+  String get catGroupBeverages => 'पेये';
+
+  @override
+  String get catGroupPersonalCare => 'वैयक्तिक काळजी';
+
+  @override
+  String get catGroupBreakfastInstant => 'नाश्ता आणि इन्स्टंट';
+
+  @override
+  String get catGroupHouseholdNeeds => 'घरगुती सामान';
+
+  @override
+  String get catGroupDairyBakery => 'दुग्धजन्य आणि बेकरी';
+
+  @override
+  String get catGroupFreshProduce => 'ताजी भाजी-फळे';
+
+  @override
+  String get catGroupSaucesSpreads => 'सॉस आणि स्प्रेड';
+
+  @override
+  String get invGroupAll => 'सर्व';
+
+  @override
+  String get invGroupOther => 'इतर';
+
+  @override
+  String get invManageGroups => 'गट व्यवस्थापित करा';
+
+  @override
+  String get invGroupsTitle => 'श्रेणी गट';
+
+  @override
+  String get invGroupsHint => 'तुमची कपाटे तुम्हाला हवी तशी गटात ठेवा.';
+
+  @override
+  String get invGroupRename => 'नाव बदला';
+
+  @override
+  String get invGroupDelete => 'गट हटवा';
+
+  @override
+  String get invGroupNew => 'नवीन गट';
+
+  @override
+  String get invGroupResetDefaults => 'डीफॉल्टवर रीसेट करा';
+
+  @override
+  String get invGroupSaved => 'गट अपडेट झाले';
+
+  @override
+  String get invGroupNameHint => 'गटाचे नाव';
+
+  @override
+  String get invGroupPickCategories => 'श्रेणी निवडा';
 }

@@ -12,8 +12,10 @@ import '../../../core/vertical/vertical_copy.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../vision/views/onboarding_stockin_screen.dart';
 import '../../../shared/widgets/shimmer_widgets.dart';
+import '../models/category_group.dart';
 import '../models/inventory_item.dart';
 import '../models/pending_inventory_item.dart';
+import '../providers/category_group_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../providers/near_expiry_provider.dart';
 import '../providers/price_memory_provider.dart';
@@ -24,6 +26,7 @@ import 'price_memory_screen.dart';
 import 'widgets/add_product_sheet_new.dart';
 import 'widgets/barcode_scanner_overlay.dart';
 import '../../stockracks/stock_racks_screen.dart';
+import 'widgets/category_groups_sheet.dart';
 import 'widgets/edit_product_sheet.dart';
 
 class InventoryTab extends ConsumerStatefulWidget {
@@ -178,6 +181,36 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                   .toList()
                 ..sort();
 
+          // G7 — the store's own grouping over those categories ("Kids & treats"
+          // = chips + biscuits + ice cream). Falls back to the flat category
+          // list when the store has no groups, or the fetch failed: grouping is
+          // a view over inventory the owner already has, never a gate on it.
+          final groupSet =
+              ref.watch(categoryGroupsProvider).asData?.value ??
+              const CategoryGroupSet();
+          final catToGroup = groupSet.byCategoryName();
+          // Only offer a group chip if the store actually stocks something in it
+          // — an empty "Fresh produce" chip is noise on a shop that sells none.
+          final groupLabels = <String>[
+            for (final g in groupSet.groups)
+              if (categories.any((c) => catToGroup[c]?.groupId == g.groupId))
+                g.displayName(l10n),
+          ];
+          // "Other" collects stocked categories no group covers, so switching to
+          // the grouped view can never hide stock.
+          final hasUngrouped = categories.any((c) => !catToGroup.containsKey(c));
+          final useGroups = groupLabels.isNotEmpty;
+          final chipLabels = useGroups
+              ? [...groupLabels, if (hasUngrouped) l10n.invGroupOther]
+              : categories;
+
+          String bucketOf(InventoryItem item) {
+            final cat = item.categoryName;
+            if (!useGroups) return cat ?? l10n.invUncategorised;
+            final g = cat == null ? null : catToGroup[cat];
+            return g?.displayName(l10n) ?? l10n.invGroupOther;
+          }
+
           // AI tags (ML flags) per product — same source as the per-item chips.
           final mlFlags =
               ref.watch(inventoryFlagsProvider).asData?.value ??
@@ -202,9 +235,10 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
 
           final q = _searchQuery.toLowerCase().trim();
           final filteredItems = data.items.where((item) {
+            // _selectedCategory holds a *bucket* label: a group name when the
+            // store has groups, a raw category name otherwise.
             final matchesCategory =
-                _selectedCategory == null ||
-                item.categoryName == _selectedCategory;
+                _selectedCategory == null || bucketOf(item) == _selectedCategory;
             final matchesFlag =
                 _selectedFlag == null ||
                 (mlFlags[item.productId] ?? const []).contains(_selectedFlag);
@@ -218,8 +252,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
 
           final Map<String, List<InventoryItem>> filteredGrouped = {};
           for (final item in filteredItems) {
-            final cat = item.categoryName ?? l10n.invUncategorised;
-            filteredGrouped.putIfAbsent(cat, () => []).add(item);
+            filteredGrouped.putIfAbsent(bucketOf(item), () => []).add(item);
           }
 
           final nearExpiryCount = ref.watch(nearExpiryCountProvider);
@@ -366,7 +399,7 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                     padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final allCategories = ['All', ...categories];
+                        final allCategories = ['All', ...chipLabels];
                         final initialCount = constraints.maxWidth > 400 ? 6 : 4;
 
                         final displayCategories = _isExpanded
@@ -405,6 +438,25 @@ class _InventoryTabState extends ConsumerState<InventoryTab> {
                                     onTap: () =>
                                         setState(() => _isExpanded = true),
                                   ),
+
+                                // Reachable from where the grouping is actually
+                                // seen, rather than buried in Profile.
+                                _ViewMoreChip(
+                                  label: l10n.invManageGroups,
+                                  onTap: () {
+                                    final stocked = <int, String>{
+                                      for (final i in data.items)
+                                        if (i.categoryName != null &&
+                                            i.categoryId != 0)
+                                          i.categoryId: i.categoryName!,
+                                    };
+                                    showCategoryGroupsSheet(
+                                      context,
+                                      ref,
+                                      stockedCategories: stocked,
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                             if (_isExpanded)

@@ -6459,4 +6459,70 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get visionModelSettingUp => 'ನಿಮ್ಮ ಕೌಂಟರ್ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ';
+
+  @override
+  String get catGroupStaplesCooking => 'ದಿನಸಿ & ಅಡುಗೆ';
+
+  @override
+  String get catGroupKidsTreats => 'ಮಕ್ಕಳು & ತಿಂಡಿ';
+
+  @override
+  String get catGroupSnacksNamkeen => 'ತಿಂಡಿ & ನಮ್ಕೀನ್';
+
+  @override
+  String get catGroupBeverages => 'ಪಾನೀಯಗಳು';
+
+  @override
+  String get catGroupPersonalCare => 'ವೈಯಕ್ತಿಕ ಆರೈಕೆ';
+
+  @override
+  String get catGroupBreakfastInstant => 'ಬೆಳಗಿನ ಉಪಾಹಾರ & ಇನ್‌ಸ್ಟಂಟ್';
+
+  @override
+  String get catGroupHouseholdNeeds => 'ಮನೆ ಅಗತ್ಯಗಳು';
+
+  @override
+  String get catGroupDairyBakery => 'ಹಾಲಿನ ಉತ್ಪನ್ನ & ಬೇಕರಿ';
+
+  @override
+  String get catGroupFreshProduce => 'ತಾಜಾ ತರಕಾರಿ & ಹಣ್ಣು';
+
+  @override
+  String get catGroupSaucesSpreads => 'ಸಾಸ್ & ಸ್ಪ್ರೆಡ್';
+
+  @override
+  String get invGroupAll => 'ಎಲ್ಲಾ';
+
+  @override
+  String get invGroupOther => 'ಇತರೆ';
+
+  @override
+  String get invManageGroups => 'ಗುಂಪುಗಳನ್ನು ನಿರ್ವಹಿಸಿ';
+
+  @override
+  String get invGroupsTitle => 'ವರ್ಗ ಗುಂಪುಗಳು';
+
+  @override
+  String get invGroupsHint => 'ನಿಮ್ಮ ಶೆಲ್ಫ್‌ಗಳನ್ನು ನಿಮಗೆ ಬೇಕಾದಂತೆ ಗುಂಪು ಮಾಡಿ.';
+
+  @override
+  String get invGroupRename => 'ಹೆಸರು ಬದಲಿಸಿ';
+
+  @override
+  String get invGroupDelete => 'ಗುಂಪು ಅಳಿಸಿ';
+
+  @override
+  String get invGroupNew => 'ಹೊಸ ಗುಂಪು';
+
+  @override
+  String get invGroupResetDefaults => 'ಡೀಫಾಲ್ಟ್‌ಗೆ ಮರುಹೊಂದಿಸಿ';
+
+  @override
+  String get invGroupSaved => 'ಗುಂಪುಗಳು ನವೀಕರಿಸಲಾಗಿದೆ';
+
+  @override
+  String get invGroupNameHint => 'ಗುಂಪಿನ ಹೆಸರು';
+
+  @override
+  String get invGroupPickCategories => 'ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ';
 }
