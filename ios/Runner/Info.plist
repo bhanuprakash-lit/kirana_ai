@@ -83,6 +83,8 @@
 	<string>Camera is required to scan barcodes and invoices.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>We need access to your contacts to add udhaar entries</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location is used to verify store transactions and delivery tracking.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Location is used to verify store transactions and delivery tracking.</string>
 	<key>NSMicrophoneUsageDescription</key>
