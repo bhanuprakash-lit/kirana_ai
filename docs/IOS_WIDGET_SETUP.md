@@ -128,3 +128,23 @@ so its version comes from build settings. They are set to match the app:
 > `CURRENT_PROJECT_VERSION` on the KiranaWidgetExtensionExtension target** (General
 > tab → Version/Build, or the 3 config blocks in `project.pbxproj`) to the same
 > values. A forgotten bump fails validation at upload with a clear ITMS-90473 error.
+
+### 3. ⚠️ Archive with `flutter build ipa`, NOT Xcode's Product → Archive
+The generated SPM manifest
+`ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift`
+declares an iOS platform floor via `.iOS("…")`. Its default is the Flutter
+framework minimum (**13.0**); it is raised to the project's
+`IPHONEOS_DEPLOYMENT_TARGET` (**15.6**) **only** by
+`SwiftPackageManager.updateMinimumDeployment`, which runs **exclusively in the
+`flutter build ios/ipa` code path** (`flutter_tools/lib/src/ios/mac.dart`).
+
+**Xcode's Product → Archive does NOT run that bump.** Its run-script phase calls
+`flutter assemble`, which regenerates `Package.swift` at the default **13.0** →
+Firebase (needs iOS 15) fails to resolve → the archive errors. This recurs on
+*every* Xcode archive, no matter how many times you regenerate from the CLI.
+
+**Fix / workflow:** build releases with **`flutter build ipa --release`**. It
+applies the 15.6 bump, embeds + signs the widget appex, and emits both
+`build/ios/archive/Runner.xcarchive` (open in Xcode → Window → Organizer →
+Distribute App) and `build/ios/ipa/*.ipa` (drag into the Transporter app). Do
+not use the Archive menu for this project.
