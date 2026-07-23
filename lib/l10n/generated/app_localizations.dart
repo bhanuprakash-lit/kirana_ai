@@ -11320,6 +11320,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something else'**
   String get monoTradeOther;
+
+  /// No description provided for @visionModelStocking.
+  ///
+  /// In en, this message translates to:
+  /// **'Stocking the shelf…'**
+  String get visionModelStocking;
+
+  /// No description provided for @visionModelKeepOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'This happens once. Please keep this screen open.'**
+  String get visionModelKeepOpen;
+
+  /// No description provided for @visionModelOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total}'**
+  String visionModelOfTotal(String done, String total);
+
+  /// No description provided for @visionModelFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Download stopped'**
+  String get visionModelFailedTitle;
+
+  /// No description provided for @visionModelFailedResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is lost — it will carry on from {done}.'**
+  String visionModelFailedResume(String done);
+
+  /// No description provided for @visionModelFailedFresh.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t finish the setup. Check your connection and try again.'**
+  String get visionModelFailedFresh;
+
+  /// No description provided for @visionModelRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get visionModelRetry;
+
+  /// No description provided for @visionModelChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting ready…'**
+  String get visionModelChecking;
+
+  /// No description provided for @visionModelHint1.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at your counter and it counts what sells.'**
+  String get visionModelHint1;
+
+  /// No description provided for @visionModelHint2.
+  ///
+  /// In en, this message translates to:
+  /// **'Once installed it works fully offline.'**
+  String get visionModelHint2;
+
+  /// No description provided for @visionModelHint3.
+  ///
+  /// In en, this message translates to:
+  /// **'You only need to do this once.'**
+  String get visionModelHint3;
+
+  /// No description provided for @visionModelSettingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting up your counter'**
+  String get visionModelSettingUp;
 }
 
 class _AppLocalizationsDelegate

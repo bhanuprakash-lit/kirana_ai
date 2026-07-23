@@ -1871,5 +1871,17 @@
   "monoTradeFootwear": "പാദരക്ഷകൾ",
   "monoTradeElectronics": "മൊബൈൽ & ഇലക്ട്രോണിക്സ്",
   "monoTradeCosmetics": "കോസ്മെറ്റിക്സ് & ബ്യൂട്ടി",
-  "monoTradeOther": "മറ്റെന്തെങ്കിലും"
+  "monoTradeOther": "മറ്റെന്തെങ്കിലും",
+  "visionModelStocking": "ഷെൽഫ് നിറയ്ക്കുന്നു…",
+  "visionModelKeepOpen": "ഇത് ഒരിക്കൽ മാത്രം. ദയവായി ഈ സ്ക്രീൻ തുറന്നു വയ്ക്കുക.",
+  "visionModelOfTotal": "{total}-ൽ {done}",
+  "visionModelFailedTitle": "ഡൗൺലോഡ് നിന്നു",
+  "visionModelFailedResume": "ഒന്നും നഷ്ടപ്പെട്ടിട്ടില്ല — {done} മുതൽ തുടരും.",
+  "visionModelFailedFresh": "സജ്ജീകരണം പൂർത്തിയാക്കാനായില്ല. കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",
+  "visionModelRetry": "വീണ്ടും ശ്രമിക്കുക",
+  "visionModelChecking": "തയ്യാറാകുന്നു…",
+  "visionModelHint1": "ക്യാമറ കൗണ്ടറിലേക്ക് കാണിക്കുക, വിറ്റത് എണ്ണും.",
+  "visionModelHint2": "ഇൻസ്റ്റാൾ ചെയ്ത ശേഷം പൂർണമായും ഓഫ്‌ലൈനിൽ പ്രവർത്തിക്കും.",
+  "visionModelHint3": "ഇത് ഒരിക്കൽ മാത്രം ചെയ്താൽ മതി.",
+  "visionModelSettingUp": "നിങ്ങളുടെ കൗണ്ടർ സജ്ജമാക്കുന്നു"
 }

@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:kirana_ai/core/services/api_client.dart';
 
 /// Test double for [ApiClient]. Each method returns a value from a queue
@@ -157,5 +158,20 @@ class FakeApiClient implements ApiClient {
   Future<List<int>> getBytes(String path) async {
     calls.add('GET BYTES $path');
     return _dequeue(path) as List<int>;
+  }
+
+  @override
+  Future<http.StreamedResponse> getStream(String path, {int resumeFrom = 0}) async {
+    // Records the offset too, so a resume test can assert the Range actually
+    // asked to continue rather than silently restarting.
+    calls.add('GET STREAM $path${resumeFrom > 0 ? ' from=$resumeFrom' : ''}');
+    final queued = _dequeue(path);
+    if (queued is http.StreamedResponse) return queued;
+    final bytes = (queued as List<int>).sublist(resumeFrom);
+    return http.StreamedResponse(
+      Stream.value(bytes),
+      resumeFrom > 0 ? 206 : 200,
+      contentLength: bytes.length,
+    );
   }
 }

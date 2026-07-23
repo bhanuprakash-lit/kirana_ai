@@ -6320,4 +6320,48 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get monoTradeOther => 'कुछ और';
+
+  @override
+  String get visionModelStocking => 'शेल्फ भरी जा रही है…';
+
+  @override
+  String get visionModelKeepOpen =>
+      'यह एक ही बार होता है। कृपया यह स्क्रीन खुली रखें।';
+
+  @override
+  String visionModelOfTotal(String done, String total) {
+    return '$total में से $done';
+  }
+
+  @override
+  String get visionModelFailedTitle => 'डाउनलोड रुक गया';
+
+  @override
+  String visionModelFailedResume(String done) {
+    return 'कुछ भी नहीं गया — यह $done से आगे बढ़ेगा।';
+  }
+
+  @override
+  String get visionModelFailedFresh =>
+      'सेटअप पूरा नहीं हो सका। अपना कनेक्शन जाँचकर फिर कोशिश करें।';
+
+  @override
+  String get visionModelRetry => 'फिर कोशिश करें';
+
+  @override
+  String get visionModelChecking => 'तैयार हो रहा है…';
+
+  @override
+  String get visionModelHint1 =>
+      'कैमरा अपने काउंटर पर रखें, यह बिकने वाला सामान गिन लेगा।';
+
+  @override
+  String get visionModelHint2 =>
+      'इंस्टॉल होने के बाद यह पूरी तरह ऑफ़लाइन चलता है।';
+
+  @override
+  String get visionModelHint3 => 'यह सिर्फ़ एक बार करना है।';
+
+  @override
+  String get visionModelSettingUp => 'आपका काउंटर तैयार किया जा रहा है';
 }

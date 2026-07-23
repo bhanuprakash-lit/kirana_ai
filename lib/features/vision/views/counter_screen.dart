@@ -15,6 +15,7 @@ import '../counter/model_provisioner.dart';
 import '../counter/simple_tracker.dart';
 import '../models/counter_models.dart';
 import '../providers/counter_provider.dart';
+import 'widgets/model_download_view.dart';
 
 /// Live sale-area counter. On-device YOLO detects products in the camera feed;
 /// a Dart tracker gives each a stable id; [CounterEngine] counts each item once
@@ -189,19 +190,37 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    // PAI-15 — the model is fetched, not bundled, so resolving its path is the
-    // availability check: null means neither a download nor a bundled copy.
-    // First launch shows the spinner while ~38 MB comes down, once.
-    final modelPath = ref.watch(counterModelPathProvider);
+    // PAI-15 — the model is fetched, not bundled. Until it's on disk the screen
+    // belongs to the setup flow, which runs itself and only reports progress.
+    final model = ref.watch(counterModelProvider);
 
-    return modelPath.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, _) => _CounterMessage(
-        icon: Icons.videocam_off_rounded,
-        title: l10n.visionCounterModelMissingTitle,
-        message: l10n.visionCounterModelMissingDesc,
-      ),
-      data: (path) {
+    // A setup that just finished walks straight into the camera. Someone who
+    // waited out the download has already said what they want; making them tap
+    // "Start" on a landing page afterwards is a step for its own sake.
+    ref.listen(counterModelProvider, (prev, next) {
+      if (next.phase == ModelPhase.ready &&
+          next.justInstalled &&
+          prev?.phase == ModelPhase.downloading &&
+          !_started) {
+        _beginSession();
+      }
+    });
+
+    switch (model.phase) {
+      case ModelPhase.checking:
+      case ModelPhase.downloading:
+      case ModelPhase.failed:
+        return _ModelGate(state: model, l10n: l10n);
+      case ModelPhase.unavailable:
+        return _CounterMessage(
+          icon: Icons.videocam_off_rounded,
+          title: l10n.visionCounterModelMissingTitle,
+          message: l10n.visionCounterModelMissingDesc,
+          actionLabel: l10n.visionModelRetry,
+          onAction: () => ref.read(counterModelProvider.notifier).retry(),
+        );
+      case ModelPhase.ready:
+        final path = model.path;
         if (path == null || path.isEmpty) {
           return _CounterMessage(
             icon: Icons.download_for_offline_outlined,
@@ -213,8 +232,7 @@ class _CounterScreenState extends ConsumerState<CounterScreen> {
           return _CounterLanding(onStart: _beginSession);
         }
         return _buildActive(context, l10n, path);
-      },
-    );
+    }
   }
 
   Widget _buildActive(
@@ -910,6 +928,131 @@ class _CounterMessage extends StatelessWidget {
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 18),
               FilledButton(onPressed: onAction, child: Text(actionLabel!)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The pre-flight screen for the counter model: ask, show progress, recover.
+///
+/// This is deliberately a full screen rather than a spinner or a dialog. A
+/// ~38 MB transfer on a shop's connection can run for minutes, and the two
+/// things the user needs — that it's working, and that leaving costs them —
+/// can't be conveyed by an indeterminate circle.
+/// The setup screen for the counter model: run it, show it, recover from it.
+///
+/// Deliberately not a prompt. The user already chose the Counter by opening it;
+/// asking a shopkeeper to then approve a "38 MB model download" hands them an
+/// engineering decision they have no basis to make and no way to opt out of.
+/// So this only ever reports — what's happening, how far along, and the one
+/// thing they can get wrong (leaving). The size is shown, not hidden, but it
+/// isn't a gate.
+class _ModelGate extends ConsumerWidget {
+  final CounterModelState state;
+  final AppLocalizations l10n;
+  const _ModelGate({required this.state, required this.l10n});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final failed = state.phase == ModelPhase.failed;
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ShelfStockingLoader(
+              // Nothing measurable during the manifest check or after a
+              // failure — run the indeterminate wave rather than show a
+              // percentage we can't stand behind.
+              progress: state.phase == ModelPhase.downloading
+                  ? state.progress
+                  : null,
+            ),
+            const SizedBox(height: 22),
+            Text(
+              failed ? l10n.visionModelFailedTitle : l10n.visionModelSettingUp,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                color: BrandColors.ink,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            if (failed) ...[
+              Text(
+                state.resumable
+                    ? l10n.visionModelFailedResume(formatBytes(state.received))
+                    : l10n.visionModelFailedFresh,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.45,
+                  color: BrandColors.muted,
+                ),
+              ),
+              const SizedBox(height: 22),
+              FilledButton.icon(
+                onPressed: () =>
+                    ref.read(counterModelProvider.notifier).retry(),
+                icon: const Icon(Icons.refresh_rounded, size: 19),
+                label: Text(l10n.visionModelRetry),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(200, 46),
+                  backgroundColor: BrandColors.primary,
+                ),
+              ),
+            ] else if (state.phase == ModelPhase.downloading) ...[
+              Text(
+                l10n.visionModelKeepOpen,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.45,
+                  color: BrandColors.muted,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ModelPercentText(progress: state.progress),
+              const SizedBox(height: 12),
+              ModelProgressBar(progress: state.progress),
+              const SizedBox(height: 10),
+              Text(
+                l10n.visionModelOfTotal(
+                  formatBytes(state.received),
+                  formatBytes(state.total),
+                ),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: BrandColors.muted,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // A long silent wait reads as a hang. A line that changes is
+              // proof of life, and buys space to explain what they're getting.
+              SizedBox(
+                height: 38,
+                child: RotatingHint(
+                  hints: [
+                    l10n.visionModelHint1,
+                    l10n.visionModelHint2,
+                    l10n.visionModelHint3,
+                  ],
+                ),
+              ),
+            ] else ...[
+              Text(
+                l10n.visionModelChecking,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, color: BrandColors.muted),
+              ),
             ],
           ],
         ),

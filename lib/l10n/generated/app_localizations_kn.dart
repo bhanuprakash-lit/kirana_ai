@@ -6415,4 +6415,48 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get monoTradeOther => 'ಬೇರೆ ಏನಾದರೂ';
+
+  @override
+  String get visionModelStocking => 'ಕಪಾಟು ತುಂಬುತ್ತಿದೆ…';
+
+  @override
+  String get visionModelKeepOpen =>
+      'ಇದು ಒಮ್ಮೆ ಮಾತ್ರ. ದಯವಿಟ್ಟು ಈ ಪರದೆ ತೆರೆದಿಡಿ.';
+
+  @override
+  String visionModelOfTotal(String done, String total) {
+    return '$total ರಲ್ಲಿ $done';
+  }
+
+  @override
+  String get visionModelFailedTitle => 'ಡೌನ್‌ಲೋಡ್ ನಿಂತಿದೆ';
+
+  @override
+  String visionModelFailedResume(String done) {
+    return 'ಏನೂ ಕಳೆದುಹೋಗಿಲ್ಲ — $done ರಿಂದ ಮುಂದುವರಿಯುತ್ತದೆ.';
+  }
+
+  @override
+  String get visionModelFailedFresh =>
+      'ಸೆಟಪ್ ಪೂರ್ಣಗೊಳಿಸಲಾಗಲಿಲ್ಲ. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.';
+
+  @override
+  String get visionModelRetry => 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ';
+
+  @override
+  String get visionModelChecking => 'ಸಿದ್ಧವಾಗುತ್ತಿದೆ…';
+
+  @override
+  String get visionModelHint1 =>
+      'ಕ್ಯಾಮೆರಾವನ್ನು ನಿಮ್ಮ ಕೌಂಟರ್‌ಗೆ ತೋರಿಸಿ, ಮಾರಾಟವಾದದ್ದನ್ನು ಎಣಿಸುತ್ತದೆ.';
+
+  @override
+  String get visionModelHint2 =>
+      'ಸ್ಥಾಪಿಸಿದ ನಂತರ ಸಂಪೂರ್ಣ ಆಫ್‌ಲೈನ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ.';
+
+  @override
+  String get visionModelHint3 => 'ಇದನ್ನು ಒಮ್ಮೆ ಮಾತ್ರ ಮಾಡಬೇಕು.';
+
+  @override
+  String get visionModelSettingUp => 'ನಿಮ್ಮ ಕೌಂಟರ್ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ';
 }

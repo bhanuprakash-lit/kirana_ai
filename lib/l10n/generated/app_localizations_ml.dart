@@ -6461,4 +6461,48 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get monoTradeOther => 'മറ്റെന്തെങ്കിലും';
+
+  @override
+  String get visionModelStocking => 'ഷെൽഫ് നിറയ്ക്കുന്നു…';
+
+  @override
+  String get visionModelKeepOpen =>
+      'ഇത് ഒരിക്കൽ മാത്രം. ദയവായി ഈ സ്ക്രീൻ തുറന്നു വയ്ക്കുക.';
+
+  @override
+  String visionModelOfTotal(String done, String total) {
+    return '$total-ൽ $done';
+  }
+
+  @override
+  String get visionModelFailedTitle => 'ഡൗൺലോഡ് നിന്നു';
+
+  @override
+  String visionModelFailedResume(String done) {
+    return 'ഒന്നും നഷ്ടപ്പെട്ടിട്ടില്ല — $done മുതൽ തുടരും.';
+  }
+
+  @override
+  String get visionModelFailedFresh =>
+      'സജ്ജീകരണം പൂർത്തിയാക്കാനായില്ല. കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.';
+
+  @override
+  String get visionModelRetry => 'വീണ്ടും ശ്രമിക്കുക';
+
+  @override
+  String get visionModelChecking => 'തയ്യാറാകുന്നു…';
+
+  @override
+  String get visionModelHint1 =>
+      'ക്യാമറ കൗണ്ടറിലേക്ക് കാണിക്കുക, വിറ്റത് എണ്ണും.';
+
+  @override
+  String get visionModelHint2 =>
+      'ഇൻസ്റ്റാൾ ചെയ്ത ശേഷം പൂർണമായും ഓഫ്‌ലൈനിൽ പ്രവർത്തിക്കും.';
+
+  @override
+  String get visionModelHint3 => 'ഇത് ഒരിക്കൽ മാത്രം ചെയ്താൽ മതി.';
+
+  @override
+  String get visionModelSettingUp => 'നിങ്ങളുടെ കൗണ്ടർ സജ്ജമാക്കുന്നു';
 }

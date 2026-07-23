@@ -6465,4 +6465,47 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get monoTradeOther => 'வேறு ஏதேனும்';
+
+  @override
+  String get visionModelStocking => 'அலமாரி நிரப்பப்படுகிறது…';
+
+  @override
+  String get visionModelKeepOpen =>
+      'இது ஒருமுறை மட்டுமே. இந்தத் திரையைத் திறந்து வைக்கவும்.';
+
+  @override
+  String visionModelOfTotal(String done, String total) {
+    return '$total இல் $done';
+  }
+
+  @override
+  String get visionModelFailedTitle => 'பதிவிறக்கம் நின்றது';
+
+  @override
+  String visionModelFailedResume(String done) {
+    return 'எதுவும் இழக்கவில்லை — $done இலிருந்து தொடரும்.';
+  }
+
+  @override
+  String get visionModelFailedFresh =>
+      'அமைப்பை முடிக்க முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get visionModelRetry => 'மீண்டும் முயற்சி';
+
+  @override
+  String get visionModelChecking => 'தயாராகிறது…';
+
+  @override
+  String get visionModelHint1 =>
+      'கேமராவை உங்கள் கவுண்டரில் காட்டுங்கள், விற்பனையானதை எண்ணும்.';
+
+  @override
+  String get visionModelHint2 => 'நிறுவிய பின் முழுமையாக ஆஃப்லைனில் இயங்கும்.';
+
+  @override
+  String get visionModelHint3 => 'இதை ஒருமுறை மட்டும் செய்தால் போதும்.';
+
+  @override
+  String get visionModelSettingUp => 'உங்கள் கவுண்டர் தயார் செய்யப்படுகிறது';
 }

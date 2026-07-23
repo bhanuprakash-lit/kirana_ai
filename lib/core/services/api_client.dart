@@ -99,6 +99,35 @@ class ApiClient {
     throw ApiException(res.statusCode, _extractError(res.body));
   }
 
+  /// Streamed GET, for payloads too large to hold in memory (the vision model
+  /// is ~38 MB). Returns the live response so the caller can write bytes to
+  /// disk as they arrive and report progress.
+  ///
+  /// No total-duration timeout here on purpose: a 38 MB download over a slow
+  /// shop connection legitimately takes minutes, and a fixed deadline would
+  /// fail it every time. The caller enforces an *idle* timeout instead — a
+  /// connection that stops delivering bytes is dead, one that's merely slow is
+  /// not.
+  ///
+  /// [resumeFrom] issues a `Range` request so an interrupted download continues
+  /// instead of restarting; check for a 206 before trusting it.
+  Future<http.StreamedResponse> getStream(
+    String path, {
+    int resumeFrom = 0,
+  }) async {
+    final token = await _getAuthToken();
+    final req = http.Request(
+      'GET',
+      Uri.parse('${AppConfig.apiBaseUrl}$path'),
+    );
+    req.headers.addAll({
+      'Authorization': 'Bearer $token',
+      'X-Correlation-ID': _newCid(),
+      if (resumeFrom > 0) 'Range': 'bytes=$resumeFrom-',
+    });
+    return _client.send(req);
+  }
+
   Future<dynamic> post(String path, dynamic body) async {
     final token = await _getAuthToken();
     final res = await _client.post(

@@ -24,7 +24,10 @@ Owner shoots morning + evening shelf photos → detect products → `morning −
 
 ### 2. Sale-area counter — LIVE (on-device)
 Live camera at the billing counter → **on-device YOLO (v7 `.tflite`)** + pure-Dart line-crossing tally → syncs a daily per-product summary. No server round-trip (real-time can't afford one).
-- Android `.tflite` bundled in `assets/models/`. **iOS CoreML export pending** (needs a Mac).
+- **Nothing is bundled** (PAI-15): the model is downloaded per platform by an authenticated
+  user and cached in app-private storage. Android gets the `.tflite` from the `counter`
+  blob prefix; iOS gets a CoreML `.mlpackage` (zipped, since it's a directory) from
+  `counter-ios`. Both are exported from the same `kirana_v7` weights at 640px.
 
 ### 3. Bulk stock-in / onboarding — LIVE
 New or existing stores photograph shelves → detect → confirm quantities → write to inventory (SET for empty stores, ADD-on for restock). Ungated but rate-limited (5 scans/store/day).
@@ -55,7 +58,9 @@ New or existing stores photograph shelves → detect → confirm quantities → 
 | Review-screen crop thumbnails | ✅ done |
 | Durable Blob storage for shelf photos | ✅ done |
 | iOS counter: Dart platform-aware wiring (CoreML path + availability gate) | ✅ done |
-| iOS CoreML export for counter (the `.mlpackage` binary) | ⏸ pending (needs the trained `.pt` weights + `yolo export`) |
+| iOS CoreML export for counter (the `.mlpackage` binary) | ✅ done (exported in a Linux container, published to blob) |
+| Model delivery: download + resume + checksum, both platforms | ✅ done |
+| Counter verified on a physical iPhone | ⏸ **pending — never run on iOS hardware** |
 | v7 class-map curation (397 need_review rows) | ⏸ pending (optional) |
 | Counter → POS/basket + price guess | ⏸ deferred |
 
@@ -63,15 +68,24 @@ New or existing stores photograph shelves → detect → confirm quantities → 
 
 ## Pending / follow-ups
 
-1. **iOS CoreML export** for the counter model. The Dart side is now
-   platform-aware (`CounterModel.path` → `counter_model` on iOS; the availability
-   gate checks the CoreML model via the plugin's native resolver instead of the
-   `.tflite`, which iOS can't load). What remains is producing + bundling the
-   binary: from the trained YOLO weights run `yolo export model=counter.pt
-   format=coreml nms=True`, then drag `counter_model.mlpackage` into the **Runner**
-   target (Target Membership = Runner). Blocked here because the `.pt` weights
-   live in the uncommitted `vision-ai` R&D repo (not on the build machine) — only
-   the Android `.tflite` is committed under `assets/models/`.
+1. **Run the counter on a real iPhone.** Everything below it is built and the
+   model is published, but no part of the iOS path has ever executed on Apple
+   hardware — it can't be built from Windows. Two things are unverified and both
+   fail loudly rather than silently: (a) the CoreML conversion is numerically
+   untested, because `coremltools` can convert on Linux but only *predict* on
+   macOS, and the `nms=True` pipeline rewires the output heads; (b) the extracted
+   `.mlpackage` path handed to `YOLOView` is exercised only by unit tests.
+
+   The export itself does **not** need a Mac. `coremltools` ships no Windows
+   wheels (hence `assert not WINDOWS` in the ultralytics exporter), but Linux is
+   fine — a container is enough:
+
+       yolo export model=runs/kirana_v7/weights/best.pt format=coreml \
+                   nms=True imgsz=640 half=True
+
+   `nms=True` because this is yolo11s; YOLO26 would want `nms=False end2end=True`.
+   Publish with `--model counter-ios`, which zips to `.mlpackage.zip`.
+   A Mac (or macOS CI) is still required to *build and sign* the IPA.
 2. **v7 class-map curation** — `kirana_v7_class_map.json` is generated (11 confirmed / 431 need_review). The 431 fall through to safe fuzzy matching; a human curating them (set `product_id` + `confirmed:true`) makes YOLO mapping deterministic. Optional.
 3. **Look-alike products (v8 retrain)** — text-first matching shipped (see below); the deeper fix (65–90%) needs labelled per-variant crops + a retrain. Plan: `vision-ai/LOOKALIKE_PLAN.md`.
 4. **Gemini billing** — the free-tier key hits the 20-req quota; YOLO covers scans regardless. For a paid Gemini fallback funded by GCP free-trial credits, switch `call_gemini` to **Vertex AI** (the free-trial credit reliably covers Vertex, not the AI-Studio key). Optional.

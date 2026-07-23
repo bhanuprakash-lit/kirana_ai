@@ -1871,5 +1871,17 @@
   "monoTradeFootwear": "காலணிகள்",
   "monoTradeElectronics": "மொபைல் & மின்னணுவியல்",
   "monoTradeCosmetics": "அழகுசாதனம் & பியூட்டி",
-  "monoTradeOther": "வேறு ஏதேனும்"
+  "monoTradeOther": "வேறு ஏதேனும்",
+  "visionModelStocking": "அலமாரி நிரப்பப்படுகிறது…",
+  "visionModelKeepOpen": "இது ஒருமுறை மட்டுமே. இந்தத் திரையைத் திறந்து வைக்கவும்.",
+  "visionModelOfTotal": "{total} இல் {done}",
+  "visionModelFailedTitle": "பதிவிறக்கம் நின்றது",
+  "visionModelFailedResume": "எதுவும் இழக்கவில்லை — {done} இலிருந்து தொடரும்.",
+  "visionModelFailedFresh": "அமைப்பை முடிக்க முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+  "visionModelRetry": "மீண்டும் முயற்சி",
+  "visionModelChecking": "தயாராகிறது…",
+  "visionModelHint1": "கேமராவை உங்கள் கவுண்டரில் காட்டுங்கள், விற்பனையானதை எண்ணும்.",
+  "visionModelHint2": "நிறுவிய பின் முழுமையாக ஆஃப்லைனில் இயங்கும்.",
+  "visionModelHint3": "இதை ஒருமுறை மட்டும் செய்தால் போதும்.",
+  "visionModelSettingUp": "உங்கள் கவுண்டர் தயார் செய்யப்படுகிறது"
 }

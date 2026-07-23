@@ -3590,5 +3590,34 @@
   "monoTradeFootwear": "Footwear",
   "monoTradeElectronics": "Mobile & electronics",
   "monoTradeCosmetics": "Cosmetics & beauty",
-  "monoTradeOther": "Something else"
+  "monoTradeOther": "Something else",
+  "visionModelStocking": "Stocking the shelf…",
+  "visionModelKeepOpen": "This happens once. Please keep this screen open.",
+  "visionModelOfTotal": "{done} of {total}",
+  "@visionModelOfTotal": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "visionModelFailedTitle": "Download stopped",
+  "visionModelFailedResume": "Nothing is lost — it will carry on from {done}.",
+  "@visionModelFailedResume": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      }
+    }
+  },
+  "visionModelFailedFresh": "We couldn't finish the setup. Check your connection and try again.",
+  "visionModelRetry": "Try again",
+  "visionModelChecking": "Getting ready…",
+  "visionModelHint1": "Point the camera at your counter and it counts what sells.",
+  "visionModelHint2": "Once installed it works fully offline.",
+  "visionModelHint3": "You only need to do this once.",
+  "visionModelSettingUp": "Setting up your counter"
 }

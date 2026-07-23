@@ -1871,5 +1871,17 @@
   "monoTradeFootwear": "जूते-चप्पल",
   "monoTradeElectronics": "मोबाइल और इलेक्ट्रॉनिक्स",
   "monoTradeCosmetics": "कॉस्मेटिक्स और ब्यूटी",
-  "monoTradeOther": "कुछ और"
+  "monoTradeOther": "कुछ और",
+  "visionModelStocking": "शेल्फ भरी जा रही है…",
+  "visionModelKeepOpen": "यह एक ही बार होता है। कृपया यह स्क्रीन खुली रखें।",
+  "visionModelOfTotal": "{total} में से {done}",
+  "visionModelFailedTitle": "डाउनलोड रुक गया",
+  "visionModelFailedResume": "कुछ भी नहीं गया — यह {done} से आगे बढ़ेगा।",
+  "visionModelFailedFresh": "सेटअप पूरा नहीं हो सका। अपना कनेक्शन जाँचकर फिर कोशिश करें।",
+  "visionModelRetry": "फिर कोशिश करें",
+  "visionModelChecking": "तैयार हो रहा है…",
+  "visionModelHint1": "कैमरा अपने काउंटर पर रखें, यह बिकने वाला सामान गिन लेगा।",
+  "visionModelHint2": "इंस्टॉल होने के बाद यह पूरी तरह ऑफ़लाइन चलता है।",
+  "visionModelHint3": "यह सिर्फ़ एक बार करना है।",
+  "visionModelSettingUp": "आपका काउंटर तैयार किया जा रहा है"
 }

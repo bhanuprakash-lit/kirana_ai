@@ -6384,4 +6384,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monoTradeOther => 'Something else';
+
+  @override
+  String get visionModelStocking => 'Stocking the shelf…';
+
+  @override
+  String get visionModelKeepOpen =>
+      'This happens once. Please keep this screen open.';
+
+  @override
+  String visionModelOfTotal(String done, String total) {
+    return '$done of $total';
+  }
+
+  @override
+  String get visionModelFailedTitle => 'Download stopped';
+
+  @override
+  String visionModelFailedResume(String done) {
+    return 'Nothing is lost — it will carry on from $done.';
+  }
+
+  @override
+  String get visionModelFailedFresh =>
+      'We couldn\'t finish the setup. Check your connection and try again.';
+
+  @override
+  String get visionModelRetry => 'Try again';
+
+  @override
+  String get visionModelChecking => 'Getting ready…';
+
+  @override
+  String get visionModelHint1 =>
+      'Point the camera at your counter and it counts what sells.';
+
+  @override
+  String get visionModelHint2 => 'Once installed it works fully offline.';
+
+  @override
+  String get visionModelHint3 => 'You only need to do this once.';
+
+  @override
+  String get visionModelSettingUp => 'Setting up your counter';
 }

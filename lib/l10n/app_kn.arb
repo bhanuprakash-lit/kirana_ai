@@ -1871,5 +1871,17 @@
   "monoTradeFootwear": "ಪಾದರಕ್ಷೆಗಳು",
   "monoTradeElectronics": "ಮೊಬೈಲ್ ಮತ್ತು ಎಲೆಕ್ಟ್ರಾನಿಕ್ಸ್",
   "monoTradeCosmetics": "ಕಾಸ್ಮೆಟಿಕ್ಸ್ ಮತ್ತು ಬ್ಯೂಟಿ",
-  "monoTradeOther": "ಬೇರೆ ಏನಾದರೂ"
+  "monoTradeOther": "ಬೇರೆ ಏನಾದರೂ",
+  "visionModelStocking": "ಕಪಾಟು ತುಂಬುತ್ತಿದೆ…",
+  "visionModelKeepOpen": "ಇದು ಒಮ್ಮೆ ಮಾತ್ರ. ದಯವಿಟ್ಟು ಈ ಪರದೆ ತೆರೆದಿಡಿ.",
+  "visionModelOfTotal": "{total} ರಲ್ಲಿ {done}",
+  "visionModelFailedTitle": "ಡೌನ್‌ಲೋಡ್ ನಿಂತಿದೆ",
+  "visionModelFailedResume": "ಏನೂ ಕಳೆದುಹೋಗಿಲ್ಲ — {done} ರಿಂದ ಮುಂದುವರಿಯುತ್ತದೆ.",
+  "visionModelFailedFresh": "ಸೆಟಪ್ ಪೂರ್ಣಗೊಳಿಸಲಾಗಲಿಲ್ಲ. ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "visionModelRetry": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+  "visionModelChecking": "ಸಿದ್ಧವಾಗುತ್ತಿದೆ…",
+  "visionModelHint1": "ಕ್ಯಾಮೆರಾವನ್ನು ನಿಮ್ಮ ಕೌಂಟರ್‌ಗೆ ತೋರಿಸಿ, ಮಾರಾಟವಾದದ್ದನ್ನು ಎಣಿಸುತ್ತದೆ.",
+  "visionModelHint2": "ಸ್ಥಾಪಿಸಿದ ನಂತರ ಸಂಪೂರ್ಣ ಆಫ್‌ಲೈನ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+  "visionModelHint3": "ಇದನ್ನು ಒಮ್ಮೆ ಮಾತ್ರ ಮಾಡಬೇಕು.",
+  "visionModelSettingUp": "ನಿಮ್ಮ ಕೌಂಟರ್ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ"
 }

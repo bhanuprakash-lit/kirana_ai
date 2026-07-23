@@ -1871,5 +1871,17 @@
   "monoTradeFootwear": "पादत्राणे",
   "monoTradeElectronics": "मोबाइल आणि इलेक्ट्रॉनिक्स",
   "monoTradeCosmetics": "कॉस्मेटिक्स आणि ब्युटी",
-  "monoTradeOther": "इतर काही"
+  "monoTradeOther": "इतर काही",
+  "visionModelStocking": "शेल्फ भरत आहे…",
+  "visionModelKeepOpen": "हे एकदाच होते. कृपया ही स्क्रीन उघडी ठेवा.",
+  "visionModelOfTotal": "{total} पैकी {done}",
+  "visionModelFailedTitle": "डाउनलोड थांबले",
+  "visionModelFailedResume": "काहीही गेले नाही — {done} पासून पुढे सुरू होईल.",
+  "visionModelFailedFresh": "सेटअप पूर्ण होऊ शकले नाही. कनेक्शन तपासून पुन्हा प्रयत्न करा.",
+  "visionModelRetry": "पुन्हा प्रयत्न करा",
+  "visionModelChecking": "तयार होत आहे…",
+  "visionModelHint1": "कॅमेरा तुमच्या काउंटरकडे धरा, विकलेले मोजले जाईल.",
+  "visionModelHint2": "इन्स्टॉल झाल्यावर पूर्णपणे ऑफलाइन चालते.",
+  "visionModelHint3": "हे फक्त एकदाच करावे लागते.",
+  "visionModelSettingUp": "तुमचा काउंटर तयार केला जात आहे"
 }

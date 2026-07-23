@@ -70,11 +70,14 @@ dependencies:
   in_app_update_flutter: ^2.0.3
 
   # On-device YOLO for the sale-area counter (real-time detection + tracking).
-  # Consumes an Ultralytics-exported .tflite bundled under assets/models/.
+  # Consumes an Ultralytics export fetched at runtime, not a bundled asset.
   ultralytics_yolo: ^0.6.6
   tutorial_coach_mark: ^1.3.3
   share_plus: ^12.0.2
   crypto: ^3.0.7
+  # Unzips the downloaded iOS CoreML model — a .mlpackage is a directory, so it
+  # travels as a zip. Pure Dart, and already in the tree transitively.
+  archive: ^4.0.9
 
 dev_dependencies:
   flutter_test:
@@ -90,8 +93,13 @@ flutter:
   generate: true
   assets:
     - assets/logos/
-    # On-device counter model + labels (Ultralytics-exported YOLO).
-    - assets/models/
+    # assets/models/ is deliberately NOT listed (PAI-15). The counter model is
+    # downloaded per platform — TFLite on Android, CoreML on iOS — by an
+    # authenticated user and cached in app-private storage, so the weights are
+    # not sitting in the APK/IPA for anyone who renames it to .zip. This is what
+    # takes ~38 MB off the Android build and ~38 MB of dead weight off iOS,
+    # which could never load the .tflite in the first place.
+    # See lib/features/vision/counter/model_provisioner.dart.
 
   # Bundled fonts (offline, no runtime google_fonts fetch). GoogleSans is the
   # Latin/default brand face; the Noto Sans families cover the Indic scripts so

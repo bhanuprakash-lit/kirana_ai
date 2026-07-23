@@ -6384,4 +6384,48 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get monoTradeOther => 'మరేదైనా';
+
+  @override
+  String get visionModelStocking => 'షెల్ఫ్ నింపుతోంది…';
+
+  @override
+  String get visionModelKeepOpen =>
+      'ఇది ఒకసారి మాత్రమే. దయచేసి ఈ స్క్రీన్ తెరిచి ఉంచండి.';
+
+  @override
+  String visionModelOfTotal(String done, String total) {
+    return '$totalలో $done';
+  }
+
+  @override
+  String get visionModelFailedTitle => 'డౌన్‌లోడ్ ఆగిపోయింది';
+
+  @override
+  String visionModelFailedResume(String done) {
+    return 'ఏమీ పోలేదు — $done నుంచి కొనసాగుతుంది.';
+  }
+
+  @override
+  String get visionModelFailedFresh =>
+      'సెటప్ పూర్తి కాలేదు. మీ కనెక్షన్ చూసి మళ్ళీ ప్రయత్నించండి.';
+
+  @override
+  String get visionModelRetry => 'మళ్ళీ ప్రయత్నించండి';
+
+  @override
+  String get visionModelChecking => 'సిద్ధమవుతోంది…';
+
+  @override
+  String get visionModelHint1 =>
+      'కెమెరాను మీ కౌంటర్‌పై ఉంచండి, అమ్ముడైనవి లెక్కిస్తుంది.';
+
+  @override
+  String get visionModelHint2 =>
+      'ఇన్‌స్టాల్ అయ్యాక పూర్తిగా ఆఫ్‌లైన్‌లో పని చేస్తుంది.';
+
+  @override
+  String get visionModelHint3 => 'ఇది ఒకసారి మాత్రమే చేయాలి.';
+
+  @override
+  String get visionModelSettingUp => 'మీ కౌంటర్ సిద్ధం చేస్తున్నాం';
 }
