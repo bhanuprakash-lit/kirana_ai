@@ -11566,6 +11566,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap a bar to see that period.'**
   String get forecastChartHint;
+
+  /// No description provided for @forecastNotReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast is still learning'**
+  String get forecastNotReadyTitle;
+
+  /// No description provided for @forecastNotReadyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep billing — predictions appear once there are a few days of sales.'**
+  String get forecastNotReadyHint;
 }
 
 class _AppLocalizationsDelegate

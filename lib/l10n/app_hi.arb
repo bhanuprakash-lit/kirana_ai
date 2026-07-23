@@ -1912,5 +1912,7 @@
   "forecastMetricStockouts": "स्टॉक खत्म होने का जोखिम",
   "forecastShowProducts": "उत्पाद सूची दिखाएँ",
   "forecastHideProducts": "उत्पाद सूची छिपाएँ",
-  "forecastChartHint": "किसी बार पर टैप करके वह अवधि देखें।"
+  "forecastChartHint": "किसी बार पर टैप करके वह अवधि देखें।",
+  "forecastNotReadyTitle": "पूर्वानुमान अभी सीख रहा है",
+  "forecastNotReadyHint": "बिलिंग जारी रखें — कुछ दिनों की बिक्री के बाद अनुमान दिखने लगेंगे।"
 }

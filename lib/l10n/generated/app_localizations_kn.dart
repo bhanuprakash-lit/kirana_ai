@@ -6546,4 +6546,11 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get forecastChartHint => 'ಆ ಅವಧಿಯನ್ನು ನೋಡಲು ಬಾರ್ ಒತ್ತಿರಿ.';
+
+  @override
+  String get forecastNotReadyTitle => 'ಮುನ್ಸೂಚನೆ ಇನ್ನೂ ಕಲಿಯುತ್ತಿದೆ';
+
+  @override
+  String get forecastNotReadyHint =>
+      'ಬಿಲ್ಲಿಂಗ್ ಮುಂದುವರಿಸಿ — ಕೆಲವು ದಿನಗಳ ಮಾರಾಟದ ನಂತರ ಮುನ್ಸೂಚನೆ ಕಾಣಿಸುತ್ತದೆ.';
 }

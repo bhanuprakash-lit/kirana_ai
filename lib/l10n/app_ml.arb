@@ -1912,5 +1912,7 @@
   "forecastMetricStockouts": "സ്റ്റോക്ക് തീരാനുള്ള സാധ്യത",
   "forecastShowProducts": "ഉൽപ്പന്ന പട്ടിക കാണിക്കുക",
   "forecastHideProducts": "ഉൽപ്പന്ന പട്ടിക മറയ്ക്കുക",
-  "forecastChartHint": "ആ കാലയളവ് കാണാൻ ബാറിൽ ടാപ്പ് ചെയ്യുക."
+  "forecastChartHint": "ആ കാലയളവ് കാണാൻ ബാറിൽ ടാപ്പ് ചെയ്യുക.",
+  "forecastNotReadyTitle": "പ്രവചനം ഇപ്പോഴും പഠിക്കുന്നു",
+  "forecastNotReadyHint": "ബില്ലിംഗ് തുടരുക — കുറച്ച് ദിവസത്തെ വിൽപ്പനയ്ക്ക് ശേഷം പ്രവചനങ്ങൾ കാണാം."
 }

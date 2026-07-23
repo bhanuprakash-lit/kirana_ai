@@ -1912,5 +1912,7 @@
   "forecastMetricStockouts": "இருப்பு தீரும் அபாயம்",
   "forecastShowProducts": "பொருட்கள் பட்டியலைக் காட்டு",
   "forecastHideProducts": "பொருட்கள் பட்டியலை மறை",
-  "forecastChartHint": "அந்தக் காலத்தைப் பார்க்க பட்டியைத் தட்டவும்."
+  "forecastChartHint": "அந்தக் காலத்தைப் பார்க்க பட்டியைத் தட்டவும்.",
+  "forecastNotReadyTitle": "முன்னறிவிப்பு இன்னும் கற்கிறது",
+  "forecastNotReadyHint": "பில்லிங்கைத் தொடருங்கள் — சில நாட்கள் விற்பனைக்குப் பிறகு கணிப்புகள் தோன்றும்."
 }

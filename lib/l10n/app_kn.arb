@@ -1912,5 +1912,7 @@
   "forecastMetricStockouts": "ಸ್ಟಾಕ್ ಮುಗಿಯುವ ಅಪಾಯ",
   "forecastShowProducts": "ಉತ್ಪನ್ನಗಳ ಪಟ್ಟಿ ತೋರಿಸಿ",
   "forecastHideProducts": "ಉತ್ಪನ್ನಗಳ ಪಟ್ಟಿ ಮರೆಮಾಡಿ",
-  "forecastChartHint": "ಆ ಅವಧಿಯನ್ನು ನೋಡಲು ಬಾರ್ ಒತ್ತಿರಿ."
+  "forecastChartHint": "ಆ ಅವಧಿಯನ್ನು ನೋಡಲು ಬಾರ್ ಒತ್ತಿರಿ.",
+  "forecastNotReadyTitle": "ಮುನ್ಸೂಚನೆ ಇನ್ನೂ ಕಲಿಯುತ್ತಿದೆ",
+  "forecastNotReadyHint": "ಬಿಲ್ಲಿಂಗ್ ಮುಂದುವರಿಸಿ — ಕೆಲವು ದಿನಗಳ ಮಾರಾಟದ ನಂತರ ಮುನ್ಸೂಚನೆ ಕಾಣಿಸುತ್ತದೆ."
 }

@@ -6524,4 +6524,11 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get forecastChartHint => 'तो कालावधी पाहण्यासाठी बारवर टॅप करा.';
+
+  @override
+  String get forecastNotReadyTitle => 'अंदाज अजून शिकत आहे';
+
+  @override
+  String get forecastNotReadyHint =>
+      'बिलिंग सुरू ठेवा — काही दिवसांच्या विक्रीनंतर अंदाज दिसू लागतील.';
 }

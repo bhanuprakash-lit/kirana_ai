@@ -6597,4 +6597,11 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get forecastChartHint =>
       'அந்தக் காலத்தைப் பார்க்க பட்டியைத் தட்டவும்.';
+
+  @override
+  String get forecastNotReadyTitle => 'முன்னறிவிப்பு இன்னும் கற்கிறது';
+
+  @override
+  String get forecastNotReadyHint =>
+      'பில்லிங்கைத் தொடருங்கள் — சில நாட்கள் விற்பனைக்குப் பிறகு கணிப்புகள் தோன்றும்.';
 }

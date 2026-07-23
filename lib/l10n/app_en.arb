@@ -3648,5 +3648,7 @@
   "forecastMetricStockouts": "Stock-out risk",
   "forecastShowProducts": "Show product list",
   "forecastHideProducts": "Hide product list",
-  "forecastChartHint": "Tap a bar to see that period."
+  "forecastChartHint": "Tap a bar to see that period.",
+  "forecastNotReadyTitle": "Forecast is still learning",
+  "forecastNotReadyHint": "Keep billing — predictions appear once there are a few days of sales."
 }

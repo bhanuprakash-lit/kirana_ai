@@ -1912,5 +1912,7 @@
   "forecastMetricStockouts": "స్టాక్ అయిపోయే ప్రమాదం",
   "forecastShowProducts": "ఉత్పత్తుల జాబితా చూపించు",
   "forecastHideProducts": "ఉత్పత్తుల జాబితా దాచు",
-  "forecastChartHint": "ఆ కాలాన్ని చూడటానికి బార్‌ను నొక్కండి."
+  "forecastChartHint": "ఆ కాలాన్ని చూడటానికి బార్‌ను నొక్కండి.",
+  "forecastNotReadyTitle": "అంచనా ఇంకా నేర్చుకుంటోంది",
+  "forecastNotReadyHint": "బిల్లింగ్ కొనసాగించండి — కొన్ని రోజుల అమ్మకాల తర్వాత అంచనాలు కనిపిస్తాయి."
 }

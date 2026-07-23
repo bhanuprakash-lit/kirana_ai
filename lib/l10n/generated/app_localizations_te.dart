@@ -6515,4 +6515,11 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get forecastChartHint => 'ఆ కాలాన్ని చూడటానికి బార్‌ను నొక్కండి.';
+
+  @override
+  String get forecastNotReadyTitle => 'అంచనా ఇంకా నేర్చుకుంటోంది';
+
+  @override
+  String get forecastNotReadyHint =>
+      'బిల్లింగ్ కొనసాగించండి — కొన్ని రోజుల అమ్మకాల తర్వాత అంచనాలు కనిపిస్తాయి.';
 }

@@ -6593,4 +6593,11 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get forecastChartHint => 'ആ കാലയളവ് കാണാൻ ബാറിൽ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get forecastNotReadyTitle => 'പ്രവചനം ഇപ്പോഴും പഠിക്കുന്നു';
+
+  @override
+  String get forecastNotReadyHint =>
+      'ബില്ലിംഗ് തുടരുക — കുറച്ച് ദിവസത്തെ വിൽപ്പനയ്ക്ക് ശേഷം പ്രവചനങ്ങൾ കാണാം.';
 }
