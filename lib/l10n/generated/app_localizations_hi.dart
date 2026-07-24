@@ -3578,6 +3578,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get wtySearchSerials => 'सीरियल / IMEI या उत्पाद खोजें';
 
   @override
+  String get wtyPickerSearchHint => 'सीरियल / IMEI खोजें';
+
+  @override
   String get wtyNoSerials =>
       'अभी कोई सीरियल पंजीकृत नहीं। चेकआउट पर या नीचे दिए बटन से सीरियल जोड़ें।';
 

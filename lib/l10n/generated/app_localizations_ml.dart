@@ -3694,6 +3694,9 @@ class AppLocalizationsMl extends AppLocalizations {
   String get wtySearchSerials => 'സീരിയൽ / IMEI അല്ലെങ്കിൽ ഉൽപ്പന്നം തിരയുക';
 
   @override
+  String get wtyPickerSearchHint => 'സീരിയൽ / IMEI തിരയുക';
+
+  @override
   String get wtyNoSerials =>
       'ഇതുവരെ സീരിയലുകളൊന്നും രജിസ്റ്റർ ചെയ്തിട്ടില്ല. ചെക്ക്ഔട്ടിലോ താഴെയുള്ള ബട്ടൺ ഉപയോഗിച്ചോ സീരിയലുകൾ ചേർക്കുക.';
 

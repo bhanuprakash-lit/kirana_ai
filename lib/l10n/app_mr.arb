@@ -1053,6 +1053,7 @@
   "wtyNewClaim": "नवीन क्लेम",
   "wtyAddSerial": "सीरियल जोडा",
   "wtySearchSerials": "सीरियल / IMEI किंवा उत्पादन शोधा",
+  "wtyPickerSearchHint": "सीरियल / IMEI शोधा",
   "wtyNoSerials": "अजून सीरियल नोंदवलेले नाहीत. चेकआउटवर किंवा खालील बटणाने सीरियल जोडा.",
   "wtyAll": "सर्व",
   "wtyInStock": "स्टॉकमध्ये",

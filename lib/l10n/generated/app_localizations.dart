@@ -6444,6 +6444,12 @@ abstract class AppLocalizations {
   /// **'Search serial / IMEI or product'**
   String get wtySearchSerials;
 
+  /// No description provided for @wtyPickerSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search serial / IMEI'**
+  String get wtyPickerSearchHint;
+
   /// No description provided for @wtyNoSerials.
   ///
   /// In en, this message translates to:

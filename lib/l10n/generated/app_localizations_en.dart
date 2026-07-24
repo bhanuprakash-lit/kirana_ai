@@ -3649,6 +3649,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wtySearchSerials => 'Search serial / IMEI or product';
 
   @override
+  String get wtyPickerSearchHint => 'Search serial / IMEI';
+
+  @override
   String get wtyNoSerials =>
       'No serials registered yet. Add serials at checkout or with the button below.';
 

@@ -3696,6 +3696,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get wtySearchSerials => 'சீரியல் / IMEI அல்லது பொருளைத் தேடு';
 
   @override
+  String get wtyPickerSearchHint => 'சீரியல் / IMEI தேடு';
+
+  @override
   String get wtyNoSerials =>
       'இன்னும் சீரியல்கள் பதிவு செய்யப்படவில்லை. செக்அவுட்டில் அல்லது கீழே உள்ள பொத்தானால் சீரியல்களைச் சேர்க்கவும்.';
 

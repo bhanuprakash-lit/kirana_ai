@@ -3636,6 +3636,9 @@ class AppLocalizationsTe extends AppLocalizations {
   String get wtySearchSerials => 'సీరియల్ / IMEI లేదా ఉత్పత్తిని వెతకండి';
 
   @override
+  String get wtyPickerSearchHint => 'సీరియల్ / IMEI వెతకండి';
+
+  @override
   String get wtyNoSerials =>
       'ఇంకా సీరియల్స్ నమోదు కాలేదు. చెక్అవుట్‌లో లేదా క్రింది బటన్‌తో సీరియల్స్ జోడించండి.';
 

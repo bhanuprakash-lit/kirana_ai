@@ -3662,6 +3662,9 @@ class AppLocalizationsKn extends AppLocalizations {
   String get wtySearchSerials => 'ಸೀರಿಯಲ್ / IMEI ಅಥವಾ ಉತ್ಪನ್ನ ಹುಡುಕಿ';
 
   @override
+  String get wtyPickerSearchHint => 'ಸೀರಿಯಲ್ / IMEI ಹುಡುಕಿ';
+
+  @override
   String get wtyNoSerials =>
       'ಇನ್ನೂ ಯಾವುದೇ ಸೀರಿಯಲ್ ನೋಂದಾಯಿಸಿಲ್ಲ. ಚೆಕ್‌ಔಟ್‌ನಲ್ಲಿ ಅಥವಾ ಕೆಳಗಿನ ಬಟನ್‌ನಿಂದ ಸೀರಿಯಲ್‌ಗಳನ್ನು ಸೇರಿಸಿ.';
 

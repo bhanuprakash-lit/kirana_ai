@@ -353,12 +353,8 @@ class _WarrantyScreenState extends ConsumerState<WarrantyScreen>
     );
   }
 
-  String _statusLabel(AppLocalizations l10n, String? st) => switch (st) {
-    null => l10n.wtyAll,
-    'in_stock' => l10n.wtyInStock,
-    'sold' => l10n.wtySold,
-    _ => st,
-  };
+  String _statusLabel(AppLocalizations l10n, String? st) =>
+      _serialStatusLabel(l10n, st);
 
   /// Register a serial/IMEI outside checkout (e.g. warehouse intake): pick the
   /// product (or scan), type the serial (or scan).
@@ -630,6 +626,16 @@ class _AddSerialSheetState extends ConsumerState<_AddSerialSheet> {
 
 /// Searchable serial/IMEI picker for the new-claim flow. Sold serials first
 /// (those are what get claimed). Returns the chosen serial row, or null.
+/// Human, localized label for a serial's status. Shared by the serials list
+/// and the picker sheet. Falls back to the raw value for statuses we don't yet
+/// have a translation for (e.g. a future 'claimed'/'returned').
+String _serialStatusLabel(AppLocalizations l10n, String? st) => switch (st) {
+  null => l10n.wtyAll,
+  'in_stock' => l10n.wtyInStock,
+  'sold' => l10n.wtySold,
+  _ => st,
+};
+
 class _SerialPickerSheet extends StatefulWidget {
   final List<Map<String, dynamic>> serials;
   const _SerialPickerSheet({required this.serials});
@@ -650,6 +656,7 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final sorted = [...widget.serials]
       ..sort((a, b) {
         final aSold = (a['status'] == 'sold') ? 0 : 1;
@@ -699,7 +706,7 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
                   autofocus: true,
                   onChanged: (v) => setState(() => _query = v),
                   decoration: InputDecoration(
-                    hintText: 'Search serial / IMEI',
+                    hintText: l10n.wtyPickerSearchHint,
                     prefixIcon: const Icon(
                       Icons.search_rounded,
                       size: 20,
@@ -721,10 +728,10 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
               const SizedBox(height: 8),
               Expanded(
                 child: filtered.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'No serials registered.',
-                          style: TextStyle(color: BrandColors.muted),
+                          l10n.wtyNoSerials,
+                          style: const TextStyle(color: BrandColors.muted),
                         ),
                       )
                     : ListView.builder(
@@ -745,7 +752,9 @@ class _SerialPickerSheetState extends State<_SerialPickerSheet> {
                               ),
                             ),
                             subtitle: Text(
-                              'status: ${s['status'] ?? "in_stock"}',
+                              _serialStatusLabel(
+                                l10n, s['status']?.toString() ?? 'in_stock',
+                              ),
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: BrandColors.muted,
